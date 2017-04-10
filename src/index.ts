@@ -11,10 +11,6 @@ import {create as createApp} from './app';
 import {create as createHeader, AppHeaderLink} from 'phovea_ui/src/header';
 import {APP_NAME} from './language';
 
-createHeader(
-  <HTMLElement>document.querySelector('#caleydoHeader'),
-  { appLink: new AppHeaderLink(APP_NAME) }
-);
 
 const parent = document.querySelector('#app');
 createApp(parent).init();
