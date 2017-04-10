@@ -1,0 +1,39 @@
+{
+  "generator-phovea": {
+    "type": "app",
+    "app": "Valid",
+    "clientOnly": true,
+    "entries": {
+      "app": "./src/index.ts"
+    },
+    "libraries": [
+      "d3",
+      "jquery",
+      "jqueryui",
+      "font-awesome",
+      "bootstrap"
+    ],
+    "modules": [
+      "phovea_core",
+      "phovea_d3",
+      "phovea_ui"
+    ],
+    "libraryAliases": {
+      "d3": "d3/d3"
+    },
+    "libraryExternals": [
+      "d3",
+      "jquery",
+      "jqueryui",
+      "font-awesome",
+      "bootstrap",
+      "bootstrap-sass"
+    ],
+    "ignores": [],
+    "extensions": [],
+    "name": "valid",
+    "author": "Florian Grassinger",
+    "today": "Mon, 10 Apr 2017 08:54:58 GMT",
+    "githubAccount": "VALIDproject"
+  }
+}
