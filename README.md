@@ -1,4 +1,4 @@
-valid [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+valid [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url]
 =====================
 
 Visually exploring flows in weighted dynamic networks for data journalists.
@@ -40,3 +40,9 @@ npm start
 
 ***
 For more Information about the setup process and general Workflow visit the WIKI of this repository.
+
+
+[phovea-image]: https://img.shields.io/badge/Phovea-Application-1BA64E.svg
+[phovea-url]: https://phovea.caleydo.org
+[npm-image]: https://badge.fury.io/js/taco.svg
+[npm-url]: https://npmjs.org/package/taco
