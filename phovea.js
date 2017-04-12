@@ -8,7 +8,9 @@
 module.exports = function(registry) {
   //registry.push('extension-type', 'extension-id', function() { return System.import('./src/extension_impl'); }, {});
   // generator-phovea:begin
-
+  registry.push('app', 'valid', function() { return System.import('./src/'); }, {
+    'name': 'VALID'
+  });
   // generator-phovea:end
 };
 
