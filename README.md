@@ -1,4 +1,4 @@
-valid [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm-url]
+VALiD Dynamic Network Flows  [![Phovea][phovea-image]][phovea-url] <!-- [![NPM version][npm-image]][npm-url] -->
 =====================
 
 Visually exploring flows in weighted dynamic networks for data journalists.
@@ -37,9 +37,10 @@ To start the application execute this command or use the npm scripts (more Infor
 ```
 npm start
 ```
+Test the application on a local webserver at http://127.0.0.1:8080/
 
 ***
-For more Information about the setup process and general Workflow visit the WIKI of this repository.
+For more Information about the setup process and general Workflow visit the [WIKI](https://github.com/VALIDproject/DyNetFlowVis/wiki/Get-Started) of this repository.
 
 
 [phovea-image]: https://img.shields.io/badge/Phovea-Application-1BA64E.svg
