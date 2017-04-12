@@ -20,12 +20,9 @@ var App = (function () {
          */
         this.views = [
             {
-                view: 'Example',
-                parent: 'app',
-                options: {
-                    cssClass: 'test',
-                    eventName: 'testEvent'
-                }
+                view: 'sankey',
+                parent: 'dataVizView',
+                options: {}
             }
         ];
         this.$node = d3.select(parent);
