@@ -11,6 +11,10 @@ module.exports = function(registry) {
   registry.push('app', 'valid', function() { return System.import('./src/'); }, {
     'name': 'VALID'
   });
+
+  registry.push('validView', 'SankeyDiagram', function() { return System.import('./src/sankey_diagram'); }, {
+    'name': 'SankeyDiagram'
+  });
   // generator-phovea:end
 };
 

@@ -8,6 +8,7 @@
 import * as d3 from 'd3';
 import * as plugins from 'phovea_core/src/plugin';
 import {HELLO_WORLD} from './language';
+import {AppConstants} from './app_constants';
 
 /**
  * Interface for all valid views
@@ -48,8 +49,16 @@ export class App implements MAppViews {
    * @type {[{view: string; parent: string; options: {cssClass: string; eventName: string}}]}
    */
   private views:MAppViewsDesc[] = [
+    /**
+     * {
+     *  view: 'ClassNameOfView',
+     *  parent: 'Name of parent view',
+     *  options: { leave empty if not needed }
+     * }
+     */
+
     {
-      view: 'sankey',
+      view: 'SankeyDiagram',
       parent: 'dataVizView',
       options: {}
     }
@@ -90,7 +99,7 @@ export class App implements MAppViews {
 
     // wrap view ids from package.json as plugin and load the necessary files
     const pluginPromises = this.views
-      .map((d) => plugins.get('validView', d.view))
+      .map((d) => plugins.get(AppConstants.VIEW, d.view))
       .filter((d) => d !== undefined) // filter views that does not exists
       .map((d) => d.load());
 

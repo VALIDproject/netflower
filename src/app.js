@@ -6,6 +6,7 @@
  */
 import * as d3 from 'd3';
 import * as plugins from 'phovea_core/src/plugin';
+import { AppConstants } from './app_constants';
 /**
  * The main class for the Valid app
  */
@@ -19,8 +20,15 @@ var App = (function () {
          * @type {[{view: string; parent: string; options: {cssClass: string; eventName: string}}]}
          */
         this.views = [
+            /**
+             * {
+             *  view: 'ClassNameOfView',
+             *  parent: 'Name of parent view',
+             *  options: { leave empty if not needed }
+             * }
+             */
             {
-                view: 'sankey',
+                view: 'SankeyDiagram',
                 parent: 'dataVizView',
                 options: {}
             }
@@ -55,7 +63,7 @@ var App = (function () {
         this.setBusy(true); // show loading indicator before loading
         // wrap view ids from package.json as plugin and load the necessary files
         var pluginPromises = this.views
-            .map(function (d) { return plugins.get('validView', d.view); })
+            .map(function (d) { return plugins.get(AppConstants.VIEW, d.view); })
             .filter(function (d) { return d !== undefined; }) // filter views that does not exists
             .map(function (d) { return d.load(); });
         // when everything is loaded, then create and init the views
