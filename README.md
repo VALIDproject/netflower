@@ -9,7 +9,7 @@ Open your Git Bash or Commandline tool and navigate to the preferred working dir
 There execute the following commands, which will clone the latest version and install all dependencies.
 
 ```
-git clone https://github.com/VALIDproject/valid.git
+https://github.com/VALIDproject/DyNetFlowVis.git
 cd valid
 npm install
 ```
