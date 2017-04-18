@@ -12,9 +12,7 @@ class ValidHeader implements MAppViews {
   private $node;
 
  constructor(parent: Element, private options: any) {
-    this.$node = d3.select('#validHeader')
-      .append('div')
-      .classed('logo', true);
+    this.$node = d3.select('#validHeader');
   }
 
   /**
@@ -35,6 +33,20 @@ class ValidHeader implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
+
+    console.log(this.$node);
+    this.$node.html(` 
+    <div class="logo"></div>    
+    <div id="socialMedia">
+    <p>Project Website: <a href="http://www.validproject.at/">http://www.validproject.at</a></p>
+    <p>Twitter  </p>
+    <p>Github  </p>
+    <i class="fa fa-camera-retro fa-5x"></i>
+    
+    </div>`);
+
+
+
 
   }
 
