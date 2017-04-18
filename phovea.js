@@ -12,6 +12,10 @@ module.exports = function(registry) {
     'name': 'VALID'
   });
 
+   registry.push('validView', 'Valid_header', function() { return System.import('./src/valid_header'); }, {
+    'name': 'Valid_header'
+  });
+
   registry.push('validView', 'SankeyDiagram', function() { return System.import('./src/sankey_diagram'); }, {
     'name': 'SankeyDiagram'
   });

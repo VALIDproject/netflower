@@ -1,4 +1,7 @@
 /**
+ * Created by cniederer on 18.04.17.
+ */
+/**
  * Created by Florian on 12.04.2017.
  */
 
@@ -6,14 +9,14 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import {MAppViews} from './app';
 
-class SankeyDiagram implements MAppViews {
+class Valid_header implements MAppViews {
 
   private $node;
 
-  constructor(parent: Element, private options: any) {
-    this.$node = d3.select(parent)
+ constructor(parent: Element, private options: any) {  
+    this.$node = d3.select('#validHeader')
       .append('div')
-      .classed('sankey_diagram', true);
+      .classed('logo', true);
   }
 
   /**
@@ -41,6 +44,7 @@ class SankeyDiagram implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+
   }
 
 }
@@ -52,5 +56,5 @@ class SankeyDiagram implements MAppViews {
  * @returns {SankeyDiagram}
  */
 export function create(parent: Element, options: any) {
-  return new SankeyDiagram(parent, options);
+  return new Valid_header(parent, options);
 }
