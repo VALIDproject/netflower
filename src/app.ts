@@ -65,6 +65,7 @@ export class App implements MAppViews {
   ];
 
   constructor(parent:Element) {
+    d3.select('#app').append('div').attr('id', '#validHeader');
     this.$node = d3.select(parent);
 
     this.$node.append('div').classed('dataLoadingView', true);
