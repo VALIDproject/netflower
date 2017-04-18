@@ -1,19 +1,17 @@
 /**
  * Created by cniederer on 18.04.17.
  */
-/**
- * Created by Florian on 12.04.2017.
- */
+
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import {MAppViews} from './app';
 
-class Valid_header implements MAppViews {
+class ValidHeader implements MAppViews {
 
   private $node;
 
- constructor(parent: Element, private options: any) {  
+ constructor(parent: Element, private options: any) {
     this.$node = d3.select('#validHeader')
       .append('div')
       .classed('logo', true);
@@ -22,7 +20,7 @@ class Valid_header implements MAppViews {
   /**
    * Initialize the view and return a promise
    * that is resolved as soon the view is completely initialized.
-   * @returns {Promise<SankeyDiagram>}
+   * @returns {Promise<ValidHeader>}
    */
   init() {
     this.build();
@@ -50,11 +48,11 @@ class Valid_header implements MAppViews {
 }
 
 /**
- * Factory method to create a new SankeyDiagram instance
+ * Factory method to create a new ValidHeader instance
  * @param parent
  * @param options
- * @returns {SankeyDiagram}
+ * @returns {ValidHeader}
  */
 export function create(parent: Element, options: any) {
-  return new Valid_header(parent, options);
+  return new ValidHeader(parent, options);
 }
