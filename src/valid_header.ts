@@ -33,8 +33,6 @@ class ValidHeader implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-
-    console.log(this.$node);
     this.$node.html(` 
     <div class="logo"></div>
        
@@ -44,20 +42,12 @@ class ValidHeader implements MAppViews {
         <p><a href="http://www.validproject.at/" target ="blank"><i class="fa fa-globe fa-2x" id="web"></i></a></p>       
     </div>    
     `);
-
-
-
-
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
-
-    this.$node.select('.fh');
-
-
 
   }
 
