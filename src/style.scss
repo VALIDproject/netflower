@@ -20,7 +20,8 @@
   height:80px;
   background-color: $background-color;
   padding:10px;
- }
+  border-bottom: 2px solid $border-color;
+}
 
 .logo {
   float:left;
@@ -34,18 +35,20 @@
 }
 
 #socialMedia {
-      float:right;
-      z-index: 1000000;
-      //background-color:red;
-      height:80px;
-      margin-left: auto;
-      margin-right: 20px;
-      width:30%;
+  float:right;
+  z-index: 1000000;
+  //background-color:red;
+  height:80px;
+  margin-left: auto;
+  margin-right: 20px;
+  width:30%;
+
 }
 
 #socialMedia p {
   float:right;
-  margin: 5px;
+  padding: 15px;
+
 }
 
 

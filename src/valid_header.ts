@@ -38,11 +38,9 @@ class ValidHeader implements MAppViews {
     this.$node.html(` 
     <div class="logo"></div>    
     <div id="socialMedia">
-    <p>Project Website: <a href="http://www.validproject.at/">http://www.validproject.at</a></p>
-    <p>Twitter  </p>
-    <p>Github  </p>
-    <i class="fa fa-camera-retro"></i>
-    
+        <p><a href="https://twitter.com/valid_at"><i class="fa fa-twitter-square fa-2x" target ="blank"></i></a> </p>
+        <p><a href="https://github.com/VALIDproject" target="blank"> <i class="fa fa-github fa-2x"></i></a> </p>  
+        <p><a href="http://www.validproject.at/"><i class="fa fa-globe fa-2x"></i></a></p>
     </div>`);
 
 
