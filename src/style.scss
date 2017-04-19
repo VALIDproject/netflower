@@ -31,7 +31,8 @@
   //background: rgba(255, 255, 255, 0.26) url('media/Valid_Logo.jpg');
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
-  background-size: 140px;
+  background-size: 300px;
+  margin-top:10px;
 }
 
 #socialMedia {
@@ -50,5 +51,14 @@
   padding: 15px;
 
 }
+
+#web {
+  color:$font-color;
+}
+
+#web:hover {
+  color:$icon-hover;
+}
+
 
 
