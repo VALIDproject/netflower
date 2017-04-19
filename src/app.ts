@@ -56,7 +56,11 @@ export class App implements MAppViews {
      *  options: { leave empty if not needed }
      * }
      */
-
+    {
+      view: 'ValidHeader',
+      parent: 'app',
+      options: {},
+    },
     {
       view: 'SankeyDiagram',
       parent: 'dataVizView',

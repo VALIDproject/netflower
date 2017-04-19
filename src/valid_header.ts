@@ -1,28 +1,24 @@
 /**
  * Created by cniederer on 18.04.17.
  */
-/**
- * Created by Florian on 12.04.2017.
- */
+
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import {MAppViews} from './app';
 
-class Valid_header implements MAppViews {
+class ValidHeader implements MAppViews {
 
   private $node;
 
- constructor(parent: Element, private options: any) {  
-    this.$node = d3.select('#validHeader')
-      .append('div')
-      .classed('logo', true);
+ constructor(parent: Element, private options: any) {
+    this.$node = d3.select('#validHeader');
   }
 
   /**
    * Initialize the view and return a promise
    * that is resolved as soon the view is completely initialized.
-   * @returns {Promise<SankeyDiagram>}
+   * @returns {Promise<ValidHeader>}
    */
   init() {
     this.build();
@@ -37,7 +33,15 @@ class Valid_header implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-
+    this.$node.html(` 
+    <div class="logo"></div>
+       
+    <div id="socialMedia">
+        <p><a href="https://twitter.com/valid_at" target ="blank"><i class="fa fa-twitter-square fa-2x" id="web" ></i></a> </p>
+        <p><a href="https://github.com/VALIDproject" target="blank"> <i class="fa fa-github fa-2x" id="web"></i></a> </p>  
+        <p><a href="http://www.validproject.at/" target ="blank"><i class="fa fa-globe fa-2x" id="web"></i></a></p>       
+    </div>    
+    `);
   }
 
   /**
@@ -50,11 +54,11 @@ class Valid_header implements MAppViews {
 }
 
 /**
- * Factory method to create a new SankeyDiagram instance
+ * Factory method to create a new ValidHeader instance
  * @param parent
  * @param options
- * @returns {SankeyDiagram}
+ * @returns {ValidHeader}
  */
 export function create(parent: Element, options: any) {
-  return new Valid_header(parent, options);
+  return new ValidHeader(parent, options);
 }
