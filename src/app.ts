@@ -61,6 +61,21 @@ export class App implements MAppViews {
       parent: 'app',
       options: {},
     },
+     {
+      view: 'Filter',
+      parent: 'dataVizView',
+      options: {}
+    },
+    {
+      view: 'GlobalSettings',
+      parent: 'dataVizView',
+      options: {}
+    },
+    {
+      view: 'SankeyFeatures',
+      parent: 'dataVizView',
+      options: {}
+    },
     {
       view: 'SankeyDiagram',
       parent: 'dataVizView',

@@ -15,6 +15,18 @@ module.exports = function(registry) {
    registry.push('validView', 'ValidHeader', function() { return System.import('./src/valid_header'); }, {
     'name': 'ValidHeader'
   });
+  
+  registry.push('validView', 'Filter', function() { return System.import('./src/filter'); }, {
+    'name': 'Filter'
+  });
+  
+  registry.push('validView', 'GlobalSettings', function() { return System.import('./src/global_settings'); }, {
+    'name': 'GlobalSettings'
+  });
+  
+  registry.push('validView', 'SankeyFeatures', function() { return System.import('./src/sankey_features'); }, {
+    'name': 'SankeyFeatures'
+  });
 
   registry.push('validView', 'SankeyDiagram', function() { return System.import('./src/sankey_diagram'); }, {
     'name': 'SankeyDiagram'

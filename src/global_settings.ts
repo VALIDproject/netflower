@@ -1,19 +1,19 @@
 /**
- * Created by Florian on 12.04.2017.
+ * Created by Christina on 21.04.2017.
  */
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import {MAppViews} from './app';
 
-class SankeyDiagram implements MAppViews {
+class GlobalSettings implements MAppViews {
 
   private $node;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
       .append('div')
-      .classed('sankey_diagram', true);
+      .classed('global_settings', true);
   }
 
   /**
@@ -34,9 +34,6 @@ class SankeyDiagram implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    this.$node.append('div').attr('class', 'left_bars');
-    this.$node.append('div').attr('class', 'sankey_vis');
-    this.$node.append('div').attr('class', 'right_bars');   
 
   }
 
@@ -55,5 +52,5 @@ class SankeyDiagram implements MAppViews {
  * @returns {SankeyDiagram}
  */
 export function create(parent: Element, options: any) {
-  return new SankeyDiagram(parent, options);
+  return new GlobalSettings(parent, options);
 }
