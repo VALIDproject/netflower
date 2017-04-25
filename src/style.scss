@@ -67,7 +67,7 @@
   display: flex;
   height: 760px;
   width: 80%;
-  border: 2px solid black;
+  border: 1px solid black;
   position: absolute;
   top: 250px;
   right: 10px;
@@ -129,4 +129,14 @@
 .heading {
   padding:5px;
   font-size: 16px;
+}
+
+.global_settings {
+  width: 16%;
+  height: 810px;
+  position:absolute;
+  top: 200px;
+  left:10px;
+  border: 1px solid black;
+
 }
