@@ -77,9 +77,14 @@ export class App implements MAppViews {
       options: {}
     },
     {
+      view: 'DataImport',
+      parent: 'dataLoadingView',
+      options: {},
+    },
+    {
       view: 'SankeyDiagram',
       parent: 'dataVizView',
-      options: {}
+      options: {},
     }
   ];
 

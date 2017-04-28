@@ -12,7 +12,7 @@ module.exports = function(registry) {
     'name': 'VALID'
   });
 
-   registry.push('validView', 'ValidHeader', function() { return System.import('./src/valid_header'); }, {
+  registry.push('validView', 'ValidHeader', function() { return System.import('./src/valid_header'); }, {
     'name': 'ValidHeader'
   });
   
@@ -26,6 +26,10 @@ module.exports = function(registry) {
   
   registry.push('validView', 'SankeyFeatures', function() { return System.import('./src/sankey_features'); }, {
     'name': 'SankeyFeatures'
+  });
+
+  registry.push('validView', 'DataImport', function() { return System.import('./src/data_import'); }, {
+    'name': 'DataImport'
   });
 
   registry.push('validView', 'SankeyDiagram', function() { return System.import('./src/sankey_diagram'); }, {
