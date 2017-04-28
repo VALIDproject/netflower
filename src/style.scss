@@ -30,7 +30,7 @@
 .logo {
   float:left;
   width: 40%;
-  height: 800px;
+  height: 100px;
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
   background-size: 300px;
@@ -53,9 +53,25 @@
 }
 
 #web {
-  color:$font-color;
+  color: $valid-color;
 
   &:hover {
-    color:$icon-hover;
+    color: $icon-hover;
   }
+}
+
+.fileContainer {
+  width: 50%;
+  height: 0;
+  margin-left: 25%;
+  padding-top: 15%;
+}
+
+.btn-primary {
+  background-color: $valid-color !important;
+  border: none;
+}
+
+.scrollArea {
+  overflow: auto;
 }

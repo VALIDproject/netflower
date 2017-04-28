@@ -73,7 +73,6 @@
     "@types/papaparse": "^4.1.28",
     "bootstrap-sass": "3.3.7",
     "d3": "3.5.17",
-    "filedrop": "^2.0.0",
     "font-awesome": "4.6.3",
     "jquery": "3.1.1",
     "jqueryui": "1.11.1",
