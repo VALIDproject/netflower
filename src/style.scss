@@ -15,9 +15,6 @@
   flex-direction: column;
   //margin: 55px 20px 50px;
   // min-height: 100vh;
-
-
-
 }
 
 .invisibleClass {
@@ -28,32 +25,32 @@
   position: fixed;
   z-index: 100000;
   width: 100%;
-  height:80px;
+  height: 80px;
   background-color: $background-color;
-  padding:10px;
+  padding: 10px;
   border-bottom: 2px solid $border-color;
 }
 
 .logo {
-  float:left;
+  float: left;
   width: 40%;
   height: 100px;
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
   background-size: 300px;
-  margin-top:10px;
+  margin-top: 10px;
 }
 
 #socialMedia {
-  float:right;
+  float: right;
   z-index: 1000000;
-  height:80px;
+  height: 80px;
   margin-left: auto;
   margin-right: 20px;
-  width:30%;
+  width: 30%;
 
   p {
-    float:right;
+    float: right;
     padding: 15px;
   }
 
@@ -66,4 +63,93 @@
     color: $icon-hover;
   }
 }
+
+.fileContainer {
+  width: 50%;
+  height: 0;
+  margin-left: 25%;
+  padding-top: 15%;
+}
+
+.btn-primary {
+  background-color: $valid-color !important;
+  border: none;
+}
+
+.scrollArea {
+  overflow: auto;
+}
+
+.sankey_diagram {
+  display: flex;
+  height: 760px;
+  width: 80%;
+  border: 1px solid black;
+  position: absolute;
+  top: 250px;
+  right: 10px;
+  margin-bottom: 20px;
+  margin-right: 10px;
+}
+
+.left_bars {
+  border: 1px solid grey;
+  width: 10%;
+  float: right;
+  height: 100%;
+}
+
+
+.sankey_vis {
+  float: right;
+  border: 1px solid grey;
+  width: 80%;
+  height: 100%;
+}
+
+.right_bars {
+  float: right;
+  height: 100%;
+  border: 1px solid grey;
+  width: 10%;
+}
+
+/*.global_settings {
+  float:left;
+  background-color: grey;
+  width: 25%;
+}*/
+
+.filter {
+  border: 1px solid grey;
+  width: 100%;
+  height: 100px;
+  position: absolute;
+  top: 85px;
+  right: 10px;
+}
+
+
+.sankey_features{
+  //background-color: yellow;
+  border: 1px solid grey;
+  width: 80%;
+  height: 50px;
+  position: absolute;
+  top: 200px;
+  right: 20px;
+}
+
+.heading {
+  padding: 5px;
+  font-size: 16px;
+}
+
+.global_settings {
+  width: 16%;
+  height: 810px;
+  position: absolute;
+  top: 200px;
+  left: 10px;
+  border: 1px solid black;
 }
