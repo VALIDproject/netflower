@@ -6,7 +6,8 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
-import 'imports-loader?d3=d3!../lib/sankey.js';
+// import 'imports-loader?d3=d3!../lib/sankey.js';
+import {tableToJSON} from './utilities';
 import {MAppViews} from './app';
 
 //TODO (F & N): Fire event while file is loading that enables the busy view.
@@ -18,11 +19,12 @@ class DataImport implements MAppViews {
 
   private $node: d3.Selection<any>;
   private $dropZoneCont: d3.Selection<any>;
+  private $logCont: d3.Selection<any>;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
       .append('div')
-      .classed('data_import', true);
+      .classed('dataImport', true);
   }
 
   /**
@@ -63,6 +65,14 @@ class DataImport implements MAppViews {
     </div>
     `);
 
+    d3.select('.dataImport').append('div')
+      .classed('logContainer', true)
+      .append('h3')
+      .text('Log:');
+
+    d3.select('.logContainer').append('div')
+      .classed('well', true)
+      .classed('errorLog', true);
   }
 
   /**
@@ -81,6 +91,10 @@ class DataImport implements MAppViews {
       });
   }
 
+  /**
+   * The functino is called upon the upload button is clicked and it parses the file further.
+   * @param filesInput The file input element
+   */
   private handleFileUpload(filesInput) {
     papaparse.parse(filesInput.files[0], {
       header: true,   //First row of parsed data is interpreted as field name
@@ -88,19 +102,33 @@ class DataImport implements MAppViews {
       complete: this.displayData,     //Exceutes once data is loaded
       error: function(err, file)    //Executes if there is an error loading the file
 			{
-				console.log("ERROR:", err, file);
+			  d3.select('.errorLog').append('p')
+          .text(new Date().toLocaleTimeString() + ' --- ' + err + ' :: ' + file);
 			},
       // step: this.displayData
     });
   }
 
+  /**
+   * This method displays the results in the table and enables further investigation as well as
+   * passing the data to the visualization view.
+   * @param results
+   */
   private displayData(results) {
     //Resize the table appropriate and add scroll area if necessary
     d3.select('#valuesList')
       .attr('max-width', ($(window).innerWidth() / 2))
       .classed('scrollArea', true);
 
-		let table = `<table class='table'>`;
+    if (results.errors.length > 0) {
+      for (let i = 0; i < results.errors.length; i++) {
+        let elem = results.errors[i];
+          d3.select('.errorLog').append('p').style('color', 'red')
+            .text(new Date().toLocaleTimeString() + ' --- ' + elem.message);
+      }
+    }
+
+		let table = `<table class='table valueTable' >`;
 		let data = results.data;
 
     //Create the header of the table
@@ -120,9 +148,13 @@ class DataImport implements MAppViews {
       table += '</tr>';
 		}
 		table += '</table>';
-		$("#valuesList").html(table);
-  }
+		$('#valuesList').html(table);
 
+		d3.select('.errorLog').append('p')
+      .text(new Date().toLocaleTimeString() + ' --- Success!! Loaded the data.');
+
+		console.log(tableToJSON($('.valueTable')));
+  }
 }
 
 /**

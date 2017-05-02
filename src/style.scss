@@ -64,6 +64,9 @@
   }
 }
 
+/**
+Part of the data loading view.
+ */
 .fileContainer {
   width: 50%;
   height: 0;
@@ -80,6 +83,23 @@
   overflow: auto;
 }
 
+.logContainer {
+  margin-top: 15%;
+  margin-left: 2%;
+}
+
+.errorLog {
+  font-family: "Courier New", sans-serif;
+  font-size: 10px;
+  overflow: auto;
+  width: 200px;
+  height: 400px;
+}
+
+
+/**
+Part of the data viz view.
+ */
 .sankey_diagram {
   display: flex;
   height: 760px;
