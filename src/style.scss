@@ -71,7 +71,7 @@ Part of the data loading view.
   width: 50%;
   height: 0;
   margin-left: 25%;
-  padding-top: 15%;
+  padding-top: 10%;
 }
 
 .btn-primary {
@@ -80,22 +80,34 @@ Part of the data loading view.
 }
 
 .scrollArea {
+  max-height: 1000px;
   overflow: auto;
 }
 
 .logContainer {
-  margin-top: 15%;
-  margin-left: 2%;
-}
+  height: 80px;
+  max-width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
 
-.errorLog {
   font-family: "Courier New", sans-serif;
-  font-size: 10px;
+  font-size: 11px;
+  word-break: break-all;
   overflow: auto;
-  width: 200px;
-  height: 400px;
+
+  #messageLog {
+    color: $green-color;
+  }
+
+  #errorLog {
+    color: $red-color;
+  }
 }
 
+#specialBtn {
+  margin-left: 40%;
+  margin-bottom: 30px;
+}
 
 /**
 Part of the data viz view.

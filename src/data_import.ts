@@ -19,7 +19,7 @@ class DataImport implements MAppViews {
 
   private $node: d3.Selection<any>;
   private $dropZoneCont: d3.Selection<any>;
-  private $logCont: d3.Selection<any>;
+  private $finishBtn: d3.Selection<any>;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
@@ -49,6 +49,7 @@ class DataImport implements MAppViews {
   private build() {
     this.$dropZoneCont = this.$node.html(`
     <div class='fileContainer'>
+    <button type='button' id='specialBtn' class='btn btn-primary'>Start Visualization</button>
     <center><h1>Upload your data here!!</h1></center>
       <form class='form-inline well'>
         <div class='form-group'>
@@ -59,20 +60,17 @@ class DataImport implements MAppViews {
           <button type='submit' id='submit-file' class='btn btn-primary'>Upload File</button>
         </div>
       </form>
+      <div class='logContainer'>
+        <div id='errorLog'></div>
+        <div id='messageLog'></div>
+      </div>
       <div class="row"
 			    <div class="row" id="valuesList">
 			</div>
     </div>
     `);
 
-    d3.select('.dataImport').append('div')
-      .classed('logContainer', true)
-      .append('h3')
-      .text('Log:');
-
-    d3.select('.logContainer').append('div')
-      .classed('well', true)
-      .classed('errorLog', true);
+    d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
   }
 
   /**
@@ -81,10 +79,24 @@ class DataImport implements MAppViews {
   private attachListener() {
     this.$node.select('#submit-file')
       .on('click', (e) => {
+        //Clear the log first and disable the button
+        d3.select('#errorLog').selectAll('*').remove();
+        d3.select('#messageLog').html('');
+        d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
+
         const filesInput = <HTMLInputElement>d3.select('#files').node();
-        this.handleFileUpload(filesInput)
+        this.handleFileUpload(filesInput);
 
         //Necessary in order to prevent the reload of the page.
+        const evt = <MouseEvent>d3.event;
+        evt.preventDefault();
+        evt.stopPropagation();
+      });
+
+    this.$node.select('#specialBtn')
+      .on('click', (e) => {
+        console.log('Parse the data...');
+
         const evt = <MouseEvent>d3.event;
         evt.preventDefault();
         evt.stopPropagation();
@@ -102,7 +114,7 @@ class DataImport implements MAppViews {
       complete: this.displayData,     //Exceutes once data is loaded
       error: function(err, file)    //Executes if there is an error loading the file
 			{
-			  d3.select('.errorLog').append('p')
+			  d3.select('#errorLog').append('p')
           .text(new Date().toLocaleTimeString() + ' --- ' + err + ' :: ' + file);
 			},
       // step: this.displayData
@@ -123,8 +135,9 @@ class DataImport implements MAppViews {
     if (results.errors.length > 0) {
       for (let i = 0; i < results.errors.length; i++) {
         let elem = results.errors[i];
-          d3.select('.errorLog').append('p').style('color', 'red')
-            .text(new Date().toLocaleTimeString() + ' --- ' + elem.message);
+          d3.select('#errorLog').append('p')
+            .html('Date: ' + new Date().toLocaleTimeString() + '<br/>'
+              + 'Error: ' + elem.message + '<br/>' + ' Search in Row: ' + elem.row);
       }
     }
 
@@ -143,17 +156,22 @@ class DataImport implements MAppViews {
 
       table += '<tr>';
 		  for (let key in row) {
-        table += '<td>' + row[key] + '</td>';
+        table += '<td contenteditable>' + row[key] + '</td>';
       }
       table += '</tr>';
 		}
 		table += '</table>';
 		$('#valuesList').html(table);
 
-		d3.select('.errorLog').append('p')
-      .text(new Date().toLocaleTimeString() + ' --- Success!! Loaded the data.');
+		//Show a success message
+		d3.select('#messageLog').html('Date: ' + new Date().toLocaleTimeString()
+      + ' --- Success!! Data is loaded.');
 
-		console.log(tableToJSON($('.valueTable')));
+		//Finally enable the button
+    d3.select('#specialBtn').attr('disabled', null)
+      .transition()
+      .duration(1250)
+      .style('opacity', 1);
   }
 }
 
