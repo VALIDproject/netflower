@@ -19,7 +19,7 @@ class DataImport implements MAppViews {
 
   private $node: d3.Selection<any>;
   private $dropZoneCont: d3.Selection<any>;
-  private $finishBtn: d3.Selection<any>;
+  private $chaningHeading: d3.Selection<any>;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
@@ -49,8 +49,8 @@ class DataImport implements MAppViews {
   private build() {
     this.$dropZoneCont = this.$node.html(`
     <div class='fileContainer'>
-    <button type='button' id='specialBtn' class='btn btn-primary'>Start Visualization</button>
-    <center><h1>Upload your data here!!</h1></center>
+    <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>
+    <center><h2 id='informationText'>1st: Upload your data here!!</h2></center>
       <form class='form-inline well'>
         <div class='form-group'>
           <label for='files'>Upload a CSV file:</label>
@@ -60,16 +60,22 @@ class DataImport implements MAppViews {
           <button type='submit' id='submit-file' class='btn btn-primary'>Upload File</button>
         </div>
       </form>
-      <div class='logContainer'>
-        <div id='errorLog'></div>
-        <div id='messageLog'></div>
-      </div>
-      <div class="row"
-			    <div class="row" id="valuesList">
+      <div id='additionalInfo'>
+        <div class='logContainer'>
+          <div id='errorLog'></div>
+          <div id='messageLog'></div>
+        </div>
+        <div class="row">
+            <div class="row" id="valuesList">
+        </div>
 			</div>
     </div>
     `);
 
+    //Initialize for text transition
+    this.$chaningHeading = d3.select('#informationText');
+
+    //Disable the proceed button initially
     d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
   }
 
@@ -84,6 +90,9 @@ class DataImport implements MAppViews {
         d3.select('#messageLog').html('');
         d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
 
+        //Change information
+        this.textTransition(this.$chaningHeading, '2nd: Change data, upload new or proceed!!');
+
         const filesInput = <HTMLInputElement>d3.select('#files').node();
         this.handleFileUpload(filesInput);
 
@@ -95,8 +104,6 @@ class DataImport implements MAppViews {
 
     this.$node.select('#specialBtn')
       .on('click', (e) => {
-        console.log('Parse the data...');
-
         const evt = <MouseEvent>d3.event;
         evt.preventDefault();
         evt.stopPropagation();
@@ -127,6 +134,7 @@ class DataImport implements MAppViews {
    * @param results
    */
   private displayData(results) {
+
     //Resize the table appropriate and add scroll area if necessary
     d3.select('#valuesList')
       .attr('max-width', ($(window).innerWidth() / 2))
@@ -172,6 +180,14 @@ class DataImport implements MAppViews {
       .transition()
       .duration(1250)
       .style('opacity', 1);
+  }
+
+  private textTransition(element, newText) {
+    element.transition().duration(500)
+      .style('opacity', 0)
+      .transition().duration(500)
+      .style('opacity', 1)
+      .text(newText);
   }
 }
 
