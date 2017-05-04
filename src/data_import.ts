@@ -21,6 +21,9 @@ class DataImport implements MAppViews {
   private $dropZoneCont: d3.Selection<any>;
   private $chaningHeading: d3.Selection<any>;
 
+  private editMode: boolean;
+  private parseResults;
+
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
       .append('div')
@@ -57,7 +60,8 @@ class DataImport implements MAppViews {
           <input type='file' id='files' class='form-control' accept='.csv' required />
         </div>
         <div class='form-group'>
-          <button type='submit' id='submit-file' class='btn btn-primary'>Upload File</button>
+          <button type='submit' id='submitFile' class='btn btn-primary'>Upload File</button>
+          <button type='button' id='showMoreBtn' class='btn btn-info'>Edit data</button>
         </div>
       </form>
       <div id='additionalInfo'>
@@ -75,15 +79,16 @@ class DataImport implements MAppViews {
     //Initialize for text transition
     this.$chaningHeading = d3.select('#informationText');
 
-    //Disable the proceed button initially
+    //Disable some buttons initially
     d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
+    d3.select('#showMoreBtn').attr('disabled', true).style('opacity', 0);
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
-    this.$node.select('#submit-file')
+    this.$node.select('#submitFile')
       .on('click', (e) => {
         //Clear the log first and disable the button
         d3.select('#errorLog').selectAll('*').remove();
@@ -104,6 +109,18 @@ class DataImport implements MAppViews {
 
     this.$node.select('#specialBtn')
       .on('click', (e) => {
+        if(this.editMode) {
+          console.log('In edit mode');
+        } else {
+          console.log('Not in edit mode');
+        }
+        const evt = <MouseEvent>d3.event;
+        evt.preventDefault();
+        evt.stopPropagation();
+      });
+
+    this.$node.select('#showMoreBtn')
+      .on('click', (e) => {
         const evt = <MouseEvent>d3.event;
         evt.preventDefault();
         evt.stopPropagation();
@@ -116,33 +133,41 @@ class DataImport implements MAppViews {
    */
   private handleFileUpload(filesInput) {
     papaparse.parse(filesInput.files[0], {
-      header: true,   //First row of parsed data is interpreted as field name
-      skipEmptyLines: true,   //Skips empty lines in .csv
-      complete: this.displayData,     //Exceutes once data is loaded
-      error: function(err, file)    //Executes if there is an error loading the file
+      header: true,                   //First row of parsed data is interpreted as field name
+      skipEmptyLines: true,           //Skips empty lines in .csv
+      complete: (res, file) => {  //Needs arrow function in order to pass the this object globally and not the this of papaparse object
+        this.displayData(this.parseResults);
+      },
+      error: function(err, file)      //Executes if there is an error loading the file
 			{
 			  d3.select('#errorLog').append('p')
           .text(new Date().toLocaleTimeString() + ' --- ' + err + ' :: ' + file);
 			},
-      // step: this.displayData
+      chunk: (results, file) => {     //Limit is 10MB for files
+        this.parseResults = results;
+      }
+      // step: function(results, parser) {
+      //   console.log(results);
+      // }
     });
   }
 
   /**
    * This method displays the results in the table and enables further investigation as well as
    * passing the data to the visualization view.
-   * @param results
+   * @param results The parsed results of the papaparse loader
    */
   private displayData(results) {
-
+    let resultData = results.data.slice(0, 30);
+    let resultError = results.errors;
     //Resize the table appropriate and add scroll area if necessary
     d3.select('#valuesList')
       .attr('max-width', ($(window).innerWidth() / 2))
       .classed('scrollArea', true);
 
-    if (results.errors.length > 0) {
-      for (let i = 0; i < results.errors.length; i++) {
-        let elem = results.errors[i];
+    if (resultError.length > 0) {
+      for (let i = 0; i < resultError.length; i++) {
+        let elem = resultError[i];
           d3.select('#errorLog').append('p')
             .html('Date: ' + new Date().toLocaleTimeString() + '<br/>'
               + 'Error: ' + elem.message + '<br/>' + ' Search in Row: ' + elem.row);
@@ -150,17 +175,16 @@ class DataImport implements MAppViews {
     }
 
 		let table = `<table class='table valueTable' >`;
-		let data = results.data;
 
     //Create the header of the table
 		table += '<thead>';
-		for (var k in results.data[0] ) {
+		for (var k in resultData[0] ) {
       table += '<th>' + k + '</th>';
     }
     table += '</thead>';
 
-		for (let i = 0; i < data.length; i++) {
-      let row = data[i];
+		for (let i = 0; i < resultData.length; i++) {
+      let row = resultData[i];
 
       table += '<tr>';
 		  for (let key in row) {
@@ -180,6 +204,8 @@ class DataImport implements MAppViews {
       .transition()
       .duration(1250)
       .style('opacity', 1);
+
+    console.log('all: ', this.parseResults);
   }
 
   private textTransition(element, newText) {
