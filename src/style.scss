@@ -90,7 +90,7 @@ Part of the data loading view.
   margin-top: 10px;
   margin-bottom: 10px;
 
-  font-family: "Courier New", sans-serif;
+  //font-family: "Courier New", sans-serif;
   font-size: 11px;
   word-break: break-all;
   overflow: auto;
@@ -108,10 +108,16 @@ Part of the data loading view.
   margin-left: 43%;
   margin-bottom: 30px;
   border-radius: 100px;
+
+
 }
 
 #informationText {
-  margin-bottom: 35px;
+  margin-bottom: 10px;
+}
+
+#valueListName {
+
 }
 
 #submitFile {

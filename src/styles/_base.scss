@@ -31,3 +31,7 @@ th, label, strong, b, .label {
 .loading {
   animation: color_change 1s ease-out infinite alternate;
 }
+
+button:focus {
+  outline: none !important;
+}
