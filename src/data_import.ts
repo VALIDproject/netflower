@@ -78,11 +78,16 @@ class DataImport implements MAppViews {
           <div id='messageLog'></div>
         </div>
         <div class='row'>
+          <div class='ctrlContainer'>
             <h3 id='valueListName'></h3>
-            <button type='button' id='seePrevRecords' class='btn btn-primary btn-sm'>
-              <i class='fa fa-arrow-left'></i></button>
-            <button type='button' id='seeNextRecords' class='btn btn-primary btn-sm'>
-              <i class='fa fa-arrow-right'></i></button>
+            <div class='btnContainer'>
+              <button type='button' id='seePrevRecords' class='btn btn-primary btn-sm'>
+                <i class='fa fa-arrow-left'></i></button>
+              <button type='button' id='seeNextRecords' class='btn btn-primary btn-sm'>
+                <i class='fa fa-arrow-right'></i></button>
+            </div>
+            <h4 id='valueListMeta'></h4>
+          </div>
             <div id='valuesList'></div>
         </div>
 			</div>
@@ -112,13 +117,15 @@ class DataImport implements MAppViews {
         //Then disable the unwanted buttons
         d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
         d3.select('#showMoreBtn').attr('disabled', true).style('opacity', 0);
+        this.$btnNext = $('#seeNextRecords').hide();
+        this.$btnPrev = $('#seePrevRecords').hide();
 
         //Clear the table if present
-        d3.select('#valueListName').html('');
+        d3.select('.ctrlContainer').classed('invisibleClass', true);
         d3.select('#valuesList').selectAll('*').remove();
 
         //Change information and reset edit mode
-        this.textTransition(this.$chaningHeading, 'Change data, upload new or proceed!!');
+        this.textTransition(this.$chaningHeading, 'View data, upload new or proceed!!');
         this.editMode = false;
 
         //Start the uploading
@@ -140,7 +147,7 @@ class DataImport implements MAppViews {
         this.editMode = true;
 
         //Get necessary variables for Browsing in the table
-        this.$tableRows = $('.valueTable tr');
+        this.$tableRows = $('.valueTable tbody tr');
         this.trLength = this.$tableRows.length;
         this.$tableRows.hide();
         this.$tableRows.slice(0, this.rowsToShow).show();
@@ -157,6 +164,8 @@ class DataImport implements MAppViews {
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.$tableRows.slice(this.rowsToShow, this.rowsToShow + 10).show();
         this.rowsToShow += 10;
+        d3.select('#valueListMeta').html('Viewing page: ' + this.rowsToShow / 10
+          + ' of ' + Math.round(this.parseResults.data.length / 10));
         this.checkButtons();
 
         const evt = <MouseEvent>d3.event;
@@ -169,6 +178,8 @@ class DataImport implements MAppViews {
       .on('click', (e) => {
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.rowsToShow -= 10;
+        d3.select('#valueListMeta').html('Viewing page: ' + this.rowsToShow / 10
+          + ' of ' + Math.round(this.parseResults.data.length / 10));
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).show();
         this.checkButtons();
 
@@ -211,6 +222,7 @@ class DataImport implements MAppViews {
         this.uploadedFileName = file.name;
         this.displayData(this.parseResults);
 
+        //Enable the detail button and the start visualization button
         d3.select('#showMoreBtn').attr('disabled', null)
           .transition()
           .duration(1250)
@@ -252,8 +264,17 @@ class DataImport implements MAppViews {
     //   + 'Rows-total: ' + this.parseResults.data.length);
   }
 
+  /**
+   * This function creates a html table to view the data from the .csv in a visual browser.
+   * The first 10 rows only are shown for a better viusal experience.
+   * @param resultData
+   */
   private previewData(resultData) {
+    console.log(this.parseResults.data.length);
+    d3.select('.ctrlContainer').classed('invisibleClass', false);
     d3.select('#valueListName').html('Name: ' + this.uploadedFileName);
+    d3.select('#valueListMeta').html('Viewing page: ' + this.rowsToShow / 10
+      + ' of ' + Math.round(this.parseResults.data.length / 10));
 
     let table = `<table class='table valueTable' >`;
     //Create the header of the table
@@ -267,7 +288,7 @@ class DataImport implements MAppViews {
       let row = resultData[i];
       table += '<tr>';
       for (let key in row) {
-        table += '<td>' + row[key] + '</td>';
+        table += '<td> ' + row[key] + '</td>';
       }
       table += '</tr>';
     }
@@ -275,8 +296,10 @@ class DataImport implements MAppViews {
     $('#valuesList').html(table);
   }
 
+  /**
+   * This function checks whether the left or right buttons for browsing the table should be shown or not.
+   */
   private checkButtons() {
-
     if (this.rowsToShow >= this.trLength) {
       this.$btnNext.hide();
     } else {
@@ -288,7 +311,18 @@ class DataImport implements MAppViews {
     } else {
       this.$btnPrev.hide();
     }
+
+    if(this.rowsToShow == 10) {
+      this.$btnNext.show();
+      this.$btnPrev.hide();
+    }
   }
+
+  /**
+   * This function fades in a text or fades over a text on a given html element
+   * @param element html to fade the text onto
+   * @param newText the text to show in the html elment
+   */
   private textTransition(element, newText) {
     element.transition().duration(500)
       .style('opacity', 0)

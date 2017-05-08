@@ -18,7 +18,7 @@
 }
 
 .invisibleClass {
-  display: none;
+  display: none !important;
 }
 
 #validHeader {
@@ -108,16 +108,10 @@ Part of the data loading view.
   margin-left: 43%;
   margin-bottom: 30px;
   border-radius: 100px;
-
-
 }
 
 #informationText {
   margin-bottom: 10px;
-}
-
-#valueListName {
-
 }
 
 #submitFile {
@@ -126,6 +120,22 @@ Part of the data loading view.
 
 #showMoreBtn {
   margin-left: 10px;
+}
+
+.ctrlContainer {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: inherit;
+}
+
+#valueListMeta {
+  margin-top: 23px;
+  margin-left: 20px;
+}
+
+.btnContainer {
+  margin-top: 18px;
+  margin-left: 20px;
 }
 
 /**
