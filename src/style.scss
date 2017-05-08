@@ -18,7 +18,7 @@
 }
 
 .invisibleClass {
-  display: none;
+  display: none !important;
 }
 
 #validHeader {
@@ -64,11 +64,14 @@
   }
 }
 
+/**
+Part of the data loading view.
+ */
 .fileContainer {
-  width: 50%;
+  width: 70%;
   height: 0;
-  margin-left: 25%;
-  padding-top: 15%;
+  margin-left: 15%;
+  padding-top: 10%;
 }
 
 .btn-primary {
@@ -77,9 +80,67 @@
 }
 
 .scrollArea {
+  max-height: 1000px;
   overflow: auto;
 }
 
+.logContainer {
+  height: 80px;
+  max-width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  //font-family: "Courier New", sans-serif;
+  font-size: 11px;
+  word-break: break-all;
+  overflow: auto;
+
+  #messageLog {
+    color: $green-color;
+  }
+
+  #errorLog {
+    color: $red-color;
+  }
+}
+
+#specialBtn {
+  margin-left: 43%;
+  margin-bottom: 30px;
+  border-radius: 100px;
+}
+
+#informationText {
+  margin-bottom: 10px;
+}
+
+#submitFile {
+  margin-left: 10px;
+}
+
+#showMoreBtn {
+  margin-left: 10px;
+}
+
+.ctrlContainer {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: inherit;
+}
+
+#valueListMeta {
+  margin-top: 23px;
+  margin-left: 20px;
+}
+
+.btnContainer {
+  margin-top: 18px;
+  margin-left: 20px;
+}
+
+/**
+Part of the data viz view.
+ */
 .sankey_diagram {
   display: flex;
   height: 760px;
