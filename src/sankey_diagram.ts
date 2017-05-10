@@ -41,19 +41,18 @@ class SankeyDiagram implements MAppViews {
     this.$node.append('div').attr('class', 'sankey_vis');
     this.$node.append('div').attr('class', 'right_bars');
 
-    this.buildSankey();
-
+    //this.buildSankey();
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
-
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
+      //CALL HERE YOUR BUILD SANKEY FUNCTION OR PROCEED ONLY IF DATA IS LOADED HERE....
+
       console.log('data: ', data);
     });
-
   }
 
 
@@ -154,13 +153,16 @@ class SankeyDiagram implements MAppViews {
 
     console.log('Graph Array', graph.nodes);
 
-    graph.nodes = d3.keys(d3.nest()
-      .key(function (d) {
-        console.log('Data nest', d, d.name);
-        return d.name;
+    //TODO: (CN): TypeScript isn't knowing the d.name as it doesnt exist at the moment. Try to do it
+    //in another way or try using the => funciton instead.
 
-      })
-      .map(graph.nodes));
+    // graph.nodes = d3.keys(d3.nest()
+    //   .key(function (d) {
+    //     console.log('Data nest', d, d.name);
+    //     return d.name;
+    //
+    //   })
+    //   .map(graph.nodes));
 
     //console.log('GraphNodes',graph.nodes);
 

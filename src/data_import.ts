@@ -39,8 +39,7 @@ class DataImport implements MAppViews {
    * @returns {Promise<DataImport>}
    */
   init() {
-    //d3.select('.dataVizView').classed('invisibleClass', true);
-    d3.select('.dataLoadingView').classed('invisibleClass', true);
+    d3.select('.dataVizView').classed('invisibleClass', true);
 
     this.build();
     this.attachListener();
@@ -194,10 +193,19 @@ class DataImport implements MAppViews {
     this.$node.select('#specialBtn')
       .on('click', (e) => {
         if(this.editMode) {
+          d3.select('.dataLoadingView').classed('invisibleClass', true);
+          d3.select('.dataVizView').classed('invisibleClass', false);
+          d3.select('#valuesList').selectAll('*').remove();
+
           events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
+
           console.log('In edit mode');
         } else {
+          d3.select('.dataLoadingView').classed('invisibleClass', true);
+          d3.select('.dataVizView').classed('invisibleClass', false);
+
           events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
+
           console.log('Not in edit mode');
         }
         const evt = <MouseEvent>d3.event;
@@ -327,7 +335,7 @@ class DataImport implements MAppViews {
    * @param element html to fade the text onto
    * @param newText the text to show in the html elment
    */
-  private textTransition(element, newText) {
+  private textTransition(element: d3.Selection<any>, newText: string) {
     element.transition().duration(500)
       .style('opacity', 0)
       .transition().duration(500)
