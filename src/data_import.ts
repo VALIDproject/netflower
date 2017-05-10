@@ -8,6 +8,7 @@ import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
 import {tableToJSON} from './utilities';
 import {MAppViews} from './app';
+import {AppConstants} from './app_constants';
 
 class DataImport implements MAppViews {
 
@@ -192,8 +193,10 @@ class DataImport implements MAppViews {
     this.$node.select('#specialBtn')
       .on('click', (e) => {
         if(this.editMode) {
+          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('In edit mode');
         } else {
+          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('Not in edit mode');
         }
         const evt = <MouseEvent>d3.event;

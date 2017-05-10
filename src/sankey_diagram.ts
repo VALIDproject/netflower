@@ -5,6 +5,7 @@
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import {MAppViews} from './app';
+import {AppConstants} from './app_constants';
 
 class SankeyDiagram implements MAppViews {
 
@@ -36,7 +37,7 @@ class SankeyDiagram implements MAppViews {
   private build() {
     this.$node.append('div').attr('class', 'left_bars');
     this.$node.append('div').attr('class', 'sankey_vis');
-    this.$node.append('div').attr('class', 'right_bars');   
+    this.$node.append('div').attr('class', 'right_bars');
 
   }
 
@@ -44,6 +45,11 @@ class SankeyDiagram implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+
+    events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
+      console.log('data: ', data);
+    });
+
   }
 
 }

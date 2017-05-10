@@ -9,4 +9,6 @@
 export class AppConstants {
 
   static VIEW = 'validView';
+  
+  static EVENT_DATA_PARSED = 'eventDataParsed';
 }
