@@ -38,7 +38,8 @@ class DataImport implements MAppViews {
    * @returns {Promise<DataImport>}
    */
   init() {
-    d3.select('.dataVizView').classed('invisibleClass', true);
+    //d3.select('.dataVizView').classed('invisibleClass', true);
+    d3.select('.dataLoadingView').classed('invisibleClass', true);
 
     this.build();
     this.attachListener();
