@@ -175,11 +175,11 @@ Part of the data viz view.
   width: 10%;
 }
 
-/*.global_settings {
-  float:left;
-  background-color: grey;
-  width: 25%;
-}*/
+//.globalSettings {
+//  float:left;
+//  background-color: grey;
+//  width: 25%;
+//}
 
 .filter {
   border: 1px solid grey;
@@ -206,16 +206,6 @@ Part of the data viz view.
   font-size: 16px;
 }
 
-.global_settings {
-  width: 16%;
-  height: 810px;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  border: 1px solid black;
-}
-
-
 
 node text {
   pointer-events: none;
@@ -232,3 +222,24 @@ node text {
   stroke-opacity: .5;
 }
 
+
+/**
+Part of the global settings view.
+ */
+.globalSettings {
+  width: 16%;
+  height: 810px;
+  position: absolute;
+  top: 200px;
+  left: 10px;
+  border: 1px solid black;
+}
+
+#backBtn {
+  width: 100%;
+}
+
+.dialogBox {
+  margin-top: 20%;
+  z-index: 100001;
+}

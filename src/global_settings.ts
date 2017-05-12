@@ -4,16 +4,18 @@
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
+import * as bootbox from 'bootbox';
 import {MAppViews} from './app';
 
 class GlobalSettings implements MAppViews {
 
-  private $node;
+  private $node: d3.Selection<any>;
+  private $genericControls: d3.Selection<any>;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
       .append('div')
-      .classed('global_settings', true);
+      .classed('globalSettings', true);
   }
 
   /**
@@ -34,13 +36,39 @@ class GlobalSettings implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
+    d3.select('.globalSettings').append('div').classed('genericControls', true);
 
+    this.$genericControls = d3.select('.genericControls').html(`
+      <button type='button' id='backBtn' class='btn btn-secondary'><i class='fa fa-hand-o-left'>&nbsp;</i>Back</button>
+    `);
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
+    //Listener for the Back Button
+    this.$node.select('#backBtn')
+      .on('click', (e) => {
+        bootbox.confirm({
+          className: 'dialogBox',
+          title: 'Information',
+          message: 'Upon hitting the OK button, you will be redirected to the data upload page. ' +
+          'Note!! This will reload the page and the previous data will be lost.',
+          callback: function(result) {
+            if (result) {
+              //Force reload and loose all data
+              location.reload(true);
+            } else {
+              return;
+            }
+          }
+        });
+
+        const evt = <MouseEvent>d3.event;
+        evt.preventDefault();
+        evt.stopPropagation();
+      });
   }
 
 }
