@@ -216,7 +216,7 @@ class SankeyDiagram implements MAppViews {
           .attr('x', 0).attr('y', y)
           .attr('dy', dy + 'em');
 
-          console.log('text', text, 'words', words, 'y', y, 'dy', dy, 'tspan', tspan, 'widthText', widthText);
+          //console.log('text', text, 'words', words, 'y', y, 'dy', dy, 'tspan', tspan, 'widthText', widthText);
           while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(' '));
