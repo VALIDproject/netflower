@@ -286,6 +286,10 @@ class DataImport implements MAppViews {
     //   + 'Rows-total: ' + this.parseResults.data.length);
   }
 
+  /**
+   * This function stores the data which was loaded in the localforage and a helper variable in localstorage.
+   * Differneces are the asynchronus load of localforage and smaller size of localstorage.
+   */
   private storeData() {
     //Store the data
     localforage.setItem('data', this.parseResults.data).then(function (value) {

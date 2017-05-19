@@ -61,6 +61,7 @@ class GlobalSettings implements MAppViews {
           Be sure you don't lose anything important or save your progress before you proceed.`,
           callback: function(result) {
             if (result) {
+              //Clear both storage facilities
               localStorage.clear();
               localforage.clear();
               //Force reload and loose all data
@@ -76,12 +77,16 @@ class GlobalSettings implements MAppViews {
         evt.stopPropagation();
       });
 
+    //Listener for the example button
     this.$node.select('#getData')
       .on('click', (e) => {
+        //This is how we retrieve the data. As it's loaded async it is only available as promise.
+        //We can save the promise thoug in a global variable and get the data later if we need
         this.promiseData = localforage.getItem('data').then((value) => {
           return value;
         });
 
+        //Within the {} the data is available for usage
         this.promiseData.then(function (data) {
           console.log('DATA:::::::: ', data);
         });
