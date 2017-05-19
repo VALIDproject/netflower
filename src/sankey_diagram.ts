@@ -146,7 +146,7 @@ class SankeyDiagram implements MAppViews {
 
     link
     .on("click", function(d) {
-      events.fire(AppConstants.EVENT_CLICKED_PATH, d);
+      events.fire(AppConstants.EVENT_CLICKED_PATH, d, json);
     });
 
 
