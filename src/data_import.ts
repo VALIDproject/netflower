@@ -207,7 +207,7 @@ class DataImport implements MAppViews {
 
           this.storeData();
 
-          // events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
+          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('In edit mode');
         } else {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
@@ -215,7 +215,7 @@ class DataImport implements MAppViews {
 
           this.storeData();
 
-          // events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
+          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('Not in edit mode');
         }
         const evt = <MouseEvent>d3.event;
