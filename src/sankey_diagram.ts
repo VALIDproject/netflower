@@ -4,14 +4,16 @@
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
-import {MAppViews} from './app';
+import * as localforage from 'localforage';
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
+import {MAppViews} from './app';
+import {d3TextWrap} from './utilities';
 
 class SankeyDiagram implements MAppViews {
 
   private $node;
-
+  private nodesToShow: number = 20;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
@@ -40,131 +42,76 @@ class SankeyDiagram implements MAppViews {
     this.$node.append('div').attr('class', 'left_bars');
     this.$node.append('div').attr('class', 'sankey_vis');
     this.$node.append('div').attr('class', 'right_bars');
-
-    //this.buildSankey();
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
-    events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
-      //CALL HERE YOUR BUILD SANKEY FUNCTION OR PROCEED ONLY IF DATA IS LOADED HERE....
 
-      console.log('data: ', data);
+    events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
+      //Draw Sankey Diagram
+      this.buildSankey(data);
     });
   }
 
 
-  private buildSankey() {
-
-    // console.log(this.$node);
-
+  private buildSankey(json) {
+    const that = this;
     const sankey = (<any>d3).sankey();
-    // console.log('Sankey Object', sankey);
-
     const units = '€';
 
-    /* let widthNode = this.$node.select('.sankey_vis').node();
-     widthNode.getBoundingClientRect().width;
-     console.log('width',  widthNode);*/
-
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
-    // console.log('width',  widthNode);
-
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-    //console.log('height',  heightNode);
 
-    const margin = {top: 10, right: 80, bottom: 10, left: 80};
+    const margin = { top: 10, right: 120, bottom: 10, left: 120 };
     const width =  widthNode  - margin.left - margin.right;
     const height = heightNode - margin.top - margin.bottom;
 
-    // The "0" option enables zero-padding.
-    //The comma (",") option enables the use of a comma for a thousands separator.
+    //The "0" option enables zero-padding. The comma (",") option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
-      format = function(d) { return formatNumber(d) + " " + units; },
-      color = d3.scale.category20();
+      format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
-    // append the svg canvas to the page
-    const svg = d3.select(".sankey_vis").append('svg')
+    //Append the svg canvas t the page
+    const svg = d3.select('.sankey_vis').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
       .attr('transform','translate(' + margin.left+ ',' + margin.top + ')');
 
+    //Set the diagram properties
     sankey.nodeWidth(35)
       .nodePadding(20)
       .size([width, height]);
 
     const path = sankey.link();
-    // console.log('path', path);
 
-    const json =  [
-      {'source':'Albertina',
-        "target":"Vienna Deluxe Magazine GmbH",
-        "value": 17801.84
-      },
-      {"source":"Albertina",
-        "target":"Wien Programm",
-        "value":5197.98
-      },
-      {"source":"Agrarmarkt Austria Marketing GesmbH",
-        "target":"Lebensart",
-        "value": 5702
-      },
-      {"source":"Bundeskanzleramt",
-        "target":"Wien Programm",
-        "value":5197.98
-      },
-      {'source':'Albertina',
-        "target":"Vienna Deluxe Magazine GmbH",
-        "value": 17801.84
-      },
-      {"source":"Albertina",
-        "target":"Der Standard",
-        "value":4500
-      },
-      {"source":"Agrarmarkt Austria Marketing GesmbH",
-        "target":"Woman",
-        "value": 59662.90
-      },
-      {"source":"Bundeskanzleramt",
-        "target":"Kleine Zeitung",
-        "value":75068
-      },
-      {"source":"Bundeskanzleramt",
-        "target":"Vienna Deluxe Magazine GmbH",
-        "value":6230
-      }
-    ];
-    //console.log(json);
+    //Group Data (by quartal)
+    let nest = (<any>d3).nest()
+      .key(function (d) {return d.quartal;})
+      .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
-    //console.log(graph);
 
-    json.forEach(function (d) {
-      //console.log("source: ", d.source, "target: ", d.target);
-      graph.nodes.push({ 'name': d.source });//all Nodes
-      graph.nodes.push({ 'name': d.target });//all Nodes
-      graph.links.push({ 'source': d.source,
-        'target': d.target,
-        'value': +d.value })
+    nest.forEach(function (d, i ) {
+      if (d.key === '20151') {
+        for(var _v = 0; _v < that.nodesToShow; _v++) {;
+          //console.log(_v, d);
+          graph.nodes.push({ 'name': d.values[_v].rechtstraeger });//all Nodes
+          graph.nodes.push({ 'name': d.values[_v].mediumMedieninhaber });//all Nodes
+          graph.links.push({ 'source': d.values[_v].rechtstraeger,
+            'target': d.values[_v].mediumMedieninhaber,
+            'value': + d.values[_v].euro });
+        }
+      }
     });
 
-    console.log('Graph Array', graph.nodes);
-
-    //TODO: (CN): TypeScript isn't knowing the d.name as it doesnt exist at the moment. Try to do it
-    //in another way or try using the => funciton instead.
-
-    // graph.nodes = d3.keys(d3.nest()
-    //   .key(function (d) {
-    //     console.log('Data nest', d, d.name);
-    //     return d.name;
-    //
-    //   })
-    //   .map(graph.nodes));
-
-    //console.log('GraphNodes',graph.nodes);
+    //d3.keys - returns array of keys from the nest function
+    //d3.nest - groups the values of an array by the given key
+    //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
+    graph.nodes = (<any>d3).keys((<any>d3).nest()
+      .key((d) => {return d.name;})
+      .map(graph.nodes));
 
     let text;
     graph.links.forEach(function (d, i) {
@@ -172,17 +119,17 @@ class SankeyDiagram implements MAppViews {
       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
     });
 
-    //console.log('GraphLinks',graph.links);
-
+    //This makes out of the array of strings a array of objects with the key 'name'
     graph.nodes.forEach(function (d, i) {
       graph.nodes[i] = { 'name': d };
     });
 
+    //Basic parameters for the diagram
     sankey
       .nodes(graph.nodes)
       //.links(linksorted)
       .links(graph.links)
-      .layout(10);//32
+      .layout(10);
 
 
     let link = svg.append('g').selectAll('.link')
@@ -194,14 +141,20 @@ class SankeyDiagram implements MAppViews {
       //reduce edges crossing
       .sort(function(a, b) { return b.dy - a.dy; });
 
-    // add the link titles HOVER
+
+    //Add the link titles - Hover Path
     link.append('title')
       .text(function(d) {
         return d.source.name + ' → ' +
-          d.target.name + '\n' + format(d.value); });
+          d.target.name + '\n' + format(d.value);
+      });
 
+    //Add the on 'click' listener for the links
+    link.on('click', function(d) {
+      events.fire(AppConstants.EVENT_CLICKED_PATH, d, json);
+    });
 
-    // add in the nodes
+    //Add in the nodes
     let node = svg.append('g').selectAll('.node')
       .data(graph.nodes)
       .enter().append('g')
@@ -210,35 +163,69 @@ class SankeyDiagram implements MAppViews {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
 
-
-    // add the rectangles for the nodes
+    //Add the rectangles for the nodes
     node.append('rect')
       .attr('height', function(d) { return d.dy; })
       .attr('width', sankey.nodeWidth())
-      .style('fill', 'orange')
-
+      .style('fill', '#DA5A6B')
       //Title rectangle
       .append('title')
       .text(function(d) {
-        return d.name + '\n' + format(d.value); });
+        return d.name + '\n' + format(d.value);
+      });
 
-    // add in the title for the nodes
-    node.append('text')
-      .attr('x', 10)
-      .attr('y', function(d) { return d.dy / 2; }) //in der Mitte des Nodes positionieren
-      .attr('dy', '.35em')
+    //Add in the title for the nodes
+    let heading = node.append('g').append('text')
+      .attr('x', 45)
+      .attr('y', function(d) { return d.dy / 2; }) //Place in middle of node
+      .attr('dy', '.2em')
       .attr('text-anchor', 'start')
-      .attr('transform', null)
-      .text(function(d) { return d.name +  ' '  +  '€ ' +  d.value; })
-      .filter(function(d) { return d.x < width / 2; })
-      //Node Text left
-      .attr('x', 2 + sankey.nodeWidth())
+      .text(function(d) { return d.name; })
+      .filter(function(d, i) { return d.x < width / 2; })
+      //Node Text left if filter function is true
+      .attr('x', -45 + sankey.nodeWidth())
       .attr('text-anchor', 'end');
 
-
-
+    //TODO: FG: Call the function with .call or .each d3TextWrap and pass depenendt arguments
+    // //Wrap the text
+    // let widthText = this.$node.selectAll('text').node().getBoundingClientRect().width;
+    //
+    // if(widthText >= 165 ) {
+    //   this.wrap(this.$node.selectAll('text'), 60);
+    // }
   }
 
+  /**
+   * This function wraps the text in order to fit it to the svg size.
+   * @param text object to wrap
+   * @param widthText width of the text object
+   *
+   * @see: from http://bl.ocks.org/mbostock/7555321
+   */
+  // private wrap(text, width) {
+  //   text.each(function() {
+  //     let text = d3.select(this),
+  //       words = text.text().split(/\s+/).reverse(),
+  //       word,
+  //       line = [],
+  //       lineNumber = 0,
+  //       lineHeight = 1, // ems
+  //       y = text.attr("y"),
+  //       dy = parseFloat(text.attr("dy")) || 0;
+  //
+  //     let tspan = (text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em") as any);
+  //     while (word = words.pop()) {
+  //       line.push(word);
+  //       tspan.text(line.join(" "));
+  //       if (tspan.node().getComputedTextLength() > width) {
+  //         line.pop();
+  //         tspan.text(line.join(" "));
+  //         line = [word];
+  //         tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", (++lineNumber * lineHeight + dy) + "em").text(word);
+  //       }
+  //     }
+  //   });
+  // }
 }
 
 /**

@@ -205,8 +205,6 @@ Part of the data viz view.
   padding: 5px;
   font-size: 16px;
 }
-
-
 node text {
   pointer-events: none;
   text-shadow: 0 1px 0 #fff;
@@ -220,27 +218,4 @@ node text {
 
 .link:hover {
   stroke-opacity: .5;
-}
-
-
-/**
-Part of the global settings view.
- */
-.globalSettings {
-  width: 16%;
-  height: 810px;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  border: 1px solid black;
-}
-
-#backBtn {
-  background: $valid-color2;
-  color: white;
-}
-
-.dialogBox {
-  margin-top: 20%;
-  z-index: 100001;
 }
