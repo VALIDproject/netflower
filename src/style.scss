@@ -175,11 +175,11 @@ Part of the data viz view.
   width: 10%;
 }
 
-/*.global_settings {
-  float:left;
-  background-color: grey;
-  width: 25%;
-}*/
+//.globalSettings {
+//  float:left;
+//  background-color: grey;
+//  width: 25%;
+//}
 
 .filter {
   border: 1px solid grey;
@@ -205,16 +205,6 @@ Part of the data viz view.
   padding: 5px;
   font-size: 16px;
 }
-
-.global_settings {
-  width: 16%;
-  height: 810px;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  border: 1px solid black;
-}
-
 node text {
   pointer-events: none;
   text-shadow: 0 1px 0 #fff;
@@ -229,7 +219,3 @@ node text {
 .link:hover {
   stroke-opacity: .5;
 }
-
-// .sankey_details {
-//   background-color: grey;
-// }

@@ -6,6 +6,7 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
+import * as localforage from 'localforage'
 import {tableToJSON} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
@@ -39,7 +40,14 @@ class DataImport implements MAppViews {
    * @returns {Promise<DataImport>}
    */
   init() {
-    d3.select('.dataVizView').classed('invisibleClass', true);
+    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+
+    if(!dataAvailable) {
+      d3.select('.dataVizView').classed('invisibleClass', true);
+    } else {
+      d3.select('.dataVizView').classed('invisibleClass', false);
+      d3.select('.dataLoadingView').classed('invisibleClass', true);
+    }
 
     this.build();
     this.attachListener();
@@ -197,15 +205,17 @@ class DataImport implements MAppViews {
           d3.select('.dataVizView').classed('invisibleClass', false);
           d3.select('#valuesList').selectAll('*').remove();
 
-          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
+          this.storeData();
 
+          // events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('In edit mode');
         } else {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
           d3.select('.dataVizView').classed('invisibleClass', false);
 
-          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
+          this.storeData();
 
+          // events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('Not in edit mode');
         }
         const evt = <MouseEvent>d3.event;
@@ -274,6 +284,22 @@ class DataImport implements MAppViews {
     //   + ' --- Success!! Data is loaded.');
     // d3.select('#messageLog').html('Rows-preview: ' + this.rowsToShow +'<br/>'
     //   + 'Rows-total: ' + this.parseResults.data.length);
+  }
+
+  /**
+   * This function stores the data which was loaded in the localforage and a helper variable in localstorage.
+   * Differneces are the asynchronus load of localforage and smaller size of localstorage.
+   */
+  private storeData() {
+    //Store the data
+    localforage.setItem('data', this.parseResults.data).then(function (value) {
+      console.log('Saved data');
+    }).catch(function (err) {
+      console.log('Error: ', err);
+    })
+
+    //Local Storage for small variables
+    localStorage.setItem('dataLoaded', 'loaded');
   }
 
   /**
