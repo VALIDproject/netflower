@@ -47,7 +47,7 @@ class SankeyDetail implements MAppViews {
   */
   private attachListener() {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json) => {
-      console.log('data', data, 'json', json);
+      //console.log('data', data, 'json', json);
       this.openDetails(data, json);
     });
 
@@ -55,78 +55,78 @@ class SankeyDetail implements MAppViews {
   }
 
   private openDetails (clickedPath, json) {
+
+    let w = 600;
+    let h = 200;
     //console.log('openDetails - true', clickedPath);
     let details = this.$node;
     details.attr('transform', 'translate(' + 600 + ',' + 500 + ')')
-    .attr('width', 600 + 'px')
-    .attr('height', 200 + 'px')
+    .attr('width', w + 'px')
+    .attr('height', h + 'px')
     .style('background',  '#C0C0C0')
     .style('z-index', '10000');
 
-    console.log(json);
+    let sourceName = clickedPath.source.name;
+    let targetName = clickedPath.target.name;
+    let value = clickedPath.target.value;
 
     let euroOverTime = (<any>d3).nest()
     .key(function (d) {return d.quartal; })
-    .key(function (d) {return d.rechtstraeger; })
-    .rollup(function (v) {
-      //console.log('v', v);
-      let sum = (<any>d3).sum(v, function (d){ return d.euro});
-      //console.log('sum', sum);
-      return [sum]})
-      .map(json);
+    //.key(function (d) {return d.rechtstraeger; })
+    .entries(json);
 
-      console.log(euroOverTime, 'length', Object.keys(euroOverTime).length);
 
-      // for(var i = 0; i <= Object.keys(euroOverTime).length; i++) {
-      //
-      //   console.log(i, euroOverTime[i]);
-      //
-      // }
+    let data = [];
+    //2015 
+    for(let i in euroOverTime[0].values) {
 
-      for (let key in euroOverTime) {
-        if (euroOverTime.hasOwnProperty(key)) {
+      if(euroOverTime[0].values[i].rechtstraeger === sourceName && euroOverTime[0].values[i].mediumMedieninhaber === targetName) {
 
-          if(key === '20151') {
-          console.log(key + " -> " + euroOverTime[key]);
-
-          }
-
-          //console.log(key + " -> " + euroOverTime[key]);
-        }
+        data.push(
+          [+euroOverTime[0].values[i].quartal,+euroOverTime[0].values[i].euro ],
+          [+euroOverTime[1].values[i].quartal, +euroOverTime[1].values[i].euro],
+          [+euroOverTime[2].values[i].quartal, +euroOverTime[2].values[i].euro],
+          [+euroOverTime[3].values[i].quartal, +euroOverTime[3].values[i].euro]
+        );
       }
-
-
-
-
-      // let sumQuartal = (<any>d3).nest()
-      // .key(function (d) {return d.quartal; })
-      // // .rollup(function (v) {
-      // //   //console.log('v', v);
-      // //   let sum = (<any>d3).sum(v, function (d){ return d.euro});
-      // //  //console.log('sum', sum);
-      // //   return sum; })
-      // .map(euroOverTime);
-      //
-      // console.log('Sum over Quartal', sumQuartal);
-
-      // details.selectAll(".bar")
-      //     .data(json)
-      //   .enter().append("rect")
-      //     .attr("class", "bar")
-      //     .attr("x", function(d) { return x(d.salesperson); })
-      //     .attr("width", x.bandwidth())
-      //     .attr("y", function(d) { return y(d.sales); })
-      //     .attr("height", function(d) { return height - y(d.sales); });
-
-
     }
+
+    var x = (<any>d3).scale.ordinal()
+    .rangeBands([0, w], 0.2);
+
+    var y = d3.scale.linear()
+    .range([h, 0]);
+
+    x.domain(data.map(function(d) { return d; }));
+    y.domain([0, d3.max(data[1])]);
+
+    let detailSVG = d3.select('svg.sankey_details');
+
+    detailSVG.selectAll('.bar')
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('class', 'bar')
+    .attr('x', function(d, i) { console.log('i', i);return x(d); })
+    .attr('width', x.rangeBand())
+    .attr('y', function(d) { console.log('data - y', d); return y(d[1]); })
+    .attr('height', function(d) { return 200 - y(d[1]); });
+
+    detailSVG.selectAll('text')
+    .append('text')
+    .attr("transform", "rotate(90)")
+    .attr("y", 0)
+    .attr("x", 7)
+    .attr("dy", ".35em")
+    .style("text-anchor", "start");
   }
-  /**
-  * Factory method to create a new SankeyDiagram instance
-  * @param parent
-  * @param options
-  * @returns {SankeyDetail}
-  */
-  export function create(parent: Element, options: any) {
-    return new SankeyDetail(parent, options);
-  }
+}
+/**
+* Factory method to create a new SankeyDiagram instance
+* @param parent
+* @param options
+* @returns {SankeyDetail}
+*/
+export function create(parent: Element, options: any) {
+  return new SankeyDetail(parent, options);
+}
