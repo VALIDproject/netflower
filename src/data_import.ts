@@ -206,16 +206,16 @@ class DataImport implements MAppViews {
           d3.select('#valuesList').selectAll('*').remove();
 
           this.storeData();
+          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
 
-          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('In edit mode');
         } else {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
           d3.select('.dataVizView').classed('invisibleClass', false);
 
           this.storeData();
+          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
 
-          events.fire(AppConstants.EVENT_DATA_PARSED, this.parseResults.data);
           console.log('Not in edit mode');
         }
         const evt = <MouseEvent>d3.event;

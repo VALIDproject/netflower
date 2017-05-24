@@ -48,14 +48,30 @@ class SankeyDiagram implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    if(dataAvailable) {
+      this.getStorageData();
+    }
 
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
       //Draw Sankey Diagram
-      this.buildSankey(data);
+      this.getStorageData();
     });
   }
 
+  /**
+   * Just a handy mehtod that can be called whenever the page is reloaded or when the data is ready.
+   */
+  private getStorageData() {
+    localforage.getItem('data').then((value) => {
+      this.buildSankey(value);
+    });
+  }
 
+  /**
+   * This function draws the whole sankey visualization by using the data which is passed from the storage.
+   * @param json data from the read functionality
+   */
   private buildSankey(json) {
     const that = this;
     const sankey = (<any>d3).sankey();
