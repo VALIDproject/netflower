@@ -62,7 +62,7 @@ class SankeyDetail implements MAppViews {
     let details = this.$node;
     details.attr('transform', 'translate(' + 600 + ',' + 500 + ')')
     .attr('width', w + 'px')
-    .attr('height', h + 'px')
+    .attr('height', h  + 'px')
     .style('background',  '#C0C0C0')
     .style('z-index', '10000');
 
@@ -70,35 +70,44 @@ class SankeyDetail implements MAppViews {
     let targetName = clickedPath.target.name;
     let value = clickedPath.target.value;
 
-    let euroOverTime = (<any>d3).nest()
-    .key(function (d) {return d.quartal; })
-    //.key(function (d) {return d.rechtstraeger; })
-    .entries(json);
+    //console.log('json', json);
 
 
-    let data = [];
-    //2015 
-    for(let i in euroOverTime[0].values) {
+    function filterBySelectedPath (obj) {
+      return obj.rechtstraeger === sourceName && obj.mediumMedieninhaber === targetName;
+    }
 
-      if(euroOverTime[0].values[i].rechtstraeger === sourceName && euroOverTime[0].values[i].mediumMedieninhaber === targetName) {
+    let path = json.filter(filterBySelectedPath);
 
-        data.push(
-          [+euroOverTime[0].values[i].quartal,+euroOverTime[0].values[i].euro ],
-          [+euroOverTime[1].values[i].quartal, +euroOverTime[1].values[i].euro],
-          [+euroOverTime[2].values[i].quartal, +euroOverTime[2].values[i].euro],
-          [+euroOverTime[3].values[i].quartal, +euroOverTime[3].values[i].euro]
-        );
+    //console.log('path', path);
+
+    let euroOverTime = {};
+
+    for(var key in path) {
+      if(path.hasOwnProperty(key)) {
+        euroOverTime[path[key].quartal] = path[key];
       }
     }
 
+    //console.log('euroOverTime', euroOverTime);
+
+    let data = [];
+
+    for(let i in euroOverTime) {
+      data.push({quartal: +euroOverTime[i].quartal, euro: +euroOverTime[i].euro});
+    }
+
+    //console.log('data', data);
+
     var x = (<any>d3).scale.ordinal()
-    .rangeBands([0, w], 0.2);
+    .rangeBands([0, w ], 0.2);
 
     var y = d3.scale.linear()
-    .range([h, 0]);
+    .range([0, h-20]);
 
-    x.domain(data.map(function(d) { return d; }));
-    y.domain([0, d3.max(data[1])]);
+
+    x.domain(data.map(function(d) { return d.quartal; }));
+    y.domain([0, d3.max(data, function(d) { return d.euro; })]);
 
     let detailSVG = d3.select('svg.sankey_details');
 
@@ -107,10 +116,10 @@ class SankeyDetail implements MAppViews {
     .enter()
     .append('rect')
     .attr('class', 'bar')
-    .attr('x', function(d, i) { console.log('i', i);return x(d); })
+    .attr('x', function(d, i) {return x(d.quartal); })
     .attr('width', x.rangeBand())
-    .attr('y', function(d) { console.log('data - y', d); return y(d[1]); })
-    .attr('height', function(d) { return 200 - y(d[1]); });
+    .attr('y', function(d) {  return h - y(d.euro); })
+    .attr('height', function(d) { return y(d.euro); });
 
     detailSVG.selectAll('text')
     .append('text')
