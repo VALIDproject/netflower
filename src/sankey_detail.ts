@@ -48,6 +48,7 @@ class SankeyDetail implements MAppViews {
   private attachListener() {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json) => {
       //console.log('data', data, 'json', json);
+      console.log(evt);
       this.openDetails(data, json);
     });
 
@@ -56,13 +57,18 @@ class SankeyDetail implements MAppViews {
 
   private openDetails (clickedPath, json) {
 
-    let w = 600;
-    let h = 200;
+    let margin = {top: 30 , right: 40, bottom: 30, left: 40},
+    w = 400 - margin.left - margin.right,
+    h= 200 - margin.top - margin.bottom;
+
+
+
+
     //console.log('openDetails - true', clickedPath);
     let details = this.$node;
-    details.attr('transform', 'translate(' + 600 + ',' + 500 + ')')
-    .attr('width', w + 'px')
-    .attr('height', h  + 'px')
+    details.attr('transform', 'translate(' + 400 + ',' + 500 + ')')
+    .attr('width', w + margin.left + margin.right + 'px')
+    .attr('height', h + margin.top + margin.bottom + 'px')
     .style('background',  '#C0C0C0')
     .style('z-index', '10000');
 
@@ -71,7 +77,6 @@ class SankeyDetail implements MAppViews {
     let value = clickedPath.target.value;
 
     //console.log('json', json);
-
 
     function filterBySelectedPath (obj) {
       return obj.rechtstraeger === sourceName && obj.mediumMedieninhaber === targetName;
@@ -103,23 +108,43 @@ class SankeyDetail implements MAppViews {
     .rangeBands([0, w ], 0.2);
 
     var y = d3.scale.linear()
-    .range([0, h-20]);
+    .range([h, 0]);
 
 
     x.domain(data.map(function(d) { return d.quartal; }));
     y.domain([0, d3.max(data, function(d) { return d.euro; })]);
 
-    let detailSVG = d3.select('svg.sankey_details');
+    let detailSVG = d3.select('svg.sankey_details').append('g').attr('class', 'bars');
+
+    detailSVG.attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
 
     detailSVG.selectAll('.bar')
     .data(data)
     .enter()
     .append('rect')
     .attr('class', 'bar')
-    .attr('x', function(d, i) {return x(d.quartal); })
+    .attr('x', function(d, i) { return x(d.quartal); })
     .attr('width', x.rangeBand())
-    .attr('y', function(d) {  return h - y(d.euro); })
+    .attr('y', function(d) { return h - y(d.euro); })
     .attr('height', function(d) { return y(d.euro); });
+    //  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    // Define the axes
+    var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom");
+
+    var yAxis = d3.svg.axis().scale(y)
+    .orient("left");
+
+    detailSVG.append('g')
+    .attr('class', ' x axis')
+    .attr('transform', 'translate(0,' + h + ')')
+    .call(xAxis);
+
+    detailSVG.append('g')
+    .attr('class', 'y axis')
+    .call(yAxis);
+
 
     detailSVG.selectAll('text')
     .append('text')
