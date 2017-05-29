@@ -14,6 +14,7 @@ class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 20;
+  private promise;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
@@ -63,6 +64,8 @@ class SankeyDiagram implements MAppViews {
    * Just a handy mehtod that can be called whenever the page is reloaded or when the data is ready.
    */
   private getStorageData() {
+    this.promise = localforage.getItem('data').then((val) => {return val;});
+
     localforage.getItem('data').then((value) => {
       this.buildSankey(value);
     });
@@ -83,6 +86,7 @@ class SankeyDiagram implements MAppViews {
     const margin = { top: 10, right: 120, bottom: 10, left: 120 };
     const width =  widthNode  - margin.left - margin.right;
     const height = heightNode - margin.top - margin.bottom;
+    const widthOffset = 30;
 
     //The "0" option enables zero-padding. The comma (",") option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
@@ -98,7 +102,7 @@ class SankeyDiagram implements MAppViews {
     //Set the diagram properties
     sankey.nodeWidth(35)
       .nodePadding(20)
-      .size([width, height]);
+      .size([width - widthOffset, height]);
 
     const path = sankey.link();
 
@@ -128,6 +132,11 @@ class SankeyDiagram implements MAppViews {
     graph.nodes = (<any>d3).keys((<any>d3).nest()
       .key((d) => {return d.name;})
       .map(graph.nodes));
+
+    //Add the fake node
+    graph.nodes.push('Others');
+    graph.nodes.push('More');
+    graph.links.push({'source': 'Others', 'target': 'More', 'value': 20000});
 
     let text;
     graph.links.forEach(function (d, i) {
@@ -193,55 +202,35 @@ class SankeyDiagram implements MAppViews {
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
       .attr('x', 45)
-      .attr('y', function(d) { return d.dy / 2; }) //Place in middle of node
-      .attr('dy', '.2em')
+      .attr('y', function(d) { return (d.dy / 2) - 10;})
+      .attr('dy', '1.0em')
       .attr('text-anchor', 'start')
-      .text(function(d) { return d.name; })
-      .filter(function(d, i) { return d.x < width / 2; })
-      //Node Text left if filter function is true
+      .attr('class', 'rightText')
+      .text(function(d) { return `${format(d.value)} ${d.name}`; })
+      .filter(function(d, i) { return d.x < width / 2})
       .attr('x', -45 + sankey.nodeWidth())
-      .attr('text-anchor', 'end');
+      .attr('text-anchor', 'end')
+      .attr('class', 'leftText');
 
-    //TODO: FG: Call the function with .call or .each d3TextWrap and pass depenendt arguments
-    // //Wrap the text
-    // let widthText = this.$node.selectAll('text').node().getBoundingClientRect().width;
-    //
-    // if(widthText >= 165 ) {
-    //   this.wrap(this.$node.selectAll('text'), 60);
-    // }
+    //The strange word wrapping. Needs to be reworked based on the svg size the
+    //sankey diagram size and the words and text size.
+    const leftWrap = this.$node.selectAll('.leftText');
+    const rightWrap = this.$node.selectAll('.rightText');
+    const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
+    const rightTextWidth = rightWrap.node().getBoundingClientRect().width;
+    const svgBox = {
+      'width': width + margin.left + margin.right,
+      'height': height + margin.top + margin.bottom
+    };
+    const wordWrapBorder = (svgBox.width - width) / 2;
+
+    if(leftTextWidth > wordWrapBorder) {
+      d3TextWrap(leftWrap, wordWrapBorder - 20, 0, 120);
+    }
+    if(rightTextWidth > wordWrapBorder) {
+      d3TextWrap(rightWrap, wordWrapBorder + 120, 60)
+    }
   }
-
-  /**
-   * This function wraps the text in order to fit it to the svg size.
-   * @param text object to wrap
-   * @param widthText width of the text object
-   *
-   * @see: from http://bl.ocks.org/mbostock/7555321
-   */
-  // private wrap(text, width) {
-  //   text.each(function() {
-  //     let text = d3.select(this),
-  //       words = text.text().split(/\s+/).reverse(),
-  //       word,
-  //       line = [],
-  //       lineNumber = 0,
-  //       lineHeight = 1, // ems
-  //       y = text.attr("y"),
-  //       dy = parseFloat(text.attr("dy")) || 0;
-  //
-  //     let tspan = (text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em") as any);
-  //     while (word = words.pop()) {
-  //       line.push(word);
-  //       tspan.text(line.join(" "));
-  //       if (tspan.node().getComputedTextLength() > width) {
-  //         line.pop();
-  //         tspan.text(line.join(" "));
-  //         line = [word];
-  //         tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", (++lineNumber * lineHeight + dy) + "em").text(word);
-  //       }
-  //     }
-  //   });
-  // }
 }
 
 /**
