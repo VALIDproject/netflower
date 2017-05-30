@@ -90,6 +90,11 @@ export class App implements MAppViews {
       view: 'SankeyDiagram',
       parent: 'dataVizView',
       options: {},
+    },
+    {
+      view: 'SparklineBarChart',
+      parent: 'dataVizView',
+      options: {},
     }
   ];
 
