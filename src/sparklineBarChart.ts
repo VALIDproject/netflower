@@ -36,9 +36,9 @@ class SparklineBarChart implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-        console.log("Hello Alex im barchart");
+        console.log("Now executing SparklineBarChart :-)");
     this.$node.html(`
-    <p>Hello World</p>
+    <p>This will turn into a sparkline barchart</p>
        `);
 
             //This is how we retrieve the data. As it's loaded async it is only available as promise.
