@@ -15,6 +15,11 @@ class SankeyDiagram implements MAppViews {
   private $node;
   private nodesToShow: number = 20;
 
+  //Variables for the temporary nodes to show more
+  private tempNodeLeft: string = 'Others';
+  private tempNodeRight: string = 'More';
+  private tempNodeVal: number = 20000;
+
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
       .append('div')
@@ -131,11 +136,10 @@ class SankeyDiagram implements MAppViews {
       .map(graph.nodes));
 
     //Add the fake node
-    graph.nodes.push('Others');
-    graph.nodes.push('More');
-    graph.links.push({'source': 'Others', 'target': 'More', 'value': 20000});
+    graph.nodes.push(this.tempNodeLeft);
+    graph.nodes.push(this.tempNodeRight);
+    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight, 'value': this.tempNodeVal});
 
-    let text;
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
@@ -153,7 +157,6 @@ class SankeyDiagram implements MAppViews {
       .links(graph.links)
       .layout(10);
 
-
     let link = svg.append('g').selectAll('.link')
       .data(graph.links)
       .enter().append('path')
@@ -163,12 +166,16 @@ class SankeyDiagram implements MAppViews {
       //reduce edges crossing
       .sort(function(a, b) { return b.dy - a.dy; });
 
-
     //Add the link titles - Hover Path
     link.append('title')
       .text(function(d) {
-        return d.source.name + ' → ' +
+        if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
+          return d.source.name + ' → ' +
+          d.target.name;
+        } else {
+          return d.source.name + ' → ' +
           d.target.name + '\n' + format(d.value);
+        }
       });
 
     //Add the on 'click' listener for the links
@@ -193,7 +200,11 @@ class SankeyDiagram implements MAppViews {
       //Title rectangle
       .append('title')
       .text(function(d) {
-        return d.name + '\n' + format(d.value);
+        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+          return `${d.name}`;
+        } else {
+          return d.name + '\n' + format(d.value);
+        }
       });
 
     //Add in the title for the nodes
@@ -203,7 +214,13 @@ class SankeyDiagram implements MAppViews {
       .attr('dy', '1.0em')
       .attr('text-anchor', 'start')
       .attr('class', 'rightText')
-      .text(function(d) { return `${format(d.value)} ${d.name}`; })
+      .text(function(d) {
+        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+          return `${d.name}`;
+        } else {
+          return `${format(d.value)} ${d.name}`;
+        }
+      })
       .filter(function(d, i) { return d.x < width / 2})
       .attr('x', -45 + sankey.nodeWidth())
       .attr('text-anchor', 'end')
