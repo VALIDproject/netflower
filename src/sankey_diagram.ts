@@ -14,7 +14,6 @@ class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 20;
-  private promise;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
@@ -64,8 +63,6 @@ class SankeyDiagram implements MAppViews {
    * Just a handy mehtod that can be called whenever the page is reloaded or when the data is ready.
    */
   private getStorageData() {
-    this.promise = localforage.getItem('data').then((val) => {return val;});
-
     localforage.getItem('data').then((value) => {
       this.buildSankey(value);
     });
@@ -225,10 +222,12 @@ class SankeyDiagram implements MAppViews {
     const wordWrapBorder = (svgBox.width - width) / 2;
 
     if(leftTextWidth > wordWrapBorder) {
-      d3TextWrap(leftWrap, wordWrapBorder - 20, 0, 120);
+      d3TextWrap(leftWrap, wordWrapBorder);
+      leftWrap.attr('transform', 'translate(' + (wordWrapBorder + 5) * (-1) + ', 0)');
     }
     if(rightTextWidth > wordWrapBorder) {
-      d3TextWrap(rightWrap, wordWrapBorder + 120, 60)
+      d3TextWrap(rightWrap, wordWrapBorder + 10);
+      rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
     }
   }
 }
