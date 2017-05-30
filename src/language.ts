@@ -5,5 +5,5 @@
  * If all strings and texts are written in constants it's easier to change the language depending on the region settings.
  */
 
-export const APP_NAME = 'Valid';
+export const APP_NAME = 'VALiD';
 export const HELLO_WORLD = 'Hello World this is VALID... or will be...';
