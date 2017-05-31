@@ -270,15 +270,14 @@ Part of the global settings view.
 div.tooltip {
   position: absolute;
   text-align: center;
-  width: 60px;
-  height: 23px;
+  width: auto;
+  height: 20px;
   padding: 2px;
   font: 12px sans-serif;
   background: white;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
-
 }
 
 .caption {
