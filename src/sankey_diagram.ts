@@ -9,13 +9,19 @@ import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap} from './utilities';
+import FilterPipeline from './filterpipeline';
+
 
 class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 20;
+  private pipeline: FilterPipeline;
 
   constructor(parent: Element, private options: any) {
+    //Create FilterPipeline
+    this.pipeline = FilterPipeline.getInstance();
+
     this.$node = d3.select(parent)
       .append('div')
       .classed('sankey_diagram', true);
@@ -57,6 +63,12 @@ class SankeyDiagram implements MAppViews {
       //Draw Sankey Diagram
       this.getStorageData();
     });
+
+    events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
+      this.$node.select('.sankey_vis').html("");
+      //Redraw Sankey Diagram
+      this.getStorageData();
+    });
   }
 
   /**
@@ -64,6 +76,7 @@ class SankeyDiagram implements MAppViews {
    */
   private getStorageData() {
     localforage.getItem('data').then((value) => {
+      value = this.pipeline.performFilters(value);
       this.buildSankey(value);
     });
   }
@@ -110,7 +123,7 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
 
     nest.forEach(function (d, i ) {
-      if (d.key === '20151') {
+      if (d.key === '20151' || d.key === '20152') {
         for(var _v = 0; _v < that.nodesToShow; _v++) {;
           //console.log(_v, d);
           graph.nodes.push({ 'name': d.values[_v].rechtstraeger });//all Nodes
