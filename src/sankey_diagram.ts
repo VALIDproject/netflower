@@ -110,7 +110,7 @@ class SankeyDiagram implements MAppViews {
 
     //Group Data (by quartal)
     let nest = (<any>d3).nest()
-      .key(function (d) {return d.quartal;})
+      .key(function (d) {return d.timeNode;})
       .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
@@ -118,12 +118,12 @@ class SankeyDiagram implements MAppViews {
     nest.forEach(function (d, i ) {
       if (d.key === '20151') {
         for(var _v = 0; _v < that.nodesToShow; _v++) {;
-          //console.log(_v, d);
-          graph.nodes.push({ 'name': d.values[_v].rechtstraeger });//all Nodes
-          graph.nodes.push({ 'name': d.values[_v].mediumMedieninhaber });//all Nodes
-          graph.links.push({ 'source': d.values[_v].rechtstraeger,
-            'target': d.values[_v].mediumMedieninhaber,
-            'value': + d.values[_v].euro });
+          // console.log(_v, d);
+          graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
+          graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+          graph.links.push({ 'source': d.values[_v].sourceNode,
+            'target': d.values[_v].targetNode,
+            'value': + d.values[_v].valueNode });
         }
       }
     });
