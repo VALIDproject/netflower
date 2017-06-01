@@ -44,7 +44,6 @@ class SankeyDetail implements MAppViews {
   */
   private attachListener() {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json) => {
-      console.log(evt, data);
       if(this.isOpen) {
         this.closeDetail();
         this.isOpen = false;
@@ -103,19 +102,19 @@ class SankeyDetail implements MAppViews {
 
     //Filter data based on the clicked path (sourceName and targetName) and store it
     let path = json.filter((obj) => {
-      return obj.rechtstraeger === sourceName && obj.mediumMedieninhaber === targetName;
+      return obj.sourceNode === sourceName && obj.targetNode === targetName;
     });
 
     //Data for the bar chart
     let valueOverTime = {};
     for(let key in path) {
       if(path.hasOwnProperty(key)) {
-        valueOverTime[path[key].quartal] = path[key];
+        valueOverTime[path[key].timeNode] = path[key];
       }
     }
     let data = [];
     for(let i in valueOverTime) {
-      data.push({quartal: +valueOverTime[i].quartal, euro: +valueOverTime[i].euro});
+      data.push({timeNode: +valueOverTime[i].timeNode, valueNode: +valueOverTime[i].valueNode});
     }
 
     //X-Scale and equal distribution
@@ -126,8 +125,8 @@ class SankeyDetail implements MAppViews {
     let y = d3.scale.linear()
     .range([h, 0]);
 
-    x.domain(data.map(function(d) { return d.quartal; }));
-    y.domain([0, d3.max(data, function(d) { return d.euro; })]);
+    x.domain(data.map(function(d) { return d.timeNode; }));
+    y.domain([0, d3.max(data, function(d) { return d.valueNode; })]);
 
     //Add the svg for the bars and transform it slightly to be in position of the box
     this.detailSVG = d3.select('svg.sankey_details')
@@ -141,14 +140,14 @@ class SankeyDetail implements MAppViews {
     .enter()
     .append('rect')
     .attr('class', 'bar')
-    .attr('x', function(d, i) { return x(d.quartal); })
+    .attr('x', function(d, i) { return x(d.timeNode); })
     .attr('width', x.rangeBand())
-    .attr('y', function(d) { return y(d.euro); }) // h - y(d.euro);
-    .attr('height', function(d) { return y(0) - y(d.euro); })
+    .attr('y', function(d) { return y(d.valueNode); }) // h - y(d.valueNode);
+    .attr('height', function(d) { return y(0) - y(d.valueNode); })
     .on('mouseover', function(d) {
       tooltip.transition().duration(200).style('opacity', .9);
 
-      tooltip.html(format(d.euro))
+      tooltip.html(format(d.valueNode))
       .style('left', ((<any>d3).event.pageX -40) + 'px')
       .style('top', ((<any>d3).event.pageY - 20) + 'px');
     })
