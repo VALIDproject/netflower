@@ -24,7 +24,21 @@ class SparklineBarChart implements MAppViews {
    * @returns {Promise<ValidHeader>}
    */
   init() {
-    this.build();
+
+    var media = ["Tiroler Tageszeitung", "ORF Radio Tirol", "Tirolerin",  "ORF2", "Kleine Zeitung", "Die Presse", "Kronen Zeitung", "NÖN", "Salzburger Nachrichten", "Kurier", "BVZ", "Blick ins Land", "ExtraDienst"];
+
+     for (var d of media) {
+       this.build("div.right_bars", "mediumMedieninhaber", d);
+ }
+
+     var legal = ["Agrarmarketing Tirol (Verein)", "Agrarmarkt Austria Marketing GesmbH"];
+
+     for (var d of legal) {
+       this.build("div.left_bars", "rechtstraeger", d);
+ }
+
+//       this.build("div.right_bars", "Tiroler Tageszeitung");
+
     this.attachListener();
 
     //Return the promise directly as long there is no dynamical data to update
@@ -34,7 +48,7 @@ class SparklineBarChart implements MAppViews {
   /**
    * Build the basic DOM elements
    */
-  private build() {
+  private build(parent, field, medium) {
 //        console.log("Now executing SparklineBarChart :-)");
 //     this.$node.html(`
 //     <p>This will turn into a sparkline barchart</p>
@@ -49,12 +63,13 @@ class SparklineBarChart implements MAppViews {
         //Within the {} the data is available for usage
         this.promiseData.then(function (data) {
           // TODO get legalEnt/medium name into this scope
-          var filtered_data = data.filter(function(d) { return d.mediumMedieninhaber == "Kurier"; });
+          var filtered_data = data.filter(function(d) { return d[field] == medium; });
           var aggregated_data = d3.nest()
             .key(function(d) { return d.quartal; })
             .rollup(function(v) { return d3.sum(v, function(d) { return d.euro; }})
             .entries(filtered_data);
-          console.log('spark data: ', JSON.stringify(aggregated_data));
+          console.log('spark data for ', field, ' : ', medium, ' :');
+          console.log(JSON.stringify(aggregated_data));
 
     let width = 120;
     let height = 40;
@@ -72,7 +87,7 @@ class SparklineBarChart implements MAppViews {
     x.domain(aggregated_data.map(function(d,i) { return d.key; }));
     y.domain([0, d3.max(aggregated_data, function(d) { return d.values; })]);
 
-    let svg = d3.select("div.right_bars").append("svg")
+    let svg = d3.select(parent).append("svg")
     .attr("width", width)
     .attr("height", height);
 
