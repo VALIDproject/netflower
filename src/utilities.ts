@@ -25,7 +25,7 @@ Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
  *
  * @see: from https://github.com/d3/d3/issues/1642 AlexandreBonneau
  */
-export function d3TextWrap(text, width, paddingRightLeft, paddingTopBottom) {
+export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
   paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
   paddingTopBottom = (paddingTopBottom || 5) - 2; //Default padding (5px), remove 2 pixels because of the borders
   let maxWidth = width; //I store the tooltip max width
