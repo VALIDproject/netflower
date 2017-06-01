@@ -15,6 +15,11 @@ class SankeyDiagram implements MAppViews {
   private $node;
   private nodesToShow: number = 20;
 
+  //Variables for the temporary nodes to show more
+  private tempNodeLeft: string = 'Others';
+  private tempNodeRight: string = 'More';
+  private tempNodeVal: number = 20000;
+
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent)
       .append('div')
@@ -83,6 +88,7 @@ class SankeyDiagram implements MAppViews {
     const margin = { top: 10, right: 120, bottom: 10, left: 120 };
     const width =  widthNode  - margin.left - margin.right;
     const height = heightNode - margin.top - margin.bottom;
+    const widthOffset = 30;
 
     //The "0" option enables zero-padding. The comma (",") option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
@@ -98,13 +104,13 @@ class SankeyDiagram implements MAppViews {
     //Set the diagram properties
     sankey.nodeWidth(35)
       .nodePadding(20)
-      .size([width, height]);
+      .size([width - widthOffset, height]);
 
     const path = sankey.link();
 
     //Group Data (by quartal)
     let nest = (<any>d3).nest()
-      .key(function (d) {return d.quartal;})
+      .key(function (d) {return d.timeNode;})
       .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
@@ -112,12 +118,12 @@ class SankeyDiagram implements MAppViews {
     nest.forEach(function (d, i ) {
       if (d.key === '20151') {
         for(var _v = 0; _v < that.nodesToShow; _v++) {;
-          //console.log(_v, d);
-          graph.nodes.push({ 'name': d.values[_v].rechtstraeger });//all Nodes
-          graph.nodes.push({ 'name': d.values[_v].mediumMedieninhaber });//all Nodes
-          graph.links.push({ 'source': d.values[_v].rechtstraeger,
-            'target': d.values[_v].mediumMedieninhaber,
-            'value': + d.values[_v].euro });
+          // console.log(_v, d);
+          graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
+          graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+          graph.links.push({ 'source': d.values[_v].sourceNode,
+            'target': d.values[_v].targetNode,
+            'value': + d.values[_v].valueNode });
         }
       }
     });
@@ -129,7 +135,11 @@ class SankeyDiagram implements MAppViews {
       .key((d) => {return d.name;})
       .map(graph.nodes));
 
-    let text;
+    //Add the fake node
+    graph.nodes.push(this.tempNodeLeft);
+    graph.nodes.push(this.tempNodeRight);
+    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight, 'value': this.tempNodeVal});
+
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
@@ -147,7 +157,6 @@ class SankeyDiagram implements MAppViews {
       .links(graph.links)
       .layout(10);
 
-
     let link = svg.append('g').selectAll('.link')
       .data(graph.links)
       .enter().append('path')
@@ -157,12 +166,16 @@ class SankeyDiagram implements MAppViews {
       //reduce edges crossing
       .sort(function(a, b) { return b.dy - a.dy; });
 
-
     //Add the link titles - Hover Path
     link.append('title')
       .text(function(d) {
-        return d.source.name + ' → ' +
+        if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
+          return d.source.name + ' → ' +
+          d.target.name;
+        } else {
+          return d.source.name + ' → ' +
           d.target.name + '\n' + format(d.value);
+        }
       });
 
     //Add the on 'click' listener for the links
@@ -187,61 +200,53 @@ class SankeyDiagram implements MAppViews {
       //Title rectangle
       .append('title')
       .text(function(d) {
-        return d.name + '\n' + format(d.value);
+        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+          return `${d.name}`;
+        } else {
+          return d.name + '\n' + format(d.value);
+        }
       });
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
       .attr('x', 45)
-      .attr('y', function(d) { return d.dy / 2; }) //Place in middle of node
-      .attr('dy', '.2em')
+      .attr('y', function(d) { return (d.dy / 2) - 10;})
+      .attr('dy', '1.0em')
       .attr('text-anchor', 'start')
-      .text(function(d) { return d.name; })
-      .filter(function(d, i) { return d.x < width / 2; })
-      //Node Text left if filter function is true
+      .attr('class', 'rightText')
+      .text(function(d) {
+        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+          return `${d.name}`;
+        } else {
+          return `${format(d.value)} ${d.name}`;
+        }
+      })
+      .filter(function(d, i) { return d.x < width / 2})
       .attr('x', -45 + sankey.nodeWidth())
-      .attr('text-anchor', 'end');
+      .attr('text-anchor', 'end')
+      .attr('class', 'leftText');
 
-    //TODO: FG: Call the function with .call or .each d3TextWrap and pass depenendt arguments
-    // //Wrap the text
-    // let widthText = this.$node.selectAll('text').node().getBoundingClientRect().width;
-    //
-    // if(widthText >= 165 ) {
-    //   this.wrap(this.$node.selectAll('text'), 60);
-    // }
+    //The strange word wrapping. Needs to be reworked based on the svg size the
+    //sankey diagram size and the words and text size.
+    const leftWrap = this.$node.selectAll('.leftText');
+    const rightWrap = this.$node.selectAll('.rightText');
+    const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
+    const rightTextWidth = rightWrap.node().getBoundingClientRect().width;
+    const svgBox = {
+      'width': width + margin.left + margin.right,
+      'height': height + margin.top + margin.bottom
+    };
+    const wordWrapBorder = (svgBox.width - width) / 2;
+
+    if(leftTextWidth > wordWrapBorder) {
+      d3TextWrap(leftWrap, wordWrapBorder);
+      leftWrap.attr('transform', 'translate(' + (wordWrapBorder + 5) * (-1) + ', 0)');
+    }
+    if(rightTextWidth > wordWrapBorder) {
+      d3TextWrap(rightWrap, wordWrapBorder + 10);
+      rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
+    }
   }
-
-  /**
-   * This function wraps the text in order to fit it to the svg size.
-   * @param text object to wrap
-   * @param widthText width of the text object
-   *
-   * @see: from http://bl.ocks.org/mbostock/7555321
-   */
-  // private wrap(text, width) {
-  //   text.each(function() {
-  //     let text = d3.select(this),
-  //       words = text.text().split(/\s+/).reverse(),
-  //       word,
-  //       line = [],
-  //       lineNumber = 0,
-  //       lineHeight = 1, // ems
-  //       y = text.attr("y"),
-  //       dy = parseFloat(text.attr("dy")) || 0;
-  //
-  //     let tspan = (text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em") as any);
-  //     while (word = words.pop()) {
-  //       line.push(word);
-  //       tspan.text(line.join(" "));
-  //       if (tspan.node().getComputedTextLength() > width) {
-  //         line.pop();
-  //         tspan.text(line.join(" "));
-  //         line = [word];
-  //         tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", (++lineNumber * lineHeight + dy) + "em").text(word);
-  //       }
-  //     }
-  //   });
-  // }
 }
 
 /**

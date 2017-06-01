@@ -200,6 +200,9 @@ class DataImport implements MAppViews {
     //Listener for the finished visualization Button
     this.$node.select('#specialBtn')
       .on('click', (e) => {
+        //Before rework the keys of the data
+        this.reworkKeys(this.parseResults);
+
         if(this.editMode) {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
           d3.select('.dataVizView').classed('invisibleClass', false);
@@ -300,6 +303,21 @@ class DataImport implements MAppViews {
 
     //Local Storage for small variables
     localStorage.setItem('dataLoaded', 'loaded');
+  }
+
+  private reworkKeys(json) {
+    let data = json.data;
+    let keys = Object.keys(data[0]);
+    const keyRep: Array<string> = ['sourceNode', 'timeNode', 'attribute1', 'attribute2', 'targetNode', 'valueNode'];
+
+    data.forEach(function(e) {
+      for(let i = 0; i < keys.length; i++) {
+        e[keyRep[i]] = e[keys[i]];
+        delete e[keys[i]];
+      }
+    });
+
+    this.parseResults.data = data;
   }
 
   /**
