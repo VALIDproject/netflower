@@ -287,3 +287,17 @@ div.tooltip {
 .bar {
   fill: #696969;
 }
+
+.closeLink {
+  // position: absolute;
+  // text-align: center;
+  // width: auto;
+  // height: 20px;
+  // padding: 2px;
+  font: 12px sans-serif;
+  //pointer-events: none;
+  cursor: pointer;
+  text-decoration:underline;
+
+
+}
