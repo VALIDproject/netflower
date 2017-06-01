@@ -1,0 +1,62 @@
+import Filter from './filter';
+
+export default class EuroFilter implements Filter
+{
+  private resultData: Array<any>;
+
+  private _minValue: number;
+  private _maxValue: number;
+
+  constructor()
+  {
+    this.resultData = new Array<any>();
+  }
+
+  get minValue():number
+  {
+    return this._minValue;
+  }
+
+  set minValue(min:number)
+  {
+    this._minValue = min;
+  }
+
+  get maxValue():number
+  {
+    return this._maxValue;
+  }
+
+  set maxValue(max:number)
+  {
+    this._maxValue = max;
+  }
+
+  public changeRange(minValue: number, maxValue: number)
+  {
+    this.minValue = minValue;
+    this.maxValue = maxValue;
+  }
+
+  public meetCriteria(data: any): any
+  {
+    this.resultData = new Array<any>();
+
+    for(let entry of data)
+    {
+      let euro:number = entry.euro;
+
+      if(euro >= this.minValue && euro <= this.maxValue)
+      {
+        this.resultData.push(entry);
+      }
+    }
+
+    return this.resultData;
+  }
+
+  public printData(): void
+  {
+    console.log("Euro Filter: " + this.minValue + " / " + this.maxValue);
+  }
+}
