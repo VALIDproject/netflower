@@ -11,11 +11,17 @@ import {AppConstants} from './app_constants';
 class SankeyDetail implements MAppViews {
 
   private $node;
-  private isOpen = false;
+  //private isOpen = false;
+
   private detailSVG;
+  //Path clicked check if it twice clicked
   private clicked = 0;
 
+  //Draw SVG Bar Chart
   private drawSvg = 0;
+
+  //Look if the bar chart is drawn
+  private drawBarChart = 0;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent);
@@ -49,34 +55,20 @@ class SankeyDetail implements MAppViews {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json) => {
       //this.drawDetails(data, json);
 
-      if(this.clicked === 0) {
-
+      if (this.clicked <= 1 ) {
         this.drawDetails(data, json);
         ++this.clicked;
-        console.log('first click', this.clicked);
-
-      } else if (this.clicked === 1){
-
-        this.drawDetails(data, json);
-        ++this.clicked;
-        console.log('second click', this.clicked);
 
       } else {
-        console.log('close');
-         this.closeDetail();
-         this.clicked = 0;
+        this.closeDetail();
+        this.clicked = 0;
       }
-      // if(this.isOpen) {
-      //   this.closeDetail();
-      //   this.isOpen = false;
-      // } else {
-      //   this.drawDetails(data, json);
-      //   this.isOpen = true;
-      // }
+
     });
 
     events.on(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, (evt, d) => {
-    this.closeDetail();
+      this.closeDetail();
+      this.clicked = 0;
     });
   }
 
@@ -84,10 +76,9 @@ class SankeyDetail implements MAppViews {
   * This method cleans up the view by removing all generated graphs and charts.
   */
   private closeDetail () {
-    //console.log('remove', this.$node, this.detailSVG);
-    this.detailSVG.remove();
-    this.$node.selectAll('svg.sankey_details').remove();
 
+    this.$node.select('svg.sankey_details').remove();
+    this.$node.select('svg.sankey_details2').remove();
   }
 
   /**
@@ -128,9 +119,7 @@ class SankeyDetail implements MAppViews {
     let newYPositionSvg = ypositionSvg+20;
 
 
-
     if(this.drawSvg  === 0) {
-      console.log('this.clicked', this.clicked);
 
       this.$node.append('svg')
       .attr('class', 'sankey_details')
@@ -149,7 +138,7 @@ class SankeyDetail implements MAppViews {
 
     } else {
       this.$node.append('svg')
-      .attr('class', 'sankey_details')
+      .attr('class', 'sankey_details2')
       .attr('transform', 'translate(' + xpositionSvg + ',' + (newYPositionSvg + 20) + ')')
       .attr('width', w + margin.left + margin.right + 'px')
       .attr('height', h + margin.top + margin.bottom + 'px')
@@ -162,7 +151,6 @@ class SankeyDetail implements MAppViews {
       .attr('y', 16);
 
       this.drawSvg = 0;
-
     }
 
 
@@ -195,21 +183,26 @@ class SankeyDetail implements MAppViews {
     y.domain([0, d3.max(data, function(d) { return d.valueNode; })]);
 
 
+    if(this.drawBarChart === 0) {
 
-      //Add the svg for the bars and transform it slightly to be in position of the box
+      // //Add the svg for the bars and transform it slightly to be in position of the box
       this.detailSVG = d3.select('svg.sankey_details')
       .append('g')
       .attr('class', 'bars')
       .attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
 
+      ++this.drawBarChart;
 
+
+    } else {
       // //Add the svg for the bars and transform it slightly to be in position of the box
-      // this.detailSVG = d3.select('svg.sankey_details')
-      // .append('g')
-      // .attr('class', 'bars')
-      // .attr('transform', 'translate(' + (xpositionSvg + 10) + ',' + newYPositionSvg + ')'); 
+      this.detailSVG = d3.select('svg.sankey_details2')
+      .append('g')
+      .attr('class', 'bars')
+      .attr('transform', 'translate(' + (margin.left+ 10) + ',' + margin.top + ')');
 
-
+      this.drawBarChart = 0;
+    }
 
 
     //Add in the bar charts and the tooltips if user mouses over them.
@@ -260,6 +253,7 @@ class SankeyDetail implements MAppViews {
     .on('click', function (d){
       events.fire(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, d);
     });
+
   }
 
 
