@@ -47,7 +47,7 @@ export default class EuroFilter implements Filter
 
     for(let entry of data)
     {
-      let euro:number = entry.euro;
+      let euro:number = entry.valueNode;
 
       if(euro >= this.minValue && euro <= this.maxValue)
       {

@@ -139,15 +139,15 @@ class FilterData implements MAppViews {
 
   private setQuarterFilterRange(json)
   {
-    let min:number = json[0].quartal;
-    let max:number = json[0].quartal;
+    let min:number = json[0].timeNode;
+    let max:number = json[0].timeNode;
     for(let entry of json)
     {
-      if(entry.quartal < min)
-        min = entry.quarter;
+      if(entry.timeNode < min)
+        min = entry.timeNode;
 
-      if(entry.quartal > max)
-        max = entry.quartal;
+      if(entry.timeNode > max)
+        max = entry.timeNode;
     }
 
     this.quarterFilter.changeRange(min, max);
@@ -157,11 +157,11 @@ class FilterData implements MAppViews {
 
    private setEuroFilterRange(json)
   {
-    let min:number = Number(json[0].euro);
-    let max:number = Number(json[0].euro);
+    let min:number = Number(json[0].valueNode);
+    let max:number = Number(json[0].valueNode);
     for(let entry of json)
     {
-      let value:number = Number(entry.euro);
+      let value:number = Number(entry.valueNode);
       if(value < min)
         min = value;
 

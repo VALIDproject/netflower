@@ -47,7 +47,7 @@ export default class QuarterFilter implements Filter
 
     for(let entry of data)
     {
-      let quarter:number = entry.quartal;
+      let quarter:number = entry.timeNode;
 
       if(quarter >= this.minValue && quarter <= this.maxValue)
       {

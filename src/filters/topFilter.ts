@@ -27,16 +27,16 @@ export default class TopFilter implements Filter
 
     for(let entry of data)
     {
-      let key = entry.rechtstraeger;
+      let key = entry.sourceNode;
       let value:number = map.get(key);
 
       if(value === null || value === undefined)
       {
-        map.set(key, Number(entry.euro));
+        map.set(key, Number(entry.valueNode));
       }
       else
       {
-        let newValue:number = value + Number(entry.euro);
+        let newValue:number = value + Number(entry.valueNode);
         map.set(key, newValue);
       }
     }
@@ -62,7 +62,7 @@ export default class TopFilter implements Filter
 
     for(let entry of data)
     {
-      if(entry.rechtstraeger === this.rechtstraeger)
+      if(entry.sourceNode === this.rechtstraeger)
       {
         this.resultData.push(entry);
       }
