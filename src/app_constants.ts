@@ -14,5 +14,7 @@ export class AppConstants {
 
   static EVENT_CLICKED_PATH = 'eventClickPath';
 
+  static EVENT_CLOSE_DETAIL_SANKEY = 'closeSankeyDetails';
+
   static EVENT_FILTER_CHANGED = 'eventFilterChanged';
 }

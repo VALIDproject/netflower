@@ -11,8 +11,17 @@ import {AppConstants} from './app_constants';
 class SankeyDetail implements MAppViews {
 
   private $node;
-  private isOpen = false;
+  //private isOpen = false;
+
   private detailSVG;
+  //Path clicked check if it twice clicked
+  private clicked = 0;
+
+  //Draw SVG Bar Chart
+  private drawSvg = 0;
+
+  //Look if the bar chart is drawn
+  private drawBarChart = 0;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent);
@@ -44,30 +53,39 @@ class SankeyDetail implements MAppViews {
   */
   private attachListener() {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json) => {
-      if(this.isOpen) {
-        this.closeDetail();
-        this.isOpen = false;
-      } else {
+      //this.drawDetails(data, json);
+
+      if (this.clicked <= 1 ) {
         this.drawDetails(data, json);
-        this.isOpen = true;
+        ++this.clicked;
+
+      } else {
+        this.closeDetail();
+        this.clicked = 0;
       }
+
+    });
+
+    events.on(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, (evt, d) => {
+      this.closeDetail();
+      this.clicked = 0;
     });
   }
 
   /**
-   * This method cleans up the view by removing all generated graphs and charts.
-   */
+  * This method cleans up the view by removing all generated graphs and charts.
+  */
   private closeDetail () {
-    console.log('remove', this.$node, this.detailSVG);
-    this.detailSVG.remove();
+
     this.$node.select('svg.sankey_details').remove();
+    this.$node.select('svg.sankey_details2').remove();
   }
 
   /**
-   * This method draws the bar chart over time for each selected node.
-   * @param clickedPath is the node which was clicked by the user
-   * @param json is the whole data set in order to retrieve all time points for the current node
-   */
+  * This method draws the bar chart over time for each selected node.
+  * @param clickedPath is the node which was clicked by the user
+  * @param json is the whole data set in order to retrieve all time points for the current node
+  */
   private drawDetails (clickedPath, json) {
     let margin = {top: 30 , right: 40, bottom: 30, left: 40},
     w = 400 - margin.left - margin.right,
@@ -87,18 +105,54 @@ class SankeyDetail implements MAppViews {
     const formatNumber = d3.format(',.0f'),   // zero decimal places
     format = function(d) { return formatNumber(d) + ' ' + units; };
 
-    this.$node.append('svg')
-    .attr('class', 'sankey_details')
-    .attr('transform', 'translate(' + 550 + ',' + 300 + ')')
-    .attr('width', w + margin.left + margin.right + 'px')
-    .attr('height', h + margin.top + margin.bottom + 'px')
-    .style('background-color',  '#e0e0e0')
-    .style('z-index', '10000')
-    .append('text')
-    .attr('class', 'caption')
-    .text(function(d) { return sourceName + ' → ' + targetName ; })
-    .attr('x', 5)
-    .attr('y', 16);
+    const xSvg = 550;
+    const ySvg = 300;
+
+    //get width and height of sankey div to calculate position of svg
+    let widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
+    let heightSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().height;
+
+    //position of svg in the sankey_diagram div
+    let xpositionSvg = widthSankeyDiv/2 + 100;
+    let ypositionSvg = heightSankeyDiv/2 - h;
+
+    let newYPositionSvg = ypositionSvg+20;
+
+
+    if(this.drawSvg  === 0) {
+
+      this.$node.append('svg')
+      .attr('class', 'sankey_details')
+      .attr('transform', 'translate(' + xpositionSvg + ',' + newYPositionSvg + ')')
+      .attr('width', w + margin.left + margin.right + 'px')
+      .attr('height', h + margin.top + margin.bottom + 'px')
+      .style('background-color',  '#e0e0e0')
+      .style('z-index', '10000')
+      .append('text')
+      .attr('class', 'caption')
+      .text(function(d) { return sourceName + ' → ' + targetName ; })
+      .attr('x', 5)
+      .attr('y', 16);
+
+      ++this.drawSvg;
+
+    } else {
+      this.$node.append('svg')
+      .attr('class', 'sankey_details2')
+      .attr('transform', 'translate(' + xpositionSvg + ',' + (newYPositionSvg + 20) + ')')
+      .attr('width', w + margin.left + margin.right + 'px')
+      .attr('height', h + margin.top + margin.bottom + 'px')
+      .style('background-color',  '#e0e0e0')
+      .style('z-index', '10000')
+      .append('text')
+      .attr('class', 'caption')
+      .text(function(d) { return sourceName + ' → ' + targetName ; })
+      .attr('x', 5)
+      .attr('y', 16);
+
+      this.drawSvg = 0;
+    }
+
 
     //Filter data based on the clicked path (sourceName and targetName) and store it
     let path = json.filter((obj) => {
@@ -128,11 +182,28 @@ class SankeyDetail implements MAppViews {
     x.domain(data.map(function(d) { return d.timeNode; }));
     y.domain([0, d3.max(data, function(d) { return d.valueNode; })]);
 
-    //Add the svg for the bars and transform it slightly to be in position of the box
-    this.detailSVG = d3.select('svg.sankey_details')
+
+    if(this.drawBarChart === 0) {
+
+      // //Add the svg for the bars and transform it slightly to be in position of the box
+      this.detailSVG = d3.select('svg.sankey_details')
       .append('g')
       .attr('class', 'bars')
       .attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
+
+      ++this.drawBarChart;
+
+
+    } else {
+      // //Add the svg for the bars and transform it slightly to be in position of the box
+      this.detailSVG = d3.select('svg.sankey_details2')
+      .append('g')
+      .attr('class', 'bars')
+      .attr('transform', 'translate(' + (margin.left+ 10) + ',' + margin.top + ')');
+
+      this.drawBarChart = 0;
+    }
+
 
     //Add in the bar charts and the tooltips if user mouses over them.
     this.detailSVG.selectAll('.bar')
@@ -170,7 +241,22 @@ class SankeyDetail implements MAppViews {
     this.detailSVG.append('g')
     .attr('class', 'y axis')
     .call(yAxis.ticks(4).tickFormat(d3.format(',')));
+
+
+    let close = this.detailSVG.append('g').attr('class', 'closeLink');
+
+    close.append('text')
+    .text('close')
+    .style('z-index', '200000')
+    .attr('x', '300')
+    .attr('y', '-13')
+    .on('click', function (d){
+      events.fire(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, d);
+    });
+
   }
+
+
 }
 /**
 * Factory method to create a new SankeyDiagram instance
