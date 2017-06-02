@@ -8,16 +8,17 @@
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
+import * as $ from 'jquery';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import FilterPipeline from './filterpipeline';
+import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
 import EuroFilter from './filters/euroFilter';
 import TopFilter from './filters/topFilter';
 
-class Filter implements MAppViews {
+class FilterData implements MAppViews {
 
-  private $node;
+  private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
   private euroFilter: EuroFilter;
@@ -49,8 +50,8 @@ class Filter implements MAppViews {
   init() {
     localforage.getItem('data').then((value) => {
       this.build(value);
+      this.attachListener(value);
     });
-    this.attachListener();
 
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
@@ -62,62 +63,70 @@ class Filter implements MAppViews {
    */
   private build(json) {
     this.$node.html(`
-      <div class="container">
-        <div class="row">
-          <div class="col-md-5">
+      <div class='container'>
+        <div class='row'>
+          <div class='col-md-5'>
             <h3>Euro Filter</h3>
           </div>
-          <div class="col-md-5">
+          <div class='col-md-5'>
             <h3>Quartal Filter</h3>
           </div>
-          <div class="col-md-2">
+          <div class='col-md-2'>
             <h3>Top Filter</h3>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-2">
+        <div class='row'>
+          <div class='col-md-2'>
             <label>Min:</label>
-            <input type="text" id="euroFilterMin" />
+            <input type='text' id='euroFilterMin' />
           </div>
-          <div class="col-md-2">
+          <div class='col-md-2'>
             <label>Max:</label>
-            <input type="text" id="euroFilterMax" />
+            <input type='text' id='euroFilterMax' />
           </div>
-          <div class="col-md-2 col-md-offset-1">
+          <div class='col-md-2 col-md-offset-1'>
             <label>Min:</label>
-            <input type="text" id="quarterFilterMin" />
+            <input type='text' id='quarterFilterMin' />
           </div>
-          <div class="col-md-2">
+          <div class='col-md-2'>
             <label>Max:</label>
-            <input type="text" id="quarterFilterMax" />
+            <input type='text' id='quarterFilterMax' />
           </div>
-          <div class="col-md-2 col-md-offset-1">
-            <button type="button" id="topFilter" class="btn btn-primary">Toggle Top Filter</button>
+          <div class='col-md-2 col-md-offset-1'>
+            <button type='button' id='topFilter' class='btn btn-primary'>Toggle Top Filter</button>
           </div>
         </div>
     `);
 
+    this.setEuroFilterRange(json);
+    this.setQuarterFilterRange(json);
+  }
+
+  /**
+   * Attach the event listeners
+   */
+  private attachListener(json) {
     this.$node.select('#euroFilterMin').on('input', (d) => {
-      let newMin:number = Number((<HTMLInputElement>document.getElementById("euroFilterMin")).value);
+      let newMin:number = $('#euroFilterMin').val() as number;
       this.euroFilter.minValue = newMin;
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     this.$node.select('#euroFilterMax').on('input', (d) => {
-      let newMax:number = Number((<HTMLInputElement>document.getElementById("euroFilterMax")).value);
+      let newMax:number = $('#euroFilterMax').val() as number;
       this.euroFilter.maxValue = newMax;
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     this.$node.select('#quarterFilterMin').on('input', (d) => {
-      let newMin:number = Number((<HTMLInputElement>document.getElementById("quarterFilterMin")).value);
+      let newMin:number = $('#quarterFilterMin').val() as number;
       this.quarterFilter.minValue = newMin;
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     this.$node.select('#quarterFilterMax').on('input', (d) => {
-      let newMax:number = Number((<HTMLInputElement>document.getElementById("quarterFilterMax")).value);
+      let newMax:number = $('#quarterFilterMax').val() as number;
       this.quarterFilter.maxValue = newMax;
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
@@ -126,29 +135,6 @@ class Filter implements MAppViews {
       this.topFilter.switchActive();
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
-
-
-    this.setEuroFilterRange(json);
-    this.setQuarterFilterRange(json);
-  }
-
-  private setEuroFilterRange(json)
-  {
-    let min:number = Number(json[0].euro);
-    let max:number = Number(json[0].euro);
-    for(let entry of json)
-    {
-      let value:number = Number(entry.euro);
-      if(value < min)
-        min = value;
-
-      if(value > max)
-        max = value;
-    }
-
-    this.euroFilter.changeRange(min, max);
-    (<HTMLInputElement>document.getElementById("euroFilterMin")).value = min.toString();
-    (<HTMLInputElement>document.getElementById("euroFilterMax")).value = max.toString();
   }
 
   private setQuarterFilterRange(json)
@@ -165,16 +151,28 @@ class Filter implements MAppViews {
     }
 
     this.quarterFilter.changeRange(min, max);
-    (<HTMLInputElement>document.getElementById("quarterFilterMin")).value = min.toString();
-    (<HTMLInputElement>document.getElementById("quarterFilterMax")).value = max.toString();
+    $('#quarterFilterMin').val(min.toString());
+    $('#quarterFilterMax').val(max.toString());
   }
 
-  /**
-   * Attach the event listeners
-   */
-  private attachListener() {
-  }
+   private setEuroFilterRange(json)
+  {
+    let min:number = Number(json[0].euro);
+    let max:number = Number(json[0].euro);
+    for(let entry of json)
+    {
+      let value:number = Number(entry.euro);
+      if(value < min)
+        min = value;
 
+      if(value > max)
+        max = value;
+    }
+
+    this.euroFilter.changeRange(min, max);
+    $('#euroFilterMin').val(min.toString());
+    $('#euroFilterMax').val(max.toString());
+  }
 }
 
 /**
@@ -184,5 +182,5 @@ class Filter implements MAppViews {
  * @returns {SankeyDiagram}
  */
 export function create(parent: Element, options: any) {
-  return new Filter(parent, options);
+  return new FilterData(parent, options);
 }

@@ -1,6 +1,10 @@
 import Filter from './filter';
 
-export default class QuarterFilter implements Filter
+/**
+ * This class is used to filter the data by either the upper best or the lowest ones.
+ * Either by value or time or other criteria.
+ */
+export default class TopFilter implements Filter
 {
   private resultData: Array<any>;
   private rechtstraeger: string;
@@ -69,6 +73,6 @@ export default class QuarterFilter implements Filter
 
   public printData(): void
   {
-    console.log("Top Filter: ");
+    console.log('Top Filter: ');
   }
 }

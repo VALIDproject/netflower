@@ -16,8 +16,8 @@ module.exports = function(registry) {
     'name': 'ValidHeader'
   });
 
-  registry.push('validView', 'Filter', function() { return System.import('./src/filter'); }, {
-    'name': 'Filter'
+  registry.push('validView', 'FilterData', function() { return System.import('./src/filter_data'); }, {
+    'name': 'FilterData'
   });
 
   registry.push('validView', 'GlobalSettings', function() { return System.import('./src/global_settings'); }, {

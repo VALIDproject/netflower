@@ -1,5 +1,8 @@
 import Filter from './filter';
 
+/**
+ * This class is used to describe a filter by the time aspect of the data.
+ */
 export default class QuarterFilter implements Filter
 {
   private resultData: Array<any>;
@@ -57,6 +60,6 @@ export default class QuarterFilter implements Filter
 
   public printData(): void
   {
-    console.log("Quarter Filter: " + this.minValue + " / " + this.maxValue);
+    console.log('Quarter Filter: ' + this.minValue + ' / ' + this.maxValue);
   }
 }

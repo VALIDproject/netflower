@@ -1,5 +1,8 @@
 import Filter from './filter';
 
+/**
+ * This class is used to describe a value filter or filtering by value of the data set.
+ */
 export default class EuroFilter implements Filter
 {
   private resultData: Array<any>;
@@ -57,6 +60,6 @@ export default class EuroFilter implements Filter
 
   public printData(): void
   {
-    console.log("Euro Filter: " + this.minValue + " / " + this.maxValue);
+    console.log('Euro Filter: ' + this.minValue + ' / ' + this.maxValue);
   }
 }
