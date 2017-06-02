@@ -9,7 +9,7 @@ import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap} from './utilities';
-import FilterPipeline from './filterpipeline';
+import FilterPipeline from './filters/filterpipeline';
 
 
 class SankeyDiagram implements MAppViews {

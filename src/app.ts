@@ -62,7 +62,7 @@ export class App implements MAppViews {
       options: {},
     },
      {
-      view: 'Filter',
+      view: 'FilterData',
       parent: 'dataVizView',
       options: {}
     },

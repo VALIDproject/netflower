@@ -1,6 +1,8 @@
-import Filter from './filters/filter';
+import Filter from './filter';
 
-
+/**
+ * This class represents the whole filter pipeline where all filters are added and processed.
+ */
 export default class FilterPipeline
 {
   private filters: Array<Filter>;
@@ -41,7 +43,7 @@ export default class FilterPipeline
 
   public printFilters(): void
   {
-    console.log("Filter Count: " + this.filters.length);
+    console.log('Filter Count: ' + this.filters.length);
     for(let filter of this.filters)
     {
       filter.printData();
