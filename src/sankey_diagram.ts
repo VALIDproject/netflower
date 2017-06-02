@@ -77,12 +77,17 @@ class SankeyDiagram implements MAppViews {
   }
 
   /**
-   * Just a handy mehtod that can be called whenever the page is reloaded or when the data is ready.
+   * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
    */
   private getStorageData() {
     localforage.getItem('data').then((value) => {
-      value = this.pipeline.performFilters(value);
-      this.buildSankey(value);
+      //Store the unfiltered data too
+      let originalData = value;
+
+      //Filter the data before and then pass it to the draw function.
+      let filteredData = this.pipeline.performFilters(value);
+
+      this.buildSankey(filteredData, originalData);
     });
   }
 
@@ -90,7 +95,7 @@ class SankeyDiagram implements MAppViews {
    * This function draws the whole sankey visualization by using the data which is passed from the storage.
    * @param json data from the read functionality
    */
-  private buildSankey(json) {
+  private buildSankey(json, origJson) {
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
@@ -193,7 +198,7 @@ class SankeyDiagram implements MAppViews {
 
     //Add the on 'click' listener for the links
     link.on('click', function(d) {
-      events.fire(AppConstants.EVENT_CLICKED_PATH, d, json);
+      events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson);
     });
 
     //Add in the nodes
