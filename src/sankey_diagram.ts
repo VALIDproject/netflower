@@ -70,7 +70,7 @@ class SankeyDiagram implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      this.$node.select('.sankey_vis').html("");
+      this.$node.select('.sankey_vis').html('');
       //Redraw Sankey Diagram
       this.getStorageData();
     });
@@ -112,6 +112,11 @@ class SankeyDiagram implements MAppViews {
     const formatNumber = d3.format(',.0f'),    // zero decimal places
       format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
+    //This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
+    //where the first returns a funciton. So everytime the function is called the same index is used for example.
+    const splitAt = index => it =>
+      [it.slice(0, index), it.slice(index)];
+
     //Append the svg canvas t the page
     const svg = d3.select('.sankey_vis').append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -133,17 +138,16 @@ class SankeyDiagram implements MAppViews {
 
     let graph = {'nodes' : [], 'links' : []};
 
+    that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
+
     nest.forEach(function (d, i ) {
-      if (d.key === '20151' || d.key === '20152') {
-        let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
-        for(var _v = 0; _v < max; _v++) {
-          //console.log(_v, d);
-          graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
-          graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
-          graph.links.push({ 'source': d.values[_v].sourceNode,
-            'target': d.values[_v].targetNode,
-            'value': + d.values[_v].valueNode });
-        }
+      let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
+      for(var _v = 0; _v < max; _v++) {;
+        graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
+        graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+        graph.links.push({ 'source': d.values[_v].sourceNode,
+          'target': d.values[_v].targetNode,
+          'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
       }
     });
 
@@ -154,10 +158,15 @@ class SankeyDiagram implements MAppViews {
       .key((d) => {return d.name;})
       .map(graph.nodes));
 
-    //Add the fake node
+    //Add the fake node from last to 'more'
+    const lastSource = graph.links[graph.links.length - 1].source;
+    graph.links.push({'source': lastSource, 'target': this.tempNodeRight, 'time': '0', 'value': 0});
+
+    //Add fake nodes generally
     graph.nodes.push(this.tempNodeLeft);
     graph.nodes.push(this.tempNodeRight);
-    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight, 'value': this.tempNodeVal});
+    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight,
+      'time':  '0', 'value': this.tempNodeVal});
 
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
@@ -190,10 +199,11 @@ class SankeyDiagram implements MAppViews {
       .text(function(d) {
         if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
           return d.source.name + ' → ' +
-          d.target.name;
+            d.target.name;
         } else {
           return d.source.name + ' → ' +
-          d.target.name + '\n' + format(d.value);
+            d.target.name + '\n' + format(d.value) + ' in '
+            + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
         }
       });
 
