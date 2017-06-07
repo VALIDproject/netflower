@@ -7,18 +7,32 @@ import Filter from './filter';
 export default class TopFilter implements Filter
 {
   private resultData: Array<any>;
-  private rechtstraeger: string;
-  private active: boolean;
+
+  private _active: boolean;
+  private filterTop: boolean;
+  private filterEntries: Array<string>;
 
   constructor()
   {
     this.resultData = new Array<any>();
+    this.filterEntries = new Array<string>();
     this.active = false;
+    this.filterTop = true;
   }
 
-  public switchActive(): void
+  get active():boolean
   {
-    this.active = !this.active;
+    return this._active;
+  }
+
+  set active(act:boolean)
+  {
+    this._active = act;
+  }
+
+  public changeFilterTop(top: boolean)
+  {
+    this.filterTop = top;
   }
 
   public findTop(data: any): any
@@ -41,33 +55,57 @@ export default class TopFilter implements Filter
       }
     }
 
-    let max:number = 0;
+    let arr = [];
     map.forEach( (value, key, map) => {
-      if(value > max)
-      {
-        max = value;
-        this.rechtstraeger = key;
-      }
+      arr.push({key, value});
     });
+
+    arr.sort(function(a, b)
+    {
+      return (<number>b.value) - (<number>a.value);
+    });
+
+    let index:number = 0;
+    let max:number = 0;
+
+    if(!this.filterTop)
+    {
+      index = arr.length-10;
+      max = arr.length;
+    }
+    else {
+      index = 0;
+      max = 10;
+    }
+
+    while(index < max)
+    {
+      let entry = arr[index].key;
+      this.filterEntries.push(entry);
+      index ++;
+    }
   }
 
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
 
-    if(!this.active)
+    if(!this._active)
       return data;
 
     this.findTop(data);
 
     for(let entry of data)
     {
-      if(entry.sourceNode === this.rechtstraeger)
+      for(let filterEntry of this.filterEntries)
       {
-        this.resultData.push(entry);
+        if(entry.sourceNode === filterEntry)
+        {
+          this.resultData.push(entry);
+        }
       }
     }
-
+    //console.log(this.resultData);
     return this.resultData;
   }
 

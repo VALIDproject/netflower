@@ -135,8 +135,9 @@ class SankeyDiagram implements MAppViews {
 
     nest.forEach(function (d, i ) {
       if (d.key === '20151' || d.key === '20152') {
-        for(var _v = 0; _v < that.nodesToShow; _v++) {;
-          // console.log(_v, d);
+        let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
+        for(var _v = 0; _v < max; _v++) {
+          //console.log(_v, d);
           graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
           graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
           graph.links.push({ 'source': d.values[_v].sourceNode,
