@@ -70,7 +70,7 @@ class SankeyDiagram implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      this.$node.select('.sankey_vis').html("");
+      this.$node.select('.sankey_vis').html('');
       //Redraw Sankey Diagram
       this.getStorageData();
     });
@@ -134,7 +134,7 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
 
     nest.forEach(function (d, i ) {
-      if (d.key === '20151' || d.key === '20152') {
+      // if (d.key === '20151' || d.key === '20152') {
         for(var _v = 0; _v < that.nodesToShow; _v++) {;
           // console.log(_v, d);
           graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
@@ -143,7 +143,7 @@ class SankeyDiagram implements MAppViews {
             'target': d.values[_v].targetNode,
             'value': + d.values[_v].valueNode });
         }
-      }
+      // }
     });
 
     //d3.keys - returns array of keys from the nest function

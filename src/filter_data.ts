@@ -150,9 +150,9 @@ class FilterData implements MAppViews {
         max = entry.timeNode;
     }
 
-    this.quarterFilter.changeRange(min, max);
+    this.quarterFilter.changeRange(min, min);
     $('#quarterFilterMin').val(min.toString());
-    $('#quarterFilterMax').val(max.toString());
+    $('#quarterFilterMax').val(min.toString());
   }
 
    private setEuroFilterRange(json)
