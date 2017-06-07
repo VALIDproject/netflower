@@ -138,9 +138,10 @@ class SankeyDiagram implements MAppViews {
 
     let graph = {'nodes' : [], 'links' : []};
 
+    that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
+
     nest.forEach(function (d, i ) {
       for(var _v = 0; _v < that.nodesToShow; _v++) {;
-        // console.log(_v, d);
         graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
         graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
         graph.links.push({ 'source': d.values[_v].sourceNode,
@@ -149,8 +150,6 @@ class SankeyDiagram implements MAppViews {
       }
     });
 
-    console.log('graph', graph);
-
     //d3.keys - returns array of keys from the nest function
     //d3.nest - groups the values of an array by the given key
     //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
@@ -158,10 +157,15 @@ class SankeyDiagram implements MAppViews {
       .key((d) => {return d.name;})
       .map(graph.nodes));
 
-    //Add the fake node
+    //Add the fake node from last to 'more'
+    const lastSource = graph.links[graph.links.length - 1].source;
+    graph.links.push({'source': lastSource, 'target': this.tempNodeRight, 'time': '0', 'value': 0});
+
+    //Add fake nodes generally
     graph.nodes.push(this.tempNodeLeft);
     graph.nodes.push(this.tempNodeRight);
-    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight, 'value': this.tempNodeVal});
+    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight,
+      'time':  '0', 'value': this.tempNodeVal});
 
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
