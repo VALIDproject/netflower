@@ -112,6 +112,11 @@ class SankeyDiagram implements MAppViews {
     const formatNumber = d3.format(',.0f'),    // zero decimal places
       format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
+    //This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
+    //where the first returns a funciton. So everytime the function is called the same index is used for example.
+    const splitAt = index => it =>
+      [it.slice(0, index), it.slice(index)];
+
     //Append the svg canvas t the page
     const svg = d3.select('.sankey_vis').append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -134,17 +139,17 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
 
     nest.forEach(function (d, i ) {
-      // if (d.key === '20151' || d.key === '20152') {
-        for(var _v = 0; _v < that.nodesToShow; _v++) {;
-          // console.log(_v, d);
-          graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
-          graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
-          graph.links.push({ 'source': d.values[_v].sourceNode,
-            'target': d.values[_v].targetNode,
-            'value': + d.values[_v].valueNode });
-        }
-      // }
+      for(var _v = 0; _v < that.nodesToShow; _v++) {;
+        // console.log(_v, d);
+        graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
+        graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+        graph.links.push({ 'source': d.values[_v].sourceNode,
+          'target': d.values[_v].targetNode,
+          'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
+      }
     });
+
+    console.log('graph', graph);
 
     //d3.keys - returns array of keys from the nest function
     //d3.nest - groups the values of an array by the given key
@@ -189,10 +194,11 @@ class SankeyDiagram implements MAppViews {
       .text(function(d) {
         if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
           return d.source.name + ' → ' +
-          d.target.name;
+            d.target.name;
         } else {
           return d.source.name + ' → ' +
-          d.target.name + '\n' + format(d.value);
+            d.target.name + '\n' + format(d.value) + ' in '
+            + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
         }
       });
 
