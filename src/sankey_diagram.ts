@@ -141,7 +141,8 @@ class SankeyDiagram implements MAppViews {
     that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
 
     nest.forEach(function (d, i ) {
-      for(var _v = 0; _v < that.nodesToShow; _v++) {;
+      let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
+      for(var _v = 0; _v < max; _v++) {;
         graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
         graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
         graph.links.push({ 'source': d.values[_v].sourceNode,

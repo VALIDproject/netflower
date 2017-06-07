@@ -298,3 +298,13 @@ div.tooltip {
   //pointer-events: none;
   cursor: pointer;
 }
+
+.slider-selection {
+  background: $valid-color !important;
+}
+
+.slider-handle {
+  width: 16px !important;
+  height: 16px !important;
+  background: lightgrey !important;
+}
