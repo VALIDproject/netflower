@@ -131,25 +131,42 @@ class SankeyDiagram implements MAppViews {
 
     const path = sankey.link();
 
+    console.log('json', json);
+
     //Group Data (by quartal)
-    let nest = (<any>d3).nest()
+    let nest =(<any>d3).nest()
       .key(function (d) {return d.timeNode;})
+      //.rollup(function (v) { return d3.sum(v, function (d :any){ return d.valueNode;})})
       .entries(json);
+
+    console.log('nest time', nest);
 
     let graph = {'nodes' : [], 'links' : []};
 
     that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
 
     nest.forEach(function (d, i ) {
+      //console.log('d and i', d,i);
       let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
       for(var _v = 0; _v < max; _v++) {;
         graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
         graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+
         graph.links.push({ 'source': d.values[_v].sourceNode,
           'target': d.values[_v].targetNode,
           'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
       }
     });
+
+    console.log('nodes', graph.nodes, 'links', graph.links);
+
+    let test = (<any>d3).nest()
+      .key((d) => {return d.source;})
+      .key((d) => {return d.target;})
+      .rollup(function (v) { return d3.sum(v, function (d :any){ return d.value;})})
+      .entries(graph.links);
+
+      console.log('test-data', test);
 
     //d3.keys - returns array of keys from the nest function
     //d3.nest - groups the values of an array by the given key
@@ -157,6 +174,8 @@ class SankeyDiagram implements MAppViews {
     graph.nodes = (<any>d3).keys((<any>d3).nest()
       .key((d) => {return d.name;})
       .map(graph.nodes));
+
+    console.log('nest graph nodes', graph.nodes);
 
     //Add the fake node from last to 'more'
     const lastSource = graph.links[graph.links.length - 1].source;
@@ -172,6 +191,16 @@ class SankeyDiagram implements MAppViews {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
     });
+
+    console.log('graph.links forEach', graph.links);
+    //
+    // let test =(<any>d3).nest()
+    //   .key(function (d) {return d.time;})
+    //   .rollup(function (v) { return d3.sum(v, function (d :any){ return d.value;})})
+    //   .entries(graph.links);
+    //
+    //   console.log(test);
+
 
     //This makes out of the array of strings a array of objects with the key 'name'
     graph.nodes.forEach(function (d, i) {
