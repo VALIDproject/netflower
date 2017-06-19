@@ -1,6 +1,6 @@
 /**
- * Created by Florian on 12.04.2017.
- */
+* Created by Florian on 12.04.2017.
+*/
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
@@ -28,15 +28,15 @@ class SankeyDiagram implements MAppViews {
     this.pipeline = FilterPipeline.getInstance();
 
     this.$node = d3.select(parent)
-      .append('div')
-      .classed('sankey_diagram', true);
+    .append('div')
+    .classed('sankey_diagram', true);
   }
 
   /**
-   * Initialize the view and return a promise
-   * that is resolved as soon the view is completely initialized.
-   * @returns {Promise<SankeyDiagram>}
-   */
+  * Initialize the view and return a promise
+  * that is resolved as soon the view is completely initialized.
+  * @returns {Promise<SankeyDiagram>}
+  */
   init() {
     this.build();
     this.attachListener();
@@ -47,8 +47,8 @@ class SankeyDiagram implements MAppViews {
 
 
   /**
-   * Build the basic DOM elements
-   */
+  * Build the basic DOM elements
+  */
   private build() {
     this.$node.append('div').attr('class', 'left_bars');
     this.$node.append('div').attr('class', 'sankey_vis');
@@ -56,8 +56,8 @@ class SankeyDiagram implements MAppViews {
   }
 
   /**
-   * Attach the event listeners
-   */
+  * Attach the event listeners
+  */
   private attachListener() {
     let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
     if(dataAvailable) {
@@ -77,8 +77,8 @@ class SankeyDiagram implements MAppViews {
   }
 
   /**
-   * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
-   */
+  * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
+  */
   private getStorageData() {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
@@ -92,9 +92,9 @@ class SankeyDiagram implements MAppViews {
   }
 
   /**
-   * This function draws the whole sankey visualization by using the data which is passed from the storage.
-   * @param json data from the read functionality
-   */
+  * This function draws the whole sankey visualization by using the data which is passed from the storage.
+  * @param json data from the read functionality
+  */
   private buildSankey(json, origJson) {
     const that = this;
     const sankey = (<any>d3).sankey();
@@ -110,73 +110,125 @@ class SankeyDiagram implements MAppViews {
 
     //The "0" option enables zero-padding. The comma (",") option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
-      format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
+    format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
     //This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
     //where the first returns a funciton. So everytime the function is called the same index is used for example.
     const splitAt = index => it =>
-      [it.slice(0, index), it.slice(index)];
+    [it.slice(0, index), it.slice(index)];
 
     //Append the svg canvas t the page
     const svg = d3.select('.sankey_vis').append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform','translate(' + margin.left+ ',' + margin.top + ')');
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform','translate(' + margin.left+ ',' + margin.top + ')');
 
     //Set the diagram properties
     sankey.nodeWidth(35)
-      .nodePadding(20)
-      .size([width - widthOffset, height]);
+    .nodePadding(20)
+    .size([width - widthOffset, height]);
 
     const path = sankey.link();
 
-    console.log('json', json);
+    //  console.log(json);
 
+    /*__________________________________________________________________________*/
+
+    /*OLD NESTING*/
     //Group Data (by quartal)
-    let nest =(<any>d3).nest()
-      .key(function (d) {return d.timeNode;})
-      //.rollup(function (v) { return d3.sum(v, function (d :any){ return d.valueNode;})})
-      .entries(json);
+    // let nest =(<any>d3).nest()
+    // .key(function (d) {return d.timeNode;})
+    // //.rollup(function (v) { return d3.sum(v, function (d :any){ return d.valueNode;})})
+    // .entries(json);
 
-    console.log('nest time', nest);
+    /*__________________________________________________________________________*/
+
+    /*NEW VERSION*/
+
+  //  console.log(json);
+
+    //   //Group Data (by quartal)
+    let nest =(<any>d3).nest()
+    //.key(function (d) {return d.timeNode;})
+    //.rollup(function (v) { return d3.sum(v, function (d :any){ return d.valueNode;})})
+    .key((d) => {return d.sourceNode;})
+    .key(function (d) {return d.targetNode;})
+    //.rollup( function (v) { return d3.sum(v,function(d: any) {return d.valueNode;});})
+    .rollup(function (v) { return {
+      target: v[0].targetNode,
+      source: v[0].sourceNode,
+      time: v[0].timeNode,
+      sum:  d3.sum(v, function (d :any){ return d.valueNode;})
+      //sum: d3.sum(v, function (d :any){ return d.valueNode;})
+    }})
+    .entries(json);
+
+  //  console.log('Nested Data', nest);
 
     let graph = {'nodes' : [], 'links' : []};
 
     that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
 
-    nest.forEach(function (d, i ) {
-      //console.log('d and i', d,i);
-      let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
-      for(var _v = 0; _v < max; _v++) {;
-        graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
-        graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
 
-        graph.links.push({ 'source': d.values[_v].sourceNode,
-          'target': d.values[_v].targetNode,
-          'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
+    nest.forEach(function (d, i ) {
+
+      let max = (nest.length < 19)?nest.length:19;
+
+      if(i <= 2) {
+        for (var v = 0; v <= d.values.length-1; ++v) {
+          //console.log('v', v);
+          graph.nodes.push({ 'name': d.key });//all Nodes source
+          graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
+
+          graph.links.push({ 'source': d.key,
+          'target': d.values[v].key,
+          'value': +d.values[v].values.sum, 'time': d.values[v].values.time });
+
+          }
+
+
       }
     });
 
-    console.log('nodes', graph.nodes, 'links', graph.links);
+  //  console.log('nested nodes', graph.nodes, 'nested links', graph.links);
 
-    let test = (<any>d3).nest()
-      .key((d) => {return d.source;})
-      .key((d) => {return d.target;})
-      .rollup(function (v) { return d3.sum(v, function (d :any){ return d.value;})})
-      .entries(graph.links);
 
-      console.log('test-data', test);
+    /*__________________________________________________________________________*/
 
-    //d3.keys - returns array of keys from the nest function
-    //d3.nest - groups the values of an array by the given key
-    //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
+
+    /*OLD VERSION*/
+    // let graph = {'nodes' : [], 'links' : []};
+    //
+    // that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
+    //
+    // nest.forEach(function (d, i ) {
+    //   console.log('d ', d);
+    //   console.log('length values', d.values.length,'nodetoShow', that.nodesToShow );
+    //   let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
+    //   console.log('max', max);
+    //   for(var _v = 0; _v < max; _v++) {
+    //     graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
+    //     graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+    //
+    //     graph.links.push({ 'source': d.values[_v].sourceNode,
+    //     'target': d.values[_v].targetNode,
+    //     'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
+    //   }
+    // });
+    //
+    // console.log('nodes', graph.nodes, 'links', graph.links);
+
+    /*__________________________________________________________________________*/
+
+    // //d3.keys - returns array of keys from the nest function
+    // //d3.nest - groups the values of an array by the given key
+    // //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
     graph.nodes = (<any>d3).keys((<any>d3).nest()
-      .key((d) => {return d.name;})
-      .map(graph.nodes));
+    .key((d) => {return d.name;})
+    .map(graph.nodes));
 
-    console.log('nest graph nodes', graph.nodes);
-
+    //console.log('names', graph.nodes);
     //Add the fake node from last to 'more'
     const lastSource = graph.links[graph.links.length - 1].source;
     graph.links.push({'source': lastSource, 'target': this.tempNodeRight, 'time': '0', 'value': 0});
@@ -185,56 +237,53 @@ class SankeyDiagram implements MAppViews {
     graph.nodes.push(this.tempNodeLeft);
     graph.nodes.push(this.tempNodeRight);
     graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight,
-      'time':  '0', 'value': this.tempNodeVal});
+    'time':  '0', 'value': this.tempNodeVal});
+
+    console.log(graph.links);
 
     graph.links.forEach(function (d, i) {
+      //console.log(graph.links[i].source, '   ', graph.nodes.indexOf(graph.links[i].source));
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
     });
 
-    console.log('graph.links forEach', graph.links);
-    //
-    // let test =(<any>d3).nest()
-    //   .key(function (d) {return d.time;})
-    //   .rollup(function (v) { return d3.sum(v, function (d :any){ return d.value;})})
-    //   .entries(graph.links);
-    //
-    //   console.log(test);
-
 
     //This makes out of the array of strings a array of objects with the key 'name'
     graph.nodes.forEach(function (d, i) {
+      //console.log(d,i);
       graph.nodes[i] = { 'name': d };
     });
 
+//console.log('FINAL LINKS', graph.links);
+
     //Basic parameters for the diagram
     sankey
-      .nodes(graph.nodes)
-      //.links(linksorted)
-      .links(graph.links)
-      .layout(10);
+    .nodes(graph.nodes)
+    //.links(linksorted)
+    .links(graph.links)
+    .layout(10);
 
     let link = svg.append('g').selectAll('.link')
-      .data(graph.links)
-      .enter().append('path')
-      .attr('class', 'link')
-      .attr('d', path)
-      .style('stroke-width', function(d) { return Math.max(1, d.dy); })
-      //reduce edges crossing
-      .sort(function(a, b) { return b.dy - a.dy; });
+    .data(graph.links)
+    .enter().append('path')
+    .attr('class', 'link')
+    .attr('d', path)
+    .style('stroke-width', function(d) { return Math.max(1, d.dy); })
+    //reduce edges crossing
+    .sort(function(a, b) { return b.dy - a.dy; });
 
     //Add the link titles - Hover Path
     link.append('title')
-      .text(function(d) {
-        if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
-          return d.source.name + ' → ' +
-            d.target.name;
-        } else {
-          return d.source.name + ' → ' +
-            d.target.name + '\n' + format(d.value) + ' in '
-            + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
-        }
-      });
+    .text(function(d) {
+      if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
+        return d.source.name + ' → ' +
+        d.target.name;
+      } else {
+        return d.source.name + ' → ' +
+        d.target.name + '\n' + format(d.value) + ' in '
+        + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
+      }
+    });
 
     //Add the on 'click' listener for the links
     link.on('click', function(d) {
@@ -243,46 +292,46 @@ class SankeyDiagram implements MAppViews {
 
     //Add in the nodes
     let node = svg.append('g').selectAll('.node')
-      .data(graph.nodes)
-      .enter().append('g')
-      .attr('class', 'node')
-      .attr('transform', function(d) {
-        return 'translate(' + d.x + ',' + d.y + ')';
-      });
+    .data(graph.nodes)
+    .enter().append('g')
+    .attr('class', 'node')
+    .attr('transform', function(d) {
+      return 'translate(' + d.x + ',' + d.y + ')';
+    });
 
     //Add the rectangles for the nodes
     node.append('rect')
-      .attr('height', function(d) { return d.dy; })
-      .attr('width', sankey.nodeWidth())
-      .style('fill', '#DA5A6B')
-      //Title rectangle
-      .append('title')
-      .text(function(d) {
-        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-          return `${d.name}`;
-        } else {
-          return d.name + '\n' + format(d.value);
-        }
-      });
+    .attr('height', function(d) { return d.dy; })
+    .attr('width', sankey.nodeWidth())
+    .style('fill', '#DA5A6B')
+    //Title rectangle
+    .append('title')
+    .text(function(d) {
+      if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+        return `${d.name}`;
+      } else {
+        return d.name + '\n' + format(d.value);
+      }
+    });
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
-      .attr('x', 45)
-      .attr('y', function(d) { return (d.dy / 2) - 10;})
-      .attr('dy', '1.0em')
-      .attr('text-anchor', 'start')
-      .attr('class', 'rightText')
-      .text(function(d) {
-        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-          return `${d.name}`;
-        } else {
-          return `${format(d.value)} ${d.name}`;
-        }
-      })
-      .filter(function(d, i) { return d.x < width / 2})
-      .attr('x', -45 + sankey.nodeWidth())
-      .attr('text-anchor', 'end')
-      .attr('class', 'leftText');
+    .attr('x', 45)
+    .attr('y', function(d) { return (d.dy / 2) - 10;})
+    .attr('dy', '1.0em')
+    .attr('text-anchor', 'start')
+    .attr('class', 'rightText')
+    .text(function(d) {
+      if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+        return `${d.name}`;
+      } else {
+        return `${format(d.value)} ${d.name}`;
+      }
+    })
+    .filter(function(d, i) { return d.x < width / 2})
+    .attr('x', -45 + sankey.nodeWidth())
+    .attr('text-anchor', 'end')
+    .attr('class', 'leftText');
 
     //The strange word wrapping. Needs to be reworked based on the svg size the
     //sankey diagram size and the words and text size.
@@ -308,11 +357,11 @@ class SankeyDiagram implements MAppViews {
 }
 
 /**
- * Factory method to create a new SankeyDiagram instance
- * @param parent
- * @param options
- * @returns {SankeyDiagram}
- */
+* Factory method to create a new SankeyDiagram instance
+* @param parent
+* @param options
+* @returns {SankeyDiagram}
+*/
 export function create(parent: Element, options: any) {
   return new SankeyDiagram(parent, options);
 }
