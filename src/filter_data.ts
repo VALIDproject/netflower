@@ -13,16 +13,18 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
-import EuroFilter from './filters/euroFilter';
+import PaymentEuroFilter from './filters/paymentEuroFilter';
 import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/ParagraphFilter';
+import EntityEuroFilter from './filters/entityEuroFilter';
+import MediaEuroFilter from './filters/mediaEuroFilter';
 
 class FilterData implements MAppViews {
 
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
-  private euroFilter: EuroFilter;
+  private euroFilter: PaymentEuroFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
 
@@ -31,7 +33,7 @@ class FilterData implements MAppViews {
     //Create FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
     //Create Filters
-    this.euroFilter = new EuroFilter();
+    this.euroFilter = new PaymentEuroFilter();
     this.quarterFilter = new QuarterFilter();
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
