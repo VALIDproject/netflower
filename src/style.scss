@@ -297,7 +297,14 @@ div.tooltip {
   font: 12px sans-serif;
   //pointer-events: none;
   cursor: pointer;
-  text-decoration:underline;
+}
 
+.slider-selection {
+  background: $valid-color !important;
+}
 
+.slider-handle {
+  width: 16px !important;
+  height: 16px !important;
+  background: lightgrey !important;
 }
