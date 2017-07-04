@@ -25,7 +25,9 @@ export default class MediaSearchFilter implements Filter
 
     for(let entry of data)
     {
-      if(entry.targetNode.indexOf(this._term) !== -1)
+      let term = this._term.toLowerCase();
+      let value = entry.targetNode.toLowerCase();
+      if(value.indexOf(term) !== -1)
         resultData.push(entry);
     }
 

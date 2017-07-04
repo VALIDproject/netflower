@@ -25,7 +25,9 @@ export default class EntitySearchFilter implements Filter
 
     for(let entry of data)
     {
-      if(entry.sourceNode.indexOf(this._term) !== -1)
+      let term = this._term.toLowerCase();
+      let value = entry.sourceNode.toLowerCase();
+      if(value.indexOf(term) !== -1)
         resultData.push(entry);
     }
 
