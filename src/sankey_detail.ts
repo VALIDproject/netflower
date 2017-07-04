@@ -19,6 +19,10 @@ class SankeyDetail implements MAppViews {
   //Look if the bar chart is drawn
   private drawBarChart: number = 0;
 
+  private toolbox;
+
+  private toolbox2;
+
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent);
   }
@@ -122,7 +126,30 @@ class SankeyDetail implements MAppViews {
       .attr('x', 5)
       .attr('y', 16);
 
+      this.toolbox = d3.select('svg.sankey_details')
+      .append('g')
+      .attr('class', 'toolbox')
+      .attr('transform', 'translate(' + 20 + ',' + 30 + ')');
+
+      this.toolbox.append('text')
+      .attr('font-family', 'FontAwesome')
+      .text(function(d) { return ' ' + '\uf24a';})
+      .style('z-index', '200000')
+      .attr('x', '354')
+      .attr('y', '10')
+      .on('mouseover', function(d) {
+        tooltip.transition().duration(200).style('opacity', .9);
+
+        tooltip.html('Add Notes to this particular flow!')
+        .style('left', ((<any>d3).event.pageX -40) + 'px')
+        .style('top', ((<any>d3).event.pageY - 20) + 'px');
+      })
+      .on('mouseout', function(d) {
+        tooltip.transition().duration(500).style('opacity', 0);
+      });
+
       ++this.drawSvg;
+
     } else {
       this.$node.append('svg')
       .attr('class', 'sankey_details2')
@@ -136,6 +163,28 @@ class SankeyDetail implements MAppViews {
       .text(function(d) { return sourceName + ' → ' + targetName ; })
       .attr('x', 5)
       .attr('y', 16);
+
+      this.toolbox2 = d3.select('svg.sankey_details2')
+      .append('g')
+      .attr('class', 'toolbox2')
+      .attr('transform', 'translate(' + 20 + ',' + 30 + ')');
+
+      this.toolbox2.append('text')
+      .attr('font-family', 'FontAwesome')
+      .text(function(d) { return ' ' + '\uf24a';})
+      .style('z-index', '200000')
+      .attr('x', '354')
+      .attr('y', '10')
+      .on('mouseover', function(d) {
+        tooltip.transition().duration(200).style('opacity', .9);
+
+        tooltip.html('Add Notes to this particular flow!')
+        .style('left', ((<any>d3).event.pageX -40) + 'px')
+        .style('top', ((<any>d3).event.pageY - 20) + 'px');
+      })
+      .on('mouseout', function(d) {
+        tooltip.transition().duration(500).style('opacity', 0);
+      });
 
       this.drawSvg = 0;
     }
@@ -170,6 +219,9 @@ class SankeyDetail implements MAppViews {
     y.domain([0, d3.max(data, function(d) { return d.valueNode; })]);
 
 
+
+
+
     if (this.drawBarChart === 0) {
       //Add the svg for the bars and transform it slightly to be in position of the box
       this.detailSVG = d3.select('svg.sankey_details')
@@ -178,8 +230,10 @@ class SankeyDetail implements MAppViews {
       .attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
 
       ++this.drawBarChart;
+
     } else {
       // //Add the svg for the bars and transform it slightly to be in position of the box
+
       this.detailSVG = d3.select('svg.sankey_details2')
       .append('g')
       .attr('class', 'bars')

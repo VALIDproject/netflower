@@ -50,9 +50,9 @@ class SankeyDiagram implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    this.$node.append('div').attr('class', 'left_bars');
-    this.$node.append('div').attr('class', 'sankey_vis');
-    this.$node.append('div').attr('class', 'right_bars');
+    this.$node.append('div').attr('class', 'left_bars').append('div').attr('class', 'left_bar_heading').html('Public Entity');
+    this.$node.append('div').attr('class', 'sankey_vis').append('div').attr('class', 'sankey_heading').html('Flow');
+    this.$node.append('div').attr('class', 'right_bars').append('div').attr('class', 'right_bar_heading').html('Media Institution');
   }
 
   /**

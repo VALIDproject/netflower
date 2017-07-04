@@ -1,6 +1,6 @@
 /**
- * Basic variables and layout
- */
+* Basic variables and layout
+*/
 @import 'styles/vars';
 @import 'styles/base';
 
@@ -66,7 +66,7 @@
 
 /**
 Part of the data loading view.
- */
+*/
 .fileContainer {
   width: 70%;
   height: 0;
@@ -140,7 +140,7 @@ Part of the data loading view.
 
 /**
 Part of the data viz view.
- */
+*/
 .sankey_diagram {
   display: flex;
   height: 760px;
@@ -204,6 +204,8 @@ Part of the data viz view.
 .heading {
   padding: 5px;
   font-size: 16px;
+  float: left;
+  width: 60%;
 }
 node text {
   pointer-events: none;
@@ -221,12 +223,12 @@ node text {
 }
 
 .sankey_details {
-   //background-color: grey;
- }
+  //background-color: grey;
+}
 
 /**
 Part of the global settings view.
- */
+*/
 .globalSettings {
   width: 16%;
   height: 810px;
@@ -307,4 +309,47 @@ div.tooltip {
   width: 16px !important;
   height: 16px !important;
   background: lightgrey !important;
+}
+
+
+.left_bar_heading {
+  margin-top: 5px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.sankey_heading {
+  margin-top: 5px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+
+}
+
+.right_bar_heading {
+  margin-top: 5px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1;
+
+}
+
+.toolbox {
+    z-index: 50000000;
+}
+
+
+
+.button_bar {
+  margin-top: 8px;
+  float: right;
+  width: 40%;
+  height: 30px;
+  //height: 80px;
+  margin-left: auto;
+  //margin-right: 20px;
+
+
 }
