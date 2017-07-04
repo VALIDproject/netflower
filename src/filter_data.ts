@@ -32,7 +32,7 @@ class FilterData implements MAppViews {
 
   constructor(parent: Element, private options: any)
   {
-    //Create FilterPipeline
+    //Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
     //Create Filters
     this.euroFilter = new PaymentEuroFilter();

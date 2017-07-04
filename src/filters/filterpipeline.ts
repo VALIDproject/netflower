@@ -37,7 +37,6 @@ export default class FilterPipeline
     {
         data = filter.meetCriteria(data);
     }
-
     return data;
   }
 

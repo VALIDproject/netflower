@@ -29,7 +29,7 @@ export default class Entity
     let calc: number = 0;
     for(let p of this._payments)
     {
-      calc += p.amount;
+      calc += Number(p.amount);
     }
 
     this._totalAmount = calc;

@@ -10,22 +10,37 @@ import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
+import EntityEuroFilter from './filters/entityEuroFilter';
+import MediaEuroFilter from './filters/mediaEuroFilter';
+import * as $ from 'jquery';
+import 'bootstrap-slider';
+import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 
 
 class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 20;
+  //Fitlers
   private pipeline: FilterPipeline;
+  private entityEuroFilter: EntityEuroFilter;
+  private mediaEuroFilter: MediaEuroFilter;
 
   //Variables for the temporary nodes to show more
   private tempNodeLeft: string = 'Others';
   private tempNodeRight: string = 'More';
   private tempNodeVal: number = 20000;
 
-  constructor(parent: Element, private options: any) {
-    //Create FilterPipeline
+  constructor(parent: Element, private options: any)
+  {
+    //Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
+    //Create Filters
+    this.entityEuroFilter = new EntityEuroFilter();
+    this.mediaEuroFilter = new MediaEuroFilter();
+    //Add Filters to pipeline
+    this.pipeline.addFilter(this.entityEuroFilter);
+    this.pipeline.addFilter(this.mediaEuroFilter);
 
     this.$node = d3.select(parent)
       .append('div')
@@ -50,9 +65,15 @@ class SankeyDiagram implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    this.$node.append('div').attr('class', 'left_bars');
+    let left = this.$node.append('div').attr('class', 'left_bars');
     this.$node.append('div').attr('class', 'sankey_vis');
-    this.$node.append('div').attr('class', 'right_bars');
+    let right = this.$node.append('div').attr('class', 'right_bars');
+
+    left.append('p').text('Entity Filter');
+    left.append('input').attr('id', 'entityFilter');
+
+    right.append('p').text('Media Filter');
+    right.append('input').attr('id', 'mediaFilter');
   }
 
   /**
@@ -79,7 +100,8 @@ class SankeyDiagram implements MAppViews {
   /**
    * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
    */
-  private getStorageData() {
+  private getStorageData()
+  {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
       let originalData = value;
@@ -87,7 +109,51 @@ class SankeyDiagram implements MAppViews {
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
 
+      this.setEntityFilterRange(originalData);
+      this.setMediaFilterRange(originalData);
       this.buildSankey(filteredData, originalData);
+    });
+  }
+
+  private setEntityFilterRange(originalData:any):void
+  {
+    this.entityEuroFilter.calculateMinMaxValues(originalData);
+    let min:number = this.entityEuroFilter.minValue;
+    let max:number = this.entityEuroFilter.maxValue;
+    $('#entityFilter').bootstrapSlider({
+      min: Number(min),
+      max: Number(max),
+      range: true,
+      tooltip_split: true,
+      tooltip_position: 'bottom',
+      value: [Number(min), Number(max)],
+    }).on('slideStop', (d) => {
+        let newMin: number = d.value[0];     //First value is left slider handle;
+        let newMax: number = d.value[1];     //Second value is right slider handle;
+        this.entityEuroFilter.minValue = newMin;
+        this.entityEuroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, originalData);
+    });
+  }
+
+  private setMediaFilterRange(originalData:any):void
+  {
+    this.mediaEuroFilter.calculateMinMaxValues(originalData);
+    let min:number = this.mediaEuroFilter.minValue;
+    let max:number = this.mediaEuroFilter.maxValue;
+    $('#mediaFilter').bootstrapSlider({
+      min: Number(min),
+      max: Number(max),
+      range: true,
+      tooltip_split: true,
+      tooltip_position: 'bottom',
+      value: [Number(min), Number(max)],
+    }).on('slideStop', (d) => {
+        let newMin: number = d.value[0];     //First value is left slider handle;
+        let newMax: number = d.value[1];     //Second value is right slider handle;
+        this.mediaEuroFilter.minValue = newMin;
+        this.mediaEuroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, originalData);
     });
   }
 

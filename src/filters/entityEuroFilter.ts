@@ -64,7 +64,26 @@ export default class EntityEuroFilter implements Filter
 
   private processData(data: any): void
   {
+    this.generateDataStructure(data);
+
+    //Filter DataStructure
+    for(let entity of this._container.entities)
+    {
+      let totalAmount = entity.totalAmount;
+
+      if(totalAmount < this._minValue || totalAmount > this._maxValue)
+      {
+        this._container.removeEntity(entity);
+      }
+    }
+  }
+
+  private generateDataStructure(data: any): void
+  {
     this._container.clearEntities();
+
+    if(data === null || data === undefined)
+      return;
 
     //generating DataStructure
     for(let entry of data)
@@ -83,17 +102,38 @@ export default class EntityEuroFilter implements Filter
         ent.addPayment(entry.valueNode);
       }
     }
+  }
 
-    //Filter DataStructure
+  public calculateMinMaxValues(data: any): void
+  {
+    this.generateDataStructure(data);
+
+    let minValue:number = 0;
+    let maxValue:number = 0;
+    let first:boolean = true;
+
     for(let entity of this._container.entities)
     {
       let totalAmount = entity.totalAmount;
 
-      if(totalAmount < this._minValue || totalAmount > this._maxValue)
+      if(first)
       {
-        this._container.removeEntity(entity);
+        minValue = totalAmount;
+        maxValue = totalAmount;
+        first = false;
+      }
+
+      if(totalAmount < minValue)
+        minValue = totalAmount;
+
+      if(totalAmount > maxValue)
+      {
+        maxValue = totalAmount;
       }
     }
+
+    this._minValue = Math.floor(minValue);
+    this._maxValue = Math.ceil(maxValue);
   }
 
   public printData(): void
