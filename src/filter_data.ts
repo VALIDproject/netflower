@@ -40,7 +40,7 @@ class FilterData implements MAppViews {
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
     //Add Filters to Pipeline
-    this.pipeline.addFilter(this.topFilter); //must be first filter
+    this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
     this.pipeline.addFilter(this.euroFilter);
     this.pipeline.addFilter(this.paragraphFilter);
@@ -118,6 +118,13 @@ class FilterData implements MAppViews {
    * Attach the event listeners
    */
   private attachListener(json) {
+
+    events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
+      this.topFilter.active = false;
+      $('#topFilter').val(-1);
+    });
+
+
     this.$node.select('#topFilter').on('change', (d) => {
       let value:number = $('#topFilter').val() as number;
 

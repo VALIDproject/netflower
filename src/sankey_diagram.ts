@@ -12,6 +12,8 @@ import {d3TextWrap} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
+import EntitySearchFilter from './filters/entitySearchFilter';
+import MediaSearchFilter from './filters/MediaSearchFilter';
 import * as $ from 'jquery';
 import 'bootstrap-slider';
 import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
@@ -25,6 +27,8 @@ class SankeyDiagram implements MAppViews {
   private pipeline: FilterPipeline;
   private entityEuroFilter: EntityEuroFilter;
   private mediaEuroFilter: MediaEuroFilter;
+  private entitySearchFilter: EntitySearchFilter;
+  private mediaSearchFilter: MediaSearchFilter;
 
   //Variables for the temporary nodes to show more
   private tempNodeLeft: string = 'Others';
@@ -38,9 +42,13 @@ class SankeyDiagram implements MAppViews {
     //Create Filters
     this.entityEuroFilter = new EntityEuroFilter();
     this.mediaEuroFilter = new MediaEuroFilter();
+    this.entitySearchFilter = new EntitySearchFilter();
+    this.mediaSearchFilter = new MediaSearchFilter();
     //Add Filters to pipeline
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
+    this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
+    this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
 
     this.$node = d3.select(parent)
       .append('div')
@@ -69,10 +77,16 @@ class SankeyDiagram implements MAppViews {
     this.$node.append('div').attr('class', 'sankey_vis');
     let right = this.$node.append('div').attr('class', 'right_bars');
 
-    left.append('p').text('Entity Filter');
+    left.append('h4').text('Entity Search');
+    left.append('input').attr('id','entitySearchFilter');
+    left.append('button').text("Search").attr('type','button').attr('class', 'btn btn-primary').attr('id', 'entitySearchButton');
+    left.append('h4').text('Euro Filter');
     left.append('input').attr('id', 'entityFilter');
 
-    right.append('p').text('Media Filter');
+    right.append('h4').text('Media Search');
+    right.append('input').attr('id','mediaSearchFilter');
+    right.append('button').text("Search").attr('type','button').attr('class', 'btn btn-primary').attr('id', 'mediaSearchButton');
+    right.append('h4').text('Euro Filter');
     right.append('input').attr('id', 'mediaFilter');
   }
 
@@ -94,6 +108,27 @@ class SankeyDiagram implements MAppViews {
       this.$node.select('.sankey_vis').html('');
       //Redraw Sankey Diagram
       this.getStorageData();
+    });
+
+
+    this.$node.select('#entitySearchButton').on('click', (d) => {
+      let value:String = $('#entitySearchFilter').val();
+
+      this.entitySearchFilter.term = value;
+
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
+
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    });
+
+    this.$node.select('#mediaSearchButton').on('click', (d) => {
+      let value:String = $('#mediaSearchFilter').val();
+
+      this.mediaSearchFilter.term = value;
+
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
+
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
   }
 
