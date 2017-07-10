@@ -15,30 +15,32 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
-import EuroFilter from './filters/euroFilter';
+import PaymentEuroFilter from './filters/paymentEuroFilter';
 import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/ParagraphFilter';
+import EntityEuroFilter from './filters/entityEuroFilter';
+import MediaEuroFilter from './filters/mediaEuroFilter';
 
 class FilterData implements MAppViews {
 
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
-  private euroFilter: EuroFilter;
+  private euroFilter: PaymentEuroFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
 
   constructor(parent: Element, private options: any)
   {
-    //Create FilterPipeline
+    //Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
     //Create Filters
-    this.euroFilter = new EuroFilter();
+    this.euroFilter = new PaymentEuroFilter();
     this.quarterFilter = new QuarterFilter();
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
     //Add Filters to Pipeline
-    this.pipeline.addFilter(this.topFilter); //must be first filter
+    this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
     this.pipeline.addFilter(this.euroFilter);
     this.pipeline.addFilter(this.paragraphFilter);
@@ -116,6 +118,13 @@ class FilterData implements MAppViews {
    * Attach the event listeners
    */
   private attachListener(json) {
+
+    events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
+      this.topFilter.active = false;
+      $('#topFilter').val(-1);
+    });
+
+
     this.$node.select('#topFilter').on('change', (d) => {
       let value:number = $('#topFilter').val() as number;
 

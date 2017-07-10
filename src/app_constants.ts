@@ -17,4 +17,6 @@ export class AppConstants {
   static EVENT_CLOSE_DETAIL_SANKEY = 'closeSankeyDetails';
 
   static EVENT_FILTER_CHANGED = 'eventFilterChanged';
+
+  static EVENT_FILTER_DEACTIVATE_TOP_FILTER = 'eventFilterDeactivateTopFilter';
 }

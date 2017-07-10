@@ -3,7 +3,7 @@ import Filter from './filter';
 /**
  * This class is used to describe a value filter or filtering by value of the data set.
  */
-export default class EuroFilter implements Filter
+export default class PaymentEuroFilter implements Filter
 {
   private resultData: Array<any>;
 
