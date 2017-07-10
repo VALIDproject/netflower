@@ -5,7 +5,10 @@
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
+import * as $ from 'jquery';
 import 'imports-loader?d3=d3!../lib/sankey.js';
+import 'bootstrap-slider';
+import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap} from './utilities';
@@ -13,10 +16,7 @@ import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 import EntitySearchFilter from './filters/entitySearchFilter';
-import MediaSearchFilter from './filters/MediaSearchFilter';
-import * as $ from 'jquery';
-import 'bootstrap-slider';
-import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
+import MediaSearchFilter from './filters/mediaSearchFilter';
 
 
 class SankeyDiagram implements MAppViews {
