@@ -1,5 +1,3 @@
-
-
 export default class Payment
 {
   private _amount: number;

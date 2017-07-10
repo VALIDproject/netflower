@@ -23,7 +23,8 @@ class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 20;
-  //Fitlers
+
+  //Filters
   private pipeline: FilterPipeline;
   private entityEuroFilter: EntityEuroFilter;
   private mediaEuroFilter: MediaEuroFilter;
@@ -94,6 +95,7 @@ class SankeyDiagram implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+    //This redraws if new data is available
     let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
     if(dataAvailable) {
       this.getStorageData();
@@ -112,22 +114,18 @@ class SankeyDiagram implements MAppViews {
 
 
     this.$node.select('#entitySearchButton').on('click', (d) => {
-      let value:String = $('#entitySearchFilter').val();
-
+      let value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
-
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
     this.$node.select('#mediaSearchButton').on('click', (d) => {
-      let value:String = $('#mediaSearchFilter').val();
-
+      let value: string = $('#mediaSearchFilter').val();
       this.mediaSearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
-
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
   }
@@ -150,11 +148,12 @@ class SankeyDiagram implements MAppViews {
     });
   }
 
-  private setEntityFilterRange(originalData:any):void
+  private setEntityFilterRange(originalData: any): void
   {
     this.entityEuroFilter.calculateMinMaxValues(originalData);
-    let min:number = this.entityEuroFilter.minValue;
-    let max:number = this.entityEuroFilter.maxValue;
+    let min: number = this.entityEuroFilter.minValue;
+    let max: number = this.entityEuroFilter.maxValue;
+
     $('#entityFilter').bootstrapSlider({
       min: Number(min),
       max: Number(max),
@@ -163,6 +162,7 @@ class SankeyDiagram implements MAppViews {
       tooltip_position: 'bottom',
       value: [Number(min), Number(max)],
     }).on('slideStop', (d) => {
+      console.log('triggered');
         let newMin: number = d.value[0];     //First value is left slider handle;
         let newMax: number = d.value[1];     //Second value is right slider handle;
         this.entityEuroFilter.minValue = newMin;
@@ -171,11 +171,12 @@ class SankeyDiagram implements MAppViews {
     });
   }
 
-  private setMediaFilterRange(originalData:any):void
+  private setMediaFilterRange(originalData: any): void
   {
     this.mediaEuroFilter.calculateMinMaxValues(originalData);
-    let min:number = this.mediaEuroFilter.minValue;
-    let max:number = this.mediaEuroFilter.maxValue;
+    let min: number = this.mediaEuroFilter.minValue;
+    let max: number = this.mediaEuroFilter.maxValue;
+
     $('#mediaFilter').bootstrapSlider({
       min: Number(min),
       max: Number(max),
