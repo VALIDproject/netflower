@@ -74,9 +74,9 @@ class SankeyDiagram implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    let left = this.$node.append('div').attr('class', 'left_bars');
-    this.$node.append('div').attr('class', 'sankey_vis');
-    let right = this.$node.append('div').attr('class', 'right_bars');
+    let left = this.$node.append('div').attr('class', 'left_bars').append('div').attr('class', 'left_bar_heading').html('Public Entity');
+    this.$node.append('div').attr('class', 'sankey_vis').append('div').attr('class', 'sankey_heading').html('Flow');
+    let right = this.$node.append('div').attr('class', 'right_bars').append('div').attr('class', 'right_bar_heading').html('Media Institution');
 
     left.append('h4').text('Entity Search');
     left.append('input').attr('id','entitySearchFilter');
