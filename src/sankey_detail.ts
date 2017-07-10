@@ -59,6 +59,7 @@ class SankeyDetail implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, (evt, d) => {
+
       this.closeDetail();
       this.clicked = 0;
     });
@@ -117,8 +118,7 @@ class SankeyDetail implements MAppViews {
       .style('background-color',  '#e0e0e0')
       .style('z-index', '10000')
       .append('text')
-      .attr('class', 'caption')
-      .text(function(d) { return sourceName + ' → ' + targetName ; })
+      .text(function(d) { return sourceName + ' → ' + targetName +  '  ' + format(value) ; })
       .attr('x', 5)
       .attr('y', 16);
 
@@ -133,7 +133,7 @@ class SankeyDetail implements MAppViews {
       .style('z-index', '10000')
       .append('text')
       .attr('class', 'caption')
-      .text(function(d) { return sourceName + ' → ' + targetName ; })
+      .text(function(d) { return sourceName + ' → ' + targetName + '  ' + format(value); })
       .attr('x', 5)
       .attr('y', 16);
 
@@ -235,7 +235,7 @@ class SankeyDetail implements MAppViews {
     .style('z-index', '200000')
     .attr('x', '325')
     .attr('y', '-13')
-    .on('click', function (d){
+    .on('click', function (d) {
       events.fire(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, d);
     });
   }

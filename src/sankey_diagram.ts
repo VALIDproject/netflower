@@ -117,7 +117,7 @@ class SankeyDiagram implements MAppViews {
     const splitAt = index => it =>
       [it.slice(0, index), it.slice(index)];
 
-    //Append the svg canvas t the page
+    //Append the svg canvas to the page
     const svg = d3.select('.sankey_vis').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
@@ -131,32 +131,71 @@ class SankeyDiagram implements MAppViews {
 
     const path = sankey.link();
 
-    //Group Data (by quartal)
-    let nest = (<any>d3).nest()
-      .key(function (d) {return d.timeNode;})
-      .entries(json);
+    /**
+     * OLD VERSION
+    // Group Data (by quartal)
+    let nest =(<any>d3).nest()
+    .key(function (d) {return d.timeNode;})
+    .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
 
     that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
 
     nest.forEach(function (d, i ) {
+      console.log('d ', d);
+      console.log('length values', d.values.length,'nodetoShow', that.nodesToShow );
       let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
-      for(var _v = 0; _v < max; _v++) {;
+      console.log('max', max);
+      for(var _v = 0; _v < max; _v++) {
         graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
         graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
+
         graph.links.push({ 'source': d.values[_v].sourceNode,
-          'target': d.values[_v].targetNode,
-          'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
+        'target': d.values[_v].targetNode,
+        'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
       }
     });
+
+    console.log('nodes', graph.nodes, 'links', graph.links);
+    */
+
+    // Group Data (by quartal)
+    let nest =(<any>d3).nest()
+      .key((d) => {return d.sourceNode;})
+      .key(function (d) {return d.targetNode;})
+      .rollup(function (v) {return {
+        target: v[0].targetNode,
+        source: v[0].sourceNode,
+        time: v[0].timeNode,
+        sum: d3.sum(v, function (d :any){ return d.valueNode;})
+      }})
+      .entries(json);
+
+    let graph = {'nodes' : [], 'links' : []};
+    that.nodesToShow = Math.ceil((heightNode / 25));    //Trying to make nodes length dependent on space in window
+    console.log("changed", that.nodesToShow);
+
+    let counter = 0;
+    for(let d of nest) {
+      counter += d.values.length;
+      if(counter >= 30) break;
+        for (var v = 0; v <= d.values.length - 1; v++) {
+          graph.nodes.push({ 'name': d.key });//all Nodes source
+          graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
+          graph.links.push({ 'source': d.key,
+            'target': d.values[v].key,
+            'value': +d.values[v].values.sum,
+            'time': d.values[v].values.time});
+        }
+    }
 
     //d3.keys - returns array of keys from the nest function
     //d3.nest - groups the values of an array by the given key
     //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
     graph.nodes = (<any>d3).keys((<any>d3).nest()
-      .key((d) => {return d.name;})
-      .map(graph.nodes));
+    .key((d) => {return d.name;})
+    .map(graph.nodes));
 
     //Add the fake node from last to 'more'
     const lastSource = graph.links[graph.links.length - 1].source;
@@ -166,7 +205,7 @@ class SankeyDiagram implements MAppViews {
     graph.nodes.push(this.tempNodeLeft);
     graph.nodes.push(this.tempNodeRight);
     graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight,
-      'time':  '0', 'value': this.tempNodeVal});
+    'time':  '0', 'value': this.tempNodeVal});
 
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
@@ -180,32 +219,32 @@ class SankeyDiagram implements MAppViews {
 
     //Basic parameters for the diagram
     sankey
-      .nodes(graph.nodes)
-      //.links(linksorted)
-      .links(graph.links)
-      .layout(10);
+    .nodes(graph.nodes)
+    //.links(linksorted)
+    .links(graph.links)
+    .layout(10); //Difference only by 0, 1 and otherwise always the same
 
     let link = svg.append('g').selectAll('.link')
-      .data(graph.links)
-      .enter().append('path')
-      .attr('class', 'link')
-      .attr('d', path)
-      .style('stroke-width', function(d) { return Math.max(1, d.dy); })
-      //reduce edges crossing
-      .sort(function(a, b) { return b.dy - a.dy; });
+    .data(graph.links)
+    .enter().append('path')
+    .attr('class', 'link')
+    .attr('d', path)
+    .style('stroke-width', function(d) { return Math.max(1, d.dy); })
+    //reduce edges crossing
+    .sort(function(a, b) { return b.dy - a.dy; });
 
     //Add the link titles - Hover Path
     link.append('title')
-      .text(function(d) {
-        if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
-          return d.source.name + ' → ' +
-            d.target.name;
-        } else {
-          return d.source.name + ' → ' +
-            d.target.name + '\n' + format(d.value) + ' in '
-            + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
-        }
-      });
+    .text(function(d) {
+      if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
+        return d.source.name + ' → ' +
+        d.target.name;
+      } else {
+        return d.source.name + ' → ' +
+        d.target.name + '\n' + format(d.value) + ' in '
+        + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
+      }
+    });
 
     //Add the on 'click' listener for the links
     link.on('click', function(d) {
@@ -214,49 +253,48 @@ class SankeyDiagram implements MAppViews {
 
     //Add in the nodes
     let node = svg.append('g').selectAll('.node')
-      .data(graph.nodes)
-      .enter().append('g')
-      .attr('class', 'node')
-      .attr('transform', function(d) {
-        return 'translate(' + d.x + ',' + d.y + ')';
-      });
+    .data(graph.nodes)
+    .enter().append('g')
+    .attr('class', 'node')
+    .attr('transform', function(d) {
+      return 'translate(' + d.x + ',' + d.y + ')';
+    });
 
     //Add the rectangles for the nodes
     node.append('rect')
-      .attr('height', function(d) { return d.dy; })
-      .attr('width', sankey.nodeWidth())
-      .style('fill', '#DA5A6B')
-      //Title rectangle
-      .append('title')
-      .text(function(d) {
-        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-          return `${d.name}`;
-        } else {
-          return d.name + '\n' + format(d.value);
-        }
-      });
+    .attr('height', function(d) { return d.dy; })
+    .attr('width', sankey.nodeWidth())
+    .style('fill', '#DA5A6B')
+    //Title rectangle
+    .append('title')
+    .text(function(d) {
+      if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+        return `${d.name}`;
+      } else {
+        return d.name + '\n' + format(d.value);
+      }
+    });
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
-      .attr('x', 45)
-      .attr('y', function(d) { return (d.dy / 2) - 10;})
-      .attr('dy', '1.0em')
-      .attr('text-anchor', 'start')
-      .attr('class', 'rightText')
-      .text(function(d) {
-        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-          return `${d.name}`;
-        } else {
-          return `${format(d.value)} ${d.name}`;
-        }
-      })
-      .filter(function(d, i) { return d.x < width / 2})
-      .attr('x', -45 + sankey.nodeWidth())
-      .attr('text-anchor', 'end')
-      .attr('class', 'leftText');
+    .attr('x', 45)
+    .attr('y', function(d) { return (d.dy / 2) - 10;})
+    .attr('dy', '1.0em')
+    .attr('text-anchor', 'start')
+    .attr('class', 'rightText')
+    .text(function(d) {
+      if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
+        return `${d.name}`;
+      } else {
+        return `${format(d.value)} ${d.name}`;
+      }
+    })
+    .filter(function(d, i) { return d.x < width / 2})
+    .attr('x', -45 + sankey.nodeWidth())
+    .attr('text-anchor', 'end')
+    .attr('class', 'leftText');
 
-    //The strange word wrapping. Needs to be reworked based on the svg size the
-    //sankey diagram size and the words and text size.
+    //The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
     const leftWrap = this.$node.selectAll('.leftText');
     const rightWrap = this.$node.selectAll('.rightText');
     const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
