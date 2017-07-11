@@ -99,7 +99,16 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
   return arrLineCreatedCount;
 }
 
-
+/**
+ * This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
+ * where the first returns a funciton. So everytime the function is called the same index is used for example.
+ * @param index where to split
+ * @param it what to split
+ *
+ * Example: splitAt(4)(d.time) Splits the string at 4 from d.time
+ */
+export const splitAt = index => it =>
+      [it.slice(0, index), it.slice(index)];
 
 /**
  * This function exports a html table with letious options and creates a JSON.

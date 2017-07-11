@@ -144,7 +144,7 @@ Part of the data viz view.
 .sankey_diagram {
   display: flex;
   height: 760px;
-  width: 80%;
+  width: 86%;
   border: 1px solid black;
   position: absolute;
   top: 250px;
@@ -155,7 +155,7 @@ Part of the data viz view.
 
 .left_bars {
   border: 1px solid grey;
-  width: 10%;
+  width: 15%;
   float: right;
   height: 100%;
 }
@@ -164,7 +164,7 @@ Part of the data viz view.
 .sankey_vis {
   float: right;
   border: 1px solid grey;
-  width: 80%;
+  width: 70%;
   height: 100%;
 }
 
@@ -172,7 +172,7 @@ Part of the data viz view.
   float: right;
   height: 100%;
   border: 1px solid grey;
-  width: 10%;
+  width: 15%;
 }
 
 //.globalSettings {
@@ -194,7 +194,7 @@ Part of the data viz view.
 .sankey_features{
   //background-color: yellow;
   border: 1px solid grey;
-  width: 80%;
+  width: 86%;
   height: 50px;
   position: absolute;
   top: 200px;
@@ -230,7 +230,7 @@ node text {
 Part of the global settings view.
 */
 .globalSettings {
-  width: 16%;
+  width: 10%;
   height: 810px;
   position: absolute;
   top: 200px;

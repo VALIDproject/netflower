@@ -41,8 +41,7 @@ class GlobalSettings implements MAppViews {
     d3.select('.globalSettings').append('div').classed('genericControls', true);
 
     this.$genericControls = d3.select('.genericControls').html(`
-      <button type='button' id='backBtn' class='btn btn-secondary'><i class='fa fa-hand-o-left'>&nbsp;</i>Back</button>
-      <button type='button' id='getData' class='btn btn-primary'><i class='fa fa-hand-o-left'>&nbsp;</i>Get Data</button>
+      <button type='button' id='backBtn' class='btn btn-sm btn-secondary'><i class='fa fa-hand-o-left'>&nbsp;</i>Back</button>
     `);
   }
 
@@ -70,25 +69,6 @@ class GlobalSettings implements MAppViews {
               return;
             }
           }
-        });
-
-        const evt = <MouseEvent>d3.event;
-        evt.preventDefault();
-        evt.stopPropagation();
-      });
-
-    //Listener for the example button
-    this.$node.select('#getData')
-      .on('click', (e) => {
-        //This is how we retrieve the data. As it's loaded async it is only available as promise.
-        //We can save the promise thoug in a global variable and get the data later if we need
-        this.promiseData = localforage.getItem('data').then((value) => {
-          return value;
-        });
-
-        //Within the {} the data is available for usage
-        this.promiseData.then(function (data) {
-          console.log('DATA:::::::: ', data);
         });
 
         const evt = <MouseEvent>d3.event;
