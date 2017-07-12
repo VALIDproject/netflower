@@ -17,6 +17,7 @@ import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 import EntitySearchFilter from './filters/entitySearchFilter';
 import MediaSearchFilter from './filters/mediaSearchFilter';
+import PaymentEuroFilter from './filters/paymentEuroFilter';
 
 
 class SankeyDiagram implements MAppViews {
@@ -75,34 +76,40 @@ class SankeyDiagram implements MAppViews {
    */
   private build() {
     let left = this.$node.append('div').attr('class', 'left_bars');
-    this.$node.append('div').attr('class', 'sankey_vis').append('div').attr('class', 'sankey_heading').html('Flow');
-    let right = this.$node.append('div').attr('class', 'right_bars').append('div').attr('class', 'right_bar_heading').html('Media Institution');
+    let sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
+    let middle = sankeyVis.append('div').attr('class', 'sankey_heading');
+    let right = this.$node.append('div').attr('class', 'right_bars');
 
-    // left.html(`
-    //   <div class='left_bar_heading'>Public Entity</div>
-    //   <div class='input-group input-group-sm'>
-    //     <input type='text' id='entitySearchButton' class='form-control' placeholder='Search for...'>
-    //     <span class='input-group-btn'>
-    //       <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-hand-o-left'></i></button>
-    //     </span>
-    //   </div>
-    // `);
+    left.html(`
+      <div class='left_bar_heading'><p>Public Entity</p></div>
+      <label for='entitySearchFilter'>Search & Value Filter</label>
+      <div class='input-group input-group-sm'>
+        <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for...'/>
+        <span class='input-group-btn'>
+          <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+        </span>
+      </div>
+      <div class='input-group input-group-sm'>
+        <input id='entityFilter'/>
+      </div>
+    `);
 
-    // right.html(`
-    //   <div class='right_bar_heading'>Media Institution</div>
-    // `);
-    //
-    // left.append('h4').text('Entity Search');
-    // left.append('input').attr('id','entitySearchFilter');
-    // left.append('button').text("Search").attr('type','button').attr('class', 'btn btn-primary').attr('id', 'entitySearchButton');
-    // left.append('h4').text('Euro Filter');
-    // left.append('input').attr('id', 'entityFilter');
-    //
-    // right.append('h4').text('Media Search');
-    // right.append('input').attr('id','mediaSearchFilter');
-    // right.append('button').text("Search").attr('type','button').attr('class', 'btn btn-primary').attr('id', 'mediaSearchButton');
-    // right.append('h4').text('Euro Filter');
-    // right.append('input').attr('id', 'mediaFilter');
+    middle.html(`
+      <div><p>Flow</p></div>
+    `);
+
+    right.html(`
+      <div class='right_bar_heading'><p>Media Institution</p></div>
+      <label for='mediaSearchFilter'>Search & Value Filter</label>
+      <div class='input-group input-group-sm'>
+        <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for...'/>
+        <span class='input-group-btn'>
+          <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+      </div>
+      <div class='input-group input-group-sm'>
+        <input id='mediaFilter'/>
+      </div>
+    `);
   }
 
   /**
@@ -112,15 +119,18 @@ class SankeyDiagram implements MAppViews {
     //This redraws if new data is available
     let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
     if(dataAvailable) {
+      console.log('First redraw triggered.');
       this.getStorageData();
     }
 
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
+      console.log('Second redraw triggered.');
       //Draw Sankey Diagram
       this.getStorageData();
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
+      console.log('Third redraw triggered.');
       this.$node.select('.sankey_vis').html('');
       //Redraw Sankey Diagram
       this.getStorageData();
@@ -156,56 +166,11 @@ class SankeyDiagram implements MAppViews {
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
 
-      // this.setEntityFilterRange(originalData);
-      // this.setMediaFilterRange(originalData);
+      this.setEntityFilterRange(originalData);
+      this.setMediaFilterRange(originalData);
       this.buildSankey(filteredData, originalData);
     });
   }
-
-  // private setEntityFilterRange(originalData: any): void
-  // {
-  //   this.entityEuroFilter.calculateMinMaxValues(originalData);
-  //   let min: number = this.entityEuroFilter.minValue;
-  //   let max: number = this.entityEuroFilter.maxValue;
-  //
-  //   $('#entityFilter').bootstrapSlider({
-  //     min: Number(min),
-  //     max: Number(max),
-  //     range: true,
-  //     tooltip_split: true,
-  //     tooltip_position: 'bottom',
-  //     value: [Number(min), Number(max)],
-  //   }).on('slideStop', (d) => {
-  //     console.log('triggered');
-  //     let newMin: number = d.value[0];     //First value is left slider handle;
-  //     let newMax: number = d.value[1];     //Second value is right slider handle;
-  //     this.entityEuroFilter.minValue = newMin;
-  //     this.entityEuroFilter.maxValue = newMax;
-  //     events.fire(AppConstants.EVENT_FILTER_CHANGED, originalData);
-  //   });
-  // }
-  //
-  // private setMediaFilterRange(originalData: any): void
-  // {
-  //   this.mediaEuroFilter.calculateMinMaxValues(originalData);
-  //   let min: number = this.mediaEuroFilter.minValue;
-  //   let max: number = this.mediaEuroFilter.maxValue;
-  //
-  //   $('#mediaFilter').bootstrapSlider({
-  //     min: Number(min),
-  //     max: Number(max),
-  //     range: true,
-  //     tooltip_split: true,
-  //     tooltip_position: 'bottom',
-  //     value: [Number(min), Number(max)],
-  //   }).on('slideStop', (d) => {
-  //     let newMin: number = d.value[0];     //First value is left slider handle;
-  //     let newMax: number = d.value[1];     //Second value is right slider handle;
-  //     this.mediaEuroFilter.minValue = newMin;
-  //     this.mediaEuroFilter.maxValue = newMax;
-  //     events.fire(AppConstants.EVENT_FILTER_CHANGED, originalData);
-  //   });
-  // }
 
   /**
    * This function draws the whole sankey visualization by using the data which is passed from the storage.
@@ -216,15 +181,16 @@ class SankeyDiagram implements MAppViews {
     const sankey = (<any>d3).sankey();
     const units = '€';
 
+    let headingOffset = this.$node.select('.sankey_heading').node().getBoundingClientRect().height + 10;  //10 from padding of p tag
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
     const margin = { top: 10, right: 120, bottom: 10, left: 120 };
     const width =  widthNode  - margin.left - margin.right;
-    const height = heightNode - margin.top - margin.bottom;
+    const height = heightNode - margin.top - margin.bottom - headingOffset;
     const widthOffset = 80;
 
-    //The "0" option enables zero-padding. The comma (",") option enables the use of a comma for a thousands separator.
+    //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
       format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
@@ -240,38 +206,7 @@ class SankeyDiagram implements MAppViews {
       .nodePadding(20)
       .size([width - widthOffset, height]);
 
-    console.log('Test3');
-
     const path = sankey.link();
-
-    /**
-     * OLD VERSION
-     // Group Data (by quartal)
-     let nest =(<any>d3).nest()
-     .key(function (d) {return d.timeNode;})
-     .entries(json);
-
-     let graph = {'nodes' : [], 'links' : []};
-
-     that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
-
-     nest.forEach(function (d, i ) {
-      console.log('d ', d);
-      console.log('length values', d.values.length,'nodetoShow', that.nodesToShow );
-      let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
-      console.log('max', max);
-      for(var _v = 0; _v < max; _v++) {
-        graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
-        graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
-
-        graph.links.push({ 'source': d.values[_v].sourceNode,
-        'target': d.values[_v].targetNode,
-        'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
-      }
-    });
-
-     console.log('nodes', graph.nodes, 'links', graph.links);
-     */
 
       // Group Data (by quartal)
     let nest =(<any>d3).nest()
@@ -287,12 +222,12 @@ class SankeyDiagram implements MAppViews {
 
     let graph = {'nodes' : [], 'links' : []};
     that.nodesToShow = Math.ceil((heightNode / 25));    //Trying to make nodes length dependent on space in window
-    console.log("changed", that.nodesToShow);
+    console.log('changed', that.nodesToShow);
 
     let counter = 0;
     for(let d of nest) {
       counter += d.values.length;
-      if(counter >= 30) break;
+      if(counter >= 26) break;
       for (var v = 0; v <= d.values.length - 1; v++) {
         graph.nodes.push({ 'name': d.key });//all Nodes source
         graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
@@ -425,6 +360,54 @@ class SankeyDiagram implements MAppViews {
       d3TextWrap(rightWrap, wordWrapBorder + 10);
       rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
     }
+  }
+
+  /**
+   * This method sets the range for the entity value filter according to the priovided data.
+   * @param data where the filter gets the range from.
+   */
+  private setEntityFilterRange(data: any): void
+  {
+    this.entityEuroFilter.calculateMinMaxValues(data);
+    let min: number = this.entityEuroFilter.minValue;
+    let max: number = this.entityEuroFilter.maxValue;
+
+    $('#entityFilter').bootstrapSlider({
+      min: Number(min),
+      max: Number(max),
+      range: true,
+      tooltip_split: true,
+      tooltip_position: 'bottom',
+      value: [Number(min), Number(max)],
+    }).on('slideStop', (d) => {
+      let newMin: number = d.value[0];     //First value is left slider handle;
+      let newMax: number = d.value[1];     //Second value is right slider handle;
+      this.entityEuroFilter.minValue = newMin;
+      this.entityEuroFilter.maxValue = newMax;
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+    });
+  }
+
+  private setMediaFilterRange(originalData: any): void
+  {
+    this.mediaEuroFilter.calculateMinMaxValues(originalData);
+    let min: number = this.mediaEuroFilter.minValue;
+    let max: number = this.mediaEuroFilter.maxValue;
+
+    $('#mediaFilter').bootstrapSlider({
+      min: Number(min),
+      max: Number(max),
+      range: true,
+      tooltip_split: true,
+      tooltip_position: 'bottom',
+      value: [Number(min), Number(max)],
+    }).on('slideStop', (d) => {
+      let newMin: number = d.value[0];     //First value is left slider handle;
+      let newMax: number = d.value[1];     //Second value is right slider handle;
+      this.mediaEuroFilter.minValue = newMin;
+      this.mediaEuroFilter.maxValue = newMax;
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, originalData);
+    });
   }
 }
 
