@@ -181,7 +181,8 @@ class SankeyDiagram implements MAppViews {
     const sankey = (<any>d3).sankey();
     const units = '€';
 
-    let headingOffset = this.$node.select('.sankey_heading').node().getBoundingClientRect().height + 10;  //10 from padding of p tag
+    let headingOffset = 50;
+    // let headingOffset = this.$node.select('.sankey_heading').node().getBoundingClientRect().height + 10;  //10 from padding of p tag
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
@@ -322,6 +323,15 @@ class SankeyDiagram implements MAppViews {
         }
       });
 
+    // //This is how the overlays for the rects can be done after they have been added
+    // node.append('rect')
+    //   .attr('height', function(d) {
+    //     console.log(d.name, d.dy);
+    //     return 10;
+    //   })
+    //   .attr('width', sankey.nodeWidth())
+    //   .style('fill', '#FAB847');
+
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
       .attr('x', 45)
@@ -329,13 +339,7 @@ class SankeyDiagram implements MAppViews {
       .attr('dy', '1.0em')
       .attr('text-anchor', 'start')
       .attr('class', 'rightText')
-      .text(function(d) {
-        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-          return `${d.name}`;
-        } else {
-          return `${format(d.value)} ${d.name}`;
-        }
-      })
+      .text(function(d) {return `${d.name}`;})
       .filter(function(d, i) { return d.x < width / 2})
       .attr('x', -45 + sankey.nodeWidth())
       .attr('text-anchor', 'end')
