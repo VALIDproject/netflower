@@ -5,6 +5,19 @@
 @import 'styles/base';
 
 
+/**
+The other styles of the page.
+ */
+//Part of the data loading view.
+@import 'styles/data_imports';
+//Part of the filter data view.
+@import 'styles/filter_data';
+//Part of all sankey related visualization stuff.
+@import 'styles/sankey';
+//Part of the global settings view.
+@import 'styles/global_settings';
+
+
 .dataLoadingView {
 
 }
@@ -64,231 +77,11 @@
   }
 }
 
-/**
-Part of the data loading view.
-*/
-.fileContainer {
-  width: 70%;
-  height: 0;
-  margin-left: 15%;
-  padding-top: 10%;
-}
-
-.btn-primary {
-  background-color: $valid-color !important;
-  border: none;
-}
-
-.scrollArea {
-  max-height: 1000px;
-  overflow: auto;
-}
-
-.logContainer {
-  height: 80px;
-  max-width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-
-  //font-family: "Courier New", sans-serif;
-  font-size: 11px;
-  word-break: break-all;
-  overflow: auto;
-
-  #messageLog {
-    color: $green-color;
-  }
-
-  #errorLog {
-    color: $red-color;
-  }
-}
-
-#specialBtn {
-  margin-left: 43%;
-  margin-bottom: 30px;
-  border-radius: 100px;
-}
-
-#informationText {
-  margin-bottom: 10px;
-}
-
-#submitFile {
-  margin-left: 10px;
-}
-
-#showMoreBtn {
-  margin-left: 10px;
-}
-
-.ctrlContainer {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: inherit;
-}
-
-#valueListMeta {
-  margin-top: 23px;
-  margin-left: 20px;
-}
-
-.btnContainer {
-  margin-top: 18px;
-  margin-left: 20px;
-}
-
-/**
-Part of the data viz view.
-*/
-.sankey_diagram {
-  display: flex;
-  height: 760px;
-  width: 86%;
-  border: 1px solid black;
-  position: absolute;
-  top: 250px;
-  right: 10px;
-  margin-bottom: 20px;
-  margin-right: 10px;
-}
-
-.left_bars {
-  border: 1px solid grey;
-  width: 15%;
-  float: right;
-  height: 100%;
-}
-
-
-.sankey_vis {
-  float: right;
-  border: 1px solid grey;
-  width: 70%;
-  height: 100%;
-}
-
-.right_bars {
-  float: right;
-  height: 100%;
-  border: 1px solid grey;
-  width: 15%;
-}
-
 //.globalSettings {
 //  float:left;
 //  background-color: grey;
 //  width: 25%;
 //}
-
-.filter {
-  border: 1px solid grey;
-  width: 100%;
-  height: 100px;
-  position: absolute;
-  top: 85px;
-  right: 10px;
-}
-
-
-.sankey_features{
-  //background-color: yellow;
-  border: 1px solid grey;
-  width: 86%;
-  height: 50px;
-  position: absolute;
-  top: 200px;
-  right: 20px;
-}
-
-.heading {
-  padding: 5px;
-  font-size: 16px;
-  float: left;
-  width: 60%;
-}
-node text {
-  pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
-}
-
-.link {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: .2;
-}
-
-.link:hover {
-  stroke-opacity: .5;
-}
-
-.sankey_details {
-  //background-color: grey;
-}
-
-/**
-Part of the global settings view.
-*/
-.globalSettings {
-  width: 10%;
-  height: 810px;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  border: 1px solid black;
-}
-
-#backBtn {
-  background: $valid-color2;
-  color: white;
-}
-
-.dialogBox {
-  margin-top: 20%;
-  z-index: 100001;
-}
-
-
-.global_settings {
-  width: 16%;
-  height: 810px;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  border: 1px solid black;
-}
-
-.axis text {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-div.tooltip {
-  position: absolute;
-  text-align: center;
-  width: auto;
-  height: 20px;
-  padding: 2px;
-  font: 12px sans-serif;
-  background: white;
-  border: 0px;
-  border-radius: 8px;
-  pointer-events: none;
-}
-
-.caption {
-  font:12px sans-serif;
-}
-
-.bar {
-  fill: #696969;
-}
 
 .closeLink {
   // position: absolute;
@@ -301,46 +94,9 @@ div.tooltip {
   cursor: pointer;
 }
 
-.slider-selection {
-  background: $valid-color !important;
-}
-
-.slider-handle {
-  width: 16px !important;
-  height: 16px !important;
-  background: lightgrey !important;
-}
-
-
-.left_bar_heading {
-  margin-top: 5px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.sankey_heading {
-  margin-top: 5px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 16px;
-
-}
-
-.right_bar_heading {
-  margin-top: 5px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 1;
-
-}
-
 .toolbox {
     z-index: 50000000;
 }
-
-
 
 .button_bar {
   margin-top: 8px;
@@ -350,10 +106,4 @@ div.tooltip {
   //height: 80px;
   margin-left: auto;
   //margin-right: 20px;
-
-
-}
-
-.sankey_vis text {
-  font-size: 12px !important;
 }

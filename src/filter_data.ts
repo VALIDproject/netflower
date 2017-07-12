@@ -89,15 +89,15 @@ class FilterData implements MAppViews {
 
         <div class='row'>
           <div class='col-md-2'>
-            <select class="form-control" id="topFilter">
-              <option value="-1" selected>disabled</option>
-              <option value="0">Bottom 10</option>
-              <option value="1">Top 10</option>
+            <select class='form-control' id='topFilter'>
+              <option value='-1' selected>disabled</option>
+              <option value='0'>Bottom 10</option>
+              <option value='1'>Top 10</option>
             </select>
           </div>
           <div class='col-md-2'>
-            <select class="form-control" id="paragraph">
-              <option value="-1" selected>disabled</option>
+            <select class='form-control' id='paragraph'>
+              <option value='-1' selected>disabled</option>
             </select>
           </div>
           <div class='col-md-2'>
@@ -169,7 +169,7 @@ class FilterData implements MAppViews {
       if(paragraphs.indexOf(val) === -1)
       {
         paragraphs.push(val);
-        this.$node.select('#paragraph').append("option").attr("value",val).text(val);
+        this.$node.select('#paragraph').append('option').attr('value',val).text(val);
       }
     }
   }
