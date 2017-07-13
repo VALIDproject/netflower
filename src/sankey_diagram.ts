@@ -96,18 +96,18 @@ class SankeyDiagram implements MAppViews {
   private attachListener() {
     let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
     if(dataAvailable) {
-      this.getStorageData();
+      this.getStorageData(false);
     }
 
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
       //Draw Sankey Diagram
-      this.getStorageData();
+      this.getStorageData(false);
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       this.$node.select('.sankey_vis').html('');
       //Redraw Sankey Diagram
-      this.getStorageData();
+      this.getStorageData(true);
     });
 
 
@@ -135,7 +135,7 @@ class SankeyDiagram implements MAppViews {
   /**
    * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
    */
-  private getStorageData()
+  private getStorageData(redraw: boolean)
   {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
@@ -144,8 +144,11 @@ class SankeyDiagram implements MAppViews {
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
 
-      this.setEntityFilterRange(originalData);
-      this.setMediaFilterRange(originalData);
+      if(!redraw)
+      {
+        this.setEntityFilterRange(originalData);
+        this.setMediaFilterRange(originalData);
+      }
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -163,6 +166,7 @@ class SankeyDiagram implements MAppViews {
       tooltip_position: 'bottom',
       value: [Number(min), Number(max)],
     }).on('slideStop', (d) => {
+        console.log('refresh');
         let newMin: number = d.value[0];     //First value is left slider handle;
         let newMax: number = d.value[1];     //Second value is right slider handle;
         this.entityEuroFilter.minValue = newMin;
