@@ -34,7 +34,6 @@ class SankeyFeatures implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-
      this.$node.html(`
     <div class="heading"><h4>Media Transparency Data set</h4></div>
     <div class="button_bar">
@@ -45,8 +44,6 @@ class SankeyFeatures implements MAppViews {
         <button type="button" class="btn btn-default"><i class="fa fa-camera fa-lg" aria-hidden="true"></i></button>
       </div>
     </div>
-    <div class="search"></div>
-
     `);
 
   }
@@ -55,9 +52,7 @@ class SankeyFeatures implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-
     this.createButtonBar();
-
   }
 
   private createButtonBar () {
@@ -67,11 +62,6 @@ class SankeyFeatures implements MAppViews {
     // button_bar.append('div').attr('class', 'createGroup');
     // button_bar.append('div').attr('class', 'pinning');
     // button_bar.append('div').attr('class', 'addToNotes');
-
-
-
-
-
   }
 
 }

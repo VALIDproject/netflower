@@ -32,11 +32,6 @@ class SankeyDiagram implements MAppViews {
   private entitySearchFilter: EntitySearchFilter;
   private mediaSearchFilter: MediaSearchFilter;
 
-  //Variables for the temporary nodes to show more
-  private tempNodeLeft: string = 'Others';
-  private tempNodeRight: string = 'More';
-  private tempNodeVal: number = 20000;
-
   constructor(parent: Element, private options: any)
   {
     //Get FilterPipeline
@@ -78,6 +73,7 @@ class SankeyDiagram implements MAppViews {
     let left = this.$node.append('div').attr('class', 'left_bars');
     let sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
     let middle = sankeyVis.append('div').attr('class', 'sankey_heading');
+    let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     let right = this.$node.append('div').attr('class', 'right_bars');
 
     left.html(`
@@ -128,7 +124,7 @@ class SankeyDiagram implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      this.$node.select('.sankey_vis').html('');
+      this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
       this.getStorageData(true);
     });
@@ -163,6 +159,8 @@ class SankeyDiagram implements MAppViews {
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
 
+      this.pipeline.printFilters();
+
       if(!redraw)
       {
         this.setEntityFilterRange(originalData);
@@ -196,7 +194,7 @@ class SankeyDiagram implements MAppViews {
       format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
     //Append the svg canvas to the page
-    const svg = d3.select('.sankey_vis').append('svg')
+    const svg = d3.select('#sankeyDiagram').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
@@ -246,16 +244,6 @@ class SankeyDiagram implements MAppViews {
       .key((d) => {return d.name;})
       .map(graph.nodes));
 
-    //Add the fake node from last to 'more'
-    // const lastSource = graph.links[graph.links.length - 1].source;
-    // graph.links.push({'source': lastSource, 'target': this.tempNodeRight, 'time': '0', 'value': 0});
-
-    //Add fake nodes generally
-    graph.nodes.push(this.tempNodeLeft);
-    graph.nodes.push(this.tempNodeRight);
-    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight,
-      'time':  '0', 'value': this.tempNodeVal});
-
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
@@ -284,15 +272,7 @@ class SankeyDiagram implements MAppViews {
 
     //Add the link titles - Hover Path
     link.append('title')
-      .text(function(d) {
-        if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
-          return d.source.name + ' → ' +
-            d.target.name;
-        } else {
-          return d.source.name + ' → ' +
-            d.target.name + '\n' + format(d.value);
-        }
-      });
+      .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + format(d.value); });
 
     //Add the on 'click' listener for the links
     link.on('click', function(d) {
@@ -315,13 +295,7 @@ class SankeyDiagram implements MAppViews {
       .style('fill', '#DA5A6B')
       //Title rectangle
       .append('title')
-      .text(function(d) {
-        if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-          return `${d.name}`;
-        } else {
-          return d.name + '\n' + format(d.value);
-        }
-      });
+      .text(function(d) { return d.name + '\n' + format(d.value); });
 
     // //This is how the overlays for the rects can be done after they have been added
     // node.append('rect')

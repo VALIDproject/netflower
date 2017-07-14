@@ -138,6 +138,6 @@ export default class EntityEuroFilter implements Filter
 
   public printData(): void
   {
-    console.log('Euro Filter: ' + this.minValue + ' / ' + this.maxValue);
+    console.log('Entity Value Filter: ' + this.minValue + ' / ' + this.maxValue);
   }
 }

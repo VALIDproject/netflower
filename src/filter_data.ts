@@ -9,6 +9,7 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
+import * as bootbox from 'bootbox';
 import 'bootstrap-slider';
 import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {MAppViews} from './app';
@@ -74,6 +75,8 @@ class FilterData implements MAppViews {
       <div class='container'>
         <div class='row'>
           <div class='col-md-2'>
+          </div>
+          <div class='col-md-2'>
             <h4>Top Filter</h4>
           </div>
           <div class='col-md-2'>
@@ -88,6 +91,10 @@ class FilterData implements MAppViews {
         </div>
 
         <div class='row'>
+        <div class='col-md-2'>
+          <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
+            <i class='fa fa-hand-o-left'>&nbsp;</i>Back</button>
+        </div>
           <div class='col-md-2'>
             <select class='form-control' id='topFilter'>
               <option value='-1' selected>disabled</option>
@@ -118,6 +125,32 @@ class FilterData implements MAppViews {
    * Attach the event listeners
    */
   private attachListener(json) {
+    //Listener for the Back Button
+    this.$node.select('#backBtn')
+      .on('click', (e) => {
+        bootbox.confirm({
+          className: 'dialogBox',
+          title: 'Information',
+          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data upload page.<br/>
+          <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
+          Be sure you don't lose anything important or save your progress before you proceed.`,
+          callback: function(result) {
+            if (result) {
+              //Clear both storage facilities
+              localStorage.clear();
+              localforage.clear();
+              //Force reload and loose all data
+              location.reload(true);
+            } else {
+              return;
+            }
+          }
+        });
+
+        const evt = <MouseEvent>d3.event;
+        evt.preventDefault();
+        evt.stopPropagation();
+      });
 
     events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
       this.topFilter.active = false;
@@ -199,11 +232,11 @@ class FilterData implements MAppViews {
       tooltip_position: 'bottom',
       value: [Number(min), Number(min)],
     }).on('slideStop', (d) => {
-        let newMin: number = d.value[0];     //First value is left slider handle;
-        let newMax: number = d.value[1];     //Second value is right slider handle;
-        this.quarterFilter.minValue = newMin;
-        this.quarterFilter.maxValue = newMax;
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+      let newMin: number = d.value[0];     //First value is left slider handle;
+      let newMax: number = d.value[1];     //Second value is right slider handle;
+      this.quarterFilter.minValue = newMin;
+      this.quarterFilter.maxValue = newMax;
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
     });
   }
 
@@ -230,11 +263,11 @@ class FilterData implements MAppViews {
       tooltip_split: true,
       tooltip_position: 'bottom',
     }).on('slideStop', (d) => {
-        let newMin: number = d.value[0];     //First value is left slider handle;
-        let newMax: number = d.value[1];     //Second value is right slider handle;
-        this.euroFilter.minValue = newMin;
-        this.euroFilter.maxValue = newMax;
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+      let newMin: number = d.value[0];     //First value is left slider handle;
+      let newMax: number = d.value[1];     //Second value is right slider handle;
+      this.euroFilter.minValue = newMin;
+      this.euroFilter.maxValue = newMax;
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
     });
   }
 }

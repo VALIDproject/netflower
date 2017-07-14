@@ -4,7 +4,7 @@ Sankey diagram part.
 .sankey_diagram {
   display: flex;
   height: 760px;
-  width: 86%;
+  width: 96%;
   border: 1px solid black;
   position: absolute;
   top: 250px;
@@ -15,7 +15,7 @@ Sankey diagram part.
 
 .left_bars {
   border: 1px solid grey;
-  width: 15%;
+  width: 20%;
   float: right;
   height: 100%;
 }
@@ -24,7 +24,7 @@ Sankey diagram part.
 .sankey_vis {
   float: right;
   border: 1px solid grey;
-  width: 70%;
+  width: 60%;
   height: 100%;
 }
 
@@ -32,7 +32,7 @@ Sankey diagram part.
   float: right;
   height: 100%;
   border: 1px solid grey;
-  width: 15%;
+  width: 20%;
 }
 
 .axis text {
@@ -87,7 +87,7 @@ Sankey features part.
 .sankey_features{
   //background-color: yellow;
   border: 1px solid grey;
-  width: 86%;
+  width: 96%;
   height: 50px;
   position: absolute;
   top: 200px;

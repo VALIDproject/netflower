@@ -138,6 +138,6 @@ export default class MediaEuroFilter implements Filter
 
   public printData(): void
   {
-    console.log('Euro Filter: ' + this.minValue + ' / ' + this.maxValue);
+    console.log('Media Value Filter: ' + this.minValue + ' / ' + this.maxValue);
   }
 }
