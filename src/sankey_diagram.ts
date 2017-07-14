@@ -119,21 +119,18 @@ class SankeyDiagram implements MAppViews {
     //This redraws if new data is available
     let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
     if(dataAvailable) {
-      console.log('First redraw triggered.');
-      this.getStorageData();
+      this.getStorageData(false);
     }
 
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
-      console.log('Second redraw triggered.');
       //Draw Sankey Diagram
-      this.getStorageData();
+      this.getStorageData(false);
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      console.log('Third redraw triggered.');
       this.$node.select('.sankey_vis').html('');
       //Redraw Sankey Diagram
-      this.getStorageData();
+      this.getStorageData(true);
     });
 
 
@@ -157,7 +154,7 @@ class SankeyDiagram implements MAppViews {
   /**
    * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
    */
-  private getStorageData()
+  private getStorageData(redraw: boolean)
   {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
@@ -166,8 +163,11 @@ class SankeyDiagram implements MAppViews {
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
 
-      this.setEntityFilterRange(originalData);
-      this.setMediaFilterRange(originalData);
+      if(!redraw)
+      {
+        this.setEntityFilterRange(originalData);
+        this.setMediaFilterRange(originalData);
+      }
       this.buildSankey(filteredData, originalData);
     });
   }
