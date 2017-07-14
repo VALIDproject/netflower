@@ -74,6 +74,7 @@ class SankeyDiagram implements MAppViews {
     let sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
     let middle = sankeyVis.append('div').attr('class', 'sankey_heading');
     let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
+    let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
 
     left.html(`
@@ -92,6 +93,11 @@ class SankeyDiagram implements MAppViews {
 
     middle.html(`
       <div><p>Flow</p></div>
+    `);
+
+    loadMore.html(`
+      <button type='button' class='btn btn-secondary btn-xs btn-block'>
+      <span style='font-size:smaller;'>Load More ...</span></button>
     `);
 
     right.html(`
@@ -179,14 +185,14 @@ class SankeyDiagram implements MAppViews {
     const sankey = (<any>d3).sankey();
     const units = '€';
 
-    let headingOffset = 50;
-    // let headingOffset = this.$node.select('.sankey_heading').node().getBoundingClientRect().height + 10;  //10 from padding of p tag
+    let headingOffset = this.$node.select('.sankey_heading').node().getBoundingClientRect().height + 10;  //10 from padding of p tag
+    let footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 5;
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
     const margin = { top: 10, right: 120, bottom: 10, left: 120 };
     const width =  widthNode  - margin.left - margin.right;
-    const height = heightNode - margin.top - margin.bottom - headingOffset;
+    const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
     const widthOffset = 80;
 
     //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
