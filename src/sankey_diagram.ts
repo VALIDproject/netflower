@@ -31,6 +31,7 @@ class SankeyDiagram implements MAppViews {
   private mediaEuroFilter: MediaEuroFilter;
   private entitySearchFilter: EntitySearchFilter;
   private mediaSearchFilter: MediaSearchFilter;
+  private euroFilter: PaymentEuroFilter;
 
   constructor(parent: Element, private options: any)
   {
@@ -39,11 +40,13 @@ class SankeyDiagram implements MAppViews {
     //Create Filters
     this.entityEuroFilter = new EntityEuroFilter();
     this.mediaEuroFilter = new MediaEuroFilter();
+    this.euroFilter = new PaymentEuroFilter();
     this.entitySearchFilter = new EntitySearchFilter();
     this.mediaSearchFilter = new MediaSearchFilter();
     //Add Filters to pipeline
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
+    this.pipeline.addFilter(this.euroFilter);
     this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
     this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
 
@@ -93,6 +96,7 @@ class SankeyDiagram implements MAppViews {
 
     middle.html(`
       <div><p>Flow</p></div>
+      <input id='valueSlider'/>
     `);
 
     loadMore.html(`
@@ -162,16 +166,15 @@ class SankeyDiagram implements MAppViews {
       //Store the unfiltered data too
       let originalData = value;
 
-      //Filter the data before and then pass it to the draw function.
-      let filteredData = this.pipeline.performFilters(value);
-
-      this.pipeline.printFilters();
-
       if(!redraw)
       {
+        this.setEuroFilterRange(originalData);
         this.setEntityFilterRange(originalData);
         this.setMediaFilterRange(originalData);
       }
+
+      //Filter the data before and then pass it to the draw function.
+      let filteredData = this.pipeline.performFilters(value);
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -325,7 +328,7 @@ class SankeyDiagram implements MAppViews {
       .attr('text-anchor', 'end')
       .attr('class', 'leftText');
 
-    //The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
+    // The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
     const leftWrap = this.$node.selectAll('.leftText');
     const rightWrap = this.$node.selectAll('.rightText');
     const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
@@ -372,9 +375,13 @@ class SankeyDiagram implements MAppViews {
     });
   }
 
-  private setMediaFilterRange(originalData: any): void
+  /**
+   * This methods sets the range for the media value filter according to the provided data.
+   * @param data where the filter gets the range from.
+   */
+  private setMediaFilterRange(data: any): void
   {
-    this.mediaEuroFilter.calculateMinMaxValues(originalData);
+    this.mediaEuroFilter.calculateMinMaxValues(data);
     let min: number = this.mediaEuroFilter.minValue;
     let max: number = this.mediaEuroFilter.maxValue;
 
@@ -390,7 +397,42 @@ class SankeyDiagram implements MAppViews {
       let newMax: number = d.value[1];     //Second value is right slider handle;
       this.mediaEuroFilter.minValue = newMin;
       this.mediaEuroFilter.maxValue = newMax;
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, originalData);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+    });
+  }
+
+  /**
+   * This method sets the range for the node value filte according to the provided data.
+   * @param data where the filter gets the range from.
+   */
+   private setEuroFilterRange(data: any): void
+  {
+    let min: number = Number(data[0].valueNode);
+    let max: number = Number(data[0].valueNode);
+    for(let entry of data)
+    {
+      let value: number = Number(entry.valueNode);
+      if(value < min)
+        min = value;
+
+      if(value > max)
+        max = value;
+    }
+
+    this.euroFilter.changeRange(min, max);
+
+    $('#valueSlider').bootstrapSlider({
+      min: min,
+      max: max,
+      range: true,
+      tooltip_split: true,
+      tooltip_position: 'bottom',
+    }).on('slideStop', (d) => {
+      let newMin: number = d.value[0];     //First value is left slider handle;
+      let newMax: number = d.value[1];     //Second value is right slider handle;
+      this.euroFilter.minValue = newMin;
+      this.euroFilter.maxValue = newMax;
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     });
   }
 }

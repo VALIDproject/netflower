@@ -16,7 +16,6 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
-import PaymentEuroFilter from './filters/paymentEuroFilter';
 import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/ParagraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
@@ -27,7 +26,6 @@ class FilterData implements MAppViews {
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
-  private euroFilter: PaymentEuroFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
 
@@ -36,14 +34,12 @@ class FilterData implements MAppViews {
     //Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
     //Create Filters
-    this.euroFilter = new PaymentEuroFilter();
     this.quarterFilter = new QuarterFilter();
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
     //Add Filters to Pipeline
     this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
-    this.pipeline.addFilter(this.euroFilter);
     this.pipeline.addFilter(this.paragraphFilter);
 
     this.$node = d3.select(parent)
@@ -82,9 +78,6 @@ class FilterData implements MAppViews {
           <div class='col-md-2'>
             <h4>Paragraph Filter</h4>
           </div>
-          <div class='col-md-2'>
-            <h4>Euro Filter</h4>
-          </div>
           <div class='col-md-4'>
             <h4>Quartal Filter</h4>
           </div>
@@ -107,16 +100,12 @@ class FilterData implements MAppViews {
               <option value='-1' selected>disabled</option>
             </select>
           </div>
-          <div class='col-md-2'>
-            <input id='valueSlider'/>
-          </div>
           <div class='col-md-2 col-md-offset-1'>
             <input id='timeSlider'/>
           </div>
         </div>
     `);
 
-    this.setEuroFilterRange(json);
     this.setQuarterFilterRange(json);
     this.setParagraphFilterElements(json);
   }
@@ -236,37 +225,6 @@ class FilterData implements MAppViews {
       let newMax: number = d.value[1];     //Second value is right slider handle;
       this.quarterFilter.minValue = newMin;
       this.quarterFilter.maxValue = newMax;
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
-    });
-  }
-
-  private setEuroFilterRange(json)
-  {
-    let min:number = Number(json[0].valueNode);
-    let max:number = Number(json[0].valueNode);
-    for(let entry of json)
-    {
-      let value:number = Number(entry.valueNode);
-      if(value < min)
-        min = value;
-
-      if(value > max)
-        max = value;
-    }
-
-    this.euroFilter.changeRange(min, max);
-
-    $('#valueSlider').bootstrapSlider({
-      min: min,
-      max: max,
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-    }).on('slideStop', (d) => {
-      let newMin: number = d.value[0];     //First value is left slider handle;
-      let newMax: number = d.value[1];     //Second value is right slider handle;
-      this.euroFilter.minValue = newMin;
-      this.euroFilter.maxValue = newMax;
       events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
     });
   }
