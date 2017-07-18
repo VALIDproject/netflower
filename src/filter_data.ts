@@ -17,7 +17,7 @@ import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
 import EuroFilter from './filters/euroFilter';
 import TopFilter from './filters/topFilter';
-import ParagraphFilter from './filters/ParagraphFilter';
+import ParagraphFilter from './filters/paragraphFilter';
 
 class FilterData implements MAppViews {
 
