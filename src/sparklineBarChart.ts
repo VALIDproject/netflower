@@ -28,13 +28,13 @@ class SparklineBarChart implements MAppViews {
     var media = ["Tiroler Tageszeitung", "ORF Radio Tirol", "Tirolerin",  "ORF2", "Kleine Zeitung", "Die Presse", "Kronen Zeitung", "NÖN", "Salzburger Nachrichten", "Kurier", "BVZ", "Blick ins Land", "ExtraDienst"];
 
      for (var d of media) {
-       this.build("div.right_bars", "mediumMedieninhaber", d);
+       this.build("div.right_bars", "targetNode", d);
  }
 
      var legal = ["Agrarmarketing Tirol (Verein)", "Agrarmarkt Austria Marketing GesmbH"];
 
      for (var d of legal) {
-       this.build("div.left_bars", "rechtstraeger", d);
+       this.build("div.left_bars", "sourceNode", d);
  }
 
 //       this.build("div.right_bars", "Tiroler Tageszeitung");
@@ -65,8 +65,8 @@ class SparklineBarChart implements MAppViews {
           // TODO get legalEnt/medium name into this scope
           var filtered_data = data.filter(function(d) { return d[field] == medium; });
           var aggregated_data = d3.nest()
-            .key(function(d) { return d.quartal; })
-            .rollup(function(v) { return d3.sum(v, function(d) { return d.euro; }})
+            .key(function(d) { return d.timeNode; })
+            .rollup(function(v) { return d3.sum(v, function(d) { return d.valueNode; })})
             .entries(filtered_data);
           console.log('spark data for ', field, ' : ', medium, ' :');
           console.log(JSON.stringify(aggregated_data));
