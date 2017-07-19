@@ -10,8 +10,10 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
-import 'bootstrap-slider';
-import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
+// import * as nouislider from 'nouislider/distribute/nouislider.js';
+// import 'style-loader!css-loader!nouislider/distribute/nouislider.css';
+// import 'bootstrap-slider';
+// import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
@@ -101,7 +103,9 @@ class FilterData implements MAppViews {
             </select>
           </div>
           <div class='col-md-2 col-md-offset-1'>
+          <div style="width: 100px;">
             <input id='timeSlider'/>
+          </div>
           </div>
         </div>
     `);

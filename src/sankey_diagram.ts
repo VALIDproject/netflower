@@ -6,6 +6,9 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
+import 'ion-rangeslider';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import 'bootstrap-slider';
 import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
@@ -32,6 +35,11 @@ class SankeyDiagram implements MAppViews {
   private entitySearchFilter: EntitySearchFilter;
   private mediaSearchFilter: MediaSearchFilter;
   private euroFilter: PaymentEuroFilter;
+
+  //Sliders
+  private entitySlider;
+  private mediaSlider;
+  private valueSlider;
 
   constructor(parent: Element, private options: any)
   {
@@ -75,7 +83,7 @@ class SankeyDiagram implements MAppViews {
   private build() {
     let left = this.$node.append('div').attr('class', 'left_bars');
     let sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
-    let middle = sankeyVis.append('div').attr('class', 'sankey_heading');
+    let middle = sankeyVis.append('div').attr('class', 'middle_bars');
     let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
@@ -83,20 +91,22 @@ class SankeyDiagram implements MAppViews {
     left.html(`
       <div class='left_bar_heading'><p>Public Entity</p></div>
       <label for='entitySearchFilter'>Search & Value Filter</label>
-      <div class='input-group input-group-sm'>
+      <div class='input-group input-group-xs'>
         <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for...'/>
         <span class='input-group-btn'>
           <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
         </span>
       </div>
-      <div class='input-group input-group-sm'>
+      <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
         <input id='entityFilter'/>
       </div>
     `);
 
     middle.html(`
-      <div><p>Flow</p></div>
-      <input id='valueSlider'/>
+      <div class='sankey_heading'><p>Flow</p></div>
+      <div style='width: 40%; margin: auto;'>
+        <input id='valueSlider'/>
+      </div>
     `);
 
     loadMore.html(`
@@ -107,12 +117,12 @@ class SankeyDiagram implements MAppViews {
     right.html(`
       <div class='right_bar_heading'><p>Media Institution</p></div>
       <label for='mediaSearchFilter'>Search & Value Filter</label>
-      <div class='input-group input-group-sm'>
+      <div class='input-group input-group-xs'>
         <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for...'/>
         <span class='input-group-btn'>
           <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
       </div>
-      <div class='input-group input-group-sm'>
+      <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
         <input id='mediaFilter'/>
       </div>
     `);
@@ -359,20 +369,27 @@ class SankeyDiagram implements MAppViews {
     let min: number = this.entityEuroFilter.minValue;
     let max: number = this.entityEuroFilter.maxValue;
 
-    $('#entityFilter').bootstrapSlider({
+    $('#entityFilter').ionRangeSlider({
+      type: 'double',
       min: Number(min),
       max: Number(max),
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-      value: [Number(min), Number(max)],
-    }).on('slideStop', (d) => {
-      let newMin: number = d.value[0];     //First value is left slider handle;
-      let newMax: number = d.value[1];     //Second value is right slider handle;
-      this.entityEuroFilter.minValue = newMin;
-      this.entityEuroFilter.maxValue = newMax;
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      prefix: '€',
+      grid: true,
+      prettify_enabled: true,
+      prettify_separator: '.',
+      force_edges: true,  //Lets the labels inside the container
+      min_interval: 1000, //Forces at least 1000 to be shown in order to prevent errors
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+        this.entityEuroFilter.minValue = newMin;
+        this.entityEuroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      }
     });
+
+    this.entitySlider = $('#entityFilter').data('ionRangeSlider');    //Store instance to update it later
   }
 
   /**
@@ -385,20 +402,26 @@ class SankeyDiagram implements MAppViews {
     let min: number = this.mediaEuroFilter.minValue;
     let max: number = this.mediaEuroFilter.maxValue;
 
-    $('#mediaFilter').bootstrapSlider({
+    $('#mediaFilter').ionRangeSlider({
+      type: 'double',
       min: Number(min),
       max: Number(max),
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-      value: [Number(min), Number(max)],
-    }).on('slideStop', (d) => {
-      let newMin: number = d.value[0];     //First value is left slider handle;
-      let newMax: number = d.value[1];     //Second value is right slider handle;
-      this.mediaEuroFilter.minValue = newMin;
-      this.mediaEuroFilter.maxValue = newMax;
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      prefix: '€',
+      prettify_enabled: true,
+      prettify_separator: '.',
+      force_edges: true,  //Lets the labels inside the container
+      min_interval: 1000, //Forces at least 1000 to be shown in order to prevent errors
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+        this.mediaEuroFilter.minValue = newMin;
+        this.mediaEuroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      }
     });
+
+    this.mediaSlider = $('#mediaFilter').data('ionRangeSlider');    //Store instance to update it later
   }
 
   /**
@@ -412,28 +435,31 @@ class SankeyDiagram implements MAppViews {
     for(let entry of data)
     {
       let value: number = Number(entry.valueNode);
-      if(value < min)
-        min = value;
-
-      if(value > max)
-        max = value;
+      if(value < min) min = value;
+      if(value > max) max = value;
     }
-
     this.euroFilter.changeRange(min, max);
 
-    $('#valueSlider').bootstrapSlider({
+    $('#valueSlider').ionRangeSlider({
+      type: 'double',
       min: min,
       max: max,
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-    }).on('slideStop', (d) => {
-      let newMin: number = d.value[0];     //First value is left slider handle;
-      let newMax: number = d.value[1];     //Second value is right slider handle;
-      this.euroFilter.minValue = newMin;
-      this.euroFilter.maxValue = newMax;
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      prefix: '€',
+      prettify_enabled: true,
+      prettify_separator: '.',
+      force_edges: true,  //Lets the labels inside the container
+      min_interval: 1000, //Forces at least 1000 to be shown in order to prevent errors
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+        this.euroFilter.minValue = newMin;
+        this.euroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      }
     });
+
+    this.valueSlider = $('#valueSlider').data('ionRangeSlider');    //Store instance to update it later
   }
 }
 

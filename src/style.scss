@@ -107,3 +107,18 @@ The other styles of the page.
   margin-left: auto;
   //margin-right: 20px;
 }
+
+//Slider distance to the top
+.irs {
+  margin-top: 5px;
+}
+
+//Make input search smaller
+.input-group-xs>.form-control,
+.input-group-xs>.input-group-addon,
+.input-group-xs>.input-group-btn>.btn {
+    height: 22px;
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+}
