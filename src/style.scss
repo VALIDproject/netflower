@@ -38,7 +38,7 @@ The other styles of the page.
   position: fixed;
   z-index: 100000;
   width: 100%;
-  height: 80px;
+  height: 67px;
   background-color: $background-color;
   padding: 10px;
   border-bottom: 2px solid $border-color;
@@ -47,10 +47,10 @@ The other styles of the page.
 .logo {
   float: left;
   width: 40%;
-  height: 100px;
+  height: 40px;
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
-  background-size: 300px;
+  background-size: 240px;
   margin-top: 10px;
 }
 
@@ -101,11 +101,8 @@ The other styles of the page.
 .button_bar {
   margin-top: 8px;
   float: right;
-  width: 40%;
   height: 30px;
-  //height: 80px;
-  margin-left: auto;
-  //margin-right: 20px;
+  margin-right: 20px;
 }
 
 //Slider distance to the top

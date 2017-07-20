@@ -46,7 +46,8 @@ class FilterData implements MAppViews {
 
     this.$node = d3.select(parent)
       .append('div')
-      .classed('filter', true);
+      .classed('filter', true)
+      .classed('invisibleClass', true);
   }
 
   /**

@@ -89,24 +89,28 @@ class SankeyDiagram implements MAppViews {
     let right = this.$node.append('div').attr('class', 'right_bars');
 
     left.html(`
-      <div class='left_bar_heading'><p>Public Entity</p></div>
-      <label for='entitySearchFilter'>Search & Value Filter</label>
-      <div class='input-group input-group-xs'>
-        <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for...'/>
-        <span class='input-group-btn'>
-          <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
-        </span>
-      </div>
-      <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
-        <input id='entityFilter'/>
+    <div class='controlBox'>
+        <div class='left_bar_heading'><p>Public Entity</p></div>
+        <label for='entitySearchFilter'>Search & Value Filter</label>
+        <div class='input-group input-group-xs'>
+          <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for...'/>
+          <span class='input-group-btn'>
+            <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+          </span>
+        </div>
+        <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
+          <input id='entityFilter'/>
+        </div>
       </div>
     `);
 
     middle.html(`
+    <div class='controlBox'>
       <div class='sankey_heading'><p>Flow</p></div>
       <div style='width: 40%; margin: auto;'>
         <input id='valueSlider'/>
       </div>
+    </div>
     `);
 
     loadMore.html(`
@@ -115,6 +119,7 @@ class SankeyDiagram implements MAppViews {
     `);
 
     right.html(`
+    <div class='controlBox'>
       <div class='right_bar_heading'><p>Media Institution</p></div>
       <label for='mediaSearchFilter'>Search & Value Filter</label>
       <div class='input-group input-group-xs'>
@@ -125,6 +130,7 @@ class SankeyDiagram implements MAppViews {
       <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
         <input id='mediaFilter'/>
       </div>
+    </div>
     `);
   }
 
@@ -198,8 +204,8 @@ class SankeyDiagram implements MAppViews {
     const sankey = (<any>d3).sankey();
     const units = '€';
 
-    let headingOffset = this.$node.select('.sankey_heading').node().getBoundingClientRect().height + 10;  //10 from padding of p tag
-    let footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 5;
+    let headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
+    let footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
