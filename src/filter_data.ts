@@ -9,38 +9,38 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
-import 'bootstrap-slider';
-import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
+import * as bootbox from 'bootbox';
+import 'ion-rangeslider';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
-import EuroFilter from './filters/euroFilter';
 import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/ParagraphFilter';
+import EntityEuroFilter from './filters/entityEuroFilter';
+import MediaEuroFilter from './filters/mediaEuroFilter';
 
 class FilterData implements MAppViews {
 
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
-  private euroFilter: EuroFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
 
   constructor(parent: Element, private options: any)
   {
-    //Create FilterPipeline
+    //Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
     //Create Filters
-    this.euroFilter = new EuroFilter();
     this.quarterFilter = new QuarterFilter();
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
     //Add Filters to Pipeline
-    this.pipeline.addFilter(this.topFilter); //must be first filter
+    this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
-    this.pipeline.addFilter(this.euroFilter);
     this.pipeline.addFilter(this.paragraphFilter);
 
     this.$node = d3.select(parent)
@@ -71,43 +71,42 @@ class FilterData implements MAppViews {
     this.$node.html(`
       <div class='container'>
         <div class='row'>
-          <div class='col-md-2'>
-            <h4>Top Filter</h4>
+          <div class='col-sm-2'>
+            <small>Top Filter</small>
           </div>
-          <div class='col-md-2'>
-            <h4>Paragraph Filter</h4>
+          <div class='col-sm-2'>
+            <small>Paragraph Filter</small>
           </div>
-          <div class='col-md-2'>
-            <h4>Euro Filter</h4>
-          </div>
-          <div class='col-md-4'>
-            <h4>Quartal Filter</h4>
-          </div>
+          <!--<div class='col-sm-2'>-->
+            <!--<small>Quartal Filter</small>-->
+          <!--</div>-->
         </div>
 
         <div class='row'>
-          <div class='col-md-2'>
-            <select class="form-control" id="topFilter">
-              <option value="-1" selected>disabled</option>
-              <option value="0">Bottom 10</option>
-              <option value="1">Top 10</option>
+          <div class='col-sm-2'>
+            <select class='form-control input-sm' id='topFilter'>
+              <option value='-1' selected>disabled</option>
+              <option value='0'>Bottom 10</option>
+              <option value='1'>Top 10</option>
             </select>
           </div>
-          <div class='col-md-2'>
-            <select class="form-control" id="paragraph">
-              <option value="-1" selected>disabled</option>
+          <div class='col-sm-2'>
+            <select class='form-control input-sm' id='paragraph'>
+              <option value='-1' selected>disabled</option>
             </select>
           </div>
-          <div class='col-md-2'>
-            <input id='valueSlider'/>
-          </div>
-          <div class='col-md-2 col-md-offset-1'>
-            <input id='timeSlider'/>
-          </div>
+          <!--<div class='col-sm-2'>-->
+          <!--<div>-->
+            <!--<input id='timeSlider'/>-->
+          <!--</div>-->
+          <!--</div>-->
         </div>
+       </div>
+       <div class='quarterSlider'>
+        <input id='timeSlider'/>
+       </div>
     `);
 
-    this.setEuroFilterRange(json);
     this.setQuarterFilterRange(json);
     this.setParagraphFilterElements(json);
   }
@@ -116,6 +115,12 @@ class FilterData implements MAppViews {
    * Attach the event listeners
    */
   private attachListener(json) {
+    events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
+      this.topFilter.active = false;
+      $('#topFilter').val(-1);
+    });
+
+
     this.$node.select('#topFilter').on('change', (d) => {
       let value:number = $('#topFilter').val() as number;
 
@@ -160,17 +165,15 @@ class FilterData implements MAppViews {
       if(paragraphs.indexOf(val) === -1)
       {
         paragraphs.push(val);
-        this.$node.select('#paragraph').append("option").attr("value",val).text(val);
+        this.$node.select('#paragraph').append('option').attr('value',val).text(val);
       }
     }
   }
 
   private setQuarterFilterRange(json)
   {
-    const splitAt = index => it =>
-      [it.slice(0, index), it.slice(index)];
-    let min:number = json[0].timeNode;
-    let max:number = json[0].timeNode;
+    let min: number = json[0].timeNode;
+    let max: number = json[0].timeNode;
     for(let entry of json)
     {
       if(entry.timeNode < min)
@@ -182,50 +185,22 @@ class FilterData implements MAppViews {
 
     this.quarterFilter.changeRange(min, min);
 
-    $('#timeSlider').bootstrapSlider({
-      min: Number(min),
-      max: Number(max),
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-      value: [Number(min), Number(min)],
-    }).on('slideStop', (d) => {
-        let newMin: number = d.value[0];     //First value is left slider handle;
-        let newMax: number = d.value[1];     //Second value is right slider handle;
-        this.quarterFilter.minValue = newMin;
-        this.quarterFilter.maxValue = newMax;
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
-    });
-  }
-
-  private setEuroFilterRange(json)
-  {
-    let min:number = Number(json[0].valueNode);
-    let max:number = Number(json[0].valueNode);
-    for(let entry of json)
-    {
-      let value:number = Number(entry.valueNode);
-      if(value < min)
-        min = value;
-
-      if(value > max)
-        max = value;
-    }
-
-    this.euroFilter.changeRange(min, max);
-
-    $('#valueSlider').bootstrapSlider({
+    $('#timeSlider').ionRangeSlider({
+      type: 'double',
       min: min,
       max: max,
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-    }).on('slideStop', (d) => {
-        let newMin: number = d.value[0];     //First value is left slider handle;
-        let newMax: number = d.value[1];     //Second value is right slider handle;
-        this.euroFilter.minValue = newMin;
-        this.euroFilter.maxValue = newMax;
+      from: min,
+      to: min,
+      prefix: 'Q',
+      force_edges: true,  //Lets the labels inside the container
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+      this.quarterFilter.minValue = newMin;
+      this.quarterFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+      }
     });
   }
 }
