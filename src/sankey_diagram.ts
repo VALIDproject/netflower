@@ -21,6 +21,7 @@ import MediaEuroFilter from './filters/mediaEuroFilter';
 import EntitySearchFilter from './filters/entitySearchFilter';
 import MediaSearchFilter from './filters/mediaSearchFilter';
 import PaymentEuroFilter from './filters/paymentEuroFilter';
+import SparklineBarChart from './sparklineBarChart';
 
 
 class SankeyDiagram implements MAppViews {
@@ -311,6 +312,10 @@ class SankeyDiagram implements MAppViews {
       .attr('class', 'node')
       .attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
+      })
+      .each(function(d, i){
+//        console.log("in sankey 2 " + d + " i " + i + " d3 data " + d3.select(this).datum());
+        SparklineBarChart.buildForNode(d3.select(this).datum());
       });
 
     //Add the rectangles for the nodes

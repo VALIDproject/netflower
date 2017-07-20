@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {MAppViews} from './app';
 
-class SparklineBarChart implements MAppViews {
+export default class SparklineBarChart implements MAppViews {
 
   private $node;
   private promiseData;
@@ -36,6 +36,7 @@ class SparklineBarChart implements MAppViews {
      for (var d of legal) {
        this.build("div.left_bars", "sourceNode", d);
  }
+    this.findNodes();
 
 //       this.build("div.right_bars", "Tiroler Tageszeitung");
 
@@ -43,6 +44,31 @@ class SparklineBarChart implements MAppViews {
 
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
+  }
+
+  private findNodes() {
+    console.log("in findNodes");
+    let san = d3.select('#sankeyDiagram');
+      console.log(san.toString());
+
+     let nodes = san.selectAll('.node');
+      console.log(nodes);
+      console.log(d3.selectAll('.node'));
+
+    d3.select('#sankeyDiagram').each(function (d, i) {
+      console.log(this.innerHTML);
+    });
+
+    d3.select('#sankeyDiagram').selectAll('g.node').each(function (d, i) {
+      console.log(this);
+      console.log(d); // .innerHTML
+    });
+  }
+
+  public static buildForNode(d : any)  : void {
+//    console.log("build sparkline for " + d + " at " + d.y);
+    console.log("build sparkline for " + d.name);
+
   }
 
   /**
@@ -65,11 +91,11 @@ class SparklineBarChart implements MAppViews {
           // TODO get legalEnt/medium name into this scope
           var filtered_data = data.filter(function(d) { return d[field] == medium; });
           var aggregated_data = d3.nest()
-            .key(function(d) { return d.timeNode; })
-            .rollup(function(v) { return d3.sum(v, function(d) { return d.valueNode; })})
+            .key(function(d: any) { return d.timeNode; })
+            .rollup(function(v) { return d3.sum(v, function(d: any) { return d.valueNode; })})
             .entries(filtered_data);
-          console.log('spark data for ', field, ' : ', medium, ' :');
-          console.log(JSON.stringify(aggregated_data));
+          // console.log('spark data for ', field, ' : ', medium, ' :');
+          // console.log(JSON.stringify(aggregated_data));
 
     let width = 120;
     let height = 40;
