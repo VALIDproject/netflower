@@ -113,6 +113,14 @@ The other styles of the page.
   margin-top: 5px;
 }
 
+span.to {
+    cursor: pointer !important;
+}
+
+span.from {
+  cursor: pointer !important;
+}
+
 //Make input search smaller
 .input-group-xs>.form-control,
 .input-group-xs>.input-group-addon,

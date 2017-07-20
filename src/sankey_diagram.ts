@@ -14,7 +14,7 @@ import 'bootstrap-slider';
 import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {d3TextWrap} from './utilities';
+import {d3TextWrap, roundToFull} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -366,19 +366,18 @@ class SankeyDiagram implements MAppViews {
   private setEntityFilterRange(data: any): void
   {
     this.entityEuroFilter.calculateMinMaxValues(data);
-    let min: number = this.entityEuroFilter.minValue;
-    let max: number = this.entityEuroFilter.maxValue;
+    let min: number = roundToFull(this.entityEuroFilter.minValue);
+    let max: number = roundToFull(this.entityEuroFilter.maxValue);
 
     $('#entityFilter').ionRangeSlider({
       type: 'double',
-      min: Number(min),
-      max: Number(max),
+      min: min,
+      max: max,
       prefix: '€',
-      grid: true,
       prettify_enabled: true,
       prettify_separator: '.',
       force_edges: true,  //Lets the labels inside the container
-      min_interval: 1000, //Forces at least 1000 to be shown in order to prevent errors
+      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
         let newMin: number = sliderData.from;
@@ -386,7 +385,7 @@ class SankeyDiagram implements MAppViews {
         this.entityEuroFilter.minValue = newMin;
         this.entityEuroFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
-      }
+      },
     });
 
     this.entitySlider = $('#entityFilter').data('ionRangeSlider');    //Store instance to update it later
@@ -399,18 +398,18 @@ class SankeyDiagram implements MAppViews {
   private setMediaFilterRange(data: any): void
   {
     this.mediaEuroFilter.calculateMinMaxValues(data);
-    let min: number = this.mediaEuroFilter.minValue;
-    let max: number = this.mediaEuroFilter.maxValue;
+    let min: number = roundToFull(this.mediaEuroFilter.minValue);
+    let max: number = roundToFull(this.mediaEuroFilter.maxValue);
 
     $('#mediaFilter').ionRangeSlider({
       type: 'double',
-      min: Number(min),
-      max: Number(max),
+      min:min,
+      max: max,
       prefix: '€',
       prettify_enabled: true,
       prettify_separator: '.',
       force_edges: true,  //Lets the labels inside the container
-      min_interval: 1000, //Forces at least 1000 to be shown in order to prevent errors
+      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
         let newMin: number = sliderData.from;
@@ -430,8 +429,8 @@ class SankeyDiagram implements MAppViews {
    */
    private setEuroFilterRange(data: any): void
   {
-    let min: number = Number(data[0].valueNode);
-    let max: number = Number(data[0].valueNode);
+    let min: number = roundToFull(Number(data[0].valueNode));
+    let max: number = roundToFull(Number(data[0].valueNode));
     for(let entry of data)
     {
       let value: number = Number(entry.valueNode);
@@ -448,7 +447,7 @@ class SankeyDiagram implements MAppViews {
       prettify_enabled: true,
       prettify_separator: '.',
       force_edges: true,  //Lets the labels inside the container
-      min_interval: 1000, //Forces at least 1000 to be shown in order to prevent errors
+      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
         let newMin: number = sliderData.from;
