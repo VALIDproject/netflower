@@ -8,7 +8,7 @@ import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
 
 /**
-Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
+ Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
  * Based on https://github.com/mbostock/d3/issues/1642
  * @exemple svg.append("g")
  *      .attr("class", "x axis")
@@ -99,7 +99,46 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
   return arrLineCreatedCount;
 }
 
+/**
+ * This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
+ * where the first returns a funciton. So everytime the function is called the same index is used for example.
+ * @param index where to split
+ * @param it what to split
+ *
+ * Example: splitAt(4)(d.time) Splits the string at 4 from d.time
+ */
+export const splitAt = index => it =>
+  [it.slice(0, index), it.slice(index)];
 
+/**
+ * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
+ * It's necessary but not very pretty. Not proud of it.....
+ * @param value to round
+ * @returns {number}
+ */
+export function roundToFull(value: number) {
+  if (value >= 10 && value < 100) {                             //10 step
+    return Math.round(value / 10) * 10;
+  } else if(value >= 100 && value < 1000) {                     //100 step
+    return Math.round(value / 100) * 100;
+  } else if(value >= 1000 && value < 10000) {                   //1.000 step
+    return Math.round(value / 1000) * 1000;
+  } else if(value >= 10000 && value < 100000) {                 //10.000 step
+    return Math.round(value / 10000) * 10000;
+  } else if(value >= 100000 && value < 1000000) {               //100.000 step
+    return Math.round(value / 100000) * 100000;
+  } else if(value >= 1000000 && value < 10000000) {             //1.000.000 step
+    return Math.round(value / 1000000) * 1000000;
+  } else if(value >= 10000000 && value < 100000000) {           //10.000.000 step
+    return Math.round(value / 10000000) * 10000000;
+  } else if(value >= 100000000 && value < 1000000000) {         //100.000.000 step
+    return Math.round(value / 10000000) * 10000000;
+  } else if(value >= 1000000000 && value < 10000000000) {       //1.000.000.000 step
+    return Math.round(value / 100000000) * 100000000;
+  } else {
+    return Math.round(value);
+  }
+}
 
 /**
  * This function exports a html table with letious options and creates a JSON.

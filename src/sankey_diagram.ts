@@ -5,27 +5,58 @@
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
+import * as $ from 'jquery';
+import 'ion-rangeslider';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
 import 'imports-loader?d3=d3!../lib/sankey.js';
+import 'bootstrap-slider';
+import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {d3TextWrap} from './utilities';
+import {d3TextWrap, roundToFull} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
+import EntityEuroFilter from './filters/entityEuroFilter';
+import MediaEuroFilter from './filters/mediaEuroFilter';
+import EntitySearchFilter from './filters/entitySearchFilter';
+import MediaSearchFilter from './filters/mediaSearchFilter';
+import PaymentEuroFilter from './filters/paymentEuroFilter';
 
 
 class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 20;
+
+  //Filters
   private pipeline: FilterPipeline;
+  private entityEuroFilter: EntityEuroFilter;
+  private mediaEuroFilter: MediaEuroFilter;
+  private entitySearchFilter: EntitySearchFilter;
+  private mediaSearchFilter: MediaSearchFilter;
+  private euroFilter: PaymentEuroFilter;
 
-  //Variables for the temporary nodes to show more
-  private tempNodeLeft: string = 'Others';
-  private tempNodeRight: string = 'More';
-  private tempNodeVal: number = 20000;
+  //Sliders
+  private entitySlider;
+  private mediaSlider;
+  private valueSlider;
 
-  constructor(parent: Element, private options: any) {
-    //Create FilterPipeline
+  constructor(parent: Element, private options: any)
+  {
+    //Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
+    //Create Filters
+    this.entityEuroFilter = new EntityEuroFilter();
+    this.mediaEuroFilter = new MediaEuroFilter();
+    this.euroFilter = new PaymentEuroFilter();
+    this.entitySearchFilter = new EntitySearchFilter();
+    this.mediaSearchFilter = new MediaSearchFilter();
+    //Add Filters to pipeline
+    this.pipeline.addFilter(this.entityEuroFilter);
+    this.pipeline.addFilter(this.mediaEuroFilter);
+    this.pipeline.addFilter(this.euroFilter);
+    this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
+    this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
 
     this.$node = d3.select(parent)
       .append('div')
@@ -50,43 +81,116 @@ class SankeyDiagram implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    this.$node.append('div').attr('class', 'left_bars');
-    this.$node.append('div').attr('class', 'sankey_vis');
-    this.$node.append('div').attr('class', 'right_bars');
+    let left = this.$node.append('div').attr('class', 'left_bars');
+    let sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
+    let middle = sankeyVis.append('div').attr('class', 'middle_bars');
+    let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
+    let loadMore = sankeyVis.append('div').attr('class', 'load_more');
+    let right = this.$node.append('div').attr('class', 'right_bars');
+
+    left.html(`
+    <div class='controlBox'>
+        <div class='left_bar_heading'><p>Public Entity</p></div>
+        <label for='entitySearchFilter'>Search & Value Filter</label>
+        <div class='input-group input-group-xs'>
+          <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for...'/>
+          <span class='input-group-btn'>
+            <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+          </span>
+        </div>
+        <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
+          <input id='entityFilter'/>
+        </div>
+      </div>
+    `);
+
+    middle.html(`
+    <div class='controlBox'>
+      <div class='sankey_heading'><p>Flow</p></div>
+      <div style='width: 40%; margin: auto;'>
+        <input id='valueSlider'/>
+      </div>
+    </div>
+    `);
+
+    loadMore.html(`
+      <button type='button' class='btn btn-secondary btn-xs btn-block'>
+      <span style='font-size:smaller;'>Load More ...</span></button>
+    `);
+
+    right.html(`
+    <div class='controlBox'>
+      <div class='right_bar_heading'><p>Media Institution</p></div>
+      <label for='mediaSearchFilter'>Search & Value Filter</label>
+      <div class='input-group input-group-xs'>
+        <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for...'/>
+        <span class='input-group-btn'>
+          <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+      </div>
+      <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
+        <input id='mediaFilter'/>
+      </div>
+    </div>
+    `);
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
+    //This redraws if new data is available
     let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
     if(dataAvailable) {
-      this.getStorageData();
+      this.getStorageData(false);
     }
 
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
       //Draw Sankey Diagram
-      this.getStorageData();
+      this.getStorageData(false);
     });
 
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      this.$node.select('.sankey_vis').html('');
+      this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
-      this.getStorageData();
+      this.getStorageData(true);
+    });
+
+
+    this.$node.select('#entitySearchButton').on('click', (d) => {
+      let value: string = $('#entitySearchFilter').val();
+      this.entitySearchFilter.term = value;
+
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    });
+
+    this.$node.select('#mediaSearchButton').on('click', (d) => {
+      let value: string = $('#mediaSearchFilter').val();
+      this.mediaSearchFilter.term = value;
+
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
   }
 
   /**
    * Just a handy method that can be called whenever the page is reloaded or when the data is ready.
    */
-  private getStorageData() {
+  private getStorageData(redraw: boolean)
+  {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
       let originalData = value;
 
+      if(!redraw)
+      {
+        this.setEuroFilterRange(originalData);
+        this.setEntityFilterRange(originalData);
+        this.setMediaFilterRange(originalData);
+      }
+
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
-
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -100,29 +204,26 @@ class SankeyDiagram implements MAppViews {
     const sankey = (<any>d3).sankey();
     const units = '€';
 
+    let headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
+    let footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
     const margin = { top: 10, right: 120, bottom: 10, left: 120 };
     const width =  widthNode  - margin.left - margin.right;
-    const height = heightNode - margin.top - margin.bottom;
-    const widthOffset = 30;
+    const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
+    const widthOffset = 80;
 
-    //The "0" option enables zero-padding. The comma (",") option enables the use of a comma for a thousands separator.
+    //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
       format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
-    //This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
-    //where the first returns a funciton. So everytime the function is called the same index is used for example.
-    const splitAt = index => it =>
-      [it.slice(0, index), it.slice(index)];
-
     //Append the svg canvas to the page
-    const svg = d3.select('.sankey_vis').append('svg')
+    const svg = d3.select('#sankeyDiagram').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
-      .attr('transform','translate(' + margin.left+ ',' + margin.top + ')');
+      .attr('transform','translate(' + (margin.left + widthOffset/2) + ',' + margin.top + ')');
 
     //Set the diagram properties
     sankey.nodeWidth(35)
@@ -131,81 +232,42 @@ class SankeyDiagram implements MAppViews {
 
     const path = sankey.link();
 
-    /**
-     * OLD VERSION
-    // Group Data (by quartal)
+      // Group Data (by quartal)
     let nest =(<any>d3).nest()
-    .key(function (d) {return d.timeNode;})
-    .entries(json);
-
-    let graph = {'nodes' : [], 'links' : []};
-
-    that.nodesToShow = Math.ceil((heightNode / 40) / nest.length);    //Trying to make nodes length dependent on space
-
-    nest.forEach(function (d, i ) {
-      console.log('d ', d);
-      console.log('length values', d.values.length,'nodetoShow', that.nodesToShow );
-      let max = (d.values.length < that.nodesToShow)?d.values.length:that.nodesToShow;
-      console.log('max', max);
-      for(var _v = 0; _v < max; _v++) {
-        graph.nodes.push({ 'name': d.values[_v].sourceNode });//all Nodes
-        graph.nodes.push({ 'name': d.values[_v].targetNode });//all Nodes
-
-        graph.links.push({ 'source': d.values[_v].sourceNode,
-        'target': d.values[_v].targetNode,
-        'value': +d.values[_v].valueNode, 'time': d.values[_v].timeNode });
-      }
-    });
-
-    console.log('nodes', graph.nodes, 'links', graph.links);
-    */
-
-    // Group Data (by quartal)
-    let nest =(<any>d3).nest()
-      .key((d) => {return d.sourceNode;})
-      .key(function (d) {return d.targetNode;})
-      .rollup(function (v) {return {
-        target: v[0].targetNode,
-        source: v[0].sourceNode,
-        time: v[0].timeNode,
-        sum: d3.sum(v, function (d :any){ return d.valueNode;})
-      }})
-      .entries(json);
+        .key((d) => {return d.sourceNode;})
+        .key(function (d) {return d.targetNode;})
+        .rollup(function (v) {return {
+          target: v[0].targetNode,
+          source: v[0].sourceNode,
+          time: v[0].timeNode,
+          sum: d3.sum(v, function (d :any){ return d.valueNode;})
+        }})
+        .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
     that.nodesToShow = Math.ceil((heightNode / 25));    //Trying to make nodes length dependent on space in window
-    console.log("changed", that.nodesToShow);
+    console.log('changed', that.nodesToShow);
 
     let counter = 0;
     for(let d of nest) {
       counter += d.values.length;
-      if(counter >= 30) break;
-        for (var v = 0; v <= d.values.length - 1; v++) {
-          graph.nodes.push({ 'name': d.key });//all Nodes source
-          graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
-          graph.links.push({ 'source': d.key,
-            'target': d.values[v].key,
-            'value': +d.values[v].values.sum,
-            'time': d.values[v].values.time});
-        }
+      if(counter >= 26) break;
+      for (var v = 0; v <= d.values.length - 1; v++) {
+        graph.nodes.push({ 'name': d.key });//all Nodes source
+        graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
+        graph.links.push({ 'source': d.key,
+          'target': d.values[v].key,
+          'value': +d.values[v].values.sum,
+          'time': d.values[v].values.time});
+      }
     }
 
     //d3.keys - returns array of keys from the nest function
     //d3.nest - groups the values of an array by the given key
     //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
     graph.nodes = (<any>d3).keys((<any>d3).nest()
-    .key((d) => {return d.name;})
-    .map(graph.nodes));
-
-    //Add the fake node from last to 'more'
-    const lastSource = graph.links[graph.links.length - 1].source;
-    graph.links.push({'source': lastSource, 'target': this.tempNodeRight, 'time': '0', 'value': 0});
-
-    //Add fake nodes generally
-    graph.nodes.push(this.tempNodeLeft);
-    graph.nodes.push(this.tempNodeRight);
-    graph.links.push({'source': this.tempNodeLeft, 'target': this.tempNodeRight,
-    'time':  '0', 'value': this.tempNodeVal});
+      .key((d) => {return d.name;})
+      .map(graph.nodes));
 
     graph.links.forEach(function (d, i) {
       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
@@ -219,32 +281,23 @@ class SankeyDiagram implements MAppViews {
 
     //Basic parameters for the diagram
     sankey
-    .nodes(graph.nodes)
-    //.links(linksorted)
-    .links(graph.links)
-    .layout(10); //Difference only by 0, 1 and otherwise always the same
+      .nodes(graph.nodes)
+      //.links(linksorted)
+      .links(graph.links)
+      .layout(10); //Difference only by 0, 1 and otherwise always the same
 
     let link = svg.append('g').selectAll('.link')
-    .data(graph.links)
-    .enter().append('path')
-    .attr('class', 'link')
-    .attr('d', path)
-    .style('stroke-width', function(d) { return Math.max(1, d.dy); })
-    //reduce edges crossing
-    .sort(function(a, b) { return b.dy - a.dy; });
+      .data(graph.links)
+      .enter().append('path')
+      .attr('class', 'link')
+      .attr('d', path)
+      .style('stroke-width', function(d) { return Math.max(1, d.dy); })
+      //reduce edges crossing
+      .sort(function(a, b) { return b.dy - a.dy; });
 
     //Add the link titles - Hover Path
     link.append('title')
-    .text(function(d) {
-      if(d.source.name == that.tempNodeLeft || d.target.name == that.tempNodeRight) {
-        return d.source.name + ' → ' +
-        d.target.name;
-      } else {
-        return d.source.name + ' → ' +
-        d.target.name + '\n' + format(d.value) + ' in '
-        + splitAt(4)(d.time)[0] + 'Q' + splitAt(4)(d.time)[1];
-      }
-    });
+      .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + format(d.value); });
 
     //Add the on 'click' listener for the links
     link.on('click', function(d) {
@@ -253,48 +306,45 @@ class SankeyDiagram implements MAppViews {
 
     //Add in the nodes
     let node = svg.append('g').selectAll('.node')
-    .data(graph.nodes)
-    .enter().append('g')
-    .attr('class', 'node')
-    .attr('transform', function(d) {
-      return 'translate(' + d.x + ',' + d.y + ')';
-    });
+      .data(graph.nodes)
+      .enter().append('g')
+      .attr('class', 'node')
+      .attr('transform', function(d) {
+        return 'translate(' + d.x + ',' + d.y + ')';
+      });
 
     //Add the rectangles for the nodes
     node.append('rect')
-    .attr('height', function(d) { return d.dy; })
-    .attr('width', sankey.nodeWidth())
-    .style('fill', '#DA5A6B')
-    //Title rectangle
-    .append('title')
-    .text(function(d) {
-      if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-        return `${d.name}`;
-      } else {
-        return d.name + '\n' + format(d.value);
-      }
-    });
+      .attr('height', function(d) { return d.dy; })
+      .attr('width', sankey.nodeWidth())
+      .style('fill', '#DA5A6B')
+      //Title rectangle
+      .append('title')
+      .text(function(d) { return d.name + '\n' + format(d.value); });
+
+    // //This is how the overlays for the rects can be done after they have been added
+    // node.append('rect')
+    //   .attr('height', function(d) {
+    //     console.log(d.name, d.dy);
+    //     return 10;
+    //   })
+    //   .attr('width', sankey.nodeWidth())
+    //   .style('fill', '#FAB847');
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
-    .attr('x', 45)
-    .attr('y', function(d) { return (d.dy / 2) - 10;})
-    .attr('dy', '1.0em')
-    .attr('text-anchor', 'start')
-    .attr('class', 'rightText')
-    .text(function(d) {
-      if(d.name == that.tempNodeLeft || d.name == that.tempNodeRight) {
-        return `${d.name}`;
-      } else {
-        return `${format(d.value)} ${d.name}`;
-      }
-    })
-    .filter(function(d, i) { return d.x < width / 2})
-    .attr('x', -45 + sankey.nodeWidth())
-    .attr('text-anchor', 'end')
-    .attr('class', 'leftText');
+      .attr('x', 45)
+      .attr('y', function(d) { return (d.dy / 2) - 10;})
+      .attr('dy', '1.0em')
+      .attr('text-anchor', 'start')
+      .attr('class', 'rightText')
+      .text(function(d) {return `${d.name}`;})
+      .filter(function(d, i) { return d.x < width / 2})
+      .attr('x', -45 + sankey.nodeWidth())
+      .attr('text-anchor', 'end')
+      .attr('class', 'leftText');
 
-    //The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
+    // The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
     const leftWrap = this.$node.selectAll('.leftText');
     const rightWrap = this.$node.selectAll('.rightText');
     const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
@@ -313,6 +363,108 @@ class SankeyDiagram implements MAppViews {
       d3TextWrap(rightWrap, wordWrapBorder + 10);
       rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
     }
+  }
+
+  /**
+   * This method sets the range for the entity value filter according to the priovided data.
+   * @param data where the filter gets the range from.
+   */
+  private setEntityFilterRange(data: any): void
+  {
+    this.entityEuroFilter.calculateMinMaxValues(data);
+    let min: number = roundToFull(this.entityEuroFilter.minValue);
+    let max: number = roundToFull(this.entityEuroFilter.maxValue);
+
+    $('#entityFilter').ionRangeSlider({
+      type: 'double',
+      min: min,
+      max: max,
+      prefix: '€',
+      prettify_enabled: true,
+      prettify_separator: '.',
+      force_edges: true,  //Lets the labels inside the container
+      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+        this.entityEuroFilter.minValue = newMin;
+        this.entityEuroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      },
+    });
+
+    this.entitySlider = $('#entityFilter').data('ionRangeSlider');    //Store instance to update it later
+  }
+
+  /**
+   * This methods sets the range for the media value filter according to the provided data.
+   * @param data where the filter gets the range from.
+   */
+  private setMediaFilterRange(data: any): void
+  {
+    this.mediaEuroFilter.calculateMinMaxValues(data);
+    let min: number = roundToFull(this.mediaEuroFilter.minValue);
+    let max: number = roundToFull(this.mediaEuroFilter.maxValue);
+
+    $('#mediaFilter').ionRangeSlider({
+      type: 'double',
+      min: min,
+      max: max,
+      prefix: '€',
+      prettify_enabled: true,
+      prettify_separator: '.',
+      force_edges: true,  //Lets the labels inside the container
+      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+        this.mediaEuroFilter.minValue = newMin;
+        this.mediaEuroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      }
+    });
+
+    this.mediaSlider = $('#mediaFilter').data('ionRangeSlider');    //Store instance to update it later
+  }
+
+  /**
+   * This method sets the range for the node value filte according to the provided data.
+   * @param data where the filter gets the range from.
+   */
+   private setEuroFilterRange(data: any): void
+  {
+    let min: number = roundToFull(Number(data[0].valueNode));
+    let max: number = roundToFull(Number(data[0].valueNode));
+    for(let entry of data)
+    {
+      let value: number = Number(entry.valueNode);
+      if(value < min) min = value;
+      if(value > max) max = value;
+    }
+    this.euroFilter.changeRange(min, max);
+
+    $('#valueSlider').ionRangeSlider({
+      type: 'double',
+      min: min,
+      max: max,
+      prefix: '€',
+      prettify_enabled: true,
+      prettify_separator: '.',
+      force_edges: true,  //Lets the labels inside the container
+      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
+        this.euroFilter.minValue = newMin;
+        this.euroFilter.maxValue = newMax;
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
+      }
+    });
+
+    this.valueSlider = $('#valueSlider').data('ionRangeSlider');    //Store instance to update it later
   }
 }
 
