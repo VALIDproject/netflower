@@ -99,11 +99,9 @@ Sankey features part.
 }
 
 .heading {
-  padding: 5px;
-  font-size: 16px;
-  float: left;
-  width: 60%;
+  font-weight: bolder;
 }
+
 node text {
   pointer-events: none;
   text-shadow: 0 1px 0 #fff;
@@ -144,4 +142,9 @@ node text {
 .controlBox {
   height: 130px;
   width: 100%;
+}
+
+#backBtn {
+  margin-top: 5px;
+  border-radius: 5px;
 }

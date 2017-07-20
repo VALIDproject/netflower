@@ -10,10 +10,6 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
-// import * as nouislider from 'nouislider/distribute/nouislider.js';
-// import 'style-loader!css-loader!nouislider/distribute/nouislider.css';
-// import 'bootstrap-slider';
-// import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
@@ -46,8 +42,7 @@ class FilterData implements MAppViews {
 
     this.$node = d3.select(parent)
       .append('div')
-      .classed('filter', true)
-      .classed('invisibleClass', true);
+      .classed('filter', true);
   }
 
   /**
@@ -73,37 +68,31 @@ class FilterData implements MAppViews {
     this.$node.html(`
       <div class='container'>
         <div class='row'>
-          <div class='col-md-2'>
+          <div class='col-sm-2'>
+            <small>Top Filter</small>
           </div>
-          <div class='col-md-2'>
-            <h4>Top Filter</h4>
+          <div class='col-sm-2'>
+            <small>Paragraph Filter</small>
           </div>
-          <div class='col-md-2'>
-            <h4>Paragraph Filter</h4>
-          </div>
-          <div class='col-md-4'>
-            <h4>Quartal Filter</h4>
+          <div class='col-sm-2'>
+            <small>Quartal Filter</small>
           </div>
         </div>
 
         <div class='row'>
-        <div class='col-md-2'>
-          <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
-            <i class='fa fa-hand-o-left'>&nbsp;</i>Back</button>
-        </div>
-          <div class='col-md-2'>
-            <select class='form-control' id='topFilter'>
+          <div class='col-sm-2'>
+            <select class='form-control input-sm' id='topFilter'>
               <option value='-1' selected>disabled</option>
               <option value='0'>Bottom 10</option>
               <option value='1'>Top 10</option>
             </select>
           </div>
-          <div class='col-md-2'>
-            <select class='form-control' id='paragraph'>
+          <div class='col-sm-2'>
+            <select class='form-control input-sm' id='paragraph'>
               <option value='-1' selected>disabled</option>
             </select>
           </div>
-          <div class='col-md-2 col-md-offset-1'>
+          <div class='col-sm-2'>
           <div style="width: 100px;">
             <input id='timeSlider'/>
           </div>
@@ -119,33 +108,6 @@ class FilterData implements MAppViews {
    * Attach the event listeners
    */
   private attachListener(json) {
-    //Listener for the Back Button
-    this.$node.select('#backBtn')
-      .on('click', (e) => {
-        bootbox.confirm({
-          className: 'dialogBox',
-          title: 'Information',
-          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data upload page.<br/>
-          <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
-          Be sure you don't lose anything important or save your progress before you proceed.`,
-          callback: function(result) {
-            if (result) {
-              //Clear both storage facilities
-              localStorage.clear();
-              localforage.clear();
-              //Force reload and loose all data
-              location.reload(true);
-            } else {
-              return;
-            }
-          }
-        });
-
-        const evt = <MouseEvent>d3.event;
-        evt.preventDefault();
-        evt.stopPropagation();
-      });
-
     events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
       this.topFilter.active = false;
       $('#topFilter').val(-1);
