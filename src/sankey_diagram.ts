@@ -409,7 +409,7 @@ class SankeyDiagram implements MAppViews {
 
     $('#mediaFilter').ionRangeSlider({
       type: 'double',
-      min:min,
+      min: min,
       max: max,
       prefix: '€',
       prettify_enabled: true,

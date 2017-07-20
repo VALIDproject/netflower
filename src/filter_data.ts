@@ -10,6 +10,9 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
+import 'ion-rangeslider';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
@@ -74,9 +77,9 @@ class FilterData implements MAppViews {
           <div class='col-sm-2'>
             <small>Paragraph Filter</small>
           </div>
-          <div class='col-sm-2'>
-            <small>Quartal Filter</small>
-          </div>
+          <!--<div class='col-sm-2'>-->
+            <!--<small>Quartal Filter</small>-->
+          <!--</div>-->
         </div>
 
         <div class='row'>
@@ -92,12 +95,16 @@ class FilterData implements MAppViews {
               <option value='-1' selected>disabled</option>
             </select>
           </div>
-          <div class='col-sm-2'>
-          <div style="width: 100px;">
-            <input id='timeSlider'/>
-          </div>
-          </div>
+          <!--<div class='col-sm-2'>-->
+          <!--<div>-->
+            <!--<input id='timeSlider'/>-->
+          <!--</div>-->
+          <!--</div>-->
         </div>
+       </div>
+       <div class='quarterSlider'>
+        <input id='timeSlider'/>
+       </div>
     `);
 
     this.setQuarterFilterRange(json);
@@ -165,10 +172,8 @@ class FilterData implements MAppViews {
 
   private setQuarterFilterRange(json)
   {
-    const splitAt = index => it =>
-      [it.slice(0, index), it.slice(index)];
-    let min:number = json[0].timeNode;
-    let max:number = json[0].timeNode;
+    let min: number = json[0].timeNode;
+    let max: number = json[0].timeNode;
     for(let entry of json)
     {
       if(entry.timeNode < min)
@@ -180,19 +185,22 @@ class FilterData implements MAppViews {
 
     this.quarterFilter.changeRange(min, min);
 
-    $('#timeSlider').bootstrapSlider({
-      min: Number(min),
-      max: Number(max),
-      range: true,
-      tooltip_split: true,
-      tooltip_position: 'bottom',
-      value: [Number(min), Number(min)],
-    }).on('slideStop', (d) => {
-      let newMin: number = d.value[0];     //First value is left slider handle;
-      let newMax: number = d.value[1];     //Second value is right slider handle;
+    $('#timeSlider').ionRangeSlider({
+      type: 'double',
+      min: min,
+      max: max,
+      from: min,
+      to: min,
+      prefix: 'Q',
+      force_edges: true,  //Lets the labels inside the container
+      drag_interval: true, //Allows the interval to be dragged around
+      onFinish: (sliderData) => {
+        let newMin: number = sliderData.from;
+        let newMax: number = sliderData.to;
       this.quarterFilter.minValue = newMin;
       this.quarterFilter.maxValue = newMax;
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+      }
     });
   }
 }
