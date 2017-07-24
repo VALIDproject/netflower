@@ -89,6 +89,10 @@ export default class SparklineBarChart implements MAppViews {
   private build(medium: string, dy: number) {
     let _self = this;
 
+    //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
+    const formatNumber = d3.format(',.0f');    // zero decimal places
+    const format = function(d) { return formatNumber(d) + ' ' + '€'; }; //Display number with unit sign
+
     if (this.necessaryHeight < dy) {
       this.necessaryHeight = dy;
       this.$node.attr('height', dy + CHART_HEIGHT + 5);
@@ -130,12 +134,14 @@ export default class SparklineBarChart implements MAppViews {
       svg.selectAll("bar")
         .data(aggregated_data)
         .enter().append("rect")
-        .style("fill", "steelblue")
+        .classed("bar", true)
         .attr("x", function (d, i) { return x(d.key); })
         .attr("width", x.rangeBand())
         .attr("y", function (d) { return y(d.values) + dy; })
-        .attr("height", function (d) { return CHART_HEIGHT - y(d.values); });
-
+        .attr("height", function (d) { return CHART_HEIGHT - y(d.values); })
+            //Add the link titles - Hover Path
+        .append('title')
+          .text(function(d) { return medium + ' → ' +  d.key + '\n' + format(d.values); });
     });
   }
 

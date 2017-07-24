@@ -156,6 +156,15 @@ div.left_bars svg.barchart {
   margin-right: 0;
 }
 
+svg.barchart rect.bar {
+  fill: black;
+  fill-opacity: 0.2;
+}
+
+svg.barchart rect.bar:hover {
+  fill-opacity: 0.5;
+}
+
 //REMOVE LATER
 .quarterSlider {
   width: 200px;
