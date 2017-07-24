@@ -149,6 +149,13 @@ node text {
   border-radius: 5px;
 }
 
+// push source sparkline barcharts to right of parent element
+div.left_bars svg.barchart {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
 //REMOVE LATER
 .quarterSlider {
   width: 200px;
