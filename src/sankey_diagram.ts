@@ -309,13 +309,16 @@ class SankeyDiagram implements MAppViews {
     let node = svg.append('g').selectAll('.node')
       .data(graph.nodes)
       .enter().append('g')
-      .attr('class', 'node')
+      .attr('class', function(d: any, i: number) {
+        // save type of node in DOM
+        if (d.sourceLinks.length > 0) {
+          return "node source";
+        } else {
+          return "node target";
+        }
+      })
       .attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
-      })
-      .each(function(d, i){
-//        console.log("in sankey 2 " + d + " i " + i + " d3 data " + d3.select(this).datum());
-        SparklineBarChart.buildForNode(d3.select(this).datum());
       });
 
     //Add the rectangles for the nodes
@@ -326,6 +329,9 @@ class SankeyDiagram implements MAppViews {
       //Title rectangle
       .append('title')
       .text(function(d) { return d.name + '\n' + format(d.value); });
+
+    // create sparkline barcharts for newly enter-ing g.node elements
+    node.call(SparklineBarChart.createSparklines);
 
     // //This is how the overlays for the rects can be done after they have been added
     // node.append('rect')

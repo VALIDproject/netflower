@@ -7,6 +7,9 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {MAppViews} from './app';
 
+const CHART_WIDTH = 120;
+const CHART_HEIGHT = 20;
+
 export default class SparklineBarChart implements MAppViews {
 
   private $node;
@@ -25,108 +28,85 @@ export default class SparklineBarChart implements MAppViews {
    */
   init() {
 
-    var media = ["Tiroler Tageszeitung", "ORF Radio Tirol", "Tirolerin",  "ORF2", "Kleine Zeitung", "Die Presse", "Kronen Zeitung", "NÖN", "Salzburger Nachrichten", "Kurier", "BVZ", "Blick ins Land", "ExtraDienst"];
-
-     for (var d of media) {
-       this.build("div.right_bars", "targetNode", d);
- }
-
-     var legal = ["Agrarmarketing Tirol (Verein)", "Agrarmarkt Austria Marketing GesmbH"];
-
-     for (var d of legal) {
-       this.build("div.left_bars", "sourceNode", d);
- }
-    this.findNodes();
-
-//       this.build("div.right_bars", "Tiroler Tageszeitung");
-
     this.attachListener();
 
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
-  private findNodes() {
-    console.log("in findNodes");
-    let san = d3.select('#sankeyDiagram');
-      console.log(san.toString());
+  /**
+   * build sparkline barcharts for enter selection of sankey nodes.
+   * This function can be passed to the call method of a d3 selection.
+   * @param node
+   */
+  public static createSparklines(node: d3.Selection<any>) {
+    console.log("sparkline called with: " + node.size() + " elements.");
 
-     let nodes = san.selectAll('.node');
-      console.log(nodes);
-      console.log(d3.selectAll('.node'));
+    node.each(function (d, i) {
+      let nodeElem = d3.select(this);
+      // console.log("build sparkline for " + nodeElem.datum().name + "d.y: " + nodeElem.datum().name.y );
 
-    d3.select('#sankeyDiagram').each(function (d, i) {
-      console.log(this.innerHTML);
+      if (nodeElem.attr("class").includes("source")) {
+        SparklineBarChart.build("div.left_bars", "sourceNode", nodeElem.datum().name);
+      } else {
+        SparklineBarChart.build("div.right_bars", "targetNode", nodeElem.datum().name);
+      }
     });
-
-    d3.select('#sankeyDiagram').selectAll('g.node').each(function (d, i) {
-      console.log(this);
-      console.log(d); // .innerHTML
-    });
-  }
-
-  public static buildForNode(d : any)  : void {
-//    console.log("build sparkline for " + d + " at " + d.y);
-    console.log("build sparkline for " + d.name);
-
   }
 
   /**
    * Build the basic DOM elements
    */
-  private build(parent, field, medium) {
-//        console.log("Now executing SparklineBarChart :-)");
-//     this.$node.html(`
-//     <p>This will turn into a sparkline barchart</p>
-//        `);
+  private static build(parent: string, field: string, medium: string) {
+    //        console.log("Now executing SparklineBarChart :-)");
+    //     this.$node.html(`
+    //     <p>This will turn into a sparkline barchart</p>
+    //        `);
 
-            //This is how we retrieve the data. As it's loaded async it is only available as promise.
-        //We can save the promise thoug in a global variable and get the data later if we need
-        this.promiseData = localforage.getItem('data').then((value) => {
-          return value;
-        });
+    //This is how we retrieve the data. As it's loaded async it is only available as promise.
+    //We can save the promise thoug in a global variable and get the data later if we need
+    let promiseData = localforage.getItem('data').then((value) => {
+      return value;
+    });
 
-        //Within the {} the data is available for usage
-        this.promiseData.then(function (data) {
-          // TODO get legalEnt/medium name into this scope
-          var filtered_data = data.filter(function(d) { return d[field] == medium; });
-          var aggregated_data = d3.nest()
-            .key(function(d: any) { return d.timeNode; })
-            .rollup(function(v) { return d3.sum(v, function(d: any) { return d.valueNode; })})
-            .entries(filtered_data);
-          // console.log('spark data for ', field, ' : ', medium, ' :');
-          // console.log(JSON.stringify(aggregated_data));
+    //Within the {} the data is available for usage
+    promiseData.then(function (data: any) {
+      // TODO get legalEnt/medium name into this scope
+      var filtered_data = data.filter(function (d) { return d[field] == medium; });
+      var aggregated_data = d3.nest()
+        .key(function (d: any) { return d.timeNode; })
+        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }) })
+        .entries(filtered_data);
+      // console.log('spark data for ', field, ' : ', medium, ' :');
+      // console.log(JSON.stringify(aggregated_data));
 
-    let width = 120;
-    let height = 40;
+      let x = d3.scale.ordinal().rangeRoundBands([0, CHART_WIDTH], .05);
+      let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
+      let xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+      let yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10);
 
-    let x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
-    let y = d3.scale.linear().range([height, 0]);
-    let xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-    let yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .ticks(10);
+      x.domain(aggregated_data.map(function (d, i) { return d.key; }));
+      y.domain([0, d3.max(aggregated_data, function (d) { return d.values; })]);
 
-    x.domain(aggregated_data.map(function(d,i) { return d.key; }));
-    y.domain([0, d3.max(aggregated_data, function(d) { return d.values; })]);
+      let svg = d3.select(parent).append("svg")
+        .attr("width", CHART_WIDTH)
+        .attr("height", CHART_HEIGHT);
 
-    let svg = d3.select(parent).append("svg")
-    .attr("width", width)
-    .attr("height", height);
+      svg.selectAll("bar")
+        .data(aggregated_data)
+        .enter().append("rect")
+        .style("fill", "steelblue")
+        .attr("x", function (d, i) { return x(d.key); })
+        .attr("width", x.rangeBand())
+        .attr("y", function (d) { return y(d.values); })
+        .attr("height", function (d) { return CHART_HEIGHT - y(d.values); });
 
-svg.selectAll("bar")
-      .data(aggregated_data)
-    .enter().append("rect")
-      .style("fill", "steelblue")
-      .attr("x", function(d, i) { return x(d.key); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.values); })
-      .attr("height", function(d) { return height - y(d.values); });
-
-        });
+    });
   }
 
   /*
