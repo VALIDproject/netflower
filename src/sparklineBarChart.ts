@@ -11,6 +11,15 @@ const CHART_WIDTH = 120;
 const CHART_HEIGHT = 20;
 const INITIAL_SVG_HEIGHT = 100;
 
+//The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
+const formatNumber = d3.format(',.0f');    // zero decimal places
+const format = function (d) { return formatNumber(d) + ' ' + '€'; }; //Display number with unit sign
+
+interface KeyValue {
+  key: string;
+  values: number;
+}
+
 export default class SparklineBarChart implements MAppViews {
 
   // 2 singletons for both views
@@ -23,7 +32,6 @@ export default class SparklineBarChart implements MAppViews {
   private parentDOM: string;
   private field: string;
   private necessaryHeight = INITIAL_SVG_HEIGHT;
-
 
  constructor(parent: Element, private options: any) {
 
@@ -72,31 +80,23 @@ export default class SparklineBarChart implements MAppViews {
 
     node.each(function (d, i) {
       let nodeElem = d3.select(this);
-      // console.log("build sparkline for " + nodeElem.datum().name + "d.y: " + nodeElem.datum().y);
 
       let yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
 
       if (nodeElem.attr("class").includes("source")) {
         SparklineBarChart.sourceChart.build(nodeElem.datum().name, yMiddle);
-        // SparklineBarChart.build("div.left_bars", "sourceNode", nodeElem.datum().name);
       } else {
         SparklineBarChart.targetChart.build(nodeElem.datum().name, yMiddle);
-        // SparklineBarChart.build("div.right_bars", "targetNode", nodeElem.datum().name);
       }
     });
   }
 
-  private build(medium: string, dy: number) {
+  private build(nodeName: string, yMiddle: number) {
     let _self = this;
 
-    //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
-    const formatNumber = d3.format(',.0f');    // zero decimal places
-    const format = function(d) { return formatNumber(d) + ' ' + '€'; }; //Display number with unit sign
-
-    if (this.necessaryHeight < dy) {
-      this.necessaryHeight = dy;
-      this.$node.attr('height', dy + CHART_HEIGHT + 5);
-      // console.log("increase height to " + dy);
+    if (this.necessaryHeight < yMiddle) {
+      this.necessaryHeight = yMiddle;
+      this.$node.attr('height', yMiddle + CHART_HEIGHT + 5);
     }
 
     //This is how we retrieve the data. As it's loaded async it is only available as promise.
@@ -107,103 +107,61 @@ export default class SparklineBarChart implements MAppViews {
 
     //Within the {} the data is available for usage
     promiseData.then(function (data: any) {
-      // TODO get legalEnt/medium name into this scope
-      var filtered_data = data.filter(function (d) { return d[_self.field] == medium; });
-      var aggregated_data = d3.nest()
-        .key(function (d: any) { return d.timeNode; })
-        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }) })
-        .entries(filtered_data);
-      // console.log('spark data for ', field, ' : ', medium, ' :');
-      // console.log(JSON.stringify(aggregated_data));
-
-      let x = d3.scale.ordinal().rangeRoundBands([0, CHART_WIDTH], .05);
-      let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
-      let xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-      let yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10);
-
-      x.domain(aggregated_data.map(function (d, i) { return d.key; }));
-      y.domain([0, d3.max(aggregated_data, function (d) { return d.values; })]);
-
-      let svg = _self.$node.append("g");
-
-      svg.selectAll("bar")
-        .data(aggregated_data)
-        .enter().append("rect")
-        .classed("bar", true)
-        .attr("x", function (d, i) { return x(d.key); })
-        .attr("width", x.rangeBand())
-        .attr("y", function (d) { return y(d.values) + dy; })
-        .attr("height", function (d) { return CHART_HEIGHT - y(d.values); })
-            //Add the link titles - Hover Path
-        .append('title')
-          .text(function(d) { return medium + ' → ' +  d.key + '\n' + format(d.values); });
+      let aggregated_data = _self.prepareData(data, nodeName)
+      _self.drawBarChart(aggregated_data, nodeName, yMiddle)
     });
   }
 
   /**
-   * Build the basic DOM elements
+   * returns the sum of flows from/to the node for each time unit
+   * @param data raw data, a JSON of all flows
+   * @param nodeName name of the node for which the barchart is drawn
    */
-  private static build(parent: string, field: string, medium: string) {
-    //        console.log("Now executing SparklineBarChart :-)");
-    //     this.$node.html(`
-    //     <p>This will turn into a sparkline barchart</p>
-    //        `);
+  private prepareData(data: any, nodeName: string): KeyValue[] {
+    let _self = this;
+    let filtered_data = data.filter(function (d) { return d[_self.field] == nodeName; });
+    let aggregated_data = d3.nest()
+      .key(function (d: any) { return d.timeNode; })
+      .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }) })
+      .entries(filtered_data);
 
-    //This is how we retrieve the data. As it's loaded async it is only available as promise.
-    //We can save the promise thoug in a global variable and get the data later if we need
-    let promiseData = localforage.getItem('data').then((value) => {
-      return value;
-    });
-
-    //Within the {} the data is available for usage
-    promiseData.then(function (data: any) {
-      // TODO get legalEnt/medium name into this scope
-      var filtered_data = data.filter(function (d) { return d[field] == medium; });
-      var aggregated_data = d3.nest()
-        .key(function (d: any) { return d.timeNode; })
-        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }) })
-        .entries(filtered_data);
-      // console.log('spark data for ', field, ' : ', medium, ' :');
-      // console.log(JSON.stringify(aggregated_data));
-
-      let x = d3.scale.ordinal().rangeRoundBands([0, CHART_WIDTH], .05);
-      let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
-      let xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-      let yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10);
-
-      x.domain(aggregated_data.map(function (d, i) { return d.key; }));
-      y.domain([0, d3.max(aggregated_data, function (d) { return d.values; })]);
-
-      let svg = d3.select(parent).append("svg")
-        .attr("width", CHART_WIDTH)
-        .attr("height", CHART_HEIGHT);
-
-      svg.selectAll("bar")
-        .data(aggregated_data)
-        .enter().append("rect")
-        .style("fill", "steelblue")
-        .attr("x", function (d, i) { return x(d.key); })
-        .attr("width", x.rangeBand())
-        .attr("y", function (d) { return y(d.values); })
-        .attr("height", function (d) { return CHART_HEIGHT - y(d.values); });
-
-    });
+    return aggregated_data;
   }
 
-  /*
-  private timeSeries(table: Array<Object>, source: String) {
-    return null;
-  } */
+  /**
+   * draws bars based on data
+   * @param aggregated_data one value for each time unit
+   * @param nodeName name of the node for which the barchart is drawn
+   * @param dy vertical offset from sankey diagram
+   */
+  private drawBarChart(aggregated_data: KeyValue[], nodeName: string, yMiddle: number) {
+    let x = d3.scale.ordinal().rangeRoundBands([0, CHART_WIDTH], .05);
+    let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
+    // let xAxis = d3.svg.axis()
+    //   .scale(x)
+    //   .orient("bottom");
+    // let yAxis = d3.svg.axis()
+    //   .scale(y)
+    //   .orient("left")
+    //   .ticks(10);
+
+    x.domain(aggregated_data.map(function (d, i) { return d.key; }));
+    y.domain([0, d3.max(aggregated_data, function (d) { return d.values; })]);
+
+    let group = this.$node.append("g");
+
+    group.selectAll("bar")
+      .data(aggregated_data)
+      .enter().append("rect")
+      .classed("bar", true)
+      .attr("x", function (d, i) { return x(d.key); })
+      .attr("width", x.rangeBand())
+      .attr("y", function (d) { return y(d.values) + yMiddle; })
+      .attr("height", function (d) { return CHART_HEIGHT - y(d.values); })
+      //Add the link titles - Hover Path
+      .append('title')
+      .text(function (d) { return nodeName + ' → ' + d.key + '\n' + format(d.values); });
+  }
 
   /**
    * Attach the event listeners
@@ -211,7 +169,6 @@ export default class SparklineBarChart implements MAppViews {
   private attachListener() {
 
   }
-
 }
 
 /**
