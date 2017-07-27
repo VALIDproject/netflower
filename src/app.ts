@@ -90,6 +90,16 @@ export class App implements MAppViews {
       view: 'SankeyDiagram',
       parent: 'dataVizView',
       options: {},
+    },
+    {
+      view: 'SparklineBarChart',
+      parent: 'dataVizView',
+      options: {'parentDOM' : 'div.left_bars', 'field': 'sourceNode'},
+    },
+    {
+      view: 'SparklineBarChartTarget',
+      parent: 'dataVizView',
+      options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
     }
   ];
 

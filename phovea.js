@@ -39,5 +39,13 @@ module.exports = function(registry) {
   registry.push('validView', 'SankeyDiagram', function() { return System.import('./src/sankey_diagram'); }, {
     'name': 'SankeyDiagram'
   });
+
+  registry.push('validView', 'SparklineBarChart', function() { return System.import('./src/sparklineBarChart'); }, {
+    'name': 'SparklineBarChart'
+  });
+
+  registry.push('validView', 'SparklineBarChartTarget', function() { return System.import('./src/sparklineBarChart'); }, {
+    'name': 'SparklineBarChartTarget',
+  });
   // generator-phovea:end
 };

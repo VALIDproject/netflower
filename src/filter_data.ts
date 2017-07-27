@@ -18,7 +18,7 @@ import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
 import TopFilter from './filters/topFilter';
-import ParagraphFilter from './filters/ParagraphFilter';
+import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 

@@ -10,8 +10,6 @@ import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
 import 'imports-loader?d3=d3!../lib/sankey.js';
-import 'bootstrap-slider';
-import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap, roundToFull} from './utilities';
@@ -21,6 +19,7 @@ import MediaEuroFilter from './filters/mediaEuroFilter';
 import EntitySearchFilter from './filters/entitySearchFilter';
 import MediaSearchFilter from './filters/mediaSearchFilter';
 import PaymentEuroFilter from './filters/paymentEuroFilter';
+import SparklineBarChart from './sparklineBarChart';
 
 
 class SankeyDiagram implements MAppViews {
@@ -308,7 +307,14 @@ class SankeyDiagram implements MAppViews {
     let node = svg.append('g').selectAll('.node')
       .data(graph.nodes)
       .enter().append('g')
-      .attr('class', 'node')
+      .attr('class', function(d: any, i: number) {
+        //Save type of node in DOM
+        if (d.sourceLinks.length > 0) {
+          return 'node source';
+        } else {
+          return 'node target';
+        }
+      })
       .attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
       });
@@ -321,6 +327,9 @@ class SankeyDiagram implements MAppViews {
       //Title rectangle
       .append('title')
       .text(function(d) { return d.name + '\n' + format(d.value); });
+
+    //Create sparkline barcharts for newly enter-ing g.node elements
+    node.call(SparklineBarChart.createSparklines);
 
     // //This is how the overlays for the rects can be done after they have been added
     // node.append('rect')
