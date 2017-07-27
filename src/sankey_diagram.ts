@@ -10,8 +10,6 @@ import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
 import 'imports-loader?d3=d3!../lib/sankey.js';
-import 'bootstrap-slider';
-import 'style-loader!css-loader!bootstrap-slider/dist/css/bootstrap-slider.css';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap, roundToFull} from './utilities';
@@ -310,11 +308,11 @@ class SankeyDiagram implements MAppViews {
       .data(graph.nodes)
       .enter().append('g')
       .attr('class', function(d: any, i: number) {
-        // save type of node in DOM
+        //Save type of node in DOM
         if (d.sourceLinks.length > 0) {
-          return "node source";
+          return 'node source';
         } else {
-          return "node target";
+          return 'node target';
         }
       })
       .attr('transform', function(d) {
@@ -330,7 +328,7 @@ class SankeyDiagram implements MAppViews {
       .append('title')
       .text(function(d) { return d.name + '\n' + format(d.value); });
 
-    // create sparkline barcharts for newly enter-ing g.node elements
+    //Create sparkline barcharts for newly enter-ing g.node elements
     node.call(SparklineBarChart.createSparklines);
 
     // //This is how the overlays for the rects can be done after they have been added
