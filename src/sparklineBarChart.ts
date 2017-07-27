@@ -7,10 +7,11 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
+import {splitAt} from './utilities';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
-const OFFSET = 10;                         //Offset for the chart in px
+const OFFSET = 20;                         //Offset for the chart in px
 const formatNumber = d3.format(',.0f');    //Zero decimal places
 const format = function (d) { return formatNumber(d) + ' ' + '€'; }; //Display number with unit sign
 
@@ -69,10 +70,6 @@ export default class SparklineBarChart implements MAppViews {
    * @param node
    */
   public static createSparklines(node: d3.Selection<any>) {
-    // console.log('sparkline called with: ' + node.size() + ' elements.');
-    const that = this;
-
-
     //This is how we retrieve the data. As it's loaded async it is only available as promise.
     //We can save the promise thoug in a global variable and get the data later if we need
     let promiseData = localforage.getItem('data').then((value) => {
@@ -84,9 +81,7 @@ export default class SparklineBarChart implements MAppViews {
 
       let timePoints = d3.set(
         data.map(function (d: any) { return d.timeNode; })
-      )
-        .values()
-        .sort();
+      ).values().sort();
 
       node.each(function (d, i) {
         let nodeElem = d3.select(this);
@@ -114,7 +109,18 @@ export default class SparklineBarChart implements MAppViews {
   }
 
   /**
-   * returns the sum of flows from/to the node for each time unit
+   * Attach the event listeners
+   */
+  private attachListener() {
+    let _self = this;
+    events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
+      //On filters discard everything to allow a clean redraw
+      _self.$node.html('');
+    });
+  }
+
+  /**
+   * This method returns the sum of flows from/to the node for each time unit
    * @param data raw data, a JSON of all flows
    * @param nodeName name of the node for which the barchart is drawn
    */
@@ -130,7 +136,7 @@ export default class SparklineBarChart implements MAppViews {
   }
 
   /**
-   * draws bars based on data
+   * This method draws bars based on data.
    * @param aggregated_data one value for each time unit
    * @param nodeName name of the node for which the barchart is drawn
    * @param dy vertical offset from sankey diagram
@@ -138,13 +144,6 @@ export default class SparklineBarChart implements MAppViews {
   private drawBarChart(aggregated_data: KeyValue[], nodeName: string, yMiddle: number, timePoints: string[]) {
     let x = d3.scale.ordinal().rangeRoundBands([0, this.chartWidth], .05);
     let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
-    // let xAxis = d3.svg.axis()
-    //   .scale(x)
-    //   .orient('bottom');
-    // let yAxis = d3.svg.axis()
-    //   .scale(y)
-    //   .orient('left')
-    //   .ticks(10);
 
     x.domain(timePoints);
     y.domain([0, d3.max(aggregated_data, function (d) { return d.values; })]);
@@ -161,19 +160,10 @@ export default class SparklineBarChart implements MAppViews {
       .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
       //Add the link titles - Hover Path
       .append('title')
-      .text(function (d) { return nodeName + ' → ' + d.key + '\n' + format(d.values); });
-  }
-
-  /**
-   * Attach the event listeners
-   */
-  private attachListener() {
-    let _self = this;
-    events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      // on filters discard everything to allow a clean redraw
-      _self.$node.html('');
-    });
-
+      .text(function (d) {
+        let timeArray = splitAt(4)(d.key);
+        return nodeName + ' → ' + timeArray[0] + 'Q' + timeArray[1] + '\n' + format(d.values);
+      });
   }
 }
 
