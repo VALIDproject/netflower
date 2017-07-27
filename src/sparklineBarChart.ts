@@ -8,7 +8,7 @@ import * as localforage from 'localforage';
 import {MAppViews} from './app';
 
 const CHART_WIDTH = 120;
-const CHART_HEIGHT = 20;
+const CHART_HEIGHT = 18;
 const INITIAL_SVG_HEIGHT = 100;
 
 //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
@@ -78,27 +78,6 @@ export default class SparklineBarChart implements MAppViews {
   public static createSparklines(node: d3.Selection<any>) {
     // console.log("sparkline called with: " + node.size() + " elements.");
 
-    node.each(function (d, i) {
-      let nodeElem = d3.select(this);
-
-      let yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
-
-      if (nodeElem.attr("class").includes("source")) {
-        SparklineBarChart.sourceChart.build(nodeElem.datum().name, yMiddle);
-      } else {
-        SparklineBarChart.targetChart.build(nodeElem.datum().name, yMiddle);
-      }
-    });
-  }
-
-  private build(nodeName: string, yMiddle: number) {
-    let _self = this;
-
-    if (this.necessaryHeight < yMiddle) {
-      this.necessaryHeight = yMiddle;
-      this.$node.attr('height', yMiddle + CHART_HEIGHT + 5);
-    }
-
     //This is how we retrieve the data. As it's loaded async it is only available as promise.
     //We can save the promise thoug in a global variable and get the data later if we need
     let promiseData = localforage.getItem('data').then((value) => {
@@ -107,9 +86,36 @@ export default class SparklineBarChart implements MAppViews {
 
     //Within the {} the data is available for usage
     promiseData.then(function (data: any) {
-      let aggregated_data = _self.prepareData(data, nodeName)
-      _self.drawBarChart(aggregated_data, nodeName, yMiddle)
+
+      let timePoints = d3.set(
+        data.map(function (d: any) { return d.timeNode; })
+      )
+        .values()
+        .sort();
+
+      node.each(function (d, i) {
+        let nodeElem = d3.select(this);
+        let yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
+
+        if (nodeElem.attr("class").includes("source")) {
+          SparklineBarChart.sourceChart.build(data, nodeElem.datum().name, yMiddle, timePoints);
+        } else {
+          SparklineBarChart.targetChart.build(data, nodeElem.datum().name, yMiddle, timePoints);
+        }
+      });
     });
+  }
+
+  private build(data: any, nodeName: string, yMiddle: number, timePoints: string[]) {
+    let _self = this;
+
+    if (this.necessaryHeight < yMiddle) {
+      this.necessaryHeight = yMiddle;
+      this.$node.attr('height', yMiddle + CHART_HEIGHT + 5);
+    }
+
+    let aggregated_data = _self.prepareData(data, nodeName)
+    _self.drawBarChart(aggregated_data, nodeName, yMiddle, timePoints)
   }
 
   /**
@@ -134,7 +140,7 @@ export default class SparklineBarChart implements MAppViews {
    * @param nodeName name of the node for which the barchart is drawn
    * @param dy vertical offset from sankey diagram
    */
-  private drawBarChart(aggregated_data: KeyValue[], nodeName: string, yMiddle: number) {
+  private drawBarChart(aggregated_data: KeyValue[], nodeName: string, yMiddle: number, timePoints: string[]) {
     let x = d3.scale.ordinal().rangeRoundBands([0, CHART_WIDTH], .05);
     let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
     // let xAxis = d3.svg.axis()
@@ -145,7 +151,7 @@ export default class SparklineBarChart implements MAppViews {
     //   .orient("left")
     //   .ticks(10);
 
-    x.domain(aggregated_data.map(function (d, i) { return d.key; }));
+    x.domain(timePoints);
     y.domain([0, d3.max(aggregated_data, function (d) { return d.values; })]);
 
     let group = this.$node.append("g");
