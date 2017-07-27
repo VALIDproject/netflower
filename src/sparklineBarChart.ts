@@ -5,6 +5,7 @@
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
+import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 
 const CHART_WIDTH = 120;
@@ -173,6 +174,11 @@ export default class SparklineBarChart implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+    let _self = this;
+    events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
+      // on filters discard everything to allow a clean redraw
+      _self.$node.html('');
+    });
 
   }
 }
