@@ -308,7 +308,7 @@ class DataImport implements MAppViews {
   private reworkKeys(json) {
     let data = json.data;
     let keys = Object.keys(data[0]);
-    const keyRep: Array<string> = ['sourceNode', 'timeNode', 'attribute1', 'attribute2', 'targetNode', 'valueNode'];
+    const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
     data.forEach(function(e) {
       for(let i = 0; i < keys.length; i++) {
