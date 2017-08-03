@@ -11,6 +11,8 @@ import {tableToJSON} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 
+const keyRep: Array<string> = ['sourceNode', 'timeNode', 'attribute1', 'attribute2', 'targetNode', 'valueNode'];
+
 class DataImport implements MAppViews {
 
   private $node: d3.Selection<any>;
@@ -303,12 +305,23 @@ class DataImport implements MAppViews {
 
     //Local Storage for small variables
     localStorage.setItem('dataLoaded', 'loaded');
+    localStorage.setItem('columnLabels', JSON.stringify(this.reworkColumnLabels(this.parseResults.meta.fields)));
+  }
+
+  private reworkColumnLabels(keys: string[]): any {
+
+    let result : any = {};
+    for (let i = 0; i < keys.length; i++) {
+      result[keyRep[i]] = keys[i];
+      console.log(keyRep[i] +" " + keys[i])
+    }
+    console.log(result);
+    return result;
   }
 
   private reworkKeys(json) {
     let data = json.data;
     let keys = Object.keys(data[0]);
-    const keyRep: Array<string> = ['sourceNode', 'timeNode', 'attribute1', 'attribute2', 'targetNode', 'valueNode'];
 
     data.forEach(function(e) {
       for(let i = 0; i < keys.length; i++) {
