@@ -13,7 +13,7 @@ const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
 const OFFSET = 20;                         //Offset for the chart in px
 const formatNumber = d3.format(',.0f');    //Zero decimal places
-const format = function (d) { return formatNumber(d) + ' ' + '€'; }; //Display number with unit sign
+const format = function (d) { return formatNumber(d); }; //Display number with unit sign
 
 interface KeyValue {
   key: string;
