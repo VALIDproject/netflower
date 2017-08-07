@@ -32,6 +32,7 @@ interface MAppViewsDesc {
   view: string;
   parent: string;
   options: any;
+  lazy?: boolean;
 }
 
 /**
@@ -60,46 +61,55 @@ export class App implements MAppViews {
       view: 'ValidHeader',
       parent: 'app',
       options: {},
+      lazy: false
     },
      {
       view: 'FilterData',
       parent: 'dataVizView',
-      options: {}
+      options: {},
+      lazy: true
     },
     {
       view: 'GlobalSettings',
       parent: 'dataVizView',
-      options: {}
+      options: {},
+      lazy: true
     },
     {
       view: 'SankeyFeatures',
       parent: 'dataVizView',
-      options: {}
+      options: {},
+      lazy: true
     },
     {
       view: 'DataImport',
       parent: 'dataLoadingView',
       options: {},
+      lazy: false
     },
     {
       view: 'SankeyDetail',
       parent: 'dataVizView',
       options: {},
+      lazy: true
     },
     {
       view: 'SankeyDiagram',
       parent: 'dataVizView',
       options: {},
+      lazy: true
     },
     {
       view: 'SparklineBarChart',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.left_bars', 'field': 'sourceNode'},
+      lazy: true
     },
     {
       view: 'SparklineBarChartTarget',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
+      lazy: true
     }
   ];
 
@@ -134,11 +144,12 @@ export class App implements MAppViews {
    * Load and initialize all necessary views
    * @returns {Promise<App>}
    */
-  private build() {
+  private build(buildLazy: boolean = false) {
        this.setBusy(true); // show loading indicator before loading
 
     // wrap view ids from package.json as plugin and load the necessary files
     const pluginPromises = this.views
+      .filter((d) => !d.lazy)
       .map((d) => plugins.get(AppConstants.VIEW, d.view))
       .filter((d) => d !== undefined) // filter views that does not exists
       .map((d) => d.load());
