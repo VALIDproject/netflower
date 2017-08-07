@@ -216,7 +216,11 @@ class SankeyDetail implements MAppViews {
     let y = d3.scale.linear()
     .range([h, 0]);
 
-    x.domain(data.map(function(d) { return d.timeNode; }));
+    let timePoints = d3.set(
+      json.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
+
+    x.domain(timePoints);
     y.domain([0, d3.max(data, function(d) { return d.valueNode; })]);
 
 
