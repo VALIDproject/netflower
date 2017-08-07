@@ -100,7 +100,8 @@ class SankeyDetail implements MAppViews {
 
     const units = '€';
     const formatNumber = d3.format(',.0f'),   // zero decimal places
-    format = function(d) { return formatNumber(d) + ' ' + units; };
+    format = function(d) { return formatNumber(d); };
+    //format = function(d) { return formatNumber(d) + ' ' + units; };
 
     //get width and height of sankey div to calculate position of svg
     let widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
