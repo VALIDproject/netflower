@@ -149,7 +149,7 @@ export class App implements MAppViews {
 
     // wrap view ids from package.json as plugin and load the necessary files
     const pluginPromises = this.views
-      .filter((d) => !d.lazy)
+      .filter((d) => d.lazy === buildLazy)
       .map((d) => plugins.get(AppConstants.VIEW, d.view))
       .filter((d) => d !== undefined) // filter views that does not exists
       .map((d) => d.load());
