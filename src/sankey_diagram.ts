@@ -87,9 +87,20 @@ class SankeyDiagram implements MAppViews {
     let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
 
+    // check if column meta data is in storage
+    let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    console.log(columnLabels);
+    // provide some default values
+    if (columnLabels == null) {
+      columnLabels = {};
+      columnLabels.sourceNode = "Source";
+      columnLabels.targetNode = "Target";
+      columnLabels.valueNode = "Amount"
+    }
+
     left.html(`
     <div class='controlBox'>
-        <div class='left_bar_heading'><p>Public Entity</p></div>
+        <div class='left_bar_heading'><p>${columnLabels.sourceNode}</p></div>
         <label for='entitySearchFilter'>Search & Value Filter</label>
         <div class='input-group input-group-xs'>
           <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for...'/>
@@ -119,7 +130,7 @@ class SankeyDiagram implements MAppViews {
 
     right.html(`
     <div class='controlBox'>
-      <div class='right_bar_heading'><p>Media Institution</p></div>
+      <div class='right_bar_heading'><p>${columnLabels.targetNode}</p></div>
       <label for='mediaSearchFilter'>Search & Value Filter</label>
       <div class='input-group input-group-xs'>
         <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for...'/>
