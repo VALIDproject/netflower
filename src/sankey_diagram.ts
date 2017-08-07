@@ -89,13 +89,12 @@ class SankeyDiagram implements MAppViews {
 
     // check if column meta data is in storage
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
-    console.log(columnLabels);
     // provide some default values
     if (columnLabels == null) {
       columnLabels = {};
-      columnLabels.sourceNode = "Source";
-      columnLabels.targetNode = "Target";
-      columnLabels.valueNode = "Amount"
+      columnLabels.sourceNode = 'Source';
+      columnLabels.targetNode = 'Target';
+      columnLabels.valueNode = 'Amount';
     }
 
     left.html(`
@@ -227,7 +226,6 @@ class SankeyDiagram implements MAppViews {
     //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
     const formatNumber = d3.format(',.0f'),    // zero decimal places
       format = function(d) { return formatNumber(d); }; //Display number with unit sign
-      //  format = function(d) { return formatNumber(d) + ' ' + units; }; //Display number with unit sign
 
     //Append the svg canvas to the page
     const svg = d3.select('#sankeyDiagram').append('svg')
@@ -400,7 +398,6 @@ class SankeyDiagram implements MAppViews {
       type: 'double',
       min: min,
       max: max,
-      //prefix: '€',
       prettify_enabled: true,
       prettify_separator: '.',
       force_edges: true,  //Lets the labels inside the container
@@ -432,7 +429,6 @@ class SankeyDiagram implements MAppViews {
       type: 'double',
       min: min,
       max: max,
-      //prefix: '€',
       prettify_enabled: true,
       prettify_separator: '.',
       force_edges: true,  //Lets the labels inside the container
@@ -470,7 +466,6 @@ class SankeyDiagram implements MAppViews {
       type: 'double',
       min: min,
       max: max,
-      //prefix: '€',
       prettify_enabled: true,
       prettify_separator: '.',
       force_edges: true,  //Lets the labels inside the container

@@ -11,7 +11,7 @@ import {tableToJSON} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 
-const keyRep: Array<string> = ['sourceNode', 'timeNode', 'attribute1', 'attribute2', 'targetNode', 'valueNode'];
+const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
 class DataImport implements MAppViews {
 
@@ -308,17 +308,23 @@ class DataImport implements MAppViews {
     localStorage.setItem('columnLabels', JSON.stringify(this.reworkColumnLabels(this.parseResults.meta.fields)));
   }
 
+  /**
+   * This method saves the original column labels in order to use them later on.
+   * @param keys are the values which get saved.
+   * @returns {any} object which  contains the saved column names and new names.
+   */
   private reworkColumnLabels(keys: string[]): any {
-
     let result : any = {};
     for (let i = 0; i < keys.length; i++) {
       result[keyRep[i]] = keys[i];
-      console.log(keyRep[i] +" " + keys[i])
     }
-    console.log(result);
     return result;
   }
 
+  /**
+   * This method reowrks the column headings of each table in order to make them unified.
+   * @param json the raw data.
+   */
   private reworkKeys(json) {
     let data = json.data;
     let keys = Object.keys(data[0]);
