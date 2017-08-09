@@ -138,6 +138,7 @@ export class App implements MAppViews {
    */
   private addListeners() {
     //Add listeners here
+    events.on(AppConstants.EVENT_DATA_PARSED, () => this.build(true));
   }
 
   /**
