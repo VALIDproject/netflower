@@ -10,6 +10,8 @@ export class AppConstants {
 
   static VIEW = 'validView';
 
+  static EVENT_RESIZE_WINDOW = 'resizeWindow';
+
   static EVENT_DATA_PARSED = 'eventDataParsed';
 
   static EVENT_CLICKED_PATH = 'eventClickPath';

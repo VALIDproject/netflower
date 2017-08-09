@@ -55,7 +55,7 @@ class FilterData implements MAppViews {
    */
   init() {
     localforage.getItem('data').then((value) => {
-      this.build(value);
+      this.build();
       this.attachListener(value);
     });
 
@@ -67,7 +67,7 @@ class FilterData implements MAppViews {
   /**
    * Build the basic DOM elements
    */
-  private build(json) {
+  private build() {
     this.$node.html(`
       <div class='container'>
         <div class='row'>
@@ -106,15 +106,19 @@ class FilterData implements MAppViews {
         <input id='timeSlider'/>
        </div>
     `);
-
-    this.setQuarterFilterRange(json);
-    this.setParagraphFilterElements(json);
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener(json) {
+    //Set the filters only if data is available
+    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    if(dataAvailable) {
+      this.setQuarterFilterRange(json);
+      this.setParagraphFilterElements(json);
+    }
+
     events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
       this.topFilter.active = false;
       $('#topFilter').val(-1);
@@ -197,8 +201,8 @@ class FilterData implements MAppViews {
       onFinish: (sliderData) => {
         let newMin: number = sliderData.from;
         let newMax: number = sliderData.to;
-      this.quarterFilter.minValue = newMin;
-      this.quarterFilter.maxValue = newMax;
+        this.quarterFilter.minValue = newMin;
+        this.quarterFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
       }
     });

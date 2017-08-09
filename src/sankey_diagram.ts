@@ -164,7 +164,6 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(true);
     });
 
-
     this.$node.select('#entitySearchButton').on('click', (d) => {
       let value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
@@ -190,12 +189,11 @@ class SankeyDiagram implements MAppViews {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
       let originalData = value;
-
       if(!redraw)
       {
-        this.setEuroFilterRange(originalData);
         this.setEntityFilterRange(originalData);
         this.setMediaFilterRange(originalData);
+        this.setEuroFilterRange(originalData);
       }
 
       //Filter the data before and then pass it to the draw function.
@@ -241,17 +239,17 @@ class SankeyDiagram implements MAppViews {
 
     const path = sankey.link();
 
-      // Group Data (by quartal)
+    // Group Data (by quartal)
     let nest =(<any>d3).nest()
-        .key((d) => {return d.sourceNode;})
-        .key(function (d) {return d.targetNode;})
-        .rollup(function (v) {return {
-          target: v[0].targetNode,
-          source: v[0].sourceNode,
-          time: v[0].timeNode,
-          sum: d3.sum(v, function (d :any){ return d.valueNode;})
-        }})
-        .entries(json);
+      .key((d) => {return d.sourceNode;})
+      .key(function (d) {return d.targetNode;})
+      .rollup(function (v) {return {
+        target: v[0].targetNode,
+        source: v[0].sourceNode,
+        time: v[0].timeNode,
+        sum: d3.sum(v, function (d :any){ return d.valueNode;})
+      }})
+      .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
     that.nodesToShow = Math.ceil((heightNode / 25));    //Trying to make nodes length dependent on space in window
@@ -450,16 +448,18 @@ class SankeyDiagram implements MAppViews {
    * This method sets the range for the node value filte according to the provided data.
    * @param data where the filter gets the range from.
    */
-   private setEuroFilterRange(data: any): void
+  private setEuroFilterRange(data: any): void
   {
-    let min: number = roundToFull(Number(data[0].valueNode));
-    let max: number = roundToFull(Number(data[0].valueNode));
+    let min: number = data[0].valueNode;
+    let max: number = data[0].valueNode;
     for(let entry of data)
     {
       let value: number = Number(entry.valueNode);
       if(value < min) min = value;
       if(value > max) max = value;
     }
+    min = roundToFull(min);
+    max = roundToFull(max);
     this.euroFilter.changeRange(min, max);
 
     $('#valueSlider').ionRangeSlider({
