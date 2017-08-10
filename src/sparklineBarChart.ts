@@ -120,6 +120,10 @@ export default class SparklineBarChart implements MAppViews {
       //On filters discard everything to allow a clean redraw
       _self.$node.html('');
     });
+
+    events.on(AppConstants.EVENT_RESIZE_WINDOW, (data) => {
+      _self.$node.html('');
+    });
   }
 
   /**

@@ -187,9 +187,8 @@ class SankeyDiagram implements MAppViews {
    * This method gets called whenever the page is resized.
    */
   private resize() {
-    console.log('resize...');
-    // d3.selectAll('svg').remove();
-    // this.getStorageData(true);
+    d3.select('#sankeyDiagram').html('');
+    this.getStorageData(true);
   }
 
   /**
