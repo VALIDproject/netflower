@@ -1,8 +1,21 @@
 /**
- * Basic variables and layout
- */
+* Basic variables and layout
+*/
 @import 'styles/vars';
 @import 'styles/base';
+
+
+/**
+The other styles of the page.
+ */
+//Part of the data loading view.
+@import 'styles/data_imports';
+//Part of the filter data view.
+@import 'styles/filter_data';
+//Part of all sankey related visualization stuff.
+@import 'styles/sankey';
+//Part of the global settings view.
+@import 'styles/global_settings';
 
 
 .dataLoadingView {
@@ -25,7 +38,7 @@
   position: fixed;
   z-index: 100000;
   width: 100%;
-  height: 80px;
+  height: 67px;
   background-color: $background-color;
   padding: 10px;
   border-bottom: 2px solid $border-color;
@@ -34,10 +47,10 @@
 .logo {
   float: left;
   width: 40%;
-  height: 100px;
+  height: 40px;
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
-  background-size: 300px;
+  background-size: 240px;
   margin-top: 10px;
 }
 
@@ -64,153 +77,53 @@
   }
 }
 
-/**
-Part of the data loading view.
- */
-.fileContainer {
-  width: 70%;
-  height: 0;
-  margin-left: 15%;
-  padding-top: 10%;
+//.globalSettings {
+//  float:left;
+//  background-color: grey;
+//  width: 25%;
+//}
+
+.closeLink {
+  // position: absolute;
+  // text-align: center;
+  // width: auto;
+  // height: 20px;
+  // padding: 2px;
+  font: 12px sans-serif;
+  //pointer-events: none;
+  cursor: pointer;
 }
 
-.btn-primary {
-  background-color: $valid-color !important;
-  border: none;
+.toolbox {
+    z-index: 50000000;
 }
 
-.scrollArea {
-  max-height: 1000px;
-  overflow: auto;
-}
-
-.logContainer {
-  height: 80px;
-  max-width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-
-  //font-family: "Courier New", sans-serif;
-  font-size: 11px;
-  word-break: break-all;
-  overflow: auto;
-
-  #messageLog {
-    color: $green-color;
-  }
-
-  #errorLog {
-    color: $red-color;
-  }
-}
-
-#specialBtn {
-  margin-left: 43%;
-  margin-bottom: 30px;
-  border-radius: 100px;
-}
-
-#informationText {
-  margin-bottom: 10px;
-}
-
-#submitFile {
-  margin-left: 10px;
-}
-
-#showMoreBtn {
-  margin-left: 10px;
-}
-
-.ctrlContainer {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: inherit;
-}
-
-#valueListMeta {
-  margin-top: 23px;
-  margin-left: 20px;
-}
-
-.btnContainer {
-  margin-top: 18px;
-  margin-left: 20px;
-}
-
-/**
-Part of the data viz view.
- */
-.sankey_diagram {
-  display: flex;
-  height: 760px;
-  width: 80%;
-  border: 1px solid black;
-  position: absolute;
-  top: 250px;
-  right: 10px;
-  margin-bottom: 20px;
-  margin-right: 10px;
-}
-
-.left_bars {
-  border: 1px solid grey;
-  width: 10%;
+.button_bar {
+  margin-top: 8px;
   float: right;
-  height: 100%;
+  height: 30px;
+  margin-right: 20px;
 }
 
-
-.sankey_vis {
-  float: right;
-  border: 1px solid grey;
-  width: 80%;
-  height: 100%;
+//Slider distance to the top
+.irs {
+  margin-top: 5px;
 }
 
-.right_bars {
-  float: right;
-  height: 100%;
-  border: 1px solid grey;
-  width: 10%;
+span.to {
+    cursor: pointer !important;
 }
 
-/*.global_settings {
-  float:left;
-  background-color: grey;
-  width: 25%;
-}*/
-
-.filter {
-  border: 1px solid grey;
-  width: 100%;
-  height: 100px;
-  position: absolute;
-  top: 85px;
-  right: 10px;
+span.from {
+  cursor: pointer !important;
 }
 
-
-.sankey_features{
-  //background-color: yellow;
-  border: 1px solid grey;
-  width: 80%;
-  height: 50px;
-  position: absolute;
-  top: 200px;
-  right: 20px;
-}
-
-.heading {
-  padding: 5px;
-  font-size: 16px;
-}
-
-.global_settings {
-  width: 16%;
-  height: 810px;
-  position: absolute;
-  top: 200px;
-  left: 10px;
-  border: 1px solid black;
+//Make input search smaller
+.input-group-xs>.form-control,
+.input-group-xs>.input-group-addon,
+.input-group-xs>.input-group-btn>.btn {
+    height: 22px;
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
 }

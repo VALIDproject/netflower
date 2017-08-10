@@ -1,0 +1,17 @@
+.filter {
+  width: 50%;
+  position: absolute;
+  top: 115px;
+  left: 225px;
+  z-index: 1000;
+}
+
+.slider-selection {
+  background: $valid-color !important;
+}
+
+.slider-handle {
+  width: 16px !important;
+  height: 16px !important;
+  background: lightgrey !important;
+}

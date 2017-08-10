@@ -5,8 +5,10 @@
  * Framework Created by Caleydo Team on 31.08.2016.
  */
 
+import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as plugins from 'phovea_core/src/plugin';
+import * as $ from 'jquery';
 import {HELLO_WORLD} from './language';
 import {AppConstants} from './app_constants';
 
@@ -40,6 +42,7 @@ interface MAppViewsDesc {
 export class App implements MAppViews {
 
   private $node;
+    private counter;
 
   /**
    * Enter here the views you want to append. You can choose between either the
@@ -62,7 +65,7 @@ export class App implements MAppViews {
       options: {},
     },
      {
-      view: 'Filter',
+      view: 'FilterData',
       parent: 'dataVizView',
       options: {}
     },
@@ -82,9 +85,24 @@ export class App implements MAppViews {
       options: {},
     },
     {
+      view: 'SankeyDetail',
+      parent: 'dataVizView',
+      options: {},
+    },
+    {
       view: 'SankeyDiagram',
       parent: 'dataVizView',
       options: {},
+    },
+    {
+      view: 'SparklineBarChart',
+      parent: 'dataVizView',
+      options: {'parentDOM' : 'div.left_bars', 'field': 'sourceNode'},
+    },
+    {
+      view: 'SparklineBarChartTarget',
+      parent: 'dataVizView',
+      options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
     }
   ];
 
@@ -108,11 +126,21 @@ export class App implements MAppViews {
     return this.build();
   }
 
+
   /**
    * Initialize all necessary listeners here
    */
   private addListeners() {
     //Add listeners here
+
+    //Slight trick in order to wait for th finish of the resize event.
+    let id;
+    $(window).resize(function () {
+      clearTimeout(id);
+      id = setTimeout(function () {
+        events.fire(AppConstants.EVENT_RESIZE_WINDOW);
+      }, 300);
+    });
   }
 
   /**

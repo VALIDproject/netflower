@@ -9,4 +9,16 @@
 export class AppConstants {
 
   static VIEW = 'validView';
+
+  static EVENT_RESIZE_WINDOW = 'resizeWindow';
+
+  static EVENT_DATA_PARSED = 'eventDataParsed';
+
+  static EVENT_CLICKED_PATH = 'eventClickPath';
+
+  static EVENT_CLOSE_DETAIL_SANKEY = 'closeSankeyDetails';
+
+  static EVENT_FILTER_CHANGED = 'eventFilterChanged';
+
+  static EVENT_FILTER_DEACTIVATE_TOP_FILTER = 'eventFilterDeactivateTopFilter';
 }

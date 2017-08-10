@@ -6,8 +6,12 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
+import * as localforage from 'localforage'
 import {tableToJSON} from './utilities';
 import {MAppViews} from './app';
+import {AppConstants} from './app_constants';
+
+const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
 class DataImport implements MAppViews {
 
@@ -38,7 +42,14 @@ class DataImport implements MAppViews {
    * @returns {Promise<DataImport>}
    */
   init() {
-    d3.select('.dataVizView').classed('invisibleClass', true);
+    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+
+    if(!dataAvailable) {
+      d3.select('.dataVizView').classed('invisibleClass', true);
+    } else {
+      d3.select('.dataVizView').classed('invisibleClass', false);
+      d3.select('.dataLoadingView').classed('invisibleClass', true);
+    }
 
     this.build();
     this.attachListener();
@@ -191,9 +202,25 @@ class DataImport implements MAppViews {
     //Listener for the finished visualization Button
     this.$node.select('#specialBtn')
       .on('click', (e) => {
+        //Before rework the keys of the data
+        this.reworkKeys(this.parseResults);
+
         if(this.editMode) {
+          d3.select('.dataLoadingView').classed('invisibleClass', true);
+          d3.select('.dataVizView').classed('invisibleClass', false);
+          d3.select('#valuesList').selectAll('*').remove();
+          window.location.reload(true);
+          this.storeData();
+          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+
           console.log('In edit mode');
         } else {
+          d3.select('.dataLoadingView').classed('invisibleClass', true);
+          d3.select('.dataVizView').classed('invisibleClass', false);
+          window.location.reload(true);
+          this.storeData();
+          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+
           console.log('Not in edit mode');
         }
         const evt = <MouseEvent>d3.event;
@@ -265,6 +292,54 @@ class DataImport implements MAppViews {
   }
 
   /**
+   * This function stores the data which was loaded in the localforage and a helper variable in localstorage.
+   * Differneces are the asynchronus load of localforage and smaller size of localstorage.
+   */
+  private storeData() {
+    //Store the data
+    localforage.setItem('data', this.parseResults.data).then(function (value) {
+      console.log('Saved data');
+    }).catch(function (err) {
+      console.log('Error: ', err);
+    })
+
+    //Local Storage for small variables
+    localStorage.setItem('dataLoaded', 'loaded');
+    localStorage.setItem('columnLabels', JSON.stringify(this.reworkColumnLabels(this.parseResults.meta.fields)));
+  }
+
+  /**
+   * This method saves the original column labels in order to use them later on.
+   * @param keys are the values which get saved.
+   * @returns {any} object which  contains the saved column names and new names.
+   */
+  private reworkColumnLabels(keys: string[]): any {
+    let result : any = {};
+    for (let i = 0; i < keys.length; i++) {
+      result[keyRep[i]] = keys[i];
+    }
+    return result;
+  }
+
+  /**
+   * This method reowrks the column headings of each table in order to make them unified.
+   * @param json the raw data.
+   */
+  private reworkKeys(json) {
+    let data = json.data;
+    let keys = Object.keys(data[0]);
+
+    data.forEach(function(e) {
+      for(let i = 0; i < keys.length; i++) {
+        e[keyRep[i]] = e[keys[i]];
+        delete e[keys[i]];
+      }
+    });
+
+    this.parseResults.data = data;
+  }
+
+  /**
    * This function creates a html table to view the data from the .csv in a visual browser.
    * The first 10 rows only are shown for a better viusal experience.
    * @param resultData
@@ -323,7 +398,7 @@ class DataImport implements MAppViews {
    * @param element html to fade the text onto
    * @param newText the text to show in the html elment
    */
-  private textTransition(element, newText) {
+  private textTransition(element: d3.Selection<any>, newText: string) {
     element.transition().duration(500)
       .style('opacity', 0)
       .transition().duration(500)

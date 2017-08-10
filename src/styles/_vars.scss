@@ -4,12 +4,22 @@
 
 $imagesDirectory: 'media';
 
-//Various colors
+/**
+The following section contains various colors
+ */
+//Logo colors
 $valid-color: #DA5A6B;
+$valid-color2: #3DB0E6;
+$valid-color3: #45B07C;
+$valid-color4: #FAB847;
+
+//General styling
 $background-color: #f0f0f0;
 $border-color: #dddddd;
 $icon-hover: #3EB7E6;
+$hover-color: orange;
+
+//Colorblind save colors
 $green-color: #2ca25f;
 $red-color: #f03b20;
 
-$hover-color: orange;

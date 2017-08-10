@@ -8,7 +8,140 @@ import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
 
 /**
- * This function exports a html table with various options and creates a JSON.
+ Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
+ * Based on https://github.com/mbostock/d3/issues/1642
+ * @exemple svg.append("g")
+ *      .attr("class", "x axis")
+ *      .attr("transform", "translate(0," + height + ")")
+ *      .call(xAxis)
+ *      .selectAll(".tick text")
+ *          .call(d3TextWrap, x.rangeBand());
+ *
+ * @param text d3 selection for one or more <text> object
+ * @param width number - global width in which the text will be word-wrapped.
+ * @param paddingRightLeft integer - Padding right and left between the wrapped text and the 'invisible bax' of 'width' width
+ * @param paddingTopBottom integer - Padding top and bottom between the wrapped text and the 'invisible bax' of 'width' width
+ * @returns Array[number] - Number of lines created by the function, stored in a Array in case multiple <text> element are passed to the function
+ *
+ * @see: from https://github.com/d3/d3/issues/1642 AlexandreBonneau
+ */
+export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
+  paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
+  paddingTopBottom = (paddingTopBottom || 5) - 2; //Default padding (5px), remove 2 pixels because of the borders
+  let maxWidth = width; //I store the tooltip max width
+  width = width - (paddingRightLeft * 2); //Take the padding into account
+
+  let arrLineCreatedCount = [];
+  text.each(function() {
+    let text = d3.select(this),
+      words = text.text().split(/[ \f\n\r\t\v]+/).reverse(), //Don't cut non-breaking space (\xA0), as well as the Unicode characters \u00A0 \u2028 \u2029)
+      word,
+      line = [],
+      lineNumber = 0,
+      lineHeight = 1.1, //Ems
+      x,
+      y = text.attr("y"),
+      dy = parseFloat(text.attr("dy")),
+      createdLineCount = 1, //Total line created count
+      textAlign = text.style('text-anchor') || 'start'; //'start' by default (start, middle, end, inherit)
+
+    //Clean the data in case <text> does not define those values
+    if (isNaN(dy)) dy = 0; //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
+
+    //Offset the text position based on the text-anchor
+    let wrapTickLabels = d3.select(text.node().parentNode).classed('tick'); //Don't wrap the 'normal untranslated' <text> element and the translated <g class='tick'><text></text></g> elements the same way..
+    if (wrapTickLabels) {
+      switch (textAlign) {
+        case 'start':
+          x = -width / 2;
+          break;
+        case 'middle':
+          x = 0;
+          break;
+        case 'end':
+          x = width / 2;
+          break;
+        default :
+      }
+    }
+    else { //untranslated <text> elements
+      switch (textAlign) {
+        case 'start':
+          x = paddingRightLeft;
+          break;
+        case 'middle':
+          x = maxWidth / 2;
+          break;
+        case 'end':
+          x = maxWidth - paddingRightLeft;
+          break;
+        default :
+      }
+    }
+    y = (+((null === y)?paddingTopBottom:y) as any);
+
+    let tspan = (text as any).text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+    //noinspection JSHint
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width && line.length > 1) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        ++createdLineCount;
+      }
+    }
+
+    arrLineCreatedCount.push(createdLineCount); //Store the line count in the array
+  });
+  return arrLineCreatedCount;
+}
+
+/**
+ * This method splits the given string at a given position (method used is currying, which means 2 fat arrows,
+ * where the first returns a funciton. So everytime the function is called the same index is used for example.
+ * @param index where to split
+ * @param it what to split
+ *
+ * Example: splitAt(4)(d.time) Splits the string at 4 from d.time
+ */
+export const splitAt = index => it =>
+  [it.slice(0, index), it.slice(index)];
+
+/**
+ * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
+ * It's necessary but not very pretty. Not proud of it.....
+ * @param value to round
+ * @returns {number}
+ */
+export function roundToFull(value: number) {
+  if (value >= 10 && value < 100) {                             //10 step
+    return Math.round(value / 10) * 10;
+  } else if(value >= 100 && value < 1000) {                     //100 step
+    return Math.round(value / 100) * 100;
+  } else if(value >= 1000 && value < 10000) {                   //1.000 step
+    return Math.round(value / 1000) * 1000;
+  } else if(value >= 10000 && value < 100000) {                 //10.000 step
+    return Math.round(value / 10000) * 10000;
+  } else if(value >= 100000 && value < 1000000) {               //100.000 step
+    return Math.round(value / 100000) * 100000;
+  } else if(value >= 1000000 && value < 10000000) {             //1.000.000 step
+    return Math.round(value / 1000000) * 1000000;
+  } else if(value >= 10000000 && value < 100000000) {           //10.000.000 step
+    return Math.round(value / 10000000) * 10000000;
+  } else if(value >= 100000000 && value < 1000000000) {         //100.000.000 step
+    return Math.round(value / 10000000) * 10000000;
+  } else if(value >= 1000000000 && value < 10000000000) {       //1.000.000.000 step
+    return Math.round(value / 100000000) * 100000000;
+  } else {
+    return Math.round(value);
+  }
+}
+
+/**
+ * This function exports a html table with letious options and creates a JSON.
  * The function had to be adapted and implemented here due to loading issues.
  * (C) Daniel White: http://www.developerdan.com/table-to-json/
  *
@@ -26,7 +159,7 @@ import {AppConstants} from './app_constants';
  */
 export function tableToJSON(table, opts?) {
   // Set options
-  var defaults = {
+  let defaults = {
     ignoreColumns: [],
     onlyColumns: null,
     ignoreHiddenRows: true,
@@ -39,19 +172,19 @@ export function tableToJSON(table, opts?) {
   };
   opts = $.extend(defaults, opts);
 
-  var notNull = function(value) {
+  let notNull = function(value) {
     return value !== undefined && value !== null;
   };
 
-  var ignoredColumn = function(index) {
+  let ignoredColumn = function(index) {
     if( notNull(opts.onlyColumns) ) {
       return $.inArray(index, opts.onlyColumns) === -1;
     }
     return $.inArray(index, opts.ignoreColumns) !== -1;
   };
 
-  var arraysToHash = function(keys, values) {
-    var result = {}, index = 0;
+  let arraysToHash = function(keys, values) {
+    let result = {}, index = 0;
     $.each(values, function(i, value) {
       // when ignoring columns, the header option still starts
       // with the first defined column
@@ -63,8 +196,8 @@ export function tableToJSON(table, opts?) {
     return result;
   };
 
-  var cellValues = function(cellIndex, cell, isHeader?) {
-    var $cell = $(cell),
+  let cellValues = function(cellIndex, cell, isHeader?) {
+    let $cell = $(cell),
       // textExtractor
       extractor = opts.textExtractor,
       override = $cell.attr(opts.textDataOverride);
@@ -83,11 +216,11 @@ export function tableToJSON(table, opts?) {
     return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
   };
 
-  var rowValues = function(row, isHeader) {
-    var result = [];
-    var includeRowId = opts.includeRowId;
-    var useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
-    var rowIdName = (typeof includeRowId === 'string') === true ? includeRowId : 'rowId';
+  let rowValues = function(row, isHeader) {
+    let result = [];
+    let includeRowId = opts.includeRowId;
+    let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
+    let rowIdName = (typeof includeRowId === 'string') === true ? includeRowId : 'rowId';
     if (useRowId) {
       if (typeof $(row).attr('id') === 'undefined') {
         result.push(rowIdName);
@@ -99,22 +232,22 @@ export function tableToJSON(table, opts?) {
     return result;
   };
 
-  var getHeadings = function(table) {
-    var firstRow = table.find('tr:first').first();
+  let getHeadings = function(table) {
+    let firstRow = table.find('tr:first').first();
     return notNull(opts.headings) ? opts.headings : rowValues(firstRow, true);
   };
 
-  var construct = function(table, headings) {
-    var i, j, len, len2, txt, $row, $cell,
+  let construct = function(table, headings) {
+    let i, j, len, len2, txt, $row, $cell,
       tmpArray = [], cellIndex = 0, result = [];
     table.children('tbody,*').children('tr').each(function(rowIndex, row) {
       if( rowIndex > 0 || notNull(opts.headings) ) {
-        var includeRowId = opts.includeRowId;
-        var useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
+        let includeRowId = opts.includeRowId;
+        let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
 
         $row = $(row);
 
-        var isEmpty = ($row.find('td').length === $row.find('td:empty').length) ? true : false;
+        let isEmpty = ($row.find('td').length === $row.find('td:empty').length) ? true : false;
 
         if( ( $row.is(':visible') || !opts.ignoreHiddenRows ) && ( !isEmpty || !opts.ignoreEmptyRows ) && ( !$row.data('ignore') || $row.data('ignore') === 'false' ) ) {
           cellIndex = 0;
@@ -173,7 +306,7 @@ export function tableToJSON(table, opts?) {
     $.each(tmpArray, function( i, row ){
       if (notNull(row)) {
         // remove ignoredColumns / add onlyColumns
-        var newRow = notNull(opts.onlyColumns) || opts.ignoreColumns.length ?
+        let newRow = notNull(opts.onlyColumns) || opts.ignoreColumns.length ?
             $.grep(row, function(v, index){ return !ignoredColumn(index); }) : row,
 
           // remove ignoredColumns / add onlyColumns if headings is not defined
@@ -188,6 +321,6 @@ export function tableToJSON(table, opts?) {
   };
 
   // Run
-  var headings = getHeadings(table);
+  let headings = getHeadings(table);
   return construct(table, headings);
 };
