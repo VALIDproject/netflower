@@ -32,7 +32,6 @@ class SankeyFeatures implements MAppViews {
     return Promise.resolve(this);
   }
 
-
   /**
    * Build the basic DOM elements
    */
@@ -81,6 +80,8 @@ class SankeyFeatures implements MAppViews {
               //Clear both storage facilities
               localStorage.clear();
               localforage.clear();
+              //Remove all elements that get not created from the DOM
+              d3.select('.dataVizView').selectAll('*').remove();
               //Force reload and loose all data
               location.reload(true);
             } else {
@@ -94,16 +95,11 @@ class SankeyFeatures implements MAppViews {
         evt.stopPropagation();
       });
 
-    this.createButtonBar();
+    //this.createButtonBar();
   }
 
   private createButtonBar () {
     let button_bar = this.$node.select('.button_bar');
-    console.log('button_bar', button_bar);
-    // button_bar.append('div').attr('class', 'switch_side');
-    // button_bar.append('div').attr('class', 'createGroup');
-    // button_bar.append('div').attr('class', 'pinning');
-    // button_bar.append('div').attr('class', 'addToNotes');
   }
 
 }

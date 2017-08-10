@@ -31,7 +31,7 @@ export default class SparklineBarChart implements MAppViews {
   private necessaryHeight = INITIAL_SVG_HEIGHT;
   private chartWidth: number = 120;        //Fallback if not calcualted dynamically
 
- constructor(parent: Element, private options: any) {
+  constructor(parent: Element, private options: any) {
     this.field = options.field;
     this.parentDOM = options.parentDOM;
 
@@ -53,12 +53,15 @@ export default class SparklineBarChart implements MAppViews {
   init() {
     this.attachListener();
 
-    //Prepare the svg here, apparently sankey.init() has already finished
-    this.$node = d3.select(this.parentDOM)
-      .append('svg')
-      .classed('barchart', true)
-      .attr('width', this.chartWidth)
-      .attr('height', INITIAL_SVG_HEIGHT);
+    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    if(dataAvailable) {
+      //Prepare the svg here, apparently sankey.init() has already finished
+      this.$node = d3.select(this.parentDOM)
+        .append('svg')
+        .classed('barchart', true)
+        .attr('width', this.chartWidth)
+        .attr('height', INITIAL_SVG_HEIGHT);
+    }
 
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
@@ -115,6 +118,10 @@ export default class SparklineBarChart implements MAppViews {
     let _self = this;
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       //On filters discard everything to allow a clean redraw
+      _self.$node.html('');
+    });
+
+    events.on(AppConstants.EVENT_RESIZE_WINDOW, (data) => {
       _self.$node.html('');
     });
   }
