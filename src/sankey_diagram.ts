@@ -179,6 +179,17 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
+
+    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
+  }
+
+  /**
+   * This method gets called whenever the page is resized.
+   */
+  private resize() {
+    console.log('resize...');
+    // d3.selectAll('svg').remove();
+    // this.getStorageData(true);
   }
 
   /**
