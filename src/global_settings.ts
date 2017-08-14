@@ -52,9 +52,6 @@ class GlobalSettings implements MAppViews {
         <button type="button" class="btn btn-default">Absolute Value</button>
         <button type="button" class="btn btn-default">Relative Value</button>
       </div>
-
-
-
     </div>
     `);
 
