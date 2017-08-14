@@ -11,3 +11,28 @@
   margin-top: 20%;
   z-index: 100001;
 }
+
+
+.list-group, .showChange  {
+  padding: 15px;
+}
+
+.list-group, .showChange p {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.showChange {
+  margin-top: 30px;
+}
+
+.toggler:before {
+  //background-color: red;
+  font-family: FontAwesome;
+  content:"\f013";
+  position:absolute;
+  top: 15px;
+  left: 3px;
+
+
+}

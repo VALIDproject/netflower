@@ -128,7 +128,7 @@ class SankeyDiagram implements MAppViews {
 
     right.html(`
     <div class='controlBox'>
-      <div class='right_bar_heading'><p>${columnLabels.targetNode}</p></div>      
+      <div class='right_bar_heading'><p>${columnLabels.targetNode}</p></div>
       <div class='input-group input-group-sm' style='width: 90%; margin: auto;'>
         <input id='mediaFilter'/>
       </div>
