@@ -5,16 +5,17 @@ Sankey diagram part.
   display: flex;
   height: 105%;
   width: 96%;
-  border: 1px solid black;
+  //border: 1px solid black;
   position: absolute;
   top: 176px;
   right: 10px;
+  margin-top: 30px;
   margin-bottom: 20px;
   margin-right: 10px;
 }
 
 .left_bars {
-  border: 1px solid grey;
+  //border: 1px solid grey;
   width: 15%;
   float: right;
   height: 100%;
@@ -23,7 +24,7 @@ Sankey diagram part.
 
 .sankey_vis {
   float: right;
-  border: 1px solid grey;
+  //border: 1px solid grey;
   width: 70%;
   height: 100%;
 }
@@ -31,7 +32,7 @@ Sankey diagram part.
 .right_bars {
   float: right;
   height: 100%;
-  border: 1px solid grey;
+  //border: 1px solid grey;
   width: 15%;
 }
 
@@ -89,13 +90,16 @@ Sankey detail part.
 Sankey features part.
  */
 .sankey_features{
-  //background-color: yellow;
-  border: 1px solid grey;
+  //background-color: yellow transparent;
+  //opacity: 20%;
+  border-bottom: 1px solid grey;
+  //background: rgba(54, 25, 25, .5);
   width: 96%;
   height: 12%;
   position: absolute;
   top: 74px;
   right: 20px;
+
 }
 
 .heading {

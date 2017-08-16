@@ -209,7 +209,6 @@ class DataImport implements MAppViews {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
           d3.select('.dataVizView').classed('invisibleClass', false);
           d3.select('#valuesList').selectAll('*').remove();
-          window.location.reload(true);
           this.storeData();
           events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
 
@@ -217,7 +216,6 @@ class DataImport implements MAppViews {
         } else {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
           d3.select('.dataVizView').classed('invisibleClass', false);
-          window.location.reload(true);
           this.storeData();
           events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
 

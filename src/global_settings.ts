@@ -41,17 +41,16 @@ class GlobalSettings implements MAppViews {
     this.$node.html(`
     <div id='menuTest'>
       <div class='list-group'>
-          <a href='#item-1' class='list-group-item' data-toggle='collapse'>Item 1</a>
-          <div class='list-group collapse' id='item-1'>
-              <a href='#' class='list-group-item'>Item 1 di 1</a>
-              <a href='#' class='list-group-item'>Item 2 di 1</a>
-              <a href='#item-1-1' class='list-group-item' data-toggle='collapse'>Item 3 di 1</a>
-              <div class='list-group collapse' id='item-1-1'>
-                  <a href='#' class='list-group-item'>Item 1 di 1.3</a>
-                  <a href='#' class='list-group-item'>Item 2 di 1.3</a>
-                  <a href='#' class='list-group-item'>Item 3 di 1.3</a>
-              </div>
-          </div>
+        <h4>Global Settings</h4>
+        <p>Show State <i class="fa fa-question-circle" aria-hidden="true"></i></p>
+        <button type="button" class="btn btn-default active">Absolute Value</button>
+        <button type="button" class="btn btn-default">Number of Links</button>
+      </div>
+
+      <div class='showChange'>
+      <p >Show Change <i class="fa fa-question-circle" aria-hidden="true"></i></p>
+        <button type="button" class="btn btn-default">Absolute Value</button>
+        <button type="button" class="btn btn-default">Relative Value</button>
       </div>
     </div>
     `);
