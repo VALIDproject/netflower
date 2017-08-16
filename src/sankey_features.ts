@@ -39,10 +39,6 @@ class SankeyFeatures implements MAppViews {
      this.$node.html(`
       <div class='container'>
         <div class='row align-items-start'>
-          <!--<div class='col-md-2'>
-            <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
-              <i class='fa fa-hand-o-left'>&nbsp;</i>Reupload Data</button>
-          </div>-->
           <div class='col-md-9'>
             <div class='heading'><h4>Media Transparency Data set</h4></div>
           </div>
@@ -66,35 +62,6 @@ class SankeyFeatures implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-        //Listener for the Back Button
-    this.$node.select('#backBtn')
-      .on('click', (e) => {
-        bootbox.confirm({
-          className: 'dialogBox',
-          title: 'Information',
-          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data upload page.<br/>
-          <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
-          Be sure you don't lose anything important or save your progress before you proceed.`,
-          callback: function(result) {
-            if (result) {
-              //Clear both storage facilities
-              localStorage.clear();
-              localforage.clear();
-              //Remove all elements that get not created from the DOM
-              d3.select('.dataVizView').selectAll('*').remove();
-              //Force reload and loose all data
-              location.reload(true);
-            } else {
-              return;
-            }
-          }
-        });
-
-        const evt = <MouseEvent>d3.event;
-        evt.preventDefault();
-        evt.stopPropagation();
-      });
-
     //this.createButtonBar();
   }
 
