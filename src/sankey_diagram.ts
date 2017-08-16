@@ -25,7 +25,7 @@ import SparklineBarChart from './sparklineBarChart';
 class SankeyDiagram implements MAppViews {
 
   private $node;
-  private nodesToShow: number = 20;
+  private nodesToShow: number = 25;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -122,7 +122,7 @@ class SankeyDiagram implements MAppViews {
     `);
 
     loadMore.html(`
-      <button type='button' class='btn btn-secondary btn-xs btn-block'>
+      <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs btn-block'>
       <span style='font-size:smaller;'>Load More ...</span></button>
     `);
 
@@ -178,6 +178,20 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
+    this.$node.select('#loadMoreBtn').on('click', (e) => {
+      this.nodesToShow += 20;
+      let sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
+      sankeyHeight += 250;
+      this.$node.select('.sankey_vis').style('height', sankeyHeight + 'px');
+
+      d3.select('#sankeyDiagram').html('');
+      d3.selectAll('.barchart').html('');
+      this.getStorageData(true);
+
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
   }
 
@@ -260,13 +274,18 @@ class SankeyDiagram implements MAppViews {
       .entries(json);
 
     let graph = {'nodes' : [], 'links' : []};
-    that.nodesToShow = Math.ceil((heightNode / 25));    //Trying to make nodes length dependent on space in window
     console.log('changed', that.nodesToShow);
 
+    console.log('Nest: ', nest);
+    let check = 0;
+    for(let obj of nest) {
+      check += obj.values.length;
+      console.log('Check: ', check);
+    }
     let counter = 0;
     for(let d of nest) {
       counter += d.values.length;
-      if(counter >= 26) break;
+      if(counter >= that.nodesToShow) break;
       for (var v = 0; v <= d.values.length - 1; v++) {
         graph.nodes.push({ 'name': d.key });//all Nodes source
         graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
