@@ -189,7 +189,7 @@ class SankeyDiagram implements MAppViews {
 
       //Increase the height of the svg to fit the data
       let sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      sankeyHeight += 250;
+      sankeyHeight += (10 * this.nodesToShow);
       this.$node.select('.sankey_vis').style('height', sankeyHeight + 'px');
 
       d3.select('#sankeyDiagram').html('');
