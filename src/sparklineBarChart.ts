@@ -7,13 +7,11 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {splitAt} from './utilities';
+import {splitAt, dotFormat} from './utilities';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
 const OFFSET = 20;                         //Offset for the chart in px
-const formatNumber = d3.format(',.0f');    //Zero decimal places
-const format = function (d) { return formatNumber(d); }; //Display number with unit sign
 
 interface KeyValue {
   key: string;
@@ -169,7 +167,7 @@ export default class SparklineBarChart implements MAppViews {
       .append('title')
       .text(function (d) {
         let timeArray = splitAt(4)(d.key);
-        return nodeName + ' → ' + timeArray[0] + 'Q' + timeArray[1] + '\n' + format(d.values);
+        return nodeName + ' → ' + timeArray[0] + 'Q' + timeArray[1] + '\n' + dotFormat(d.values);
       });
   }
 }

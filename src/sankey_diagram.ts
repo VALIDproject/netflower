@@ -12,7 +12,7 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {d3TextWrap, roundToFull} from './utilities';
+import {d3TextWrap, roundToFull, dotFormat} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -26,6 +26,7 @@ class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 25;
+  private maximumNodes: number = 0;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -87,9 +88,8 @@ class SankeyDiagram implements MAppViews {
     let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
 
-    // check if column meta data is in storage
+    //Check if column meta data is in storage and provide some defaults
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
-    // provide some default values
     if (columnLabels == null) {
       columnLabels = {};
       columnLabels.sourceNode = 'Source';
@@ -152,6 +152,10 @@ class SankeyDiagram implements MAppViews {
     }
 
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
+      setTimeout(function () {
+        location.reload();
+      }, 500);
+
       //Draw Sankey Diagram
       this.getStorageData(false);
     });
@@ -178,8 +182,12 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
+    //Functionality of load more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
-      this.nodesToShow += 20;
+      this.nodesToShow += 25;
+      if(this.nodesToShow > this.maximumNodes) this.nodesToShow = this.maximumNodes;
+
+      //Increase the height of the svg to fit the data
       let sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
       sankeyHeight += 250;
       this.$node.select('.sankey_vis').style('height', sankeyHeight + 'px');
@@ -192,6 +200,8 @@ class SankeyDiagram implements MAppViews {
       evt.preventDefault();
       evt.stopPropagation();
     });
+
+    //Listen for resize of the window
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
   }
 
@@ -243,10 +253,6 @@ class SankeyDiagram implements MAppViews {
     const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
     const widthOffset = 80;
 
-    //The '0' option enables zero-padding. The comma (',') option enables the use of a comma for a thousands separator.
-    const formatNumber = d3.format(',.0f'),    // zero decimal places
-      format = function(d) { return formatNumber(d); }; //Display number with unit sign
-
     //Append the svg canvas to the page
     const svg = d3.select('#sankeyDiagram').append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -276,12 +282,8 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
 
-    console.log('Nest: ', nest);
-    let check = 0;
-    for(let obj of nest) {
-      check += obj.values.length;
-      console.log('Check: ', check);
-    }
+    that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
+
     let counter = 0;
     for(let d of nest) {
       counter += d.values.length;
@@ -331,7 +333,7 @@ class SankeyDiagram implements MAppViews {
 
     //Add the link titles - Hover Path
     link.append('title')
-      .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + format(d.value); });
+      .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value); });
 
     //Add the on 'click' listener for the links
     link.on('click', function(d) {
@@ -361,7 +363,7 @@ class SankeyDiagram implements MAppViews {
       .style('fill', '#DA5A6B')
       //Title rectangle
       .append('title')
-      .text(function(d) { return d.name + '\n' + format(d.value); });
+      .text(function(d) { return d.name + '\n' + dotFormat(d.value); });
 
     //Create sparkline barcharts for newly enter-ing g.node elements
     node.call(SparklineBarChart.createSparklines);

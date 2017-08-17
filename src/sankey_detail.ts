@@ -4,9 +4,10 @@
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
-import {MAppViews} from './app';
 import 'imports-loader?d3=d3!../lib/sankey.js';
+import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
+import {dotFormat} from './utilities';
 
 class SankeyDetail implements MAppViews {
 
@@ -98,11 +99,6 @@ class SankeyDetail implements MAppViews {
     .style('opacity', 0)
     .style('z-index', '200000');
 
-    const units = '€';
-    const formatNumber = d3.format(',.0f'),   // zero decimal places
-    format = function(d) { return formatNumber(d); };
-    //format = function(d) { return formatNumber(d) + ' ' + units; };
-
     //get width and height of sankey div to calculate position of svg
     let widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
     let heightSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().height;
@@ -123,7 +119,7 @@ class SankeyDetail implements MAppViews {
       .style('background-color',  '#e0e0e0')
       .style('z-index', '10000')
       .append('text')
-      .text(function(d) { return sourceName + ' → ' + targetName +  '  ' + format(value) ; })
+      .text(function(d) { return sourceName + ' → ' + targetName +  '  ' + dotFormat(value) ; })
       .attr('x', 5)
       .attr('y', 16);
 
@@ -161,7 +157,7 @@ class SankeyDetail implements MAppViews {
       .style('z-index', '10000')
       .append('text')
       .attr('class', 'caption')
-      .text(function(d) { return sourceName + ' → ' + targetName + '  ' + format(value); })
+      .text(function(d) { return sourceName + ' → ' + targetName + '  ' + dotFormat(value); })
       .attr('x', 5)
       .attr('y', 16);
 
@@ -261,7 +257,7 @@ class SankeyDetail implements MAppViews {
     .on('mouseover', function(d) {
       tooltip.transition().duration(200).style('opacity', .9);
 
-      tooltip.html(format(d.valueNode))
+      tooltip.html(dotFormat(d.valueNode))
       .style('left', ((<any>d3).event.pageX -40) + 'px')
       .style('top', ((<any>d3).event.pageY - 20) + 'px');
     })
