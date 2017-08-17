@@ -19,9 +19,7 @@ class SankeyDetail implements MAppViews {
   private drawSvg: number = 0;
   //Look if the bar chart is drawn
   private drawBarChart: number = 0;
-
   private toolbox;
-
   private toolbox2;
 
   constructor(parent: Element, private options: any) {
@@ -64,7 +62,6 @@ class SankeyDetail implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, (evt, d) => {
-
       this.closeDetail();
       this.clicked = 0;
     });
@@ -74,7 +71,6 @@ class SankeyDetail implements MAppViews {
   * This method cleans up the view by removing all generated graphs and charts.
   */
   private closeDetail () {
-
     this.$node.select('svg.sankey_details').remove();
     this.$node.select('svg.sankey_details2').remove();
   }
@@ -106,7 +102,6 @@ class SankeyDetail implements MAppViews {
     //position of svg in the sankey_diagram div
     let xpositionSvg = widthSankeyDiv / 2 + 100;
     let ypositionSvg = heightSankeyDiv / 2 - h;
-
     let newYPositionSvg = ypositionSvg + 20;
 
 
@@ -134,15 +129,18 @@ class SankeyDetail implements MAppViews {
       .style('z-index', '200000')
       .attr('x', '354')
       .attr('y', '10')
+      .attr('class', 'addNotes')
       .on('mouseover', function(d) {
         tooltip.transition().duration(200).style('opacity', .9);
-
         tooltip.html('Add Notes to this particular flow!')
         .style('left', ((<any>d3).event.pageX -40) + 'px')
         .style('top', ((<any>d3).event.pageY - 20) + 'px');
       })
       .on('mouseout', function(d) {
         tooltip.transition().duration(500).style('opacity', 0);
+      })
+      .on('click', function(d){
+        alert('Save NOTES in a feature version!!');
       });
 
       ++this.drawSvg;
@@ -172,20 +170,21 @@ class SankeyDetail implements MAppViews {
       .style('z-index', '200000')
       .attr('x', '354')
       .attr('y', '10')
+      .attr('class', 'addNotes')
       .on('mouseover', function(d) {
         tooltip.transition().duration(200).style('opacity', .9);
-
         tooltip.html('Add Notes to this particular flow!')
         .style('left', ((<any>d3).event.pageX -40) + 'px')
         .style('top', ((<any>d3).event.pageY - 20) + 'px');
       })
       .on('mouseout', function(d) {
         tooltip.transition().duration(500).style('opacity', 0);
+      })
+      .on('click', function(d){
+        alert('Save NOTES in a feature version!!');
       });
-
       this.drawSvg = 0;
     }
-
 
     //Filter data based on the clicked path (sourceName and targetName) and store it
     let path = json.filter((obj) => {
@@ -219,30 +218,22 @@ class SankeyDetail implements MAppViews {
     x.domain(timePoints);
     y.domain([0, d3.max(data, function(d) { return d.valueNode; })]);
 
-
-
-
-
     if (this.drawBarChart === 0) {
       //Add the svg for the bars and transform it slightly to be in position of the box
       this.detailSVG = d3.select('svg.sankey_details')
       .append('g')
       .attr('class', 'bars')
       .attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
-
       ++this.drawBarChart;
 
     } else {
-      // //Add the svg for the bars and transform it slightly to be in position of the box
-
+      //Add the svg for the bars and transform it slightly to be in position of the box
       this.detailSVG = d3.select('svg.sankey_details2')
       .append('g')
       .attr('class', 'bars')
       .attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
-
       this.drawBarChart = 0;
     }
-
 
     //Add in the bar charts and the tooltips if user mouses over them.
     this.detailSVG.selectAll('.bar')
@@ -256,7 +247,6 @@ class SankeyDetail implements MAppViews {
     .attr('height', function(d) { return y(0) - y(d.valueNode); })
     .on('mouseover', function(d) {
       tooltip.transition().duration(200).style('opacity', .9);
-
       tooltip.html(dotFormat(d.valueNode))
       .style('left', ((<any>d3).event.pageX -40) + 'px')
       .style('top', ((<any>d3).event.pageY - 20) + 'px');
@@ -280,7 +270,6 @@ class SankeyDetail implements MAppViews {
     this.detailSVG.append('g')
     .attr('class', 'y axis')
     .call(yAxis.ticks(4).tickFormat(d3.format(',')));
-
 
     //Append the close button or link to the SVG
     let close = this.detailSVG.append('g').attr('class', 'closeLink');
