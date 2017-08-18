@@ -111,6 +111,14 @@ export const splitAt = index => it =>
   [it.slice(0, index), it.slice(index)];
 
 /**
+ * This method converts a given number to a String with dot fomrated thousands seperator.
+ * @type {(n:number)=>string} the number to format
+ */
+export const formatNumber = d3.format(',.0f'),    //Zero decimal places
+  format = function(d) { return formatNumber(d); }, //Display number with unit sign
+  dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'); }; //Replacing the , with .
+
+/**
  * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
  * It's necessary but not very pretty. Not proud of it.....
  * @param value to round
