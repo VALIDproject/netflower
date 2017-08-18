@@ -186,13 +186,13 @@ class FilterData implements MAppViews {
       if(entry.timeNode > max)
         max = entry.timeNode;
     }
-    this.quarterFilter.changeRange(min, max);
+    this.quarterFilter.changeRange(max, max);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
       min: min,
       max: max,
-      from: min,
+      from: max,
       to: max,
       prefix: 'Q',
       force_edges: true,  //Lets the labels inside the container
