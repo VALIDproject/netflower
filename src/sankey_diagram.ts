@@ -14,7 +14,7 @@ import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap, roundToFull, dotFormat} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
-        updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
+  updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -247,12 +247,12 @@ class SankeyDiagram implements MAppViews {
           .entries(originalData);
 
 
-          this.valuesSumTarget =(<any>d3).nest()
-            .key((d) => {return d.targetNode;})
-            .rollup(function (v) {return [
-              d3.sum(v, function (d :any){ return d.valueNode;})
-            ]})
-            .entries(originalData);
+        this.valuesSumTarget =(<any>d3).nest()
+          .key((d) => {return d.targetNode;})
+          .rollup(function (v) {return [
+            d3.sum(v, function (d :any){ return d.valueNode;})
+          ]})
+          .entries(originalData);
       }
 
       //Filter the data before and then pass it to the draw function.
@@ -396,9 +396,9 @@ class SankeyDiagram implements MAppViews {
     node.call(SparklineBarChart.createSparklines);
 
 
-node.append('svg')
-    .append('defs')
-    .append('pattern')
+    node.append('svg')
+      .append('defs')
+      .append('pattern')
       .attr('id', 'diagonalHatch')
       .attr('patternUnits', 'userSpaceOnUse')
       .attr('width', 4)
