@@ -91,7 +91,7 @@ class SankeyDiagram implements MAppViews {
     let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
-    let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
+    //let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
 
     //Check if column meta data is in storage and provide some defaults
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -145,7 +145,6 @@ class SankeyDiagram implements MAppViews {
     </div>
     `);
 
-    svgPattern.html(``);
   }
 
   /**
@@ -396,41 +395,49 @@ class SankeyDiagram implements MAppViews {
     //Create sparkline barcharts for newly enter-ing g.node elements
     node.call(SparklineBarChart.createSparklines);
 
+
+node.append('svg')
+    .append('defs')
+    .append('pattern')
+      .attr('id', 'diagonalHatch')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 4)
+      .attr('height', 4)
+      .append('path')
+      .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+      .attr('stroke', '#000000')
+      .attr('stroke-width', 1);
+
     //This is how the overlays for the rects can be done after they have been added
     node.append('rect')
       .attr('height', function(d) {
         return d.dy;
       })
-      .style('fill', '#FAB847')
+      .style('fill', 'url(#diagonalHatch)')
       .attr('width', sankey.nodeWidth() / 2)
+      .attr('x', function (d){
+        if (d.sourceLinks.length <= 0) return sankey.nodeWidth()/2;
+      })
       .append('title')
       .text((d) => {
         let result;
-        for (var i = 0; i < this.valuesSumSource.length; i++) {
+        for (let i = 0; i < this.valuesSumSource.length; i++) {
           if (this.valuesSumSource[i].key === d.name) {
             result =  this.valuesSumSource[i].values;
           }
         }
-        //console.log('result', result);
         return dotFormat(result) + ' ' + 'More';
-
       })
       .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
       .text((d) => {
         let result;
-        for (var i = 0; i < this.valuesSumTarget.length; i++) {
+        for (let i = 0; i < this.valuesSumTarget.length; i++) {
           if (this.valuesSumTarget[i].key === d.name) {
             result =  this.valuesSumTarget[i].values;
           }
         }
-        //console.log('result', result);
-        return dotFormat(result);
-
-      })
-
-      .attr('transform', 'translate(' + sankey.nodeWidth() / 2 + ', 0)');
-
-
+        return dotFormat(result) + ' ' + 'More';
+      });
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
