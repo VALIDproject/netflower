@@ -151,6 +151,10 @@ class FilterData implements MAppViews {
     });
   }
 
+  /**
+   * This method adds all the elements and options for the paragraph filter.
+   * @param json with the data to be added.
+   */
   private setParagraphFilterElements(json)
   {
     let paragraphs:Array<number> = [];
@@ -166,6 +170,10 @@ class FilterData implements MAppViews {
     }
   }
 
+  /**
+   * This method adds the slider for the time range.
+   * @param json with the data to be added.
+   */
   private setQuarterFilterRange(json)
   {
     let min: number = json[0].timeNode;
@@ -178,7 +186,6 @@ class FilterData implements MAppViews {
       if(entry.timeNode > max)
         max = entry.timeNode;
     }
-
     this.quarterFilter.changeRange(min, max);
 
     $('#timeSlider').ionRangeSlider({
