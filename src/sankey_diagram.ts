@@ -14,7 +14,7 @@ import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap, roundToFull, dotFormat} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
-        updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
+  updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -29,7 +29,8 @@ class SankeyDiagram implements MAppViews {
   private $node;
   private nodesToShow: number = 25;
   private maximumNodes: number = 0;
-  private valuesSumAll;
+  private valuesSumSource;
+  private valuesSumTarget;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -90,7 +91,7 @@ class SankeyDiagram implements MAppViews {
     let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
-    let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
+    //let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
 
     //Check if column meta data is in storage and provide some defaults
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -144,7 +145,6 @@ class SankeyDiagram implements MAppViews {
     </div>
     `);
 
-    svgPattern.html(``);
   }
 
   /**
@@ -238,9 +238,17 @@ class SankeyDiagram implements MAppViews {
         setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
-        
-        this.valuesSumAll =(<any>d3).nest()
+
+        this.valuesSumSource =(<any>d3).nest()
           .key((d) => {return d.sourceNode;})
+          .rollup(function (v) {return [
+            d3.sum(v, function (d :any){ return d.valueNode;})
+          ]})
+          .entries(originalData);
+
+
+        this.valuesSumTarget =(<any>d3).nest()
+          .key((d) => {return d.targetNode;})
           .rollup(function (v) {return [
             d3.sum(v, function (d :any){ return d.valueNode;})
           ]})
@@ -301,7 +309,6 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
 
-    console.log(this.valuesSumAll);
     that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
 
     let counter = 0;
@@ -388,15 +395,49 @@ class SankeyDiagram implements MAppViews {
     //Create sparkline barcharts for newly enter-ing g.node elements
     node.call(SparklineBarChart.createSparklines);
 
+
+    node.append('svg')
+      .append('defs')
+      .append('pattern')
+      .attr('id', 'diagonalHatch')
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 4)
+      .attr('height', 4)
+      .append('path')
+      .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+      .attr('stroke', '#000000')
+      .attr('stroke-width', 1);
+
     //This is how the overlays for the rects can be done after they have been added
     node.append('rect')
       .attr('height', function(d) {
         return d.dy;
       })
-      .style('fill', '#FAB847')
+      .style('fill', 'url(#diagonalHatch)')
       .attr('width', sankey.nodeWidth() / 2)
-      .filter(function (d, i) { return d.sourceLinks.length <= 0; })
-      .attr('transform', 'translate(' + sankey.nodeWidth() / 2 + ', 0)');
+      .attr('x', function (d){
+        if (d.sourceLinks.length <= 0) return sankey.nodeWidth()/2;
+      })
+      .append('title')
+      .text((d) => {
+        let result;
+        for (let i = 0; i < this.valuesSumSource.length; i++) {
+          if (this.valuesSumSource[i].key === d.name) {
+            result =  this.valuesSumSource[i].values;
+          }
+        }
+        return dotFormat(result) + ' ' + 'More';
+      })
+      .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
+      .text((d) => {
+        let result;
+        for (let i = 0; i < this.valuesSumTarget.length; i++) {
+          if (this.valuesSumTarget[i].key === d.name) {
+            result =  this.valuesSumTarget[i].values;
+          }
+        }
+        return dotFormat(result) + ' ' + 'More';
+      });
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
