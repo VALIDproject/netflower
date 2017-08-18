@@ -27,6 +27,7 @@ class SankeyDiagram implements MAppViews {
   private $node;
   private nodesToShow: number = 25;
   private maximumNodes: number = 0;
+  private valuesSumAll;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -87,6 +88,7 @@ class SankeyDiagram implements MAppViews {
     let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     let loadMore = sankeyVis.append('div').attr('class', 'load_more');
     let right = this.$node.append('div').attr('class', 'right_bars');
+    let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
 
     //Check if column meta data is in storage and provide some defaults
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -139,6 +141,8 @@ class SankeyDiagram implements MAppViews {
       </div>
     </div>
     `);
+
+    svgPattern.html(``);
   }
 
   /**
@@ -226,6 +230,13 @@ class SankeyDiagram implements MAppViews {
         this.setEntityFilterRange(originalData);
         this.setMediaFilterRange(originalData);
         this.setEuroFilterRange(originalData);
+
+        this.valuesSumAll =(<any>d3).nest()
+          .key((d) => {return d.sourceNode;})
+          .rollup(function (v) {return [
+            d3.sum(v, function (d :any){ return d.valueNode;})
+          ]})
+          .entries(originalData);
       }
 
       //Filter the data before and then pass it to the draw function.
@@ -282,6 +293,7 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
 
+    console.log(this.valuesSumAll);
     that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
 
     let counter = 0;
@@ -368,14 +380,15 @@ class SankeyDiagram implements MAppViews {
     //Create sparkline barcharts for newly enter-ing g.node elements
     node.call(SparklineBarChart.createSparklines);
 
-    // //This is how the overlays for the rects can be done after they have been added
-    // node.append('rect')
-    //   .attr('height', function(d) {
-    //     console.log(d.name, d.dy);
-    //     return 10;
-    //   })
-    //   .attr('width', sankey.nodeWidth())
-    //   .style('fill', '#FAB847');
+    //This is how the overlays for the rects can be done after they have been added
+    node.append('rect')
+      .attr('height', function(d) {
+        return d.dy;
+      })
+      .style('fill', '#FAB847')
+      .attr('width', sankey.nodeWidth() / 2)
+      .filter(function (d, i) { return d.sourceLinks.length <= 0; })
+      .attr('transform', 'translate(' + sankey.nodeWidth() / 2 + ', 0)');
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
