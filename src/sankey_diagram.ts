@@ -29,7 +29,8 @@ class SankeyDiagram implements MAppViews {
   private $node;
   private nodesToShow: number = 25;
   private maximumNodes: number = 0;
-  private valuesSumAll;
+  private valuesSumSource;
+  private valuesSumTarget;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -238,13 +239,21 @@ class SankeyDiagram implements MAppViews {
         setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
-        
-        this.valuesSumAll =(<any>d3).nest()
+
+        this.valuesSumSource =(<any>d3).nest()
           .key((d) => {return d.sourceNode;})
           .rollup(function (v) {return [
             d3.sum(v, function (d :any){ return d.valueNode;})
           ]})
           .entries(originalData);
+
+
+          this.valuesSumTarget =(<any>d3).nest()
+            .key((d) => {return d.targetNode;})
+            .rollup(function (v) {return [
+              d3.sum(v, function (d :any){ return d.valueNode;})
+            ]})
+            .entries(originalData);
       }
 
       //Filter the data before and then pass it to the draw function.
@@ -301,7 +310,6 @@ class SankeyDiagram implements MAppViews {
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
 
-    console.log(this.valuesSumAll);
     that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
 
     let counter = 0;
@@ -395,8 +403,34 @@ class SankeyDiagram implements MAppViews {
       })
       .style('fill', '#FAB847')
       .attr('width', sankey.nodeWidth() / 2)
-      .filter(function (d, i) { return d.sourceLinks.length <= 0; })
+      .append('title')
+      .text((d) => {
+        let result;
+        for (var i = 0; i < this.valuesSumSource.length; i++) {
+          if (this.valuesSumSource[i].key === d.name) {
+            result =  this.valuesSumSource[i].values;
+          }
+        }
+        //console.log('result', result);
+        return dotFormat(result) + ' ' + 'More';
+
+      })
+      .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
+      .text((d) => {
+        let result;
+        for (var i = 0; i < this.valuesSumTarget.length; i++) {
+          if (this.valuesSumTarget[i].key === d.name) {
+            result =  this.valuesSumTarget[i].values;
+          }
+        }
+        //console.log('result', result);
+        return dotFormat(result);
+
+      })
+
       .attr('transform', 'translate(' + sankey.nodeWidth() / 2 + ', 0)');
+
+
 
     //Add in the title for the nodes
     let heading = node.append('g').append('text')
