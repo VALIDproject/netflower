@@ -21,4 +21,6 @@ export class AppConstants {
   static EVENT_FILTER_CHANGED = 'eventFilterChanged';
 
   static EVENT_FILTER_DEACTIVATE_TOP_FILTER = 'eventFilterDeactivateTopFilter';
+
+  static EVENT_SLIDER_CHANGE = 'eventSliderChange';
 }
