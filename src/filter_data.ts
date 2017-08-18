@@ -179,7 +179,7 @@ class FilterData implements MAppViews {
         max = entry.timeNode;
     }
 
-    this.quarterFilter.changeRange(min, min);
+    this.quarterFilter.changeRange(min, max);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',

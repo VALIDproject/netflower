@@ -22,8 +22,10 @@ let mediaFilterRef;
 let valueFilterRef;
 
 /**
- * This method sets the range for the entity value filter according to the priovided data.
- * @param data where the filter gets the range from.
+ * This method creates the slider for the entity range filter with given parameters.
+ * @param filter the filter data
+ * @param elemName the element where the slider gets created on
+ * @param data the data for the slider to dermin the range
  */
 export function setEntityFilterRange(filter, elemName: string, data: any)
 {
@@ -52,6 +54,11 @@ export function setEntityFilterRange(filter, elemName: string, data: any)
   entityFilterRef = $(elemName).data('ionRangeSlider');    //Store instance to update it later
 }
 
+/**
+ * This method is used in order ot update the entity range slider.
+ * @param filter the filter with the base data
+ * @param data the data to update the slider with
+ */
 export function updateEntityRange(filter, data: any) {
   filter.calculateMinMaxValues(data);
   let min: number = roundToFull(filter.minValue);
@@ -64,8 +71,10 @@ export function updateEntityRange(filter, data: any) {
 }
 
 /**
- * This methods sets the range for the media value filter according to the provided data.
- * @param data where the filter gets the range from.
+ * This method creates the slider for the media range filter with given parameters.
+ * @param filter the filter data
+ * @param elemName the element where the slider gets created on
+ * @param data the data for the slider to dermin the range
  */
 export function setMediaFilterRange(filter, elemName: string, data: any): void
 {
@@ -94,6 +103,11 @@ export function setMediaFilterRange(filter, elemName: string, data: any): void
   mediaFilterRef = $(elemName).data('ionRangeSlider');    //Store instance to update it later
 }
 
+/**
+ * This method is used in order ot update the media range slider.
+ * @param filter the filter with the base data
+ * @param data the data to update the slider with
+ */
 export function updateMediaRange(filter, data: any) {
   filter.calculateMinMaxValues(data);
   let min: number = roundToFull(filter.minValue);
@@ -106,8 +120,10 @@ export function updateMediaRange(filter, data: any) {
 }
 
 /**
- * This method sets the range for the node value filte according to the provided data.
- * @param data where the filter gets the range from.
+ * This method creates the slider for the value range filter with given parameters.
+ * @param filter the filter data
+ * @param elemName the element where the slider gets created on
+ * @param data the data for the slider to dermin the range
  */
 export function setEuroFilterRange(filter, elemName: string, data: any): void {
   let min: number = data[0].valueNode;
@@ -143,6 +159,11 @@ export function setEuroFilterRange(filter, elemName: string, data: any): void {
 
 }
 
+/**
+ * This method is used in order ot update the value range slider.
+ * @param filter the filter with the base data
+ * @param data the data to update the slider with
+ */
 export function updateEuroRange(filter, data: any) {
   let min: number = data[0].valueNode;
   let max: number = data[0].valueNode;
