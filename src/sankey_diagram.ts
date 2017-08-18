@@ -13,6 +13,8 @@ import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {d3TextWrap, roundToFull} from './utilities';
+import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
+        updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -179,6 +181,12 @@ class SankeyDiagram implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
+
+    events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
+      updateEntityRange(this.entityEuroFilter, d);
+      updateMediaRange(this.mediaEuroFilter, d);
+      updateEuroRange(this.euroFilter, d);
+    });
   }
 
   /**
@@ -199,9 +207,9 @@ class SankeyDiagram implements MAppViews {
       let originalData = value;
       if(!redraw)
       {
-        this.setEntityFilterRange(originalData);
-        this.setMediaFilterRange(originalData);
-        this.setEuroFilterRange(originalData);
+        setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
+        setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
+        setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
       }
 
       //Filter the data before and then pass it to the draw function.
@@ -388,107 +396,6 @@ class SankeyDiagram implements MAppViews {
       d3TextWrap(rightWrap, wordWrapBorder + 10);
       rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
     }
-  }
-
-  /**
-   * This method sets the range for the entity value filter according to the priovided data.
-   * @param data where the filter gets the range from.
-   */
-  private setEntityFilterRange(data: any): void
-  {
-    this.entityEuroFilter.calculateMinMaxValues(data);
-    let min: number = roundToFull(this.entityEuroFilter.minValue);
-    let max: number = roundToFull(this.entityEuroFilter.maxValue);
-
-    $('#entityFilter').ionRangeSlider({
-      type: 'double',
-      min: min,
-      max: max,
-      prettify_enabled: true,
-      prettify_separator: '.',
-      force_edges: true,  //Lets the labels inside the container
-      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
-      drag_interval: true, //Allows the interval to be dragged around
-      onFinish: (sliderData) => {
-        let newMin: number = sliderData.from;
-        let newMax: number = sliderData.to;
-        this.entityEuroFilter.minValue = newMin;
-        this.entityEuroFilter.maxValue = newMax;
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
-      },
-    });
-
-    this.entitySlider = $('#entityFilter').data('ionRangeSlider');    //Store instance to update it later
-  }
-
-  /**
-   * This methods sets the range for the media value filter according to the provided data.
-   * @param data where the filter gets the range from.
-   */
-  private setMediaFilterRange(data: any): void
-  {
-    this.mediaEuroFilter.calculateMinMaxValues(data);
-    let min: number = roundToFull(this.mediaEuroFilter.minValue);
-    let max: number = roundToFull(this.mediaEuroFilter.maxValue);
-
-    $('#mediaFilter').ionRangeSlider({
-      type: 'double',
-      min: min,
-      max: max,
-      prettify_enabled: true,
-      prettify_separator: '.',
-      force_edges: true,  //Lets the labels inside the container
-      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
-      drag_interval: true, //Allows the interval to be dragged around
-      onFinish: (sliderData) => {
-        let newMin: number = sliderData.from;
-        let newMax: number = sliderData.to;
-        this.mediaEuroFilter.minValue = newMin;
-        this.mediaEuroFilter.maxValue = newMax;
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
-      }
-    });
-
-    this.mediaSlider = $('#mediaFilter').data('ionRangeSlider');    //Store instance to update it later
-  }
-
-  /**
-   * This method sets the range for the node value filte according to the provided data.
-   * @param data where the filter gets the range from.
-   */
-  private setEuroFilterRange(data: any): void
-  {
-    let min: number = data[0].valueNode;
-    let max: number = data[0].valueNode;
-    for(let entry of data)
-    {
-      let value: number = Number(entry.valueNode);
-      if(value < min) min = value;
-      if(value > max) max = value;
-    }
-    min = roundToFull(min);
-    max = roundToFull(max);
-    this.euroFilter.changeRange(min, max);
-
-    $('#valueSlider').ionRangeSlider({
-      type: 'double',
-      min: min,
-      max: max,
-      prettify_enabled: true,
-      prettify_separator: '.',
-      force_edges: true,  //Lets the labels inside the container
-      min_interval: min * 2, //Forces at least 1000 to be shown in order to prevent errors
-      drag_interval: true, //Allows the interval to be dragged around
-      onFinish: (sliderData) => {
-        let newMin: number = sliderData.from;
-        let newMax: number = sliderData.to;
-        this.euroFilter.minValue = newMin;
-        this.euroFilter.maxValue = newMax;
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
-      }
-    });
-
-    this.valueSlider = $('#valueSlider').data('ionRangeSlider');    //Store instance to update it later
   }
 }
 

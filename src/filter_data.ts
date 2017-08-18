@@ -77,9 +77,6 @@ class FilterData implements MAppViews {
           <div class='col-sm-2'>
             <small>Paragraph Filter</small>
           </div>
-          <!--<div class='col-sm-2'>-->
-            <!--<small>Quartal Filter</small>-->
-          <!--</div>-->
         </div>
 
         <div class='row'>
@@ -95,11 +92,6 @@ class FilterData implements MAppViews {
               <option value='-1' selected>disabled</option>
             </select>
           </div>
-          <!--<div class='col-sm-2'>-->
-          <!--<div>-->
-            <!--<input id='timeSlider'/>-->
-          <!--</div>-->
-          <!--</div>-->
         </div>
        </div>
        <div class='quarterSlider'>
@@ -194,8 +186,6 @@ class FilterData implements MAppViews {
       if(entry.timeNode > max)
         max = entry.timeNode;
     }
-
-
     this.quarterFilter.changeRange(min, max);
 
     $('#timeSlider').ionRangeSlider({
@@ -213,6 +203,10 @@ class FilterData implements MAppViews {
         this.quarterFilter.minValue = newMin;
         this.quarterFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+
+        //This notifies the sliders to change their values but only if the quarter slider changes
+        let filterQuarter = this.quarterFilter.meetCriteria(json);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
       }
     });
   }
