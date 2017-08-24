@@ -11,7 +11,9 @@ export default class FilterPipeline
   private filters: Array<Filter>;
   private static instance: FilterPipeline;
 
+  //top filter has to be the first filter of the pipeline and therefore is stored separately
   private _topFilter: TopFilter;
+  //search filters have to be right after the topFilter and therefore are also stored separately
   private _entitySearchFilter: EntitySearchFilter;
   private _mediaSearchFilter: MediaSearchFilter;
 
@@ -20,6 +22,7 @@ export default class FilterPipeline
     this.filters = new Array<Filter>();
   }
 
+  //class is a singeltone an therefore only one object can exist => get object with this method
   public static getInstance(): FilterPipeline
   {
     if(FilterPipeline.instance === null || FilterPipeline.instance === undefined)
@@ -30,6 +33,7 @@ export default class FilterPipeline
     return FilterPipeline.instance;
   }
 
+  //add a filter to the pipeline; all filters are connected with the AND operator
   public addFilter(newFilter: Filter): void
   {
     if(newFilter !== null || newFilter !== undefined)
@@ -38,21 +42,25 @@ export default class FilterPipeline
     }
   }
 
+  //change the stored topFilter
   public changeTopFilter(newTop: TopFilter): void
   {
     this._topFilter = newTop;
   }
 
+  //change the stored entitySearchFilter
   public changeEntitySearchFilter(newEntSearch: EntitySearchFilter): void
   {
     this._entitySearchFilter = newEntSearch;
   }
 
+  //change the stored mediaSearchFilter
   public changeMediaSearchFilter(newMedSearch: MediaSearchFilter): void
   {
     this._mediaSearchFilter = newMedSearch;
   }
 
+  //this method performs all filters in the pipeline and additionally the topFilter, entitySearchFilter and MediaSearchFilter
   public performFilters(data: any): any
   {
     if(this._topFilter !== null && this._topFilter !== undefined)
@@ -71,9 +79,13 @@ export default class FilterPipeline
     return data;
   }
 
+  //this method prints the filter charateristics of all filters
   public printFilters(): void
   {
-    console.log('Filter Count: ' + this.filters.length);
+    console.log('Filter Count: ' + (this.filters.length+3));
+    this._topFilter.printData();
+    this._entitySearchFilter.printData();
+    this._mediaSearchFilter.printData();
     for(let filter of this.filters)
     {
       filter.printData();
