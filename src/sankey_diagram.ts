@@ -257,6 +257,10 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
+      console.log("----------------------- Original Data -----------------------");
+      console.log(originalData);
+      console.log("----------------------- Filtered Data -----------------------");
+      console.log(filteredData);
       this.buildSankey(filteredData, originalData);
     });
   }

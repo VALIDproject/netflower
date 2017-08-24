@@ -35,6 +35,7 @@ export default class ParagraphFilter implements Filter
     this._value = val;
   }
 
+  //check if the value meets the entries paragraph value
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
