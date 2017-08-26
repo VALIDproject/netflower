@@ -253,6 +253,9 @@ class SankeyDiagram implements MAppViews {
             d3.sum(v, function (d :any){ return d.valueNode;})
           ]})
           .entries(originalData);
+
+          events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
+          FilterPipeline.getInstance().printFilters();
       }
 
       //Filter the data before and then pass it to the draw function.

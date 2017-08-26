@@ -23,4 +23,6 @@ export class AppConstants {
   static EVENT_FILTER_DEACTIVATE_TOP_FILTER = 'eventFilterDeactivateTopFilter';
 
   static EVENT_SLIDER_CHANGE = 'eventSliderChange';
+
+  static EVENT_UI_COMPLETE = 'eventUIComplete';
 }
