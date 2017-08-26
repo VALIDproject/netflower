@@ -173,6 +173,11 @@ svg.barchart rect.bar {
   fill-opacity: 0.2;
 }
 
+svg.barchart rect.bar.active {
+  fill: $valid-color;
+  fill-opacity: 1;
+}
+
 svg.barchart rect.bar:hover {
   fill-opacity: 0.5;
 }
