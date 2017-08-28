@@ -255,7 +255,6 @@ class SankeyDiagram implements MAppViews {
           .entries(originalData);
 
           events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
-          FilterPipeline.getInstance().printFilters();
       }
 
       //Filter the data before and then pass it to the draw function.
