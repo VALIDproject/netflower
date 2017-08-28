@@ -170,7 +170,7 @@ export default class SparklineBarChart implements MAppViews {
       .data(aggregated_data)
       .enter().append('rect')
       .classed('bar', true)
-      .classed('active', function (d, i) { return _self.activeQuarters.includes(d.key); })
+      .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
       .attr('x', function (d, i) { return x(d.key); })
       .attr('width', x.rangeBand())
       .attr('y', function (d) { return y(d.values) + yMiddle; })
