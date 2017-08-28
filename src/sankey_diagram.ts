@@ -321,7 +321,10 @@ class SankeyDiagram implements MAppViews {
     let counter = 0;
     for(let d of flatNest) {
       counter ++;
-      if(counter >= that.nodesToShow) break;
+      if(counter > that.nodesToShow) {
+        console.log("Flows below ", d.sum, " are not displayed.");
+        break;
+      }
       graph.nodes.push({ 'name': d.source });//all Nodes source
       graph.nodes.push({ 'name': d.target });//all Nodes target
       graph.links.push({ 'source': d.source,
