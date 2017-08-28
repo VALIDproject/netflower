@@ -6,6 +6,7 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
+import * as bootbox from 'bootbox';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
@@ -29,6 +30,7 @@ class SankeyDiagram implements MAppViews {
   private $node;
   private nodesToShow: number = 25;
   private maximumNodes: number = 0;
+  private drawReally: boolean = true;
   private valuesSumSource;
   private valuesSumTarget;
 
@@ -257,9 +259,9 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
-      console.log("----------------------- Original Data -----------------------");
+      console.log("----------- Original Data -----------");
       console.log(originalData);
-      console.log("----------------------- Filtered Data -----------------------");
+      console.log("----------- Filtered Data -----------");
       console.log(filteredData);
       this.buildSankey(filteredData, originalData);
     });
@@ -279,8 +281,8 @@ class SankeyDiagram implements MAppViews {
     let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
-    const margin = { top: 10, right: 120, bottom: 10, left: 120 };
-    const width =  widthNode  - margin.left - margin.right;
+    const margin = {top: 10, right: 120, bottom: 10, left: 120};
+    const width = widthNode - margin.left - margin.right;
     const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
     const widthOffset = 80;
 
@@ -289,7 +291,7 @@ class SankeyDiagram implements MAppViews {
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
-      .attr('transform','translate(' + (margin.left + widthOffset/2) + ',' + margin.top + ')');
+      .attr('transform', 'translate(' + (margin.left + widthOffset / 2) + ',' + margin.top + ')');
 
     //Set the diagram properties
     sankey.nodeWidth(35)
@@ -299,182 +301,229 @@ class SankeyDiagram implements MAppViews {
     const path = sankey.link();
 
     // Group Data (by quartal)
-    let nest =(<any>d3).nest()
-      .key((d) => {return d.sourceNode;})
-      .key(function (d) {return d.targetNode;})
+    let nest = (<any>d3).nest()
+      .key((d) => { return d.sourceNode; })
+      .key(function (d) { return d.targetNode; })
       .rollup(function (v) {return {
-        target: v[0].targetNode,
-        source: v[0].sourceNode,
-        time: v[0].timeNode,
-        sum: d3.sum(v, function (d :any){ return d.valueNode;})
-      }})
+          target: v[0].targetNode,
+          source: v[0].sourceNode,
+          time: v[0].timeNode,
+          sum: d3.sum(v, function (d: any) { return d.valueNode; })}
+      })
       .entries(json);
 
-    let graph = {'nodes' : [], 'links' : []};
+    let graph = {'nodes': [], 'links': []};
     console.log('changed', that.nodesToShow);
+    that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => { return a + b; }, 0);
 
-    that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
+    //============ CHECK IF SHOULD DRAW ============
+    if (that.nodesToShow < nest[0].values.length) {
+      that.drawReally = false;
+      this.showErrorDialog('Wrong values.');
+    } else {
+      that.drawReally = true;
+    }
 
-    let counter = 0;
-    for(let d of nest) {
-      counter += d.values.length;
-      if(counter >= that.nodesToShow) break;
-      for (var v = 0; v <= d.values.length - 1; v++) {
-        graph.nodes.push({ 'name': d.key });//all Nodes source
-        graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
-        graph.links.push({ 'source': d.key,
-          'target': d.values[v].key,
-          'value': +d.values[v].values.sum,
-          'time': d.values[v].values.time});
+    //============ REALLY DRAW ===============
+    if (that.drawReally) {
+      let counter = 0;
+      for (let d of nest) {
+        counter += d.values.length;
+        if (counter >= that.nodesToShow) break;
+        for (var v = 0; v <= d.values.length - 1; v++) {
+          graph.nodes.push({'name': d.key});//all Nodes source
+          graph.nodes.push({'name': d.values[v].key});//all Nodes target
+          graph.links.push({
+            'source': d.key,
+            'target': d.values[v].key,
+            'value': +d.values[v].values.sum,
+            'time': d.values[v].values.time
+          });
+        }
+      }
+
+      //d3.keys - returns array of keys from the nest function
+      //d3.nest - groups the values of an array by the given key
+      //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
+      graph.nodes = (<any>d3).keys((<any>d3).nest()
+        .key((d) => {
+          return d.name;
+        })
+        .map(graph.nodes));
+
+      graph.links.forEach(function (d, i) {
+        graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
+        graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
+      });
+
+      //This makes out of the array of strings a array of objects with the key 'name'
+      graph.nodes.forEach(function (d, i) {
+        graph.nodes[i] = {'name': d};
+      });
+
+      //Basic parameters for the diagram
+      sankey
+        .nodes(graph.nodes)
+        //.links(linksorted)
+        .links(graph.links)
+        .layout(10); //Difference only by 0, 1 and otherwise always the same
+
+      let link = svg.append('g').selectAll('.link')
+        .data(graph.links)
+        .enter().append('path')
+        .attr('class', 'link')
+        .attr('d', path)
+        .style('stroke-width', function (d) {
+          return Math.max(1, d.dy);
+        })
+        //reduce edges crossing
+        .sort(function (a, b) {
+          return b.dy - a.dy;
+        });
+
+      //Add the link titles - Hover Path
+      link.append('title')
+        .text(function (d) {
+          return d.source.name + ' → ' + d.target.name + '\n' + dotFormat(d.value);
+        });
+
+      //Add the on 'click' listener for the links
+      link.on('click', function (d) {
+        events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson);
+      });
+
+      //Add in the nodes
+      let node = svg.append('g').selectAll('.node')
+        .data(graph.nodes)
+        .enter().append('g')
+        .attr('class', function (d: any, i: number) {
+          //Save type of node in DOM
+          if (d.sourceLinks.length > 0) {
+            return 'node source';
+          } else {
+            return 'node target';
+          }
+        })
+        .attr('transform', function (d) {
+          return 'translate(' + d.x + ',' + d.y + ')';
+        });
+
+      //Add the rectangles for the nodes
+      node.append('rect')
+        .attr('height', function (d) {
+          return d.dy;
+        })
+        .attr('width', sankey.nodeWidth())
+        .style('fill', '#DA5A6B')
+        //Title rectangle
+        .append('title')
+        .text(function (d) {
+          return d.name + '\n' + dotFormat(d.value);
+        });
+
+      //Create sparkline barcharts for newly enter-ing g.node elements
+      node.call(SparklineBarChart.createSparklines);
+
+
+      node.append('svg')
+        .append('defs')
+        .append('pattern')
+        .attr('id', 'diagonalHatch')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 4)
+        .attr('height', 4)
+        .append('path')
+        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+        .attr('stroke', '#000000')
+        .attr('stroke-width', 1);
+
+      //This is how the overlays for the rects can be done after they have been added
+      node.append('rect')
+        .attr('height', function (d) {
+          return d.dy;
+        })
+        .style('fill', 'url(#diagonalHatch)')
+        .attr('width', sankey.nodeWidth() / 2)
+        .attr('x', function (d) {
+          if (d.sourceLinks.length <= 0) return sankey.nodeWidth() / 2;
+        })
+        .append('title')
+        .text((d) => {
+          let result;
+          for (let i = 0; i < this.valuesSumSource.length; i++) {
+            if (this.valuesSumSource[i].key === d.name) {
+              result = this.valuesSumSource[i].values;
+            }
+          }
+          return dotFormat(result) + ' ' + 'More';
+        })
+        .filter(function (d, i) {
+          return d.sourceLinks.length <= 0;
+        }) //only for the targets
+        .text((d) => {
+          let result;
+          for (let i = 0; i < this.valuesSumTarget.length; i++) {
+            if (this.valuesSumTarget[i].key === d.name) {
+              result = this.valuesSumTarget[i].values;
+            }
+          }
+          return dotFormat(result) + ' ' + 'More';
+        });
+
+      //Add in the title for the nodes
+      let heading = node.append('g').append('text')
+        .attr('x', 45)
+        .attr('y', function (d) {
+          return (d.dy / 2) - 10;
+        })
+        .attr('dy', '1.0em')
+        .attr('text-anchor', 'start')
+        .attr('class', 'rightText')
+        .text(function (d) {
+          return `${d.name}`;
+        })
+        .filter(function (d, i) {
+          return d.x < width / 2
+        })
+        .attr('x', -45 + sankey.nodeWidth())
+        .attr('text-anchor', 'end')
+        .attr('class', 'leftText');
+
+      //The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
+      const leftWrap = this.$node.selectAll('.leftText');
+      const rightWrap = this.$node.selectAll('.rightText');
+      const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
+      const rightTextWidth = rightWrap.node().getBoundingClientRect().width;
+      const svgBox = {
+        'width': width + margin.left + margin.right,
+        'height': height + margin.top + margin.bottom
+      };
+      const wordWrapBorder = (svgBox.width - width) / 2;
+
+      if (leftTextWidth > wordWrapBorder) {
+        d3TextWrap(leftWrap, wordWrapBorder);
+        leftWrap.attr('transform', 'translate(' + (wordWrapBorder + 5) * (-1) + ', 0)');
+      }
+      if (rightTextWidth > wordWrapBorder) {
+        d3TextWrap(rightWrap, wordWrapBorder + 10);
+        rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
       }
     }
+  }
 
-    //d3.keys - returns array of keys from the nest function
-    //d3.nest - groups the values of an array by the given key
-    //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
-    graph.nodes = (<any>d3).keys((<any>d3).nest()
-      .key((d) => {return d.name;})
-      .map(graph.nodes));
-
-    graph.links.forEach(function (d, i) {
-      graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
-      graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
-    });
-
-    //This makes out of the array of strings a array of objects with the key 'name'
-    graph.nodes.forEach(function (d, i) {
-      graph.nodes[i] = { 'name': d };
-    });
-
-    //Basic parameters for the diagram
-    sankey
-      .nodes(graph.nodes)
-      //.links(linksorted)
-      .links(graph.links)
-      .layout(10); //Difference only by 0, 1 and otherwise always the same
-
-    let link = svg.append('g').selectAll('.link')
-      .data(graph.links)
-      .enter().append('path')
-      .attr('class', 'link')
-      .attr('d', path)
-      .style('stroke-width', function(d) { return Math.max(1, d.dy); })
-      //reduce edges crossing
-      .sort(function(a, b) { return b.dy - a.dy; });
-
-    //Add the link titles - Hover Path
-    link.append('title')
-      .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value); });
-
-    //Add the on 'click' listener for the links
-    link.on('click', function(d) {
-      events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson);
-    });
-
-    //Add in the nodes
-    let node = svg.append('g').selectAll('.node')
-      .data(graph.nodes)
-      .enter().append('g')
-      .attr('class', function(d: any, i: number) {
-        //Save type of node in DOM
-        if (d.sourceLinks.length > 0) {
-          return 'node source';
+  private showErrorDialog(text: string): void {
+    bootbox.confirm({
+      className: 'dialogBox',
+      title: 'Information',
+      message: text,
+      callback: function(result) {
+        if (result) {
+          console.log('Ok pressed...');
         } else {
-          return 'node target';
+          return;
         }
-      })
-      .attr('transform', function(d) {
-        return 'translate(' + d.x + ',' + d.y + ')';
-      });
-
-    //Add the rectangles for the nodes
-    node.append('rect')
-      .attr('height', function(d) { return d.dy; })
-      .attr('width', sankey.nodeWidth())
-      .style('fill', '#DA5A6B')
-      //Title rectangle
-      .append('title')
-      .text(function(d) { return d.name + '\n' + dotFormat(d.value); });
-
-    //Create sparkline barcharts for newly enter-ing g.node elements
-    node.call(SparklineBarChart.createSparklines);
-
-
-    node.append('svg')
-      .append('defs')
-      .append('pattern')
-      .attr('id', 'diagonalHatch')
-      .attr('patternUnits', 'userSpaceOnUse')
-      .attr('width', 4)
-      .attr('height', 4)
-      .append('path')
-      .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-      .attr('stroke', '#000000')
-      .attr('stroke-width', 1);
-
-    //This is how the overlays for the rects can be done after they have been added
-    node.append('rect')
-      .attr('height', function(d) {
-        return d.dy;
-      })
-      .style('fill', 'url(#diagonalHatch)')
-      .attr('width', sankey.nodeWidth() / 2)
-      .attr('x', function (d){
-        if (d.sourceLinks.length <= 0) return sankey.nodeWidth()/2;
-      })
-      .append('title')
-      .text((d) => {
-        let result;
-        for (let i = 0; i < this.valuesSumSource.length; i++) {
-          if (this.valuesSumSource[i].key === d.name) {
-            result =  this.valuesSumSource[i].values;
-          }
-        }
-        return dotFormat(result) + ' ' + 'More';
-      })
-      .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
-      .text((d) => {
-        let result;
-        for (let i = 0; i < this.valuesSumTarget.length; i++) {
-          if (this.valuesSumTarget[i].key === d.name) {
-            result =  this.valuesSumTarget[i].values;
-          }
-        }
-        return dotFormat(result) + ' ' + 'More';
-      });
-
-    //Add in the title for the nodes
-    let heading = node.append('g').append('text')
-      .attr('x', 45)
-      .attr('y', function(d) { return (d.dy / 2) - 10;})
-      .attr('dy', '1.0em')
-      .attr('text-anchor', 'start')
-      .attr('class', 'rightText')
-      .text(function(d) {return `${d.name}`;})
-      .filter(function(d, i) { return d.x < width / 2})
-      .attr('x', -45 + sankey.nodeWidth())
-      .attr('text-anchor', 'end')
-      .attr('class', 'leftText');
-
-    // The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
-    const leftWrap = this.$node.selectAll('.leftText');
-    const rightWrap = this.$node.selectAll('.rightText');
-    const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
-    const rightTextWidth = rightWrap.node().getBoundingClientRect().width;
-    const svgBox = {
-      'width': width + margin.left + margin.right,
-      'height': height + margin.top + margin.bottom
-    };
-    const wordWrapBorder = (svgBox.width - width) / 2;
-
-    if(leftTextWidth > wordWrapBorder) {
-      d3TextWrap(leftWrap, wordWrapBorder);
-      leftWrap.attr('transform', 'translate(' + (wordWrapBorder + 5) * (-1) + ', 0)');
-    }
-    if(rightTextWidth > wordWrapBorder) {
-      d3TextWrap(rightWrap, wordWrapBorder + 10);
-      rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
-    }
+      }
+    });
   }
 }
 

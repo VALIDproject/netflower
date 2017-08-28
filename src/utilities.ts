@@ -332,3 +332,19 @@ export function tableToJSON(table, opts?) {
   let headings = getHeadings(table);
   return construct(table, headings);
 };
+
+/**
+ * This method creates a downloadable file which contains the json or data it was given. An example
+ * call would be: downloadFile(JSON.stringify(json), 'output.txt', 'text/plain');
+ * This creates a file named output.txt if the user visits the website or presses a button.
+ * @param text is the text or json object which should be written to the file
+ * @param name is the file name
+ * @param type the type of the file which can be specified
+ */
+export function downloadFile(text, name, type) {
+    let a = document.createElement('a');
+    let file = new Blob([text], {type: type});
+    a.href = URL.createObjectURL(file);
+    a.download = name;
+    a.click();
+  }
