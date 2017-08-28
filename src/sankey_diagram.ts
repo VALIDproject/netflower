@@ -308,12 +308,33 @@ class SankeyDiagram implements MAppViews {
         time: v[0].timeNode,
         sum: d3.sum(v, function (d :any){ return d.valueNode;})
       }})
+      .sortValues(function(a,b) {
+        console.log(a); console.log(b); return (a.sum - b.sum); } )
       .entries(json);
 
+    let flatNest = d3.nest()
+      .key((d: any) => {return d.sourceNode + "|$|" + d.targetNode;})
+      .rollup(function (v: any[]) {return {
+        target: v[0].targetNode,
+        source: v[0].sourceNode,
+        time: v[0].timeNode,
+        sum: d3.sum(v, function (d :any){ return d.valueNode;})
+      }})
+      .entries(json);
+
+    console.log(nest.slice(0, 10));
+    console.log(flatNest.slice(0, 10));
+    FilterPipeline.getInstance().printFilters();
+
+    // create reduced graph with only number of nodes shown
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
 
+    //
     that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
+    let maximumNodes2 = d3.sum(nest, function (d :any){ return d.values.length;});
+    let maximumNodes3 = flatNest.length;
+    console.log ("maximum nodes ", that.maximumNodes, maximumNodes2, maximumNodes3);
 
     let counter = 0;
     for(let d of nest) {
@@ -324,8 +345,7 @@ class SankeyDiagram implements MAppViews {
         graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
         graph.links.push({ 'source': d.key,
           'target': d.values[v].key,
-          'value': +d.values[v].values.sum,
-          'time': d.values[v].values.time});
+          'value': +d.values[v].values.sum});
       }
     }
 
