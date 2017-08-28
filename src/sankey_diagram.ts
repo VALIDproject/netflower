@@ -298,20 +298,7 @@ class SankeyDiagram implements MAppViews {
 
     const path = sankey.link();
 
-    // Group Data (by quartal)
-    let nest =(<any>d3).nest()
-      .key((d) => {return d.sourceNode;})
-      .key(function (d) {return d.targetNode;})
-      .rollup(function (v) {return {
-        target: v[0].targetNode,
-        source: v[0].sourceNode,
-        time: v[0].timeNode,
-        sum: d3.sum(v, function (d :any){ return d.valueNode;})
-      }})
-      .sortValues(function(a,b) {
-        console.log(a); console.log(b); return (a.sum - b.sum); } )
-      .entries(json);
-
+    // aggregate flow by source and target (i.e. sum multiple times and attributes)
     let flatNest = d3.nest()
       .key((d: any) => {return d.sourceNode + "|$|" + d.targetNode;})
       .rollup(function (v: any[]) {return {
@@ -320,33 +307,26 @@ class SankeyDiagram implements MAppViews {
         time: v[0].timeNode,
         sum: d3.sum(v, function (d :any){ return d.valueNode;})
       }})
-      .entries(json);
-
-    console.log(nest.slice(0, 10));
-    console.log(flatNest.slice(0, 10));
-    FilterPipeline.getInstance().printFilters();
+      .entries(json)
+      .map(o => o.values) // remove key/values
+      .sort(function(a: any, b: any){ return d3.descending(a.sum, b.sum) });
 
     // create reduced graph with only number of nodes shown
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
 
-    //
-    that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => {return a + b;}, 0);
-    let maximumNodes2 = d3.sum(nest, function (d :any){ return d.values.length;});
-    let maximumNodes3 = flatNest.length;
-    console.log ("maximum nodes ", that.maximumNodes, maximumNodes2, maximumNodes3);
+    // keep track of number of flows (distinct source target pairs)
+    that.maximumNodes = flatNest.length;
 
     let counter = 0;
-    for(let d of nest) {
-      counter += d.values.length;
+    for(let d of flatNest) {
+      counter ++;
       if(counter >= that.nodesToShow) break;
-      for (var v = 0; v <= d.values.length - 1; v++) {
-        graph.nodes.push({ 'name': d.key });//all Nodes source
-        graph.nodes.push({ 'name': d.values[v].key });//all Nodes target
-        graph.links.push({ 'source': d.key,
-          'target': d.values[v].key,
-          'value': +d.values[v].values.sum});
-      }
+      graph.nodes.push({ 'name': d.source });//all Nodes source
+      graph.nodes.push({ 'name': d.target });//all Nodes target
+      graph.links.push({ 'source': d.source,
+          'target': d.target,
+          'value': d.sum});
     }
 
     //d3.keys - returns array of keys from the nest function
