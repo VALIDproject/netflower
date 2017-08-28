@@ -41,7 +41,7 @@ class FilterData implements MAppViews {
     //Add Filters to Pipeline
     this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
-    this.pipeline.addFilter(this.paragraphFilter);
+    this.pipeline.addAttributeFilter(this.paragraphFilter);
 
     this.$node = d3.select(parent)
       .append('div')

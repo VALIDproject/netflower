@@ -8,6 +8,7 @@ import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {splitAt, dotFormat} from './utilities';
+import FilterPipeline from './filters/filterpipeline';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
@@ -84,14 +85,16 @@ export default class SparklineBarChart implements MAppViews {
         data.map(function (d: any) { return d.timeNode; })
       ).values().sort();
 
+      let attFiltData = FilterPipeline.getInstance().performAttributeFilters(data);
+
       node.each(function (d, i) {
         let nodeElem = d3.select(this);
         let yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
 
         if (nodeElem.attr('class').includes('source')) {
-          SparklineBarChart.sourceChart.build(data, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
         } else {
-          SparklineBarChart.targetChart.build(data, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
         }
       });
     });

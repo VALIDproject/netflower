@@ -17,6 +17,8 @@ export default class FilterPipeline
   private _entitySearchFilter: EntitySearchFilter;
   private _mediaSearchFilter: MediaSearchFilter;
 
+  private _attributeFilters = new Array<Filter>();
+
   private constructor()
   {
     this.filters = new Array<Filter>();
@@ -39,6 +41,20 @@ export default class FilterPipeline
     if(newFilter !== null || newFilter !== undefined)
     {
       this.filters.push(newFilter);
+    }
+  }
+
+  /**
+   * add a filter to the pipeline and mark it as an attribute filter.
+   * Sparkline Barcharts are only filtered by attribute filter and nothing else.
+   * @param newFilter
+   */
+  public addAttributeFilter(newFilter: Filter): void
+  {
+    if(newFilter !== null || newFilter !== undefined)
+    {
+      this.filters.push(newFilter);
+      this._attributeFilters.push(newFilter);
     }
   }
 
@@ -75,6 +91,19 @@ export default class FilterPipeline
     for(let filter of this.filters)
     {
         data = filter.meetCriteria(data);
+    }
+    return data;
+  }
+
+  /**
+   * only apply filters marked as attribute filter
+   * @param data
+   */
+  public performAttributeFilters(data: any): any
+  {
+    for(let filter of this._attributeFilters)
+    {
+          data = filter.meetCriteria(data);
     }
     return data;
   }
