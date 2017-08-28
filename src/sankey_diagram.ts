@@ -16,6 +16,7 @@ import {MAppViews} from './app';
 import {d3TextWrap, roundToFull, dotFormat} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
+import {ERROR_2manynodes, ERROR_2manyfilter} from './language';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -317,10 +318,15 @@ class SankeyDiagram implements MAppViews {
     that.maximumNodes = nest.map(o => o.values.length).reduce((a, b) => { return a + b; }, 0);
 
     //============ CHECK IF SHOULD DRAW ============
-    if (that.nodesToShow < nest[0].values.length) {
+    if (json.length === 0) {                                  //ERROR: Too strong filtered
       that.drawReally = false;
-      this.showErrorDialog('Wrong values.');
-    } else {
+      this.showErrorDialog(ERROR_2manyfilter);
+    }
+    else if (that.nodesToShow < nest[0].values.length) {     //ERROR: Too many nodes shown for space
+      that.drawReally = false;
+      this.showErrorDialog(ERROR_2manynodes);
+    }
+    else {
       that.drawReally = true;
     }
 
@@ -424,7 +430,6 @@ class SankeyDiagram implements MAppViews {
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
 
-
       node.append('svg')
         .append('defs')
         .append('pattern')
@@ -508,6 +513,13 @@ class SankeyDiagram implements MAppViews {
         d3TextWrap(rightWrap, wordWrapBorder + 10);
         rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
       }
+    } else {
+      let svgPlain = d3.select('#sankeyDiagram svg');
+      svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right)/2 + ')')
+        .attr('y', (height + margin.top + margin.bottom)/2)
+        .append('tspan').attr('x', '0').attr('text-anchor', 'middle').style('font-size', '2em')
+        .style('font-varaint', 'small-caps')
+        .text('Nothing to show!');
     }
   }
 
