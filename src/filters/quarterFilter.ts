@@ -41,6 +41,7 @@ export default class QuarterFilter implements Filter
     this.maxValue = maxValue;
   }
 
+  //check if the value is in the given range
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();

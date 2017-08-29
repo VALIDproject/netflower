@@ -77,9 +77,6 @@ class FilterData implements MAppViews {
           <div class='col-sm-2'>
             <small>Paragraph Filter</small>
           </div>
-          <!--<div class='col-sm-2'>-->
-            <!--<small>Quartal Filter</small>-->
-          <!--</div>-->
         </div>
 
         <div class='row'>
@@ -91,15 +88,9 @@ class FilterData implements MAppViews {
             </select>
           </div>
           <div class='col-sm-2'>
-            <select class='form-control input-sm' id='paragraph'>
-              <option value='-1' selected>disabled</option>
-            </select>
+            <div id='paragraph'>
+            </div>
           </div>
-          <!--<div class='col-sm-2'>-->
-          <!--<div>-->
-            <!--<input id='timeSlider'/>-->
-          <!--</div>-->
-          <!--</div>-->
         </div>
        </div>
        <div class='quarterSlider'>
@@ -144,21 +135,27 @@ class FilterData implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
-    this.$node.select('#paragraph').on('change', (d) => {
-      let value:number = $('#paragraph').val() as number;
-      if(value < 0)
-      {
-        this.paragraphFilter.active = false;
-      }
+    $('.paraFilter').on('change', (d) => {
 
-      else {
-        this.paragraphFilter.active = true;
-        this.paragraphFilter.value = value;
-      }
+      this.paragraphFilter.resetValues();
+
+      $('.paraFilter').each((index, element) => {
+          const value:number = $(element).val() as number;
+
+          if($(element).is(':checked'))
+          {
+            this.paragraphFilter.addValue(value);
+          }
+      });
+
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
   }
 
+  /**
+   * This method adds all the elements and options for the paragraph filter.
+   * @param json with the data to be added.
+   */
   private setParagraphFilterElements(json)
   {
     let paragraphs:Array<number> = [];
@@ -169,11 +166,20 @@ class FilterData implements MAppViews {
       if(paragraphs.indexOf(val) === -1)
       {
         paragraphs.push(val);
-        this.$node.select('#paragraph').append('option').attr('value',val).text(val);
+        this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
+          .attr('checked', true).attr('class','paraFilter');
+        this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.15em; margin-left: 10px;').text('§'+val);
+        this.$node.select('#paragraph').append('br');
       }
     }
+
+    this.paragraphFilter.values = paragraphs;
   }
 
+  /**
+   * This method adds the slider for the time range.
+   * @param json with the data to be added.
+   */
   private setQuarterFilterRange(json)
   {
     let min: number = json[0].timeNode;
@@ -186,15 +192,14 @@ class FilterData implements MAppViews {
       if(entry.timeNode > max)
         max = entry.timeNode;
     }
-
-    this.quarterFilter.changeRange(min, min);
+    this.quarterFilter.changeRange(max, max);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
       min: min,
       max: max,
-      from: min,
-      to: min,
+      from: max,
+      to: max,
       prefix: 'Q',
       force_edges: true,  //Lets the labels inside the container
       drag_interval: true, //Allows the interval to be dragged around
@@ -204,6 +209,10 @@ class FilterData implements MAppViews {
         this.quarterFilter.minValue = newMin;
         this.quarterFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+
+        //This notifies the sliders to change their values but only if the quarter slider changes
+        let filterQuarter = this.quarterFilter.meetCriteria(json);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
       }
     });
   }

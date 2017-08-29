@@ -16,6 +16,7 @@ export default class MediaSearchFilter implements Filter
     this._term = newTerm;
   }
 
+  //the search term as well as the targetNodes are transformed to lowercase and then checked with contains
   public meetCriteria(data: any): any
   {
     let resultData = new Array<any>();
@@ -27,6 +28,7 @@ export default class MediaSearchFilter implements Filter
     {
       let term = this._term.toLowerCase();
       let value = entry.targetNode.toLowerCase();
+      //value contains term?
       if(value.indexOf(term) !== -1)
         resultData.push(entry);
     }
