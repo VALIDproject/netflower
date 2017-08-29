@@ -7,32 +7,22 @@ export default class ParagraphFilter implements Filter
 {
   private resultData: Array<any>;
 
-  private _value: number;
-  private _active: boolean;
+  private _values: Array<number>;
 
   constructor()
   {
     this.resultData = new Array<any>();
+    this._values = new Array<number>();
   }
 
-  get active():boolean
+  get values():Array<number>
   {
-    return this._active;
+    return this._values;
   }
 
-  set active(act:boolean)
+  set values(val:Array<number>)
   {
-    this._active = act;
-  }
-
-  get value():number
-  {
-    return this._value;
-  }
-
-  set value(val:number)
-  {
-    this._value = val;
+    this._values = val;
   }
 
   //check if the value meets the entries paragraph value
@@ -40,24 +30,32 @@ export default class ParagraphFilter implements Filter
   {
     this.resultData = new Array<any>();
 
-    if(!this.active)
-      return data;
-
     for(let entry of data)
     {
       let para:number = entry.attribute1;
 
-      if(para === this.value)
-      {
-        this.resultData.push(entry);
+      for(let value of this._values) {
+        if (para === value) {
+          this.resultData.push(entry);
+        }
       }
     }
 
     return this.resultData;
   }
 
+  public resetValues(): void
+  {
+    this._values = new Array<number>();
+  }
+
+  public addValue(val: number): void
+  {
+    this._values.push(val);
+  }
+
   public printData(): void
   {
-    console.log('Paragraph Filter: ' + this.value);
+    console.log('Paragraph Filter: ' + this.values);
   }
 }
