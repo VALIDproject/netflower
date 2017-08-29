@@ -29,6 +29,8 @@ export default class SparklineBarChart implements MAppViews {
   private necessaryHeight = INITIAL_SVG_HEIGHT;
   private chartWidth: number = 120;        //Fallback if not calcualted dynamically
 
+  private activeQuarters: string[] = [];
+
   constructor(parent: Element, private options: any) {
     this.field = options.field;
     this.parentDOM = options.parentDOM;
@@ -122,6 +124,13 @@ export default class SparklineBarChart implements MAppViews {
     events.on(AppConstants.EVENT_RESIZE_WINDOW, (data) => {
       _self.$node.html('');
     });
+
+    // if filtered quarter changes -> keep track of active quarters based on filtered data
+    events.on(AppConstants.EVENT_SLIDER_CHANGE, (evt, filteredData) => {
+      _self.activeQuarters = d3.set(
+        filteredData.map(function (d: any) { return d.timeNode; })
+      ).values().sort();
+    });
   }
 
   /**
@@ -147,6 +156,8 @@ export default class SparklineBarChart implements MAppViews {
    * @param dy vertical offset from sankey diagram
    */
   private drawBarChart(aggregated_data: KeyValue[], nodeName: string, yMiddle: number, timePoints: string[]) {
+    let _self = this;
+
     let x = d3.scale.ordinal().rangeRoundBands([0, this.chartWidth], .05);
     let y = d3.scale.linear().range([CHART_HEIGHT, 0]);
 
@@ -159,6 +170,7 @@ export default class SparklineBarChart implements MAppViews {
       .data(aggregated_data)
       .enter().append('rect')
       .classed('bar', true)
+      .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
       .attr('x', function (d, i) { return x(d.key); })
       .attr('width', x.rangeBand())
       .attr('y', function (d) { return y(d.values) + yMiddle; })

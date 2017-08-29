@@ -149,6 +149,13 @@ class FilterData implements MAppViews {
       }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
+
+    events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
+      let max = this.quarterFilter.maxValue;
+      this.quarterFilter.changeRange(max, max);
+      let filterQuarter = this.quarterFilter.meetCriteria(data);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+    });
   }
 
   /**
@@ -186,7 +193,7 @@ class FilterData implements MAppViews {
       if(entry.timeNode > max)
         max = entry.timeNode;
     }
-    this.quarterFilter.changeRange(max, max);
+    this.quarterFilter.changeRange(min, max);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
