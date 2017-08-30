@@ -97,7 +97,7 @@ Sankey detail part.
 /**
 Sankey features part.
  */
-.sankey_features{
+.sankey_features {
   //background-color: yellow transparent;
   //opacity: 20%;
   border-bottom: 1px solid grey;
@@ -107,7 +107,6 @@ Sankey features part.
   position: absolute;
   top: 74px;
   right: 20px;
-
 }
 
 .heading {
@@ -136,12 +135,16 @@ node text {
   font-size: 16px;
 }
 
-.sankey_heading {
+#sankeyHeadingMiddle {
   margin-top: 5px;
   text-align: center;
   font-weight: bold;
   font-size: 16px;
+}
 
+#infoNodesLeft {
+  text-align: center;
+  font-size: 11px;
 }
 
 .right_bar_heading {

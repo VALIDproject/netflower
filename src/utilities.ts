@@ -342,9 +342,22 @@ export function tableToJSON(table, opts?) {
  * @param type the type of the file which can be specified
  */
 export function downloadFile(text, name, type) {
-    let a = document.createElement('a');
-    let file = new Blob([text], {type: type});
-    a.href = URL.createObjectURL(file);
-    a.download = name;
-    a.click();
-  }
+  let a = document.createElement('a');
+  let file = new Blob([text], {type: type});
+  a.href = URL.createObjectURL(file);
+  a.download = name;
+  a.click();
+}
+
+/**
+ * This function fades in a text or fades over a text on a given html element
+ * @param element html to fade the text onto
+ * @param newText the text to show in the html elment
+ */
+export function textTransition(element: d3.Selection<any>, newText: string) {
+  element.transition().duration(500)
+    .style('opacity', 0)
+    .transition().duration(500)
+    .style('opacity', 1)
+    .text(newText);
+}

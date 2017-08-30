@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
 import * as localforage from 'localforage'
-import {tableToJSON} from './utilities';
+import {tableToJSON, textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 
@@ -136,7 +136,7 @@ class DataImport implements MAppViews {
         d3.select('#valuesList').selectAll('*').remove();
 
         //Change information and reset edit mode
-        this.textTransition(this.$chaningHeading, 'View data, upload new or proceed!!');
+        textTransition(this.$chaningHeading, 'View data, upload new or proceed!!');
         this.editMode = false;
 
         //Start the uploading
@@ -389,19 +389,6 @@ class DataImport implements MAppViews {
       this.$btnNext.show();
       this.$btnPrev.hide();
     }
-  }
-
-  /**
-   * This function fades in a text or fades over a text on a given html element
-   * @param element html to fade the text onto
-   * @param newText the text to show in the html elment
-   */
-  private textTransition(element: d3.Selection<any>, newText: string) {
-    element.transition().duration(500)
-      .style('opacity', 0)
-      .transition().duration(500)
-      .style('opacity', 1)
-      .text(newText);
   }
 }
 
