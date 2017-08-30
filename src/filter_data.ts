@@ -88,9 +88,8 @@ class FilterData implements MAppViews {
             </select>
           </div>
           <div class='col-sm-2'>
-            <select class='form-control input-sm' id='paragraph'>
-              <option value='-1' selected>disabled</option>
-            </select>
+            <div id='paragraph'>
+            </div>
           </div>
         </div>
        </div>
@@ -136,17 +135,19 @@ class FilterData implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
-    this.$node.select('#paragraph').on('change', (d) => {
-      let value:number = $('#paragraph').val() as number;
-      if(value < 0)
-      {
-        this.paragraphFilter.active = false;
-      }
+    $('.paraFilter').on('change', (d) => {
 
-      else {
-        this.paragraphFilter.active = true;
-        this.paragraphFilter.value = value;
-      }
+      this.paragraphFilter.resetValues();
+
+      $('.paraFilter').each((index, element) => {
+          const value:number = $(element).val() as number;
+
+          if($(element).is(':checked'))
+          {
+            this.paragraphFilter.addValue(value);
+          }
+      });
+
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
@@ -172,9 +173,14 @@ class FilterData implements MAppViews {
       if(paragraphs.indexOf(val) === -1)
       {
         paragraphs.push(val);
-        this.$node.select('#paragraph').append('option').attr('value',val).text(val);
+        this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
+          .attr('checked', true).attr('class','paraFilter');
+        this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.15em; margin-left: 10px;').text('§'+val);
+        this.$node.select('#paragraph').append('br');
       }
     }
+
+    this.paragraphFilter.values = paragraphs;
   }
 
   /**
