@@ -176,7 +176,7 @@ class FilterData implements MAppViews {
         this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
           .attr('checked', true).attr('class','paraFilter');
         this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text('§'+val);
-        this.$node.select('#paragraph').append('br');
+        this.$node.select('#paragraph').append('span').text(' ');      
       }
     }
 
