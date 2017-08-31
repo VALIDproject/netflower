@@ -38,11 +38,16 @@ class ValidHeader implements MAppViews {
   private build() {
     this.$node.html(`
     <div class="logo"></div>
+    <div class="btn_preupload">
+      <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
+      <i class='fa fa-hand-o-left'>&nbsp;</i>Reupload Data</button>
+    </div>
 
-    <div class='col-md-2'>
+
+    <!--<div class='col-md-2'>
       <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
         <i class='fa fa-hand-o-left'>&nbsp;</i>Reupload Data</button>
-    </div>
+    </div>-->
 
     <div id="socialMedia">
         <p><a href="https://twitter.com/valid_at" target ="blank"><i class="fa fa-twitter-square fa-2x" id="web" ></i></a> </p>
