@@ -361,3 +361,28 @@ export function textTransition(element: d3.Selection<any>, newText: string) {
     .style('opacity', 1)
     .text(newText);
 }
+
+/**
+ * This function can be used to add text ellipses to overvlowing text. It will add dots to all text
+ * that is above the given width.
+ * @param text element in d3 which contains the text e.g. d3.selectAll('text');
+ * @param maxTextWidth the width in pixel where the text should be broken
+ */
+export function d3TextEllipse(text, maxTextWidth) {
+  text.each(function() {
+    let text = d3.select(this);
+    let words = text.text().split(/\s+/);
+    let ellipsis = text.text('').append('tspan').attr('class', 'elip').text('...');
+    let numWords = words.length;
+    let tspan = text.insert('tspan', ':first-child').text(words.join(' '));
+
+    //While it's too long and we have words left we keep removing words
+    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length) {
+      words.pop();
+      tspan.text(words.join(' '));
+    }
+    if (words.length === numWords) {
+      ellipsis.remove();
+    }
+  });
+}
