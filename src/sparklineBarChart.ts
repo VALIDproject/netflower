@@ -126,6 +126,7 @@ export default class SparklineBarChart implements MAppViews {
 
     events.on(AppConstants.EVENT_RESIZE_WINDOW, (data) => {
       this.chartWidth = (d3.select('.left_bars') as any).node().getBoundingClientRect().width - OFFSET;
+      this.$node.attr('width', this.chartWidth)
       _self.$node.html('');
     });
 
