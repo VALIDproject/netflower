@@ -13,7 +13,7 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {d3TextWrap, roundToFull, dotFormat, textTransition} from './utilities';
+import {roundToFull, dotFormat, textTransition, d3TextEllipse} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
 import {ERROR_2manynodes, ERROR_2manyfilter} from './language';
@@ -314,12 +314,10 @@ class SankeyDiagram implements MAppViews {
       .entries(json)
       .map(o => o.values) // remove key/values
       .sort(function(a: any, b: any){ return d3.descending(a.sum, b.sum) });
-    console.log('flat: ', flatNest);
 
     //Create reduced graph with only number of nodes shown
     let graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
-
     //Ceep track of number of flows (distinct source target pairs)
     that.maximumNodes = flatNest.length;
 
@@ -328,9 +326,7 @@ class SankeyDiagram implements MAppViews {
       that.drawReally = false;
       this.showErrorDialog(ERROR_2manyfilter);
     }
-    else {
-      that.drawReally = true;
-    }
+    else { that.drawReally = true; }
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
@@ -476,25 +472,11 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'end')
         .attr('class', 'leftText');
 
-      // The strange word wrapping. Resizes based on the svg size the sankey diagram size and the words and text size.
+      const maxTextWidth = (margin.left + margin.right - 10) / 2;
       const leftWrap = this.$node.selectAll('.leftText');
+      d3TextEllipse(leftWrap, maxTextWidth);
       const rightWrap = this.$node.selectAll('.rightText');
-      const leftTextWidth = leftWrap.node().getBoundingClientRect().width;
-      const rightTextWidth = rightWrap.node().getBoundingClientRect().width;
-      const svgBox = {
-        'width': width + margin.left + margin.right,
-        'height': height + margin.top + margin.bottom
-      };
-      const wordWrapBorder = (svgBox.width - width) / 2;
-
-      if(leftTextWidth > wordWrapBorder) {
-        d3TextWrap(leftWrap, wordWrapBorder);
-        leftWrap.attr('transform', 'translate(' + (wordWrapBorder + 5) * (-1) + ', 0)');
-      }
-      if(rightTextWidth > wordWrapBorder) {
-        d3TextWrap(rightWrap, wordWrapBorder + 10);
-        rightWrap.attr('transform', 'translate(' + ((wordWrapBorder - 45) / 2) + ', 0)');
-      }
+      d3TextEllipse(rightWrap, maxTextWidth);
     } else {
       let svgPlain = d3.select('#sankeyDiagram svg');
       svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right)/2 + ')')
