@@ -172,19 +172,6 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(false);
     });
 
-    let _self = this;
-
-  events.on(AppConstants.EVENT_SLIDER_CHANGE, (evt, filteredData) => {
-    _self.activeQuarters = d3.set(
-      filteredData.map(function (d: any) { return d.timeNode; })
-    ).values().sort();
-
-      console.log('time slider', _self.activeQuarters);
-  });
-
-
-
-
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
@@ -293,7 +280,7 @@ class SankeyDiagram implements MAppViews {
    * @param json data from the read functionality
    */
   private buildSankey(json, origJson) {
-    let _self = this;
+
     console.log('filterDAta', json);
     const that = this;
     const sankey = (<any>d3).sankey();
