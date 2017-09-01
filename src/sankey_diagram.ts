@@ -291,11 +291,11 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
-      console.log("----------- Original Data -----------");
-      console.log(originalData);
-      console.log("----------- Filtered Data -----------");
-      console.log(filteredData);
-      this.pipeline.printFilters();
+      // console.log("----------- Original Data -----------");
+      // console.log(originalData);
+      // console.log("----------- Filtered Data -----------");
+      // console.log(filteredData);
+      // this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -528,11 +528,8 @@ class SankeyDiagram implements MAppViews {
       title: 'Information',
       message: text,
       callback: function(result) {
-        if (result) {
-          console.log('Ok pressed...');
-        } else {
-          return;
-        }
+        if (result) { console.log('Ok pressed...'); }
+        else { return; }
       }
     });
   }

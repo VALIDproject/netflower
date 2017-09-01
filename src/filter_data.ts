@@ -116,7 +116,7 @@ class FilterData implements MAppViews {
       $('#topFilter').val(-1);
     });
 
-
+    //Listener for the change fo the top filter
     this.$node.select('#topFilter').on('change', (d) => {
       let value:number = $('#topFilter').val() as number;
 
@@ -136,6 +136,7 @@ class FilterData implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
+    //Listener for the change of the paragraph elements
     $('.paraFilter').on('change', (d) => {
       this.paragraphFilter.resetValues();
 
@@ -185,7 +186,6 @@ class FilterData implements MAppViews {
   private setParagraphFilterElements(json)
   {
     let paragraphs:Array<number> = [];
-
     for(let entry of json)
     {
       let val:number = entry.attribute1;
@@ -198,7 +198,6 @@ class FilterData implements MAppViews {
         this.$node.select('#paragraph').append('span').text(' ');
       }
     }
-
     this.paragraphFilter.values = paragraphs;
   }
 
@@ -212,11 +211,8 @@ class FilterData implements MAppViews {
     let max: number = json[0].timeNode;
     for(let entry of json)
     {
-      if(entry.timeNode < min)
-        min = entry.timeNode;
-
-      if(entry.timeNode > max)
-        max = entry.timeNode;
+      if(entry.timeNode < min) {  min = entry.timeNode; }
+      if(entry.timeNode > max) { max = entry.timeNode; }
     }
     this.quarterFilter.changeRange(min, max);
 
@@ -253,11 +249,8 @@ class FilterData implements MAppViews {
     let max: number = data[0].timeNode;
     for(let entry of data)
     {
-      if(entry.timeNode < min)
-        min = entry.timeNode;
-
-      if(entry.timeNode > max)
-        max = entry.timeNode;
+      if(entry.timeNode < min) { min = entry.timeNode; }
+      if(entry.timeNode > max) { max = entry.timeNode; }
     }
     this.quarterFilter.changeRange(max, max);
     this.quarterFilterRef.update({

@@ -49,7 +49,7 @@ class GlobalSettings implements MAppViews {
       </div>
 
       <div class='showChange'>
-      <p >Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></p>
+      <p>Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></p>
         <button type='button' class='btn btn-default'>Absolute Value</button>
         <button type='button' class='btn btn-default'>Relative Value</button>
       </div>
@@ -72,7 +72,6 @@ class GlobalSettings implements MAppViews {
       events.fire(AppConstants.EVENT_CLEAR_FILTERS, d, null);
     });
   }
-
 }
 
 /**
