@@ -9,6 +9,7 @@ import * as $ from 'jquery';
 import 'imports-loader?jQuery=jquery!BootSideMenu/js/BootSideMenu.js';
 import 'style-loader!css-loader!BootSideMenu/css/BootSideMenu.css';
 import {MAppViews} from './app';
+import {AppConstants} from './app_constants';
 
 class GlobalSettings implements MAppViews {
 
@@ -39,30 +40,37 @@ class GlobalSettings implements MAppViews {
    */
   private build() {
     this.$node.html(`
-    <div id='menuTest'>
+    <div id='sideMenu'>
       <div class='list-group'>
         <h4>Global Settings</h4>
-        <p>Show State <i class="fa fa-question-circle" aria-hidden="true"></i></p>
-        <button type="button" class="btn btn-default active">Absolute Value</button>
-        <button type="button" class="btn btn-default">Number of Links</button>
+        <p>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></p>
+        <button type='button' class='btn btn-default active'>Absolute Value</button>
+        <button type='button' class='btn btn-default'>Number of Links</button>
       </div>
 
       <div class='showChange'>
-      <p >Show Change <i class="fa fa-question-circle" aria-hidden="true"></i></p>
-        <button type="button" class="btn btn-default">Absolute Value</button>
-        <button type="button" class="btn btn-default">Relative Value</button>
+      <p >Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></p>
+        <button type='button' class='btn btn-default'>Absolute Value</button>
+        <button type='button' class='btn btn-default'>Relative Value</button>
+      </div>
+      
+      <div class='clearBox'>
+        <hr/>
+        <button type='button' id='clearAllFilters' class='btn btn-primary btn-sm'>Clear All Filters</button>
       </div>
     </div>
     `);
 
-    (<any>$('#menuTest')).BootSideMenu();
+    (<any>$('#sideMenu')).BootSideMenu();
   }
 
   /**
    * Attach the event listeners
    */
   private attachListener() {
-
+    this.$node.select('#clearAllFilters').on('click', (d) => {
+      events.fire(AppConstants.EVENT_CLEAR_FILTERS, d, null);
+    });
   }
 
 }

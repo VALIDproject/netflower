@@ -194,6 +194,14 @@ class SankeyDiagram implements MAppViews {
       updateEuroRange(this.euroFilter, d);
     });
 
+    //Clear the search fields too
+    events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      $('#entitySearchFilter').val('');
+      this.entitySearchFilter.term = '';
+      $('#mediaSearchFilter').val('');
+      this.mediaSearchFilter.term = '';
+    });
+
     this.$node.select('#entitySearchButton').on('click', (d) => {
       let value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
@@ -287,6 +295,7 @@ class SankeyDiagram implements MAppViews {
       console.log(originalData);
       console.log("----------- Filtered Data -----------");
       console.log(filteredData);
+      this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }
