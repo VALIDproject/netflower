@@ -116,6 +116,9 @@ class SankeyDiagram implements MAppViews {
           <span class='input-group-btn'>
             <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
           </span>
+          <span class='input-group-btn'>
+            <button type='button' id='clearEntity' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+          </span>
         </div>
       </div>
     `);
@@ -144,6 +147,10 @@ class SankeyDiagram implements MAppViews {
         <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for Target Nodes...'/>
         <span class='input-group-btn'>
           <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+        </span>
+        <span class='input-group-btn'>
+          <button type='button' id='clearMedia' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+        </span>
       </div>
     </div>
     `);
@@ -160,6 +167,7 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(false);
     }
 
+    //Listen to newly arrived data
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
       setTimeout(function () {
         location.reload();
@@ -169,10 +177,29 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(false);
     });
 
+    //Listen for changed data and redraw all
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
       this.getStorageData(true);
+    });
+
+    //Listen for resize of the window
+    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
+
+    //Listen for the change of the quarter slider and update others
+    events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
+      updateEntityRange(this.entityEuroFilter, d);
+      updateMediaRange(this.mediaEuroFilter, d);
+      updateEuroRange(this.euroFilter, d);
+    });
+
+    //Clear the search fields too
+    events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      $('#entitySearchFilter').val('');
+      this.entitySearchFilter.term = '';
+      $('#mediaSearchFilter').val('');
+      this.mediaSearchFilter.term = '';
     });
 
     this.$node.select('#entitySearchButton').on('click', (d) => {
@@ -183,11 +210,23 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
+    this.$node.select('#clearEntity').on('click', (d) => {
+      $('#entitySearchFilter').val('');
+      this.entitySearchFilter.term = '';
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    });
+
     this.$node.select('#mediaSearchButton').on('click', (d) => {
       let value: string = $('#mediaSearchFilter').val();
       this.mediaSearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    });
+
+    this.$node.select('#clearMedia').on('click', (d) => {
+      $('#mediaSearchFilter').val('');
+      this.mediaSearchFilter.term = '';
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
@@ -208,15 +247,6 @@ class SankeyDiagram implements MAppViews {
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
       evt.stopPropagation();
-    });
-
-    //Listen for resize of the window
-    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
-
-    events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
-      updateEntityRange(this.entityEuroFilter, d);
-      updateMediaRange(this.mediaEuroFilter, d);
-      updateEuroRange(this.euroFilter, d);
     });
   }
 
@@ -261,10 +291,11 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
-      console.log("----------- Original Data -----------");
-      console.log(originalData);
-      console.log("----------- Filtered Data -----------");
-      console.log(filteredData);
+      // console.log("----------- Original Data -----------");
+      // console.log(originalData);
+      // console.log("----------- Filtered Data -----------");
+      // console.log(filteredData);
+      // this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -497,11 +528,8 @@ class SankeyDiagram implements MAppViews {
       title: 'Information',
       message: text,
       callback: function(result) {
-        if (result) {
-          console.log('Ok pressed...');
-        } else {
-          return;
-        }
+        if (result) { console.log('Ok pressed...'); }
+        else { return; }
       }
     });
   }

@@ -156,7 +156,6 @@ export function setEuroFilterRange(filter, elemName: string, data: any): void {
   });
 
   valueFilterRef = $(elemName).data('ionRangeSlider');    //Store instance to update it later
-
 }
 
 /**

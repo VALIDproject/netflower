@@ -25,4 +25,6 @@ export class AppConstants {
   static EVENT_SLIDER_CHANGE = 'eventSliderChange';
 
   static EVENT_UI_COMPLETE = 'eventUIComplete';
+
+  static EVENT_CLEAR_FILTERS = 'eventClearFilters';
 }
