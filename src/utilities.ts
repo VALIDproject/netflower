@@ -354,10 +354,10 @@ export function downloadFile(text, name, type) {
  * @param element html to fade the text onto
  * @param newText the text to show in the html elment
  */
-export function textTransition(element: d3.Selection<any>, newText: string) {
-  element.transition().duration(500)
+export function textTransition(element: d3.Selection<any>, newText: string, duration: number) {
+  element.transition().duration(duration)
     .style('opacity', 0)
-    .transition().duration(500)
+    .transition().duration(duration)
     .style('opacity', 1)
     .text(newText);
 }

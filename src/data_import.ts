@@ -136,7 +136,7 @@ class DataImport implements MAppViews {
         d3.select('#valuesList').selectAll('*').remove();
 
         //Change information and reset edit mode
-        textTransition(this.$chaningHeading, 'View data, upload new or proceed!!');
+        textTransition(this.$chaningHeading, 'View data, upload new or proceed!!', 500);
         this.editMode = false;
 
         //Start the uploading

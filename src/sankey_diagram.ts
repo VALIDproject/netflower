@@ -134,15 +134,15 @@ class SankeyDiagram implements MAppViews {
     `);
 
     loadMore.html(`
-      <span id='loadInfo' style='text-align: center;'>Text...</span>
+      <span id='loadInfo' style='text-align: center;'>X/Y elements displayed</span>
       <div class='input-group input-group-xs'>
-        <span class='input-group-btn'>
-          <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs'>
-          <span style='font-size:smaller;'>Show More</span></button>
-        </span>
         <span class='input-group-btn'>
           <button id='loadLessBtn' type='button' class='btn btn-secondary btn-xs' disabled='true'>
           <span style='font-size:smaller;'>Show Less</span></button>
+        </span>
+        <span class='input-group-btn'>
+          <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs'>
+          <span style='font-size:smaller;'>Show More</span></button>
         </span>
       </div>
 
@@ -404,13 +404,14 @@ class SankeyDiagram implements MAppViews {
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
-      console.log('shown..', that.valuesSumSource.length, that.valuesSumTarget.length);
       let counter = 0;
       for(let d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
-          let text = `Flows below ${d.sum} are not displayed.`;
-          textTransition(d3.select('#infoNodesLeft'), text);
+          const textUp = `Flows below ${d.sum} are not displayed.`;
+          textTransition(d3.select('#infoNodesLeft'), textUp, 350);
+          const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
+          textTransition(d3.select('#loadInfo'), textDown, 350);
           break;
         }
         graph.nodes.push({ 'name': d.source });//all Nodes source
