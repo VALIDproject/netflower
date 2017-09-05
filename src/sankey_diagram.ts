@@ -30,6 +30,7 @@ class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 25;
+  private sankeyHeight: number = 0;
   private maximumNodes: number = 0;
   private drawReally: boolean = true;
   private valuesSumSource;
@@ -133,8 +134,18 @@ class SankeyDiagram implements MAppViews {
     `);
 
     loadMore.html(`
-      <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs btn-block'>
-      <span style='font-size:smaller;'>Load More ...</span></button>
+      <span id='loadInfo' style='text-align: center;'>X/Y elements displayed</span>
+      <div class='input-group input-group-xs'>
+        <span class='input-group-btn'>
+          <button id='loadLessBtn' type='button' class='btn btn-secondary btn-xs' disabled='true'>
+          <span style='font-size:smaller;'>Show Less</span></button>
+        </span>
+        <span class='input-group-btn'>
+          <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs'>
+          <span style='font-size:smaller;'>Show More</span></button>
+        </span>
+      </div>
+
     `);
 
     right.html(`
@@ -230,19 +241,51 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
-    //Functionality of load more button with dynamic increase of values.
+    //Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
       this.nodesToShow += 25;
       if(this.nodesToShow > this.maximumNodes) this.nodesToShow = this.maximumNodes;
+      if(this.nodesToShow > 25) {
+        d3.select('#loadLessBtn').attr('disabled', null);
+      }
 
       //Increase the height of the svg to fit the data
-      let sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      sankeyHeight += (10 * this.nodesToShow);
-      this.$node.select('.sankey_vis').style('height', sankeyHeight + 'px');
+      this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
+      this.sankeyHeight += (10 * this.nodesToShow);
+      this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
+
+      d3.select('#sankeyDiagram').html('');
+      d3.selectAll('.barchart').html('');
+      //This is necessary in order to increase the height of the barchart svgs
+      const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;
+      const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
+      d3.selectAll('.barchart').attr('height', this.sankeyHeight - headingOffset - footerOffset + 'px');
+      this.getStorageData(true);
+
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+
+    //Functionality of show less button with dynamic increase of values.
+    this.$node.select('#loadLessBtn').on('click', (e) => {
+      this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
+      this.sankeyHeight -= (10 * this.nodesToShow);
+      this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
+
+      this.nodesToShow -= 25;
+      if(this.nodesToShow <= 25) {
+        d3.select('#loadLessBtn').attr('disabled', true);
+        this.nodesToShow = 25;
+      }
 
       d3.select('#sankeyDiagram').html('');
       d3.selectAll('.barchart').html('');
       this.getStorageData(true);
+      //This is necessary in order to reduce the height of the barchart svgs
+      const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;
+      const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
+      d3.selectAll('.barchart').attr('height', this.sankeyHeight - headingOffset - footerOffset + 'px');
 
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
@@ -365,8 +408,10 @@ class SankeyDiagram implements MAppViews {
       for(let d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
-          let text = `Flows below ${d.sum} are not displayed.`;
-          textTransition(d3.select('#infoNodesLeft'), text);
+          const textUp = `Flows below ${d.sum} are not displayed.`;
+          textTransition(d3.select('#infoNodesLeft'), textUp, 350);
+          const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
+          textTransition(d3.select('#loadInfo'), textDown, 350);
           break;
         }
         graph.nodes.push({ 'name': d.source });//all Nodes source
@@ -445,7 +490,6 @@ class SankeyDiagram implements MAppViews {
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
-
 
       node.append('svg')
         .append('defs')
