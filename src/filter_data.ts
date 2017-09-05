@@ -193,12 +193,14 @@ class FilterData implements MAppViews {
       {
         paragraphs.push(val);
         this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
-          .attr('checked', true).attr('class','paraFilter');
+          .attr('class','paraFilter').attr('checked', true);
         this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text('§'+val);
         this.$node.select('#paragraph').append('span').text(' ');
       }
     }
     this.paragraphFilter.values = paragraphs;
+    d3.select('input[value = \'31\']').attr('checked', null);
+    this.paragraphFilter.values = this.paragraphFilter.values.filter(e => e.toString() !== '31');
   }
 
   /**
