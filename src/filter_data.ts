@@ -29,6 +29,7 @@ class FilterData implements MAppViews {
   private quarterFilter: QuarterFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
+  private quarterFilterRef;
 
   constructor(parent: Element, private options: any)
   {
@@ -115,7 +116,7 @@ class FilterData implements MAppViews {
       $('#topFilter').val(-1);
     });
 
-
+    //Listener for the change fo the top filter
     this.$node.select('#topFilter').on('change', (d) => {
       let value:number = $('#topFilter').val() as number;
 
@@ -135,17 +136,16 @@ class FilterData implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
+    //Listener for the change of the paragraph elements
     $('.paraFilter').on('change', (d) => {
-
       this.paragraphFilter.resetValues();
 
       $('.paraFilter').each((index, element) => {
-          const value:number = $(element).val() as number;
-
-          if($(element).is(':checked'))
-          {
-            this.paragraphFilter.addValue(value);
-          }
+        const value:number = $(element).val() as number;
+        if($(element).is(':checked'))
+        {
+          this.paragraphFilter.addValue(value);
+        }
       });
 
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
@@ -157,6 +157,26 @@ class FilterData implements MAppViews {
       let filterQuarter = this.quarterFilter.meetCriteria(data);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
+
+    //Clears all filters and updates the appropriate sliders
+    events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      this.updateQuarterFilter(json);
+      let filterQuarter = this.quarterFilter.meetCriteria(json);
+      d3.selectAll('input').property('checked', true);
+      this.paragraphFilter.resetValues();
+
+      $('.paraFilter').each((index, element) => {
+        const value:number = $(element).val() as number;
+        if($(element).is(':checked'))
+        {
+          this.paragraphFilter.addValue(value);
+        }
+      });
+
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
+    });
   }
 
   /**
@@ -166,7 +186,6 @@ class FilterData implements MAppViews {
   private setParagraphFilterElements(json)
   {
     let paragraphs:Array<number> = [];
-
     for(let entry of json)
     {
       let val:number = entry.attribute1;
@@ -174,13 +193,14 @@ class FilterData implements MAppViews {
       {
         paragraphs.push(val);
         this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
-          .attr('checked', true).attr('class','paraFilter');
+          .attr('class','paraFilter').attr('checked', true);
         this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text('§'+val);
-        this.$node.select('#paragraph').append('span').text(' ');      
+        this.$node.select('#paragraph').append('span').text(' ');
       }
     }
-
     this.paragraphFilter.values = paragraphs;
+    d3.select('input[value = \'31\']').attr('checked', null);
+    this.paragraphFilter.values = this.paragraphFilter.values.filter(e => e.toString() !== '31');
   }
 
   /**
@@ -193,11 +213,8 @@ class FilterData implements MAppViews {
     let max: number = json[0].timeNode;
     for(let entry of json)
     {
-      if(entry.timeNode < min)
-        min = entry.timeNode;
-
-      if(entry.timeNode > max)
-        max = entry.timeNode;
+      if(entry.timeNode < min) {  min = entry.timeNode; }
+      if(entry.timeNode > max) { max = entry.timeNode; }
     }
     this.quarterFilter.changeRange(min, max);
 
@@ -221,6 +238,26 @@ class FilterData implements MAppViews {
         let filterQuarter = this.quarterFilter.meetCriteria(json);
         events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
       }
+    });
+    this.quarterFilterRef = $('#timeSlider').data('ionRangeSlider');
+  }
+
+  /**
+   * This method updates the filter range of the quarter slider.
+   * @param data the original data to read out the maximum number of time
+   */
+  private updateQuarterFilter(data) {
+    let min: number = data[0].timeNode;
+    let max: number = data[0].timeNode;
+    for(let entry of data)
+    {
+      if(entry.timeNode < min) { min = entry.timeNode; }
+      if(entry.timeNode > max) { max = entry.timeNode; }
+    }
+    this.quarterFilter.changeRange(max, max);
+    this.quarterFilterRef.update({
+      from: max,
+      to: max
     });
   }
 }

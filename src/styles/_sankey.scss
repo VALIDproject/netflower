@@ -75,6 +75,15 @@ div.tooltip {
 .load_more {
   margin-left: 25%;
   width: 50%;
+  text-align: center;
+}
+
+#loadMoreBtn, #loadLessBtn {
+  width: 98%;
+}
+
+#loadInfo {
+  font-size: 11px !important;
 }
 
 /**
@@ -190,4 +199,8 @@ svg.barchart rect.bar:hover {
   width: 200px;
   margin-top: -50px;
   margin-left: 70%;
+}
+
+#mediaSearchButton, #entitySearchButton {
+  border-radius: 0;
 }

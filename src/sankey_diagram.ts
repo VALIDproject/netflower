@@ -30,6 +30,7 @@ class SankeyDiagram implements MAppViews {
 
   private $node;
   private nodesToShow: number = 25;
+  private sankeyHeight: number = 0;
   private maximumNodes: number = 0;
   private drawReally: boolean = true;
   private valuesSumSource;
@@ -119,6 +120,9 @@ class SankeyDiagram implements MAppViews {
           <span class='input-group-btn'>
             <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
           </span>
+          <span class='input-group-btn'>
+            <button type='button' id='clearEntity' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+          </span>
         </div>
       </div>
     `);
@@ -133,8 +137,18 @@ class SankeyDiagram implements MAppViews {
     `);
 
     loadMore.html(`
-      <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs btn-block'>
-      <span style='font-size:smaller;'>Load More ...</span></button>
+      <span id='loadInfo' style='text-align: center;'>X/Y elements displayed</span>
+      <div class='input-group input-group-xs'>
+        <span class='input-group-btn'>
+          <button id='loadLessBtn' type='button' class='btn btn-secondary btn-xs' disabled='true'>
+          <span style='font-size:smaller;'>Show Less</span></button>
+        </span>
+        <span class='input-group-btn'>
+          <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs'>
+          <span style='font-size:smaller;'>Show More</span></button>
+        </span>
+      </div>
+
     `);
 
     right.html(`
@@ -147,6 +161,10 @@ class SankeyDiagram implements MAppViews {
         <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for Target Nodes...'/>
         <span class='input-group-btn'>
           <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+        </span>
+        <span class='input-group-btn'>
+          <button type='button' id='clearMedia' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+        </span>
       </div>
     </div>
     `);
@@ -163,6 +181,7 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(false);
     }
 
+    //Listen to newly arrived data
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
       setTimeout(function () {
         location.reload();
@@ -172,10 +191,29 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(false);
     });
 
+    //Listen for changed data and redraw all
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
       this.getStorageData(true);
+    });
+
+    //Listen for resize of the window
+    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
+
+    //Listen for the change of the quarter slider and update others
+    events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
+      updateEntityRange(this.entityEuroFilter, d);
+      updateMediaRange(this.mediaEuroFilter, d);
+      updateEuroRange(this.euroFilter, d);
+    });
+
+    //Clear the search fields too
+    events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      $('#entitySearchFilter').val('');
+      this.entitySearchFilter.term = '';
+      $('#mediaSearchFilter').val('');
+      this.mediaSearchFilter.term = '';
     });
 
     this.$node.select('#entitySearchButton').on('click', (d) => {
@@ -183,6 +221,12 @@ class SankeyDiagram implements MAppViews {
       this.entitySearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    });
+
+    this.$node.select('#clearEntity').on('click', (d) => {
+      $('#entitySearchFilter').val('');
+      this.entitySearchFilter.term = '';
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
@@ -194,18 +238,31 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
-    //Functionality of load more button with dynamic increase of values.
+    this.$node.select('#clearMedia').on('click', (d) => {
+      $('#mediaSearchFilter').val('');
+      this.mediaSearchFilter.term = '';
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    });
+
+    //Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
       this.nodesToShow += 25;
       if(this.nodesToShow > this.maximumNodes) this.nodesToShow = this.maximumNodes;
+      if(this.nodesToShow > 25) {
+        d3.select('#loadLessBtn').attr('disabled', null);
+      }
 
       //Increase the height of the svg to fit the data
-      let sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      sankeyHeight += (10 * this.nodesToShow);
-      this.$node.select('.sankey_vis').style('height', sankeyHeight + 'px');
+      this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
+      this.sankeyHeight += (10 * this.nodesToShow);
+      this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       d3.select('#sankeyDiagram').html('');
       d3.selectAll('.barchart').html('');
+      //This is necessary in order to increase the height of the barchart svgs
+      const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;
+      const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
+      d3.selectAll('.barchart').attr('height', this.sankeyHeight - headingOffset - footerOffset + 'px');
       this.getStorageData(true);
 
       const evt = <MouseEvent>d3.event;
@@ -213,13 +270,29 @@ class SankeyDiagram implements MAppViews {
       evt.stopPropagation();
     });
 
-    //Listen for resize of the window
-    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
+    //Functionality of show less button with dynamic increase of values.
+    this.$node.select('#loadLessBtn').on('click', (e) => {
+      this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
+      this.sankeyHeight -= (10 * this.nodesToShow);
+      this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
-    events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
-      updateEntityRange(this.entityEuroFilter, d);
-      updateMediaRange(this.mediaEuroFilter, d);
-      updateEuroRange(this.euroFilter, d);
+      this.nodesToShow -= 25;
+      if(this.nodesToShow <= 25) {
+        d3.select('#loadLessBtn').attr('disabled', true);
+        this.nodesToShow = 25;
+      }
+
+      d3.select('#sankeyDiagram').html('');
+      d3.selectAll('.barchart').html('');
+      this.getStorageData(true);
+      //This is necessary in order to reduce the height of the barchart svgs
+      const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;
+      const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
+      d3.selectAll('.barchart').attr('height', this.sankeyHeight - headingOffset - footerOffset + 'px');
+
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
+      evt.stopPropagation();
     });
   }
 
@@ -250,7 +323,6 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
-
       this.valuesSumSource =(<any>d3).nest()
         .key((d) => {return d.sourceNode;})
         .rollup(function (v) {return [
@@ -266,11 +338,11 @@ class SankeyDiagram implements MAppViews {
         ]})
         .entries(filteredData);
 
-
-      console.log("----------- Original Data -----------");
-      console.log(originalData);
-      console.log("----------- Filtered Data -----------");
-      console.log(filteredData);
+      // console.log("----------- Original Data -----------");
+      // console.log(originalData);
+      // console.log("----------- Filtered Data -----------");
+      // console.log(filteredData);
+      // this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -342,8 +414,10 @@ class SankeyDiagram implements MAppViews {
       for(let d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
-          let text = `Flows below ${d.sum} are not displayed.`;
-          textTransition(d3.select('#infoNodesLeft'), text);
+          const textUp = `Flows below ${d.sum} are not displayed.`;
+          textTransition(d3.select('#infoNodesLeft'), textUp, 350);
+          const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
+          textTransition(d3.select('#loadInfo'), textDown, 350);
           break;
         }
         graph.nodes.push({ 'name': d.source });//all Nodes source
@@ -529,11 +603,8 @@ class SankeyDiagram implements MAppViews {
       title: 'Information',
       message: text,
       callback: function(result) {
-        if (result) {
-          console.log('Ok pressed...');
-        } else {
-          return;
-        }
+        if (result) { console.log('Ok pressed...'); }
+        else { return; }
       }
     });
   }
