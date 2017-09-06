@@ -49,6 +49,9 @@ class SankeyDiagram implements MAppViews {
   private mediaSlider;
   private valueSlider;
 
+
+  private activeQuarters: string[] = [];
+
   constructor(parent: Element, private options: any)
   {
     //Get FilterPipeline
@@ -315,25 +318,26 @@ class SankeyDiagram implements MAppViews {
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
 
-        this.valuesSumSource =(<any>d3).nest()
-          .key((d) => {return d.sourceNode;})
-          .rollup(function (v) {return [
-            d3.sum(v, function (d :any){ return d.valueNode;})
-          ]})
-          .entries(originalData);
-
-        this.valuesSumTarget =(<any>d3).nest()
-          .key((d) => {return d.targetNode;})
-          .rollup(function (v) {return [
-            d3.sum(v, function (d :any){ return d.valueNode;})
-          ]})
-          .entries(originalData);
-
         events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
       }
 
       //Filter the data before and then pass it to the draw function.
       let filteredData = this.pipeline.performFilters(value);
+      this.valuesSumSource =(<any>d3).nest()
+        .key((d) => {return d.sourceNode;})
+        .rollup(function (v) {return [
+          d3.sum(v, function (d :any){ return d.valueNode;})
+        ]})
+        .entries(filteredData);
+
+
+      this.valuesSumTarget =(<any>d3).nest()
+        .key((d) => {return d.targetNode;})
+        .rollup(function (v) {return [
+          d3.sum(v, function (d :any){ return d.valueNode;})
+        ]})
+        .entries(filteredData);
+
       // console.log("----------- Original Data -----------");
       // console.log(originalData);
       // console.log("----------- Filtered Data -----------");
@@ -348,6 +352,8 @@ class SankeyDiagram implements MAppViews {
    * @param json data from the read functionality
    */
   private buildSankey(json, origJson) {
+
+    console.log('filterDAta', json);
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
@@ -486,7 +492,8 @@ class SankeyDiagram implements MAppViews {
         .style('fill', '#DA5A6B')
         //Title rectangle
         .append('title')
-        .text(function(d) { return d.name + '\n' + dotFormat(d.value); });
+        .text(function(d) { return dotFormat(d.value) + ' ' + ' from displayed elements'; });
+        //.text(function(d) { return d.name + '\n' + dotFormat(d.value); });
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
@@ -502,6 +509,8 @@ class SankeyDiagram implements MAppViews {
         .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
         .attr('stroke', '#000000')
         .attr('stroke-width', 1);
+
+        console.log('Overlay Source', this.valuesSumSource);
 
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
@@ -521,7 +530,19 @@ class SankeyDiagram implements MAppViews {
               result =  this.valuesSumSource[i].values;
             }
           }
-          return dotFormat(result) + ' ' + 'More';
+
+          let timePoints: any = d3.set(
+            json.map(function (d: any) { return d.timeNode; })
+          ).values().sort();
+
+
+          if(timePoints.length > 1) {
+            console.log('sub', timePoints[0] - timePoints[timePoints.length-1]);
+            return  dotFormat(result) + ' ' + 'overall in' + ' ' + timePoints[0] + '-' + timePoints[timePoints.length-1];
+          } else {
+            return dotFormat(result) + ' ' + 'overall in' + ' '+ timePoints[0];
+          }
+
         })
         .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
         .text((d) => {
@@ -531,7 +552,17 @@ class SankeyDiagram implements MAppViews {
               result =  this.valuesSumTarget[i].values;
             }
           }
-          return dotFormat(result) + ' ' + 'More';
+          let timePoints: any = d3.set(
+            json.map(function (d: any) { return d.timeNode; })
+          ).values().sort();
+
+
+          if(timePoints.length > 1) {
+            console.log('sub', timePoints[0] - timePoints[timePoints.length-1]);
+            return  dotFormat(result) + ' ' + 'overall in' + ' ' + timePoints[0] + '-' + timePoints[timePoints.length-1];
+          } else {
+            return dotFormat(result) + ' ' + 'overall in' + ' '+ timePoints[0];
+          }
         });
 
       //Add in the title for the nodes
