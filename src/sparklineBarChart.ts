@@ -7,8 +7,9 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {splitAt, dotFormat} from './utilities';
+import {dotFormat} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
+import TimeFormat from './timeFormat';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
@@ -183,8 +184,7 @@ export default class SparklineBarChart implements MAppViews {
       //Add the link titles - Hover Path
       .append('title')
       .text(function (d) {
-        let timeArray = splitAt(4)(d.key);
-        return nodeName + ' → ' + timeArray[0] + 'Q' + timeArray[1] + '\n' + dotFormat(d.values);
+        return nodeName + '\nTime: ' + TimeFormat.format(d.key) + '\nFlow: ' + dotFormat(d.values);
       });
   }
 }

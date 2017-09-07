@@ -8,6 +8,7 @@ import 'imports-loader?d3=d3!../lib/sankey.js';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {dotFormat} from './utilities';
+import TimeFormat from './timeFormat';
 
 class SankeyDetail implements MAppViews {
 
@@ -257,6 +258,7 @@ class SankeyDetail implements MAppViews {
 
     //Define the axes and draw them
     let xAxis = d3.svg.axis().scale(x)
+    .tickFormat(TimeFormat.format)
     .orient('bottom');
 
     let yAxis = d3.svg.axis().scale(y)

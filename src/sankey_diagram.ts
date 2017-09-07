@@ -24,6 +24,7 @@ import EntitySearchFilter from './filters/entitySearchFilter';
 import MediaSearchFilter from './filters/mediaSearchFilter';
 import PaymentEuroFilter from './filters/paymentEuroFilter';
 import SparklineBarChart from './sparklineBarChart';
+import TimeFormat from './timeFormat';
 
 
 class SankeyDiagram implements MAppViews {
@@ -107,7 +108,10 @@ class SankeyDiagram implements MAppViews {
       columnLabels.sourceNode = 'Source';
       columnLabels.targetNode = 'Target';
       columnLabels.valueNode = 'Amount';
+    } else {
+      TimeFormat.setFormat(columnLabels.timeNode);
     }
+
 
     left.html(`
     <div class='controlBox'>
@@ -492,7 +496,11 @@ class SankeyDiagram implements MAppViews {
         .style('fill', '#DA5A6B')
         //Title rectangle
         .append('title')
-        .text(function(d) { return dotFormat(d.value) + ' ' + ' from displayed elements'; });
+        .text(function(d) {
+          // different preposition based on whether its a source or target node
+          const direction = (d.sourceLinks.length <= 0) ? "from" : "to";
+          return dotFormat(d.value) + ' ' + direction + ' displayed elements';
+        });
         //.text(function(d) { return d.name + '\n' + dotFormat(d.value); });
 
       //Create sparkline barcharts for newly enter-ing g.node elements
@@ -538,9 +546,9 @@ class SankeyDiagram implements MAppViews {
 
           if(timePoints.length > 1) {
             console.log('sub', timePoints[0] - timePoints[timePoints.length-1]);
-            return  dotFormat(result) + ' ' + 'overall in' + ' ' + timePoints[0] + '-' + timePoints[timePoints.length-1];
+            return  dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
           } else {
-            return dotFormat(result) + ' ' + 'overall in' + ' '+ timePoints[0];
+            return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
           }
 
         })
@@ -559,9 +567,9 @@ class SankeyDiagram implements MAppViews {
 
           if(timePoints.length > 1) {
             console.log('sub', timePoints[0] - timePoints[timePoints.length-1]);
-            return  dotFormat(result) + ' ' + 'overall in' + ' ' + timePoints[0] + '-' + timePoints[timePoints.length-1];
+            return  dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
           } else {
-            return dotFormat(result) + ' ' + 'overall in' + ' '+ timePoints[0];
+            return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
           }
         });
 
