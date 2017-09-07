@@ -414,7 +414,7 @@ class SankeyDiagram implements MAppViews {
       for(let d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
-          const textUp = `Flows below ${d.sum} are not displayed.`;
+          const textUp = `Flows below ${dotFormat(d.sum)} are not displayed.`;
           textTransition(d3.select('#infoNodesLeft'), textUp, 350);
           const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
           textTransition(d3.select('#loadInfo'), textDown, 350);
