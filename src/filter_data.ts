@@ -152,8 +152,7 @@ class FilterData implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
-      let max = this.quarterFilter.maxValue;
-      this.quarterFilter.changeRange(max, max);
+      this.updateQuarterFilter(json);
       let filterQuarter = this.quarterFilter.meetCriteria(data);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
