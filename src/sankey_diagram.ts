@@ -247,9 +247,11 @@ class SankeyDiagram implements MAppViews {
     //Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
       this.nodesToShow += 25;
-      if(this.nodesToShow > this.maximumNodes) this.nodesToShow = this.maximumNodes;
       if(this.nodesToShow > 25) {
         d3.select('#loadLessBtn').attr('disabled', null);
+      }
+      if(this.nodesToShow > this.maximumNodes) {
+        this.nodesToShow = this.maximumNodes;
       }
 
       //Increase the height of the svg to fit the data
@@ -353,10 +355,12 @@ class SankeyDiagram implements MAppViews {
    */
   private buildSankey(json, origJson) {
 
-    console.log('filterDAta', json);
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
+    let timePoints: any = d3.set(
+      json.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
 
     let headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
     let footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
@@ -492,8 +496,7 @@ class SankeyDiagram implements MAppViews {
         .style('fill', '#DA5A6B')
         //Title rectangle
         .append('title')
-        .text(function(d) { return dotFormat(d.value) + ' ' + ' from displayed elements'; });
-        //.text(function(d) { return d.name + '\n' + dotFormat(d.value); });
+        .text(function(d) { return dotFormat(d.value) + ' from displayed elements.'; });
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
@@ -509,8 +512,6 @@ class SankeyDiagram implements MAppViews {
         .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
         .attr('stroke', '#000000')
         .attr('stroke-width', 1);
-
-        console.log('Overlay Source', this.valuesSumSource);
 
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
@@ -530,14 +531,7 @@ class SankeyDiagram implements MAppViews {
               result =  this.valuesSumSource[i].values;
             }
           }
-
-          let timePoints: any = d3.set(
-            json.map(function (d: any) { return d.timeNode; })
-          ).values().sort();
-
-
           if(timePoints.length > 1) {
-            console.log('sub', timePoints[0] - timePoints[timePoints.length-1]);
             return  dotFormat(result) + ' ' + 'overall in' + ' ' + timePoints[0] + '-' + timePoints[timePoints.length-1];
           } else {
             return dotFormat(result) + ' ' + 'overall in' + ' '+ timePoints[0];
@@ -552,13 +546,7 @@ class SankeyDiagram implements MAppViews {
               result =  this.valuesSumTarget[i].values;
             }
           }
-          let timePoints: any = d3.set(
-            json.map(function (d: any) { return d.timeNode; })
-          ).values().sort();
-
-
           if(timePoints.length > 1) {
-            console.log('sub', timePoints[0] - timePoints[timePoints.length-1]);
             return  dotFormat(result) + ' ' + 'overall in' + ' ' + timePoints[0] + '-' + timePoints[timePoints.length-1];
           } else {
             return dotFormat(result) + ' ' + 'overall in' + ' '+ timePoints[0];
