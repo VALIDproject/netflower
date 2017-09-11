@@ -77,7 +77,7 @@ class FilterData implements MAppViews {
             <small>Top Filter</small>
           </div>
           <div class='col-sm-2'>
-            <small>Paragraph Filter</small>
+            <small id='attr1_label'>Paragraph Filter</small>
           </div>
         </div>
 
@@ -194,13 +194,26 @@ class FilterData implements MAppViews {
         paragraphs.push(val);
         this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
           .attr('class','paraFilter').attr('checked', true);
-        this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text('§'+val);
+        this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
         this.$node.select('#paragraph').append('span').text(' ');
       }
     }
     this.paragraphFilter.values = paragraphs;
-    d3.select('input[value = \'31\']').attr('checked', null);
-    this.paragraphFilter.values = this.paragraphFilter.values.filter(e => e.toString() !== '31');
+
+    // dirty hack to handle §31 in media transparency data
+    if (paragraphs[2] !== 31) {
+    // if (paragraphs.indexOf(31) !== -1) {
+      d3.select('input[value = \'31\']').attr('checked', null);
+      this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
+    }
+
+    // set UI label dynamically based on CSV header
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    if (columnLabels != null) {
+      this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
+    } else {
+      this.$node.select('#attr1_label').html('Attribute Filter');
+    }
   }
 
   /**
