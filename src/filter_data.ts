@@ -153,8 +153,7 @@ class FilterData implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
-      let max = this.quarterFilter.maxValue;
-      this.quarterFilter.changeRange(max, max);
+      this.updateQuarterFilter(json);
       let filterQuarter = this.quarterFilter.meetCriteria(data);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
@@ -210,27 +209,29 @@ class FilterData implements MAppViews {
    */
   private setQuarterFilterRange(json)
   {
-    let min: number = json[0].timeNode;
-    let max: number = json[0].timeNode;
-    for(let entry of json)
-    {
-      if(entry.timeNode < min) {  min = entry.timeNode; }
-      if(entry.timeNode > max) { max = entry.timeNode; }
-    }
-    this.quarterFilter.changeRange(min, max);
+    const timePoints = d3.set(
+      json.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
+
+    const newMin: number = Number(timePoints[0]);
+    const newMax: number = Number(timePoints[timePoints.length - 1]);
+    this.quarterFilter.changeRange(newMin, newMax);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
-      min: min,
-      max: max,
-      from: max,
-      to: max,
-      prettify: TimeFormat.formatNumber,
+      min: 0,
+      max: timePoints.length - 1,
+      from: 0,
+      to: timePoints.length - 1,
+      prettify: function (num) {
+        return timePoints[num];
+      },
       force_edges: true,  //Lets the labels inside the container
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
-        let newMin: number = sliderData.from;
-        let newMax: number = sliderData.to;
+        // TODO here we rely on all timeNodes to be numbers
+        let newMin: number = Number(timePoints[sliderData.from]);
+        let newMax: number = Number(timePoints[sliderData.to]);
         this.quarterFilter.minValue = newMin;
         this.quarterFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
@@ -248,17 +249,15 @@ class FilterData implements MAppViews {
    * @param data the original data to read out the maximum number of time
    */
   private updateQuarterFilter(data) {
-    let min: number = data[0].timeNode;
-    let max: number = data[0].timeNode;
-    for(let entry of data)
-    {
-      if(entry.timeNode < min) { min = entry.timeNode; }
-      if(entry.timeNode > max) { max = entry.timeNode; }
-    }
-    this.quarterFilter.changeRange(max, max);
+    const timePoints = d3.set(
+      data.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
+
+    const newMax: number = Number(timePoints[timePoints.length - 1]);
+    this.quarterFilter.changeRange(newMax, newMax);
     this.quarterFilterRef.update({
-      from: max,
-      to: max
+      from: timePoints.length - 1,
+      to: timePoints.length - 1
     });
   }
 }
