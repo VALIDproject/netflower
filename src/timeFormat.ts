@@ -11,14 +11,14 @@ export default class TimeFormat {
     }
 
     public static setFormat(header: string) {
-        if (header === "Quarter") {
+        if (header === 'Quarter') {
             TimeFormat.func = function (raw: string): string {
-                return raw.substr(0, 4) + " Q" + raw.substr(-1);
-            }
-            console.log("set to a quarter format");
+                return raw.substr(0, 4) + ' Q' + raw.substr(-1);
+            };
+            console.log('set to a quarter format');
         } else {
             TimeFormat.func = passThrough;
-            console.log("set to default format");
+            console.log('set to default format');
         }
     }
 }

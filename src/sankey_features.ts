@@ -66,7 +66,7 @@ class SankeyFeatures implements MAppViews {
   }
 
   private createButtonBar () {
-    let button_bar = this.$node.select('.button_bar');
+    const buttonBar = this.$node.select('.button_bar');
   }
 
 }

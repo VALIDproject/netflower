@@ -70,7 +70,7 @@ class ValidHeader implements MAppViews {
           message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data upload page.<br/>
           <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
           Be sure you don't lose anything important or save your progress before you proceed.`,
-          callback: function(result) {
+          callback(result) {
             if (result) {
               //Clear both storage facilities
               localStorage.clear();

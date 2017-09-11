@@ -10,11 +10,11 @@ import {AppConstants} from './app_constants';
 /**
  Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
  * Based on https://github.com/mbostock/d3/issues/1642
- * @exemple svg.append("g")
- *      .attr("class", "x axis")
- *      .attr("transform", "translate(0," + height + ")")
+ * @exemple svg.append('g')
+ *      .attr('class', 'x axis')
+ *      .attr('transform', 'translate(0,' + height + ')')
  *      .call(xAxis)
- *      .selectAll(".tick text")
+ *      .selectAll('.tick text')
  *          .call(d3TextWrap, x.rangeBand());
  *
  * @param text d3 selection for one or more <text> object
@@ -28,28 +28,30 @@ import {AppConstants} from './app_constants';
 export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
   paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
   paddingTopBottom = (paddingTopBottom || 5) - 2; //Default padding (5px), remove 2 pixels because of the borders
-  let maxWidth = width; //I store the tooltip max width
+  const maxWidth = width; //I store the tooltip max width
   width = width - (paddingRightLeft * 2); //Take the padding into account
 
-  let arrLineCreatedCount = [];
+  const arrLineCreatedCount = [];
   text.each(function() {
-    let text = d3.select(this),
+    const text = d3.select(this),
       words = text.text().split(/[ \f\n\r\t\v]+/).reverse(), //Don't cut non-breaking space (\xA0), as well as the Unicode characters \u00A0 \u2028 \u2029)
-      word,
-      line = [],
-      lineNumber = 0,
       lineHeight = 1.1, //Ems
-      x,
-      y = text.attr("y"),
-      dy = parseFloat(text.attr("dy")),
-      createdLineCount = 1, //Total line created count
       textAlign = text.style('text-anchor') || 'start'; //'start' by default (start, middle, end, inherit)
 
+    let word,
+      line = [],
+      lineNumber = 0,
+      x,
+      y = text.attr('y'),
+      dy = parseFloat(text.attr('dy')),
+      createdLineCount = 1; //Total line created count
+
+
     //Clean the data in case <text> does not define those values
-    if (isNaN(dy)) dy = 0; //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
+    if (isNaN(dy)) { dy = 0; } //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
 
     //Offset the text position based on the text-anchor
-    let wrapTickLabels = d3.select(text.node().parentNode).classed('tick'); //Don't wrap the 'normal untranslated' <text> element and the translated <g class='tick'><text></text></g> elements the same way..
+    const wrapTickLabels = d3.select(text.node().parentNode).classed('tick'); //Don't wrap the 'normal untranslated' <text> element and the translated <g class='tick'><text></text></g> elements the same way..
     if (wrapTickLabels) {
       switch (textAlign) {
         case 'start':
@@ -63,8 +65,7 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
           break;
         default :
       }
-    }
-    else { //untranslated <text> elements
+    } else { //untranslated <text> elements
       switch (textAlign) {
         case 'start':
           x = paddingRightLeft;
@@ -80,16 +81,16 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
     }
     y = (+((null === y)?paddingTopBottom:y) as any);
 
-    let tspan = (text as any).text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+    let tspan = (text as any).text(null).append('tspan').attr('x', x).attr('y', y).attr('dy', dy + 'em');
     //noinspection JSHint
     while (word = words.pop()) {
       line.push(word);
-      tspan.text(line.join(" "));
+      tspan.text(line.join(' '));
       if (tspan.node().getComputedTextLength() > width && line.length > 1) {
         line.pop();
-        tspan.text(line.join(" "));
+        tspan.text(line.join(' '));
         line = [word];
-        tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        tspan = text.append('tspan').attr('x', x).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
         ++createdLineCount;
       }
     }
@@ -107,7 +108,7 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
  *
  * Example: splitAt(4)(d.time) Splits the string at 4 from d.time
  */
-export const splitAt = index => it =>
+export const splitAt = (index) => (it) =>
   [it.slice(0, index), it.slice(index)];
 
 const formatNumber = d3.format(',.0f');    //Zero decimal places
@@ -121,7 +122,7 @@ export const dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'
 /**
  * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
  * It's necessary but not very pretty. Not proud of it.....
- * A "prettier" solution might be a loop and Math.pow(10,i) (yet but better not touch working code).
+ * A 'prettier' solution might be a loop and Math.pow(10,i) (yet but better not touch working code).
  * @param value to round
  * @returns {number}
  */
@@ -166,7 +167,7 @@ export function roundToFull(value: number) {
  *     the header instead of the default rowId
  * @returns {Array} Generated JSON
  */
-export function tableToJSON(table, opts?) {
+/*export function tableToJSON(table, opts?) {
   // Set options
   let defaults = {
     ignoreColumns: [],
@@ -333,6 +334,7 @@ export function tableToJSON(table, opts?) {
   let headings = getHeadings(table);
   return construct(table, headings);
 };
+*/
 
 /**
  * This method creates a downloadable file which contains the json or data it was given. An example
@@ -343,8 +345,8 @@ export function tableToJSON(table, opts?) {
  * @param type the type of the file which can be specified
  */
 export function downloadFile(text, name, type) {
-  let a = document.createElement('a');
-  let file = new Blob([text], {type: type});
+  const a = document.createElement('a');
+  const file = new Blob([text], {type});
   a.href = URL.createObjectURL(file);
   a.download = name;
   a.click();
@@ -371,11 +373,11 @@ export function textTransition(element: d3.Selection<any>, newText: string, dura
  */
 export function d3TextEllipse(text, maxTextWidth) {
   text.each(function() {
-    let text = d3.select(this);
-    let words = text.text().split(/\s+/);
-    let ellipsis = text.text('').append('tspan').attr('class', 'elip').text('...');
-    let numWords = words.length;
-    let tspan = text.insert('tspan', ':first-child').text(words.join(' '));
+    const text = d3.select(this);
+    const words = text.text().split(/\s+/);
+    const ellipsis = text.text('').append('tspan').attr('class', 'elip').text('...');
+    const numWords = words.length;
+    const tspan = text.insert('tspan', ':first-child').text(words.join(' '));
 
     //While it's too long and we have words left we keep removing words
     while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length) {
