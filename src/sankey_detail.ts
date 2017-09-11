@@ -83,7 +83,7 @@ class SankeyDetail implements MAppViews {
   * @param json is the whole data set in order to retrieve all time points for the current node
   */
   private drawDetails (clickedPath, json, coordinates) {
-    let margin = {top: 50 , right: 60, bottom: 40, left: 60},
+    let margin = {top: 50 , right: 60, bottom: 60, left: 60},
     w = 400 - margin.left - margin.right,
     h = 200 - margin.top - margin.bottom;
 
@@ -132,16 +132,16 @@ class SankeyDetail implements MAppViews {
       .append('text')
       .style('font-size', 11 + 'px')
       .text(function(d) {
-        //return sourceName + ' → ' + targetName + '  ' + dotFormat(value);
-        return sourceName;
-      })    
+        return sourceName + ' → ' + targetName + '  ' + dotFormat(value);
+        //return sourceName;
+      })
       .attr('x', 5)
       .attr('y', 16);
 
       const maxTextWidth = (w + margin.left + margin.right - 80) / 2;
       const leftWrap = this.$node.select('.sankey_details').select('text');
-      console.log(leftWrap);
-      d3TextEllipse(leftWrap, maxTextWidth);
+      //console.log(leftWrap);
+      //d3TextEllipse(leftWrap, maxTextWidth);
 
       this.toolbox = d3.select('svg.sankey_details')
       .append('g')
@@ -290,10 +290,26 @@ class SankeyDetail implements MAppViews {
     let yAxis = d3.svg.axis().scale(y)
     .orient('left');
 
-    this.detailSVG.append('g')
-    .attr('class', ' x axis')
+
+
+    let xAxisElement = this.detailSVG.append('g')
+    .attr('class', 'x axis')
     .attr('transform', 'translate(0,' + h + ')')
     .call(xAxis);
+
+    console.log(xAxisElement.selectAll('.tick').selectAll('text'));
+
+    xAxisElement.selectAll('.tick').selectAll('text')
+      .attr('y', 0)
+      .attr('x', 9)
+      .attr('dy', '.35em')
+      .attr('transform', 'rotate(90)')
+      .style('text-anchor', 'start')
+      .style('font-size', 9 + 'px');
+    // .attr("x", 7)
+    // .attr("y", 0)
+    // .attr("dy", ".35em")
+    // .style("text-anchor", "start");
 
     this.detailSVG.append('g')
     .attr('class', 'y axis')
