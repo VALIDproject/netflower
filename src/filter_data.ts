@@ -224,7 +224,7 @@ class FilterData implements MAppViews {
       from: 0,
       to: timePoints.length - 1,
       prettify: function (num) {
-        return timePoints[num];
+        return `` + TimeFormat.formatNumber(parseInt(timePoints[num]));
       },
       force_edges: true,  //Lets the labels inside the container
       drag_interval: true, //Allows the interval to be dragged around
