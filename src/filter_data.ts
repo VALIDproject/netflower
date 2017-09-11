@@ -189,6 +189,7 @@ class FilterData implements MAppViews {
     for(let entry of json)
     {
       let val:number = entry.attribute1;
+      // let val:number = parseInt(entry.attribute1, 10);
       if(paragraphs.indexOf(val) === -1)
       {
         paragraphs.push(val);
@@ -201,7 +202,8 @@ class FilterData implements MAppViews {
     this.paragraphFilter.values = paragraphs;
 
     // dirty hack to handle §31 in media transparency data
-    if (paragraphs[2] !== 31) {
+    // TODO does not equal with === maybe because attribute1 is a string at runtime
+    if (paragraphs[2] == 31) {
     // if (paragraphs.indexOf(31) !== -1) {
       d3.select('input[value = \'31\']').attr('checked', null);
       this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
