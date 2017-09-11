@@ -142,7 +142,7 @@ class FilterData implements MAppViews {
       this.paragraphFilter.resetValues();
 
       $('.paraFilter').each((index, element) => {
-        const value:number = $(element).val() as number;
+        const value = $(element).val() as string;
         if($(element).is(':checked'))
         {
           this.paragraphFilter.addValue(value);
@@ -166,7 +166,7 @@ class FilterData implements MAppViews {
       this.paragraphFilter.resetValues();
 
       $('.paraFilter').each((index, element) => {
-        const value:number = $(element).val() as number;
+        const value = $(element).val() as string;
         if($(element).is(':checked'))
         {
           this.paragraphFilter.addValue(value);
@@ -185,10 +185,10 @@ class FilterData implements MAppViews {
    */
   private setParagraphFilterElements(json)
   {
-    let paragraphs:Array<number> = [];
+    let paragraphs:Array<string> = [];
     for(let entry of json)
     {
-      let val:number = entry.attribute1;
+      let val:string = entry.attribute1;
       // let val:number = parseInt(entry.attribute1, 10);
       if(paragraphs.indexOf(val) === -1)
       {
@@ -202,9 +202,7 @@ class FilterData implements MAppViews {
     this.paragraphFilter.values = paragraphs;
 
     // dirty hack to handle §31 in media transparency data
-    // TODO does not equal with === maybe because attribute1 is a string at runtime
-    if (paragraphs[2] == 31) {
-    // if (paragraphs.indexOf(31) !== -1) {
+    if (paragraphs.indexOf('31') !== -1) {
       d3.select('input[value = \'31\']').attr('checked', null);
       this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
     }
