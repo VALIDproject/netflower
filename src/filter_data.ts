@@ -188,15 +188,16 @@ class FilterData implements MAppViews {
     let paragraphs:Array<string> = [];
     for(let entry of json)
     {
-      let val:string = entry.attribute1;
-      // let val:number = parseInt(entry.attribute1, 10);
-      if(paragraphs.indexOf(val) === -1)
-      {
-        paragraphs.push(val);
-        this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
-          .attr('class','paraFilter').attr('checked', true);
-        this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
-        this.$node.select('#paragraph').append('span').text(' ');
+      const val:string = entry.attribute1;
+      // attribute1 column not present in row --> not add a checkbox here
+      if (val !== undefined) {
+        if(paragraphs.indexOf(val) === -1) {
+          paragraphs.push(val);
+          this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
+            .attr('class','paraFilter').attr('checked', true);
+          this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
+          this.$node.select('#paragraph').append('span').text(' ');
+        }
       }
     }
     this.paragraphFilter.values = paragraphs;
@@ -210,7 +211,12 @@ class FilterData implements MAppViews {
     // set UI label dynamically based on CSV header
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     if (columnLabels != null) {
-      this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
+      if (columnLabels.attribute1 !== undefined) {
+        this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
+      } else {
+        // attribute1 column not present in header --> empty UI label
+        this.$node.select('#attr1_label').html('');
+      }
     } else {
       this.$node.select('#attr1_label').html('Attribute Filter');
     }

@@ -28,7 +28,10 @@ export default class ParagraphFilter implements Filter
   //check if the value meets the entries paragraph value
   public meetCriteria(data: any): any
   {
-    this.resultData = data.filter((d) => this.queriedValues.has(d.attribute1) );
+    this.resultData = data.filter((d) => {
+      // attribute1 column not present in row --> it meets the criteria (typically a dataset without an attribute column)
+      return (d.attribute1 === undefined) || this.queriedValues.has(d.attribute1);
+    });
 
     return this.resultData;
   }
