@@ -110,17 +110,18 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
 export const splitAt = index => it =>
   [it.slice(0, index), it.slice(index)];
 
+const formatNumber = d3.format(',.0f');    //Zero decimal places
+//  format = function(d) { return formatNumber(d); }, //Display number with unit sign
 /**
- * This method converts a given number to a String with dot fomrated thousands seperator.
+ * This method converts a given number to a String with dot formated thousands seperator.
  * @type {(n:number)=>string} the number to format
  */
-export const formatNumber = d3.format(',.0f'),    //Zero decimal places
-  format = function(d) { return formatNumber(d); }, //Display number with unit sign
-  dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'); }; //Replacing the , with .
+export const dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'); }; //Replacing the , with .
 
 /**
  * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
  * It's necessary but not very pretty. Not proud of it.....
+ * A "prettier" solution might be a loop and Math.pow(10,i) (yet but better not touch working code).
  * @param value to round
  * @returns {number}
  */

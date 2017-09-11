@@ -21,6 +21,7 @@ import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
+import TimeFormat from './timeFormat';
 
 class FilterData implements MAppViews {
 
@@ -224,7 +225,7 @@ class FilterData implements MAppViews {
       max: max,
       from: max,
       to: max,
-      prefix: 'Q',
+      prettify: TimeFormat.formatNumber,
       force_edges: true,  //Lets the labels inside the container
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
