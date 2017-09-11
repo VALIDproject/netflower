@@ -474,7 +474,9 @@ class SankeyDiagram implements MAppViews {
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
-        events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson);
+        let coordinates = d3.mouse(svg.node());
+        console.log(coordinates);
+        events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson, coordinates);
       });
 
       //Add in the nodes
@@ -505,7 +507,7 @@ class SankeyDiagram implements MAppViews {
           const direction = (d.sourceLinks.length <= 0) ? "from" : "to";
           return dotFormat(d.value) + ' ' + direction + ' displayed elements';
         });
-      
+
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
 
