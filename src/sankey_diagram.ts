@@ -474,8 +474,7 @@ class SankeyDiagram implements MAppViews {
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
-        let coordinates = d3.mouse(svg.node());
-        console.log(coordinates);
+        let coordinates = d3.mouse(svg.node());        
         events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson, coordinates);
       });
 

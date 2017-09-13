@@ -53,7 +53,7 @@ class SankeyDetail implements MAppViews {
   */
   private attachListener() {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json, coordinates) => {
-      console.log('Coordinaten, mouseclick evenet', coordinates, coordinates[0], coordinates[0]);
+      //console.log('Coordinaten, mouseclick evenet', coordinates, coordinates[0], coordinates[0]);
       if (this.clicked <= 1 ) {
         this.drawDetails(data, json, coordinates);
         ++this.clicked;
@@ -128,20 +128,48 @@ class SankeyDetail implements MAppViews {
       .attr('width', w + margin.left + margin.right + 'px')
       .attr('height', h + margin.top + margin.bottom + 'px')
       .style('background-color',  '#e0e0e0')
-      .style('z-index', '10000')
+      .style('z-index', '10000');
+
+      this.$node.select('svg.sankey_details').append('g')
+      .attr('class', 'headingDetailSankey')
+      .style('z-index', '10001');
+
+
+      this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
       .append('text')
+      .attr('x', 5)
+      .attr('y', 16)
+      .attr('class', 'source')
       .style('font-size', 11 + 'px')
       .text(function(d) {
-        return sourceName + ' → ' + targetName + '  ' + dotFormat(value);
+        return sourceName;
         //return sourceName;
-      })
-      .attr('x', 5)
-      .attr('y', 16);
+      });
 
-      const maxTextWidth = (w + margin.left + margin.right - 80) / 2;
-      const leftWrap = this.$node.select('.sankey_details').select('text');
-      //console.log(leftWrap);
-      //d3TextEllipse(leftWrap, maxTextWidth);
+        this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
+        .append('text')
+        .attr('class', 'target')
+        .html('<br/>' + ' → ' + targetName)
+        .attr('x', 5)
+        .attr('y', 30)
+        .style('font-size', 11 + 'px');
+
+        this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
+        .append('text')
+        .attr('class', 'target')
+        .html('<br/>' + '    ' +  dotFormat(value))
+        .attr('x', 200)
+        .attr('y', 30 )
+        .style('font-size', 11 + 'px');
+
+
+      const maxTextWidth = (w + margin.left + margin.right - 50)/ 2;
+      const leftWrap = this.$node.select('.sankey_details').select('.headingDetailSankey').selectAll('text.source');
+      const target = this.$node.select('.sankey_details').select('.headingDetailSankey').selectAll('text.target');
+      //console.log('selection- true', leftWrap);
+
+      d3TextEllipse(leftWrap, maxTextWidth);
+      d3TextEllipse(target, maxTextWidth);
 
       this.toolbox = d3.select('svg.sankey_details')
       .append('g')
