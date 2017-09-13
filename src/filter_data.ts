@@ -77,7 +77,7 @@ class FilterData implements MAppViews {
             <small>Top Filter</small>
           </div>
           <div class='col-sm-2'>
-            <small>Paragraph Filter</small>
+            <small id='attr1_label'>Paragraph Filter</small>
           </div>
         </div>
 
@@ -142,7 +142,7 @@ class FilterData implements MAppViews {
       this.paragraphFilter.resetValues();
 
       $('.paraFilter').each((index, element) => {
-        const value:number = $(element).val() as number;
+        const value = $(element).val() as string;
         if($(element).is(':checked'))
         {
           this.paragraphFilter.addValue(value);
@@ -166,7 +166,7 @@ class FilterData implements MAppViews {
       this.paragraphFilter.resetValues();
 
       $('.paraFilter').each((index, element) => {
-        const value:number = $(element).val() as number;
+        const value = $(element).val() as string;
         if($(element).is(':checked'))
         {
           this.paragraphFilter.addValue(value);
@@ -185,22 +185,41 @@ class FilterData implements MAppViews {
    */
   private setParagraphFilterElements(json)
   {
-    let paragraphs:Array<number> = [];
+    let paragraphs:Array<string> = [];
     for(let entry of json)
     {
-      let val:number = entry.attribute1;
-      if(paragraphs.indexOf(val) === -1)
-      {
-        paragraphs.push(val);
-        this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
-          .attr('class','paraFilter').attr('checked', true);
-        this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text('§'+val);
-        this.$node.select('#paragraph').append('span').text(' ');
+      const val:string = entry.attribute1;
+      // attribute1 column not present in row --> not add a checkbox here
+      if (val !== undefined) {
+        if(paragraphs.indexOf(val) === -1) {
+          paragraphs.push(val);
+          this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
+            .attr('class','paraFilter').attr('checked', true);
+          this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
+          this.$node.select('#paragraph').append('span').text(' ');
+        }
       }
     }
     this.paragraphFilter.values = paragraphs;
-    d3.select('input[value = \'31\']').attr('checked', null);
-    this.paragraphFilter.values = this.paragraphFilter.values.filter(e => e.toString() !== '31');
+
+    // dirty hack to handle §31 in media transparency data
+    if (paragraphs.indexOf('31') !== -1) {
+      d3.select('input[value = \'31\']').attr('checked', null);
+      this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
+    }
+
+    // set UI label dynamically based on CSV header
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    if (columnLabels != null) {
+      if (columnLabels.attribute1 !== undefined) {
+        this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
+      } else {
+        // attribute1 column not present in header --> empty UI label
+        this.$node.select('#attr1_label').html('');
+      }
+    } else {
+      this.$node.select('#attr1_label').html('Attribute Filter');
+    }
   }
 
   /**

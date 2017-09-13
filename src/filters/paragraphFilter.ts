@@ -1,4 +1,5 @@
 import Filter from './filter';
+import * as d3 from 'd3';
 
 /**
  * This class is used to describe a value filter or filtering by value of the data set.
@@ -7,51 +8,40 @@ export default class ParagraphFilter implements Filter
 {
   private resultData: Array<any>;
 
-  private _values: Array<number>;
+  private queriedValues: d3.Set;
 
   constructor()
   {
-    this.resultData = new Array<any>();
-    this._values = new Array<number>();
+    this.queriedValues = d3.set([]);
   }
 
-  get values():Array<number>
+  get values():Array<string>
   {
-    return this._values;
+    return this.queriedValues.values();
   }
 
-  set values(val:Array<number>)
+  set values(val:Array<string>)
   {
-    this._values = val;
+    this.queriedValues = d3.set(val);
   }
 
   //check if the value meets the entries paragraph value
   public meetCriteria(data: any): any
   {
-    this.resultData = new Array<any>();
-
-    for(let entry of data)
-    {
-      let para:number = entry.attribute1;
-
-      for(let value of this._values) {
-        if (para === value) {
-          this.resultData.push(entry);
-        }
-      }
-    }
+    this.resultData = data.filter((d) => {
+      // attribute1 column not present in row --> it meets the criteria (typically a dataset without an attribute column)
+      return (d.attribute1 === undefined) || this.queriedValues.has(d.attribute1);
+    });
 
     return this.resultData;
   }
 
-  public resetValues(): void
-  {
-    this._values = new Array<number>();
+  public resetValues(): void {
+    this.queriedValues = d3.set([]);
   }
 
-  public addValue(val: number): void
-  {
-    this._values.push(val);
+  public addValue(val: string): void {
+    this.queriedValues.add(val);
   }
 
   public printData(): void
