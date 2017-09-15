@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {dotFormat, d3TextEllipse} from './utilities';
+import {dotFormat, d3TextWrap} from './utilities';
 import TimeFormat from './timeFormat';
 
 class SankeyDetail implements MAppViews {
@@ -101,24 +101,14 @@ class SankeyDetail implements MAppViews {
     let widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
     let heightSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().height;
 
-    //console.log('sankey_vis area', widthSankeyDiv, heightSankeyDiv);
-
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
-
-    //console.log('window width and height', 'width', windowWidth, 'height',  windowHeight);
-
-
 
     //position of svg in the sankey_diagram div
     //let xpositionSvg = widthSankeyDiv / 2 + 100;
     let xpositionSvg = windowWidth / 2 - (w/2);
     let ypositionSvg = coordinates[1] + h;
-    console.log('yposition', ypositionSvg);
     let newYPositionSvg = ypositionSvg + 10;
-
-
-
 
     if (this.drawSvg === 0) {
 
@@ -134,42 +124,18 @@ class SankeyDetail implements MAppViews {
       .attr('class', 'headingDetailSankey')
       .style('z-index', '10001');
 
-
       this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
       .append('text')
       .attr('x', 5)
       .attr('y', 16)
-      .attr('class', 'source')
       .style('font-size', 11 + 'px')
       .text(function(d) {
-        return sourceName;
-        //return sourceName;
+        return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
       });
 
-        this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
-        .append('text')
-        .attr('class', 'target')
-        .html('<br/>' + ' → ' + targetName)
-        .attr('x', 5)
-        .attr('y', 30)
-        .style('font-size', 11 + 'px');
-
-        this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
-        .append('text')
-        .attr('class', 'target')
-        .html('<br/>' + '    ' +  dotFormat(value))
-        .attr('x', 200)
-        .attr('y', 30 )
-        .style('font-size', 11 + 'px');
-
-
-      const maxTextWidth = (w + margin.left + margin.right - 50)/ 2;
-      const leftWrap = this.$node.select('.sankey_details').select('.headingDetailSankey').selectAll('text.source');
-      const target = this.$node.select('.sankey_details').select('.headingDetailSankey').selectAll('text.target');
-      //console.log('selection- true', leftWrap);
-
-      d3TextEllipse(leftWrap, maxTextWidth);
-      d3TextEllipse(target, maxTextWidth);
+      const maxTextWidth = (w + margin.left + margin.right - 50);
+      const text = this.$node.select('.sankey_details').select('.headingDetailSankey').selectAll('text');
+      d3TextWrap(text , maxTextWidth, 5, 5);
 
       this.toolbox = d3.select('svg.sankey_details')
       .append('g')
@@ -205,14 +171,24 @@ class SankeyDetail implements MAppViews {
       .attr('width', w + margin.left + margin.right + 'px')
       .attr('height', h + margin.top + margin.bottom + 'px')
       .style('background-color',  '#e0e0e0')
-      .style('z-index', '10000')
-      .append('text')
-      .style('font-size', 11 + 'px')
-      .attr('class', 'caption')
-      .text(function(d) { return sourceName + ' → ' + targetName + '  ' + dotFormat(value); })
-      .attr('x', 5)
-      .attr('y', 16);
+      .style('z-index', '10000');
 
+      this.$node.select('svg.sankey_details2').append('g')
+      .attr('class', 'headingDetailSankey2')
+      .style('z-index', '10001');
+
+      this.$node.select('svg.sankey_details2').select('g.headingDetailSankey2')
+      .append('text')
+      .attr('x', 5)
+      .attr('y', 16)
+      .style('font-size', 11 + 'px')
+      .text(function(d) {
+        return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+      });
+
+      const maxTextWidth = (w + margin.left + margin.right - 50);
+      const text = this.$node.select('.sankey_details2').selectAll('text');
+      d3TextWrap(text , maxTextWidth, 5, 5);
 
       this.toolbox2 = d3.select('svg.sankey_details2')
       .append('g')
@@ -318,14 +294,10 @@ class SankeyDetail implements MAppViews {
     let yAxis = d3.svg.axis().scale(y)
     .orient('left');
 
-
-
     let xAxisElement = this.detailSVG.append('g')
     .attr('class', 'x axis')
     .attr('transform', 'translate(0,' + h + ')')
     .call(xAxis);
-
-    console.log(xAxisElement.selectAll('.tick').selectAll('text'));
 
     xAxisElement.selectAll('.tick').selectAll('text')
       .attr('y', 0)
@@ -334,10 +306,6 @@ class SankeyDetail implements MAppViews {
       .attr('transform', 'rotate(90)')
       .style('text-anchor', 'start')
       .style('font-size', 9 + 'px');
-    // .attr("x", 7)
-    // .attr("y", 0)
-    // .attr("dy", ".35em")
-    // .style("text-anchor", "start");
 
     this.detailSVG.append('g')
     .attr('class', 'y axis')
