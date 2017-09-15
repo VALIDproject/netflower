@@ -474,7 +474,7 @@ class SankeyDiagram implements MAppViews {
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
-        let coordinates = d3.mouse(svg.node());        
+        let coordinates = d3.mouse(svg.node());
         events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson, coordinates);
       });
 
@@ -575,11 +575,18 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'end')
         .attr('class', 'leftText');
 
+
       const maxTextWidth = (margin.left + margin.right - 10) / 2;
       const leftWrap = this.$node.selectAll('.leftText');
       d3TextEllipse(leftWrap, maxTextWidth);
       const rightWrap = this.$node.selectAll('.rightText');
       d3TextEllipse(rightWrap, maxTextWidth);
+
+      //On Hover titles for Sankey Diagram Text - after Text Elipsis
+      heading.append('title').text(function(d) {return d.name;});
+      rightWrap.append('title').text(function(d) {return d.name;});
+
+
     } else {
       let svgPlain = d3.select('#sankeyDiagram svg');
       svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right)/2 + ')')
