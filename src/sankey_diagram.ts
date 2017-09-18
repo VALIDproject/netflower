@@ -16,7 +16,7 @@ import {MAppViews} from './app';
 import {roundToFull, dotFormat, textTransition, d3TextEllipse} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
-import {ERROR_2manynodes, ERROR_2manyfilter} from './language';
+import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -93,12 +93,12 @@ class SankeyDiagram implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    let left = this.$node.append('div').attr('class', 'left_bars');
-    let sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
-    let middle = sankeyVis.append('div').attr('class', 'middle_bars');
-    let sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
-    let loadMore = sankeyVis.append('div').attr('class', 'load_more');
-    let right = this.$node.append('div').attr('class', 'right_bars');
+    const left = this.$node.append('div').attr('class', 'left_bars');
+    const sankeyVis = this.$node.append('div').attr('class', 'sankey_vis');
+    const middle = sankeyVis.append('div').attr('class', 'middle_bars');
+    const sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
+    const loadMore = sankeyVis.append('div').attr('class', 'load_more');
+    const right = this.$node.append('div').attr('class', 'right_bars');
     //let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
 
     //Check if column meta data is in storage and provide some defaults
@@ -180,7 +180,7 @@ class SankeyDiagram implements MAppViews {
    */
   private attachListener() {
     //This redraws if new data is available
-    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
       this.getStorageData(false);
     }
@@ -221,7 +221,7 @@ class SankeyDiagram implements MAppViews {
     });
 
     this.$node.select('#entitySearchButton').on('click', (d) => {
-      let value: string = $('#entitySearchFilter').val();
+      const value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
@@ -235,7 +235,7 @@ class SankeyDiagram implements MAppViews {
     });
 
     this.$node.select('#mediaSearchButton').on('click', (d) => {
-      let value: string = $('#mediaSearchFilter').val();
+      const value: string = $('#mediaSearchFilter').val();
       this.mediaSearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
@@ -317,7 +317,7 @@ class SankeyDiagram implements MAppViews {
   {
     localforage.getItem('data').then((value) => {
       //Store the unfiltered data too
-      let originalData = value;
+      const originalData = value;
       if(!redraw)
       {
         setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
@@ -328,12 +328,12 @@ class SankeyDiagram implements MAppViews {
       }
 
       //Filter the data before and then pass it to the draw function.
-      let filteredData = this.pipeline.performFilters(value);
+      const filteredData = this.pipeline.performFilters(value);
       this.valuesSumSource =(<any>d3).nest()
         .key((d) => {return d.sourceNode;})
         .rollup(function (v) {return [
           d3.sum(v, function (d :any){ return d.valueNode;})
-        ]})
+        ];})
         .entries(filteredData);
 
 
@@ -341,12 +341,12 @@ class SankeyDiagram implements MAppViews {
         .key((d) => {return d.targetNode;})
         .rollup(function (v) {return [
           d3.sum(v, function (d :any){ return d.valueNode;})
-        ]})
+        ];})
         .entries(filteredData);
 
-      // console.log("----------- Original Data -----------");
+      // console.log('----------- Original Data -----------');
       // console.log(originalData);
-      // console.log("----------- Filtered Data -----------");
+      // console.log('----------- Filtered Data -----------');
       // console.log(filteredData);
       // this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
@@ -362,14 +362,14 @@ class SankeyDiagram implements MAppViews {
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
-    let timePoints: any = d3.set(
+    const timePoints: any = d3.set(
       json.map(function (d: any) { return d.timeNode; })
     ).values().sort();
 
-    let headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
-    let footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
-    let widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
-    let heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
+    const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
+    const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
+    const widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
+    const heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
     const margin = {top: 10, right: 120, bottom: 10, left: 120};
     const width = widthNode - margin.left - margin.right;
@@ -391,20 +391,20 @@ class SankeyDiagram implements MAppViews {
     const path = sankey.link();
 
     // aggregate flow by source and target (i.e. sum multiple times and attributes)
-    let flatNest = d3.nest()
+    const flatNest = d3.nest()
       .key((d: any) => {return d.sourceNode + '|$|' + d.targetNode;})
       .rollup(function (v: any[]) {return {
         source: v[0].sourceNode,
         target: v[0].targetNode,
         time: v[0].timeNode,
         sum: d3.sum(v, function (d :any){ return d.valueNode;})
-      }})
+      };})
       .entries(json)
-      .map(o => o.values) // remove key/values
-      .sort(function(a: any, b: any){ return d3.descending(a.sum, b.sum) });
+      .map((o) => o.values) // remove key/values
+      .sort(function(a: any, b: any){ return d3.descending(a.sum, b.sum); });
 
     //Create reduced graph with only number of nodes shown
-    let graph = {'nodes' : [], 'links' : []};
+    const graph = {'nodes' : [], 'links' : []};
     console.log('changed', that.nodesToShow);
     //Ceep track of number of flows (distinct source target pairs)
     that.maximumNodes = flatNest.length;
@@ -412,14 +412,13 @@ class SankeyDiagram implements MAppViews {
     //============ CHECK IF SHOULD DRAW ============
     if (json.length === 0) {                                  //ERROR: Too strong filtered
       that.drawReally = false;
-      this.showErrorDialog(ERROR_2manyfilter);
-    }
-    else { that.drawReally = true; }
+      this.showErrorDialog(ERROR_TOOMANYFILTER);
+    } else { that.drawReally = true; }
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
       let counter = 0;
-      for(let d of flatNest) {
+      for(const d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
           const textUp = `Flows below ${dotFormat(d.sum)} are not displayed.`;
@@ -459,7 +458,7 @@ class SankeyDiagram implements MAppViews {
         .links(graph.links)
         .layout(10); //Difference only by 0, 1 and otherwise always the same
 
-      let link = svg.append('g').selectAll('.link')
+      const link = svg.append('g').selectAll('.link')
         .data(graph.links)
         .enter().append('path')
         .attr('class', 'link')
@@ -479,7 +478,7 @@ class SankeyDiagram implements MAppViews {
       });
 
       //Add in the nodes
-      let node = svg.append('g').selectAll('.node')
+      const node = svg.append('g').selectAll('.node')
         .data(graph.nodes)
         .enter().append('g')
         .attr('class', function(d: any, i: number) {
@@ -503,7 +502,7 @@ class SankeyDiagram implements MAppViews {
         .append('title')
         .text(function(d) {
           // different preposition based on whether its a source or target node
-          const direction = (d.sourceLinks.length <= 0) ? "from" : "to";
+          const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
           return dotFormat(d.value) + ' ' + direction + ' displayed elements';
         });
 
@@ -530,14 +529,14 @@ class SankeyDiagram implements MAppViews {
         .style('fill', 'url(#diagonalHatch)')
         .attr('width', sankey.nodeWidth() / 2)
         .attr('x', function (d){
-          if (d.sourceLinks.length <= 0) return sankey.nodeWidth()/2;
+          if (d.sourceLinks.length <= 0) { return sankey.nodeWidth()/2; };
         })
         .append('title')
         .text((d) => {
           let result;
-          for (let i = 0; i < this.valuesSumSource.length; i++) {
-            if (this.valuesSumSource[i].key === d.name) {
-              result =  this.valuesSumSource[i].values;
+          for(const val of this.valuesSumSource) {
+            if(val.key === d.name) {
+              result = val.values;
             }
           }
           if(timePoints.length > 1) {
@@ -550,9 +549,9 @@ class SankeyDiagram implements MAppViews {
         .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
         .text((d) => {
           let result;
-          for (let i = 0; i < this.valuesSumTarget.length; i++) {
-            if (this.valuesSumTarget[i].key === d.name) {
-              result =  this.valuesSumTarget[i].values;
+          for(const val of this.valuesSumTarget) {
+            if(val.key === d.name) {
+              result = val.values;
             }
           }
           if(timePoints.length > 1) {
@@ -563,14 +562,14 @@ class SankeyDiagram implements MAppViews {
         });
 
       //Add in the title for the nodes
-      let heading = node.append('g').append('text')
+      const heading = node.append('g').append('text')
         .attr('x', 45)
         .attr('y', function(d) { return (d.dy / 2) - 10;})
         .attr('dy', '1.0em')
         .attr('text-anchor', 'start')
         .attr('class', 'rightText')
         .text(function(d) {return `${d.name}`;})
-        .filter(function(d, i) { return d.x < width / 2})
+        .filter(function(d, i) { return d.x < width / 2;})
         .attr('x', -45 + sankey.nodeWidth())
         .attr('text-anchor', 'end')
         .attr('class', 'leftText');
@@ -588,7 +587,7 @@ class SankeyDiagram implements MAppViews {
 
 
     } else {
-      let svgPlain = d3.select('#sankeyDiagram svg');
+      const svgPlain = d3.select('#sankeyDiagram svg');
       svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right)/2 + ')')
         .attr('y', (height + margin.top + margin.bottom)/2)
         .append('tspan').attr('x', '0').attr('text-anchor', 'middle').style('font-size', '2em')
@@ -606,9 +605,10 @@ class SankeyDiagram implements MAppViews {
       className: 'dialogBox',
       title: 'Information',
       message: text,
-      callback: function(result) {
-        if (result) { console.log('Ok pressed...'); }
-        else { return; }
+      callback(result) {
+        if (result) {
+          console.log('Ok pressed...');
+        } else { return; }
       }
     });
   }

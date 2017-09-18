@@ -6,8 +6,8 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
-import * as localforage from 'localforage'
-import {tableToJSON, textTransition} from './utilities';
+import * as localforage from 'localforage';
+import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 
@@ -42,7 +42,7 @@ class DataImport implements MAppViews {
    * @returns {Promise<DataImport>}
    */
   init() {
-    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
 
     if(!dataAvailable) {
       d3.select('.dataVizView').classed('invisibleClass', true);
@@ -153,7 +153,7 @@ class DataImport implements MAppViews {
     this.$node.select('#showMoreBtn')
       .on('click', (e) => {
         //Plot the data in the table and enable edit mode
-        let resultData = this.parseResults.data;
+        const resultData = this.parseResults.data;
         this.previewData(resultData);
         this.editMode = true;
 
@@ -238,7 +238,7 @@ class DataImport implements MAppViews {
       chunk: (results, file) => {     //Limit is 10MB for files
         this.parseResults = results;
       },
-      error: function(err, file)      //Executes if there is an error loading the file
+      error(err, file)      //Executes if there is an error loading the file
       {
         d3.select('#errorLog').append('p')
           .text(new Date().toLocaleTimeString() + ' --- ' + err + ' :: ' + file);
@@ -266,7 +266,7 @@ class DataImport implements MAppViews {
    * @param results The parsed results of the papaparse loader
    */
   private displayData(results) {
-    let resultError = results.errors;
+    const resultError = results.errors;
 
     //Resize the table appropriate and add scroll area if necessary
     d3.select('#valuesList')
@@ -275,8 +275,8 @@ class DataImport implements MAppViews {
 
     //Print out the parse errors in the file
     if (resultError.length > 0) {
-      for (let i = 0; i < resultError.length; i++) {
-        let elem = resultError[i];
+      for(const el of resultError) {
+        const elem = el;
         d3.select('#errorLog').append('p')
           .html('Date: ' + new Date().toLocaleTimeString() + '<br/>'
             + 'Error: ' + elem.message + '<br/>' + ' Search in Row: ' + elem.row);
@@ -299,7 +299,7 @@ class DataImport implements MAppViews {
       console.log('Saved data');
     }).catch(function (err) {
       console.log('Error: ', err);
-    })
+    });
 
     //Local Storage for small variables
     localStorage.setItem('dataLoaded', 'loaded');
@@ -312,7 +312,7 @@ class DataImport implements MAppViews {
    * @returns {any} object which  contains the saved column names and new names.
    */
   private reworkColumnLabels(keys: string[]): any {
-    let result : any = {};
+    const result : any = {};
     for (let i = 0; i < keys.length; i++) {
       result[keyRep[i]] = keys[i];
     }
@@ -324,8 +324,8 @@ class DataImport implements MAppViews {
    * @param json the raw data.
    */
   private reworkKeys(json) {
-    let data = json.data;
-    let keys = Object.keys(data[0]);
+    const data = json.data;
+    const keys = Object.keys(data[0]);
 
     data.forEach(function(e) {
       for(let i = 0; i < keys.length; i++) {
@@ -352,16 +352,20 @@ class DataImport implements MAppViews {
     let table = `<table class='table valueTable' >`;
     //Create the header of the table
     table += '<thead>';
-    for (var k in resultData[0] ) {
-      table += '<th>' + k + '</th>';
+    for (const k in resultData[0] ) {
+      if(resultData[0].hasOwnProperty(k)) {
+        table += '<th>' + k + '</th>';
+      }
     }
     table += '</thead>';
 
-    for (let i = 0; i < resultData.length; i++) {
-      let row = resultData[i];
+    for(const el of resultData) {
+      const row = el;
       table += '<tr>';
-      for (let key in row) {
-        table += '<td> ' + row[key] + '</td>';
+      for (const key in row) {
+        if(row.hasOwnProperty(key)) {
+          table += '<td> ' + row[key] + '</td>';
+        }
       }
       table += '</tr>';
     }
@@ -385,7 +389,7 @@ class DataImport implements MAppViews {
       this.$btnPrev.hide();
     }
 
-    if(this.rowsToShow == 10) {
+    if(this.rowsToShow === 10) {
       this.$btnNext.show();
       this.$btnPrev.hide();
     }

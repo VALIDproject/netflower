@@ -81,31 +81,32 @@ class SankeyDetail implements MAppViews {
   * @param clickedPath is the node which was clicked by the user
   * @param json is the whole data set in order to retrieve all time points for the current node
   */
-  private drawDetails (clickedPath, json, coordinates) {
-    let margin = {top: 50 , right: 60, bottom: 60, left: 60},
+  private drawDetails (clickedPath, json) {
+    const margin = {top: 30 , right: 40, bottom: 30, left: 40},
+
     w = 400 - margin.left - margin.right,
     h = 200 - margin.top - margin.bottom;
 
-    let sourceName = clickedPath.source.name;
-    let targetName = clickedPath.target.name;
-    let value = clickedPath.target.value;
+    const sourceName = clickedPath.source.name;
+    const targetName = clickedPath.target.name;
+    const value = clickedPath.target.value;
 
     //Tooltip for the bar chart
-    let tooltip = this.$node.append('div')
+    const tooltip = this.$node.append('div')
     .attr('class', 'tooltip')
     .style('opacity', 0)
     .style('z-index', '200000');
-
+    
     //Get width and height of sankey div to calculate position of svg
-    let widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
-    let heightSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().height;
-    let windowWidth = window.innerWidth;
-    let windowHeight = window.innerHeight;
+    const widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
+    const heightSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().height;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
 
     //Position of svg in the sankey_diagram div
-    let xpositionSvg = windowWidth / 2 - (w/2);
-    let ypositionSvg = coordinates[1] + h;
-    let newYPositionSvg = ypositionSvg + 10;
+    const xpositionSvg = windowWidth / 2 - (w/2);
+    const ypositionSvg = coordinates[1] + h;
+    const newYPositionSvg = ypositionSvg + 10;
 
     if (this.drawSvg === 0) {
       this.$node.append('svg')
@@ -213,27 +214,29 @@ class SankeyDetail implements MAppViews {
     }
 
     //Filter data based on the clicked path (sourceName and targetName) and store it
-    let path = json.filter((obj) => {
+    const path = json.filter((obj) => {
       return obj.sourceNode === sourceName && obj.targetNode === targetName;
     });
 
     //Data for the bar chart
-    let valueOverTime = {};
-    for(let key in path) {
+    const valueOverTime = {};
+    for(const key in path) {
       if(path.hasOwnProperty(key)) {
         valueOverTime[path[key].timeNode] = path[key];
       }
     }
-    let data = [];
-    for(let i in valueOverTime) {
-      data.push({timeNode: +valueOverTime[i].timeNode, valueNode: +valueOverTime[i].valueNode});
+    const data = [];
+    for(const i in valueOverTime) {
+      if(valueOverTime.hasOwnProperty(i)) {
+        data.push({timeNode: +valueOverTime[i].timeNode, valueNode: +valueOverTime[i].valueNode});
+      }
     }
 
     //X-Scale and equal distribution
-    let x = (<any>d3).scale.ordinal()
+    const x = (<any>d3).scale.ordinal()
     .rangeBands([0, w], 0.2);
     //Y-Scale for the chart
-    let y = d3.scale.linear()
+    const y = d3.scale.linear()
     .range([h, 0]);
 
     const timePoints = d3.set(
@@ -280,11 +283,11 @@ class SankeyDetail implements MAppViews {
     });
 
     //Define the axes and draw them
-    let xAxis = d3.svg.axis().scale(x)
+    const xAxis = d3.svg.axis().scale(x)
     .tickFormat(TimeFormat.format)
     .orient('bottom');
 
-    let yAxis = d3.svg.axis().scale(y)
+    const yAxis = d3.svg.axis().scale(y)
     .orient('left');
 
     let xAxisElement = this.detailSVG.append('g')
@@ -305,7 +308,7 @@ class SankeyDetail implements MAppViews {
     .call(yAxis.ticks(4).tickFormat(d3.format(',')));
 
     //Append the close button or link to the SVG
-    let close = this.detailSVG.append('g').attr('class', 'closeLink');
+    const close = this.detailSVG.append('g').attr('class', 'closeLink');
     close.append('text')
     .attr('font-family', 'FontAwesome')
     .text(function(d) { return ' ' + '\uf00d';})
