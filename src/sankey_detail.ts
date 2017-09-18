@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {dotFormat} from './utilities';
+import {dotFormat, d3TextWrap} from './utilities';
 import TimeFormat from './timeFormat';
 
 class SankeyDetail implements MAppViews {
@@ -52,9 +52,9 @@ class SankeyDetail implements MAppViews {
   * Attach the event listeners
   */
   private attachListener() {
-    events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json) => {
+    events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json, coordinates) => {
       if (this.clicked <= 1 ) {
-        this.drawDetails(data, json);
+        this.drawDetails(data, json, coordinates);
         ++this.clicked;
       } else {
         this.closeDetail();
@@ -81,8 +81,8 @@ class SankeyDetail implements MAppViews {
   * @param clickedPath is the node which was clicked by the user
   * @param json is the whole data set in order to retrieve all time points for the current node
   */
-  private drawDetails (clickedPath, json) {
-    let margin = {top: 30 , right: 40, bottom: 30, left: 40},
+  private drawDetails (clickedPath, json, coordinates) {
+    let margin = {top: 50 , right: 60, bottom: 60, left: 60},
     w = 400 - margin.left - margin.right,
     h = 200 - margin.top - margin.bottom;
 
@@ -96,15 +96,16 @@ class SankeyDetail implements MAppViews {
     .style('opacity', 0)
     .style('z-index', '200000');
 
-    //get width and height of sankey div to calculate position of svg
+    //Get width and height of sankey div to calculate position of svg
     let widthSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().width;
     let heightSankeyDiv = (<any>d3).select('.sankey_vis').node().getBoundingClientRect().height;
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
 
-    //position of svg in the sankey_diagram div
-    let xpositionSvg = widthSankeyDiv / 2 + 100;
-    let ypositionSvg = heightSankeyDiv / 2 - h;
-    let newYPositionSvg = ypositionSvg + 20;
-
+    //Position of svg in the sankey_diagram div
+    let xpositionSvg = windowWidth / 2 - (w/2);
+    let ypositionSvg = coordinates[1] + h;
+    let newYPositionSvg = ypositionSvg + 10;
 
     if (this.drawSvg === 0) {
       this.$node.append('svg')
@@ -113,16 +114,29 @@ class SankeyDetail implements MAppViews {
       .attr('width', w + margin.left + margin.right + 'px')
       .attr('height', h + margin.top + margin.bottom + 'px')
       .style('background-color',  '#e0e0e0')
-      .style('z-index', '10000')
+      .style('z-index', '10000');
+
+      this.$node.select('svg.sankey_details').append('g')
+      .attr('class', 'headingDetailSankey')
+      .style('z-index', '10001');
+
+      this.$node.select('svg.sankey_details').select('g.headingDetailSankey')
       .append('text')
-      .text(function(d) { return sourceName + ' → ' + targetName +  '  ' + dotFormat(value) ; })
       .attr('x', 5)
-      .attr('y', 16);
+      .attr('y', 16)
+      .style('font-size', 11 + 'px')
+      .text(function(d) {
+        return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+      });
+
+      const maxTextWidth = (w + margin.left + margin.right - 50);
+      const text = this.$node.select('.sankey_details').select('.headingDetailSankey').selectAll('text');
+      d3TextWrap(text, maxTextWidth, 5, 5);
 
       this.toolbox = d3.select('svg.sankey_details')
       .append('g')
       .attr('class', 'toolbox')
-      .attr('transform', 'translate(' + 20 + ',' + 30 + ')');
+      .attr('transform', 'translate(' + 5 + ',' + 12 + ')');
 
       this.toolbox.append('text')
       .attr('font-family', 'FontAwesome')
@@ -145,7 +159,6 @@ class SankeyDetail implements MAppViews {
       });
 
       ++this.drawSvg;
-
     } else {
       this.$node.append('svg')
       .attr('class', 'sankey_details2')
@@ -153,17 +166,29 @@ class SankeyDetail implements MAppViews {
       .attr('width', w + margin.left + margin.right + 'px')
       .attr('height', h + margin.top + margin.bottom + 'px')
       .style('background-color',  '#e0e0e0')
-      .style('z-index', '10000')
+      .style('z-index', '10000');
+
+      this.$node.select('svg.sankey_details2').append('g')
+      .attr('class', 'headingDetailSankey2')
+      .style('z-index', '10001');
+
+      this.$node.select('svg.sankey_details2').select('g.headingDetailSankey2')
       .append('text')
-      .attr('class', 'caption')
-      .text(function(d) { return sourceName + ' → ' + targetName + '  ' + dotFormat(value); })
       .attr('x', 5)
-      .attr('y', 16);
+      .attr('y', 16)
+      .style('font-size', 11 + 'px')
+      .text(function(d) {
+        return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+      });
+
+      const maxTextWidth = (w + margin.left + margin.right - 50);
+      const text = this.$node.select('.sankey_details2').selectAll('text');
+      d3TextWrap(text, maxTextWidth, 5, 5);
 
       this.toolbox2 = d3.select('svg.sankey_details2')
       .append('g')
       .attr('class', 'toolbox2')
-      .attr('transform', 'translate(' + 20 + ',' + 30 + ')');
+      .attr('transform', 'translate(' + 5 + ',' + 12 + ')');
 
       this.toolbox2.append('text')
       .attr('font-family', 'FontAwesome')
@@ -207,12 +232,11 @@ class SankeyDetail implements MAppViews {
     //X-Scale and equal distribution
     let x = (<any>d3).scale.ordinal()
     .rangeBands([0, w], 0.2);
-
     //Y-Scale for the chart
     let y = d3.scale.linear()
     .range([h, 0]);
 
-    let timePoints = d3.set(
+    const timePoints = d3.set(
       json.map(function (d: any) { return d.timeNode; })
     ).values().sort();
 
@@ -226,7 +250,6 @@ class SankeyDetail implements MAppViews {
       .attr('class', 'bars')
       .attr('transform', 'translate(' + (margin.left + 10) + ',' + margin.top + ')');
       ++this.drawBarChart;
-
     } else {
       //Add the svg for the bars and transform it slightly to be in position of the box
       this.detailSVG = d3.select('svg.sankey_details2')
@@ -264,10 +287,18 @@ class SankeyDetail implements MAppViews {
     let yAxis = d3.svg.axis().scale(y)
     .orient('left');
 
-    this.detailSVG.append('g')
-    .attr('class', ' x axis')
+    let xAxisElement = this.detailSVG.append('g')
+    .attr('class', 'x axis')
     .attr('transform', 'translate(0,' + h + ')')
     .call(xAxis);
+
+    xAxisElement.selectAll('.tick').selectAll('text')
+      .attr('y', 0)
+      .attr('x', 9)
+      .attr('dy', '.35em')
+      .attr('transform', 'rotate(90)')
+      .style('text-anchor', 'start')
+      .style('font-size', 9 + 'px');
 
     this.detailSVG.append('g')
     .attr('class', 'y axis')
@@ -279,14 +310,13 @@ class SankeyDetail implements MAppViews {
     .attr('font-family', 'FontAwesome')
     .text(function(d) { return ' ' + '\uf00d';})
     .style('z-index', '200000')
-    .attr('x', '325')
-    .attr('y', '-13')
+    .attr('font-size', 14 + 'px')
+    .attr('x', '310')
+    .attr('y', '-28')
     .on('click', function (d) {
       events.fire(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, d);
     });
   }
-
-
 }
 /**
 * Factory method to create a new SankeyDiagram instance

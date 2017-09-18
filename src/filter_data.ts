@@ -79,6 +79,9 @@ class FilterData implements MAppViews {
           <div class='col-sm-2'>
             <small id='attr1_label'>Paragraph Filter</small>
           </div>
+          <div class='col-sm-2'>
+            <small>Time Slider</small>
+          </div>
         </div>
 
         <div class='row'>
@@ -93,11 +96,20 @@ class FilterData implements MAppViews {
             <div id='paragraph'>
             </div>
           </div>
+
         </div>
+        <div class='col-sm-2'>
+        <div class='quarterSlider'>
+         <input id='timeSlider'/>
+         </div>
+          </div>
+        </div>
+
        </div>
-       <div class='quarterSlider'>
-        <input id='timeSlider'/>
-       </div>
+
+
+
+
     `);
   }
 
