@@ -79,6 +79,9 @@ class FilterData implements MAppViews {
           <div class='col-sm-2'>
             <small id='attr1_label'>Paragraph Filter</small>
           </div>
+          <div class='col-sm-2'>
+            <small>Time Slider</small>
+          </div>
         </div>
 
         <div class='row'>
@@ -93,11 +96,20 @@ class FilterData implements MAppViews {
             <div id='paragraph'>
             </div>
           </div>
+
         </div>
+        <div class='col-sm-2'>
+        <div class='quarterSlider'>
+         <input id='timeSlider'/>
+         </div>
+          </div>
+        </div>
+
        </div>
-       <div class='quarterSlider'>
-        <input id='timeSlider'/>
-       </div>
+
+
+
+
     `);
   }
 
@@ -106,7 +118,7 @@ class FilterData implements MAppViews {
    */
   private attachListener(json) {
     //Set the filters only if data is available
-    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
       this.setQuarterFilterRange(json);
       this.setParagraphFilterElements(json);
@@ -119,19 +131,17 @@ class FilterData implements MAppViews {
 
     //Listener for the change fo the top filter
     this.$node.select('#topFilter').on('change', (d) => {
-      let value:number = $('#topFilter').val() as number;
+      const value:number = $('#topFilter').val() as number;
 
-      if(value == 0)
+      if(value === 0)
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(false);
-      }
-      else if(value == 1)
+      } else if(value === 1)
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(true);
-      }
-      else {
+      } else {
         this.topFilter.active = false;
       }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
@@ -154,14 +164,14 @@ class FilterData implements MAppViews {
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
       this.updateQuarterFilter(json);
-      let filterQuarter = this.quarterFilter.meetCriteria(data);
+      const filterQuarter = this.quarterFilter.meetCriteria(data);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
 
     //Clears all filters and updates the appropriate sliders
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
       this.updateQuarterFilter(json);
-      let filterQuarter = this.quarterFilter.meetCriteria(json);
+      const filterQuarter = this.quarterFilter.meetCriteria(json);
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
 
@@ -185,8 +195,8 @@ class FilterData implements MAppViews {
    */
   private setParagraphFilterElements(json)
   {
-    let paragraphs:Array<string> = [];
-    for(let entry of json)
+    const paragraphs:Array<string> = [];
+    for(const entry of json)
     {
       const val:string = entry.attribute1;
       // attribute1 column not present in row --> not add a checkbox here
@@ -242,21 +252,21 @@ class FilterData implements MAppViews {
       max: timePoints.length - 1,
       from: 0,
       to: timePoints.length - 1,
-      prettify: function (num) {
-        return timePoints[num];
+      prettify(num) {
+        return `` + TimeFormat.formatNumber(parseInt(timePoints[num], 10));
       },
       force_edges: true,  //Lets the labels inside the container
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
         // TODO here we rely on all timeNodes to be numbers
-        let newMin: number = Number(timePoints[sliderData.from]);
-        let newMax: number = Number(timePoints[sliderData.to]);
+        const newMin: number = Number(timePoints[sliderData.from]);
+        const newMax: number = Number(timePoints[sliderData.to]);
         this.quarterFilter.minValue = newMin;
         this.quarterFilter.maxValue = newMax;
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
 
         //This notifies the sliders to change their values but only if the quarter slider changes
-        let filterQuarter = this.quarterFilter.meetCriteria(json);
+        const filterQuarter = this.quarterFilter.meetCriteria(json);
         events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
       }
     });

@@ -26,16 +26,13 @@ export default class TimeFormat {
             TimeFormat.func = function (raw: string): string {
                 return raw.substr(0, 4) + " Q" + raw.substr(-1);
             }
-            console.log("set to a quarter format");
         } else if (header.match(/month/i)) {
             TimeFormat.func = function (raw: string): string {
                 let date = inFormatMonth.parse(raw); // returns a Date
                 return outFormatMonth(date);
             }
-            console.log("set to a month format");
         } else {
             TimeFormat.func = passThrough;
-            console.log("set to default format");
         }
     }
 }
