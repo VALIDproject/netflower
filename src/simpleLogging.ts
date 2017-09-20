@@ -6,7 +6,7 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import { AppConstants } from './app_constants';
 import { MAppViews } from './app';
-import { downloadFile } from './utilities';
+import { downloadFile, randomString } from './utilities';
 
 const formatTime = d3.time.format('%Y-%m-%d %H:%M:%S.%L');
 // const formatTime = d3.time.format('%H:%M:%S');
@@ -59,7 +59,8 @@ export default class SimpleLogging implements MAppViews {
     this.$node.on('click', (d) => {
       console.log('submit log');
       // console.log(this.logs.join('\n'));
-      downloadFile(this.logs.join('\n'), 'log.txt', 'text/plain');
+      const file = 'log-'+randomString(6) + '.txt';
+      downloadFile(this.logs.join('\n'), file, 'text/plain');
     });
   }
 
