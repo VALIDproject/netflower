@@ -14,13 +14,20 @@ const SEPARATOR = ';';
 
 export default class SimpleLogging implements MAppViews {
 
+  // for the UI (= button)
   private $node: d3.Selection<any>;
   private parentDOM: string;
 
+  /** singleton for logging */
+  private static instance;
+
+  /** cached log messages */
   private logs: string[] = [];
+
 
   constructor(parent: Element, private options: any) {
     this.parentDOM = options.parentDOM;
+    SimpleLogging.instance = this;
   }
 
   /**
@@ -57,8 +64,10 @@ export default class SimpleLogging implements MAppViews {
     });
   }
 
-  private log(category: string, payload: any) {
-    this.logs.push(formatTime(new Date()) + SEPARATOR + category + SEPARATOR + JSON.stringify(payload));
+  public static log(category: string, payload: any) {
+    const msg = formatTime(new Date()) + SEPARATOR + category + SEPARATOR + JSON.stringify(payload);
+    SimpleLogging.instance.logs.push(msg);
+    console.log('log preview: ' + msg);
   }
 }
 
