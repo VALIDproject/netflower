@@ -16,6 +16,7 @@ import MediaEuroFilter from './mediaEuroFilter';
 import EntitySearchFilter from './entitySearchFilter';
 import MediaSearchFilter from './mediaSearchFilter';
 import PaymentEuroFilter from './paymentEuroFilter';
+import SimpleLogging from '../simpleLogging';
 
 let entityFilterRef;
 let mediaFilterRef;
@@ -30,23 +31,24 @@ let valueFilterRef;
 export function setEntityFilterRange(filter, elemName: string, data: any)
 {
   filter.calculateMinMaxValues(data);
-  let min: number = roundToFull(filter.minValue);
-  let max: number = roundToFull(filter.maxValue);
+  const myMin: number = roundToFull(filter.minValue);
+  const myMax: number = roundToFull(filter.maxValue);
 
   $(elemName).ionRangeSlider({
     type: 'double',
-    min: min,
-    max: max,
+    min: myMin,
+    max: myMax,
     prettify_enabled: true,
     prettify_separator: '.',
     force_edges: true,      //Lets the labels inside the container
-    min_interval: min * 2,  //Forces at least 1000 to be shown in order to prevent errors
+    min_interval: myMin * 2,  //Forces at least 1000 to be shown in order to prevent errors
     drag_interval: true,    //Allows the interval to be dragged around
     onFinish: (sliderData) => {
-      let newMin: number = sliderData.from;
-      let newMax: number = sliderData.to;
+      const newMin: number = sliderData.from;
+      const newMax: number = sliderData.to;
       filter.minValue = newMin;
       filter.maxValue = newMax;
+      SimpleLogging.log('source value slider', [newMin, newMax]);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     },
   });
@@ -61,12 +63,12 @@ export function setEntityFilterRange(filter, elemName: string, data: any)
  */
 export function updateEntityRange(filter, data: any) {
   filter.calculateMinMaxValues(data);
-  let min: number = roundToFull(filter.minValue);
-  let max: number = roundToFull(filter.maxValue);
+  const myMin: number = roundToFull(filter.minValue);
+  const myMax: number = roundToFull(filter.maxValue);
 
   entityFilterRef.update({
-    min: min,
-    max: max
+    min: myMin,
+    max: myMax
   });
 }
 
@@ -79,23 +81,24 @@ export function updateEntityRange(filter, data: any) {
 export function setMediaFilterRange(filter, elemName: string, data: any): void
 {
   filter.calculateMinMaxValues(data);
-  let min: number = roundToFull(filter.minValue);
-  let max: number = roundToFull(filter.maxValue);
+  const myMin: number = roundToFull(filter.minValue);
+  const myMax: number = roundToFull(filter.maxValue);
 
   $(elemName).ionRangeSlider({
     type: 'double',
-    min: min,
-    max: max,
+    min: myMin,
+    max: myMax,
     prettify_enabled: true,
     prettify_separator: '.',
     force_edges: true,        //Lets the labels inside the container
-    min_interval: min * 2,    //Forces at least 1000 to be shown in order to prevent errors
+    min_interval: myMin * 2,    //Forces at least 1000 to be shown in order to prevent errors
     drag_interval: true,      //Allows the interval to be dragged around
     onFinish: (sliderData) => {
-      let newMin: number = sliderData.from;
-      let newMax: number = sliderData.to;
+      const newMin: number = sliderData.from;
+      const newMax: number = sliderData.to;
       filter.minValue = newMin;
       filter.maxValue = newMax;
+      SimpleLogging.log('target value slider', [newMin, newMax]);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     }
   });
@@ -110,12 +113,12 @@ export function setMediaFilterRange(filter, elemName: string, data: any): void
  */
 export function updateMediaRange(filter, data: any) {
   filter.calculateMinMaxValues(data);
-  let min: number = roundToFull(filter.minValue);
-  let max: number = roundToFull(filter.maxValue);
+  const myMin: number = roundToFull(filter.minValue);
+  const myMax: number = roundToFull(filter.maxValue);
 
   mediaFilterRef.update({
-    min: min,
-    max: max
+    min: myMin,
+    max: myMax
   });
 }
 
@@ -126,31 +129,32 @@ export function updateMediaRange(filter, data: any) {
  * @param data the data for the slider to dermin the range
  */
 export function setEuroFilterRange(filter, elemName: string, data: any): void {
-  let min: number = data[0].valueNode;
-  let max: number = data[0].valueNode;
+  let myMin: number = data[0].valueNode;
+  let myMax: number = data[0].valueNode;
   for (let entry of data) {
     let value: number = Number(entry.valueNode);
-    if (value < min) min = value;
-    if (value > max) max = value;
+    if (value < myMin) myMin = value;
+    if (value > myMax) myMax = value;
   }
-  min = roundToFull(min);
-  max = roundToFull(max);
-  filter.changeRange(min, max);
+  myMin = roundToFull(myMin);
+  myMax = roundToFull(myMax);
+  filter.changeRange(myMin, myMax);
 
   $(elemName).ionRangeSlider({
     type: 'double',
-    min: min,
-    max: max,
+    min: myMin,
+    max: myMax,
     prettify_enabled: true,
     prettify_separator: '.',
     force_edges: true,        //Lets the labels inside the container
-    min_interval: min * 2,    //Forces at least 1000 to be shown in order to prevent errors
+    min_interval: myMin * 2,    //Forces at least 1000 to be shown in order to prevent errors
     drag_interval: true,      //Allows the interval to be dragged around
     onFinish: (sliderData) => {
-      let newMin: number = sliderData.from;
-      let newMax: number = sliderData.to;
+      const newMin: number = sliderData.from;
+      const newMax: number = sliderData.to;
       filter.minValue = newMin;
       filter.maxValue = newMax;
+      SimpleLogging.log('flow value slider', [newMin, newMax]);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     }
   });
