@@ -131,13 +131,13 @@ class FilterData implements MAppViews {
 
     //Listener for the change fo the top filter
     this.$node.select('#topFilter').on('change', (d) => {
-      const value:number = $('#topFilter').val() as number;
+      const value:string = $('#topFilter').val().toString();
 
-      if(value === 0)
+      if(value === '0')
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(false);
-      } else if(value === 1)
+      } else if(value === '1')
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(true);
