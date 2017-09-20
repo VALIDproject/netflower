@@ -220,13 +220,20 @@ class SankeyDiagram implements MAppViews {
       this.mediaSearchFilter.term = '';
     });
 
-    this.$node.select('#entitySearchButton').on('click', (d) => {
+    // full-text search in source node names
+    const sourceSearch = (d) => {
       const value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    };
+    $('#entitySearchFilter').keypress((e) => {
+      if (e.which === 13) {
+        sourceSearch(e);
+      }
     });
+    this.$node.select('#entitySearchButton').on('click', sourceSearch);
 
     this.$node.select('#clearEntity').on('click', (d) => {
       $('#entitySearchFilter').val('');
@@ -234,13 +241,20 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
-    this.$node.select('#mediaSearchButton').on('click', (d) => {
+    // full-text search in target node names
+    const targetSearch = (d) => {
       const value: string = $('#mediaSearchFilter').val();
       this.mediaSearchFilter.term = value;
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    };
+    $('#mediaSearchFilter').keypress((e) => {
+      if (e.which === 13) {
+        targetSearch(e);
+      }
     });
+    this.$node.select('#mediaSearchButton').on('click', targetSearch);
 
     this.$node.select('#clearMedia').on('click', (d) => {
       $('#mediaSearchFilter').val('');
