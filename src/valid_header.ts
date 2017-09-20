@@ -76,7 +76,9 @@ class ValidHeader implements MAppViews {
             if (result) {
               SimpleLogging.log('reupload data confirmed', '');
               //Clear both storage facilities
-              localStorage.clear();
+              localStorage.removeItem('dataLoaded');
+              localStorage.removeItem('columnLabels');
+              SimpleLogging.trimLogFile();
               localforage.clear();
               //Remove all elements that get not created from the DOM
               d3.select('.dataVizView').selectAll('*').remove();
