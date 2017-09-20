@@ -9,6 +9,7 @@ import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 import {MAppViews} from './app';
+import SimpleLogging from './simpleLogging';
 
 class ValidHeader implements MAppViews {
 
@@ -64,6 +65,7 @@ class ValidHeader implements MAppViews {
             //Listener for the Back Button
     this.$node.select('#backBtn')
       .on('click', (e) => {
+        SimpleLogging.log('reupload data clicked', '');
         bootbox.confirm({
           className: 'dialogBox',
           title: 'Information',
@@ -72,6 +74,7 @@ class ValidHeader implements MAppViews {
           Be sure you don't lose anything important or save your progress before you proceed.`,
           callback(result) {
             if (result) {
+              SimpleLogging.log('reupload data confirmed', '');
               //Clear both storage facilities
               localStorage.clear();
               localforage.clear();
@@ -80,6 +83,7 @@ class ValidHeader implements MAppViews {
               //Force reload and loose all data
               location.reload(true);
             } else {
+              SimpleLogging.log('reupload data aborted', '');
               return;
             }
           }
