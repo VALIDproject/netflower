@@ -8,6 +8,10 @@ import { AppConstants } from './app_constants';
 import { MAppViews } from './app';
 import { dotFormat } from './utilities';
 
+const formatTime = d3.time.format('%Y-%m-%d %H:%M:%S');
+// const formatTime = d3.time.format('%H:%M:%S');
+const SEPARATOR = ';';
+
 export default class SimpleLogging implements MAppViews {
 
   private $node: d3.Selection<any>;
@@ -44,12 +48,17 @@ export default class SimpleLogging implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+    // retrieve the log file
     this.$node.on('click', (d) => {
       console.log('submit log (to be developed)');
       for (const item of this.logs) {
         console.log(item);
       }
     });
+  }
+
+  private log(category: string, payload: any) {
+    this.logs.push(formatTime(new Date()) + SEPARATOR + category + SEPARATOR + JSON.stringify(payload));
   }
 }
 
