@@ -16,3 +16,11 @@ utton at the end of the sankey diagram.<br/>This will create more visual space f
 export const ERROR_TOOMANYFILTER = `Your current <font color='#DA5A6B'><strong>FILTER</strong></font> settings are
 too restrictive. There is <strong>NO DATA</strong> to show!<br/>Please change your filter settings in order to show
 data on the visualization.`;
+
+export const USAGE_INFO = `<strong><font color='#DA5A6B'><h3>ATTENTION!</h3></font></strong><br/>
+This tool requires a specific format for the tables in order to visualize them appropriate. If the required format isn't
+met, it will result in erros or no displayed data. The format of the table headings defines all further views but needs
+to be in a specific order:`;
+
+export const DOWNLOAD_INFO = `The <strong>button</strong> below let's you download a sample dataset for the application.
+It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`

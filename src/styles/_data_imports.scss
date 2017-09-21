@@ -68,3 +68,24 @@
   margin-top: 18px;
   margin-left: 20px;
 }
+
+.demo {
+  width:100%;
+  border:1px dashed #C0C0C0;
+  border-collapse:collapse;
+  padding:5px;
+}
+.demo th {
+  border:1px dashed #C0C0C0;
+  padding:5px;
+  background:#CCCCCC;
+}
+.demo td {
+  border:1px dashed #C0C0C0;
+  text-align:center;
+  padding:5px;
+}
+
+#helpInfo {
+  margin-top: 40px;
+}
