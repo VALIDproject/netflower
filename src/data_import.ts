@@ -10,6 +10,7 @@ import * as localforage from 'localforage';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
+import SimpleLogging from './simpleLogging';
 
 const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
@@ -121,6 +122,7 @@ class DataImport implements MAppViews {
     //Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {
+        SimpleLogging.log('import submit button','');
         //Clear the log first
         d3.select('#errorLog').selectAll('*').remove();
         d3.select('#messageLog').html('');
@@ -152,6 +154,7 @@ class DataImport implements MAppViews {
     //Listener for the Edit Button
     this.$node.select('#showMoreBtn')
       .on('click', (e) => {
+        SimpleLogging.log('import preview show button','');
         //Plot the data in the table and enable edit mode
         const resultData = this.parseResults.data;
         this.previewData(resultData);
@@ -172,6 +175,7 @@ class DataImport implements MAppViews {
     //Listener for the 'Next' Button in the visual browser
     this.$node.select('#seeNextRecords')
       .on('click', (e) => {
+        SimpleLogging.log('import preview next button','');
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.$tableRows.slice(this.rowsToShow, this.rowsToShow + 10).show();
         this.rowsToShow += 10;
@@ -187,6 +191,7 @@ class DataImport implements MAppViews {
     //Listener for the 'Prev' Button in the visual browser
     this.$node.select('#seePrevRecords')
       .on('click', (e) => {
+        SimpleLogging.log('import preview prev button','');
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.rowsToShow -= 10;
         d3.select('#valueListMeta').html('Viewing page: ' + this.rowsToShow / 10
@@ -203,6 +208,7 @@ class DataImport implements MAppViews {
     this.$node.select('#specialBtn')
       .on('click', (e) => {
         //Before rework the keys of the data
+        SimpleLogging.log('import special button','');
         this.reworkKeys(this.parseResults);
 
         if(this.editMode) {
@@ -246,6 +252,8 @@ class DataImport implements MAppViews {
       complete: (res, file) => {      //Needs arrow function in order to pass the this object globally and not the this of papaparse object
         this.uploadedFileName = file.name;
         this.displayData(this.parseResults);
+
+        SimpleLogging.log('import upload complete',file.name);
 
         //Enable the detail button and the start visualization button
         d3.select('#showMoreBtn').attr('disabled', null)

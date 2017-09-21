@@ -9,6 +9,7 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {dotFormat, d3TextWrap} from './utilities';
 import TimeFormat from './timeFormat';
+import SimpleLogging from './simpleLogging';
 
 class SankeyDetail implements MAppViews {
 
@@ -55,15 +56,18 @@ class SankeyDetail implements MAppViews {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json, coordinates) => {
       //console.log('Coordinaten, mouseclick evenet', coordinates, coordinates[0], coordinates[0]);
       if (this.clicked <= 1 ) {
+        SimpleLogging.log('flow detail clicked', [data.source.name, data.target.name]);
         this.drawDetails(data, json, coordinates);
         ++this.clicked;
       } else {
+        SimpleLogging.log('flow detail clicked -> too many', [data.source.name, data.target.name]);
         this.closeDetail();
         this.clicked = 0;
       }
     });
 
     events.on(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, (evt, d) => {
+      SimpleLogging.log('flow detail close', '');
       this.closeDetail();
       this.clicked = 0;
     });

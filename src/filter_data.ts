@@ -22,6 +22,7 @@ import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 import TimeFormat from './timeFormat';
+import SimpleLogging from './simpleLogging';
 
 class FilterData implements MAppViews {
 
@@ -137,12 +138,15 @@ class FilterData implements MAppViews {
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(false);
+        SimpleLogging.log('top filter', 'bottom');
       } else if(value === '1')
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(true);
+        SimpleLogging.log('top filter', 'top');
       } else {
         this.topFilter.active = false;
+        SimpleLogging.log('top filter', 'disabled');
       }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
@@ -159,6 +163,7 @@ class FilterData implements MAppViews {
         }
       });
 
+      SimpleLogging.log('attribute filter', this.paragraphFilter.values);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
@@ -170,6 +175,7 @@ class FilterData implements MAppViews {
 
     //Clears all filters and updates the appropriate sliders
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
       this.updateQuarterFilter(json);
       const filterQuarter = this.quarterFilter.meetCriteria(json);
       d3.selectAll('input').property('checked', true);
@@ -263,6 +269,8 @@ class FilterData implements MAppViews {
         const newMax: number = Number(timePoints[sliderData.to]);
         this.quarterFilter.minValue = newMin;
         this.quarterFilter.maxValue = newMax;
+
+        SimpleLogging.log('time slider', [newMin, newMax]);
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
 
         //This notifies the sliders to change their values but only if the quarter slider changes
