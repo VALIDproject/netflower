@@ -16,7 +16,6 @@
 }
 
 .logContainer {
-  height: 80px;
   max-width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -83,6 +82,21 @@
 .demo td {
   border:1px dashed #C0C0C0;
   text-align:center;
+  padding:5px;
+}
+
+.downloadTable {
+  width:100%;
+  border:1px dotted #C0C0C0;
+  border-collapse:collapse;
+  padding:5px;
+}
+.downloadTable th {
+  border:1px dotted #C0C0C0;
+  padding:5px;
+}
+.downloadTable td {
+  border:1px dotted #C0C0C0;
   padding:5px;
 }
 

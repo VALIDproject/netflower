@@ -7,10 +7,11 @@ import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
 import * as localforage from 'localforage';
+import * as bootbox from 'bootbox';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {USAGE_INFO, DOWNLOAD_INFO} from './language';
+import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
 
 const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
@@ -127,10 +128,10 @@ class DataImport implements MAppViews {
       </table>
       <br/>
       <p>${DOWNLOAD_INFO}</p>
-      <a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>
-      <button id='#sampleFile' class='btn btn-primary btn-large' style='float: right'>
-        <i class='fa fa-download'></i> Sample File
-      </button></a>
+      <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
+      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
+        <i class='fa fa-download'></i> Sample Files</button>
+      <!--</a>-->
     `);
 
     //Initialize for text transition
@@ -257,10 +258,16 @@ class DataImport implements MAppViews {
 
     //Listener for the download file button
     this.$node.select('#sampleFile').on('click', (e) => {
+      bootbox.alert({
+        title: 'Sample Files',
+        message: `${DOWNLOAD_DIALOG}`
+      });
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
       evt.stopPropagation();
     });
+
+    d3.selectAll('a').on('click', (e) => {console.log('testaaaaaaa'); e.preventDefault();});
   }
 
   /**

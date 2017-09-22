@@ -27,4 +27,8 @@ export class AppConstants {
   static EVENT_UI_COMPLETE = 'eventUIComplete';
 
   static EVENT_CLEAR_FILTERS = 'eventClearFilters';
+
+
+  //FILE DOWNLOADS
+  static FILE1 = 'http://flock-1140.students.fhstp.ac.at/Sample_Data.csv';
 }
