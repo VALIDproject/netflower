@@ -105,12 +105,7 @@ class FilterData implements MAppViews {
          </div>
           </div>
         </div>
-
        </div>
-
-
-
-
     `);
   }
 
@@ -164,13 +159,17 @@ class FilterData implements MAppViews {
       });
 
       SimpleLogging.log('attribute filter', this.paragraphFilter.values);
+      const paraFilterData = this.paragraphFilter.meetCriteria(json);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
-      this.updateQuarterFilter(json);
-      const filterQuarter = this.quarterFilter.meetCriteria(data);
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+      const paraFilterData = this.paragraphFilter.meetCriteria(json);
+      this.updateQuarterFilter(paraFilterData);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      // const filterQuarter = this.quarterFilter.meetCriteria(data);
+      // events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
 
     //Clears all filters and updates the appropriate sliders
@@ -218,19 +217,19 @@ class FilterData implements MAppViews {
     }
     this.paragraphFilter.values = paragraphs;
 
-    // dirty hack to handle §31 in media transparency data
+    //Dirty hack to handle §31 in media transparency data
     if (paragraphs.indexOf('31') !== -1) {
       d3.select('input[value = \'31\']').attr('checked', null);
       this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
     }
 
-    // set UI label dynamically based on CSV header
+    //Set UI label dynamically based on CSV header
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     if (columnLabels != null) {
       if (columnLabels.attribute1 !== undefined) {
         this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
       } else {
-        // attribute1 column not present in header --> empty UI label
+        //Attribute1 column not present in header --> empty UI label
         this.$node.select('#attr1_label').html('');
       }
     } else {

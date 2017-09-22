@@ -51,7 +51,6 @@ class SankeyDiagram implements MAppViews {
   private mediaSlider;
   private valueSlider;
 
-
   private activeQuarters: string[] = [];
 
   constructor(parent: Element, private options: any)
@@ -100,7 +99,6 @@ class SankeyDiagram implements MAppViews {
     const sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     const loadMore = sankeyVis.append('div').attr('class', 'load_more');
     const right = this.$node.append('div').attr('class', 'right_bars');
-    //let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
 
     //Check if column meta data is in storage and provide some defaults
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -112,7 +110,6 @@ class SankeyDiagram implements MAppViews {
     } else {
       TimeFormat.setFormat(columnLabels.timeNode);
     }
-
 
     left.html(`
     <div class='controlBox'>
@@ -360,7 +357,6 @@ class SankeyDiagram implements MAppViews {
         ];})
         .entries(filteredData);
 
-
       this.valuesSumTarget =(<any>d3).nest()
         .key((d) => {return d.targetNode;})
         .rollup(function (v) {return [
@@ -368,11 +364,11 @@ class SankeyDiagram implements MAppViews {
         ];})
         .entries(filteredData);
 
-      // console.log('----------- Original Data -----------');
-      // console.log(originalData);
-      // console.log('----------- Filtered Data -----------');
-      // console.log(filteredData);
-      // this.pipeline.printFilters();
+      console.log('----------- Original Data -----------');
+      console.log(originalData);
+      console.log('----------- Filtered Data -----------');
+      console.log(filteredData);
+      this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -564,7 +560,7 @@ class SankeyDiagram implements MAppViews {
             }
           }
           if(timePoints.length > 1) {
-            return  dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
+            return dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
           } else {
             return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
           }
