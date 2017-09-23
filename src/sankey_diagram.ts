@@ -364,10 +364,10 @@ class SankeyDiagram implements MAppViews {
         ];})
         .entries(filteredData);
 
-      console.log('----------- Original Data -----------');
-      console.log(originalData);
-      console.log('----------- Filtered Data -----------');
-      console.log(filteredData);
+      // console.log('----------- Original Data -----------');
+      // console.log(originalData);
+      // console.log('----------- Filtered Data -----------');
+      // console.log(filteredData);
       this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
