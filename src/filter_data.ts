@@ -23,6 +23,7 @@ import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
+import {type} from 'os';
 
 class FilterData implements MAppViews {
 
@@ -165,8 +166,8 @@ class FilterData implements MAppViews {
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
-      const paraFilterData = this.paragraphFilter.meetCriteria(json);
-      this.updateQuarterFilter(paraFilterData);
+      const filterQuarter = this.quarterFilter.meetCriteria(data);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       // const filterQuarter = this.quarterFilter.meetCriteria(data);
       // events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
@@ -249,13 +250,13 @@ class FilterData implements MAppViews {
 
     const newMin: number = Number(timePoints[0]);
     const newMax: number = Number(timePoints[timePoints.length - 1]);
-    this.quarterFilter.changeRange(newMin, newMax);
+    this.quarterFilter.changeRange(newMax, newMax);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
       min: 0,
       max: timePoints.length - 1,
-      from: 0,
+      from: timePoints.length - 1,
       to: timePoints.length - 1,
       prettify(num) {
         return `` + TimeFormat.formatNumber(parseInt(timePoints[num], 10));
@@ -274,7 +275,8 @@ class FilterData implements MAppViews {
 
         //This notifies the sliders to change their values but only if the quarter slider changes
         const filterQuarter = this.quarterFilter.meetCriteria(json);
-        events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+        const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       }
     });
     this.quarterFilterRef = $('#timeSlider').data('ionRangeSlider');
@@ -289,10 +291,11 @@ class FilterData implements MAppViews {
       data.map(function (d: any) { return d.timeNode; })
     ).values().sort();
 
+    const newMin: number = Number(timePoints[0]);
     const newMax: number = Number(timePoints[timePoints.length - 1]);
-    this.quarterFilter.changeRange(newMax, newMax);
+    this.quarterFilter.changeRange(newMin, newMax);
     this.quarterFilterRef.update({
-      from: timePoints.length - 1,
+      from: 0,
       to: timePoints.length - 1
     });
   }
