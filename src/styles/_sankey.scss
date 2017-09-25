@@ -194,6 +194,10 @@ svg.barchart rect.bar:hover {
   fill-opacity: 0.5;
 }
 
+svg text.yaxisunit {
+  font: 10px sans-serif;
+}
+
 //REMOVE LATER
 .quarterSlider {
   width: 250px;

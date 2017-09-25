@@ -276,6 +276,13 @@ class SankeyDetail implements MAppViews {
       this.drawBarChart = 0;
     }
 
+    this.detailSVG.append('text')
+      .attr('class', 'yaxisunit')
+      .attr('x', '-10')
+      .attr('y', '-6')
+      .style('text-anchor', 'end')
+      .text(valuePostFix);
+
     //Add in the bar charts and the tooltips if user mouses over them.
     this.detailSVG.selectAll('.bar')
       .data(data)
