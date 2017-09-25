@@ -385,6 +385,13 @@ class SankeyDiagram implements MAppViews {
     const timePoints: any = d3.set(
       json.map(function (d: any) { return d.timeNode; })
     ).values().sort();
+    const selectedTimePointsAsString = (timePoints.length > 1)
+      ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1])
+      : TimeFormat.format(timePoints[0]);
+
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    /** unit of flows (e.g., '€'). Extracted from CSV header. */
+    const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
     const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
     const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
@@ -441,7 +448,7 @@ class SankeyDiagram implements MAppViews {
       for(const d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
-          const textUp = `Flows below ${dotFormat(d.sum)} are not displayed.`;
+          const textUp = `Flows below ${dotFormat(d.sum)}${valuePostFix} are not displayed.`;
           textTransition(d3.select('#infoNodesLeft'), textUp, 350);
           const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
           textTransition(d3.select('#loadInfo'), textDown, 350);
@@ -489,7 +496,8 @@ class SankeyDiagram implements MAppViews {
 
       //Add the link titles - Hover Path
       link.append('title')
-        .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value); });
+        .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix; });
+        // + ' in ' + selectedTimePointsAsString
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
@@ -523,7 +531,7 @@ class SankeyDiagram implements MAppViews {
         .text(function(d) {
           // different preposition based on whether its a source or target node
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-          return dotFormat(d.value) + ' ' + direction + ' displayed elements';
+          return dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
         });
 
       //Create sparkline barcharts for newly enter-ing g.node elements
@@ -559,12 +567,7 @@ class SankeyDiagram implements MAppViews {
               result = val.values;
             }
           }
-          if(timePoints.length > 1) {
-            return dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
-          } else {
-            return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
-          }
-
+          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
         })
         .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
         .text((d) => {
@@ -574,11 +577,7 @@ class SankeyDiagram implements MAppViews {
               result = val.values;
             }
           }
-          if(timePoints.length > 1) {
-            return  dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
-          } else {
-            return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
-          }
+          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
         });
 
       //Add in the title for the nodes
