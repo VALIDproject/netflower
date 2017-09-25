@@ -309,7 +309,7 @@ class SankeyDetail implements MAppViews {
 
     this.detailSVG.append('g')
       .attr('class', 'y axis')
-      .call(yAxis.ticks(4).tickFormat(d3.format('.')));
+      .call(yAxis.ticks(4).tickFormat(d3.format(',')));
 
     //Append the close button or link to the SVG
     let close = this.detailSVG.append('g').attr('class', 'closeLink');
