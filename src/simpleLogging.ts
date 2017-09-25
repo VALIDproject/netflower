@@ -71,7 +71,6 @@ export default class SimpleLogging implements MAppViews {
   public static log(category: string, payload: any) {
     const msg = formatTime(new Date()) + FIELD_SEPARATOR + category + FIELD_SEPARATOR + JSON.stringify(payload);
     console.log('log preview: ' + msg);
-
     SimpleLogging.appendInStorage(msg);
   }
 

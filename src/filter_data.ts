@@ -23,6 +23,7 @@ import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
+import {type} from 'os';
 
 class FilterData implements MAppViews {
 
@@ -105,12 +106,7 @@ class FilterData implements MAppViews {
          </div>
           </div>
         </div>
-
        </div>
-
-
-
-
     `);
   }
 
@@ -164,13 +160,17 @@ class FilterData implements MAppViews {
       });
 
       SimpleLogging.log('attribute filter', this.paragraphFilter.values);
+      const paraFilterData = this.paragraphFilter.meetCriteria(json);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
-      this.updateQuarterFilter(json);
       const filterQuarter = this.quarterFilter.meetCriteria(data);
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      // const filterQuarter = this.quarterFilter.meetCriteria(data);
+      // events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
 
     //Clears all filters and updates the appropriate sliders
@@ -178,6 +178,7 @@ class FilterData implements MAppViews {
       SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
       this.updateQuarterFilter(json);
       const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
 
@@ -189,7 +190,7 @@ class FilterData implements MAppViews {
         }
       });
 
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
@@ -218,19 +219,19 @@ class FilterData implements MAppViews {
     }
     this.paragraphFilter.values = paragraphs;
 
-    // dirty hack to handle §31 in media transparency data
+    //Dirty hack to handle §31 in media transparency data
     if (paragraphs.indexOf('31') !== -1) {
       d3.select('input[value = \'31\']').attr('checked', null);
       this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
     }
 
-    // set UI label dynamically based on CSV header
+    //Set UI label dynamically based on CSV header
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     if (columnLabels != null) {
       if (columnLabels.attribute1 !== undefined) {
         this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
       } else {
-        // attribute1 column not present in header --> empty UI label
+        //Attribute1 column not present in header --> empty UI label
         this.$node.select('#attr1_label').html('');
       }
     } else {
@@ -250,13 +251,13 @@ class FilterData implements MAppViews {
 
     const newMin: number = Number(timePoints[0]);
     const newMax: number = Number(timePoints[timePoints.length - 1]);
-    this.quarterFilter.changeRange(newMin, newMax);
+    this.quarterFilter.changeRange(newMax, newMax);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
       min: 0,
       max: timePoints.length - 1,
-      from: 0,
+      from: timePoints.length - 1,
       to: timePoints.length - 1,
       prettify(num) {
         return `` + TimeFormat.formatNumber(parseInt(timePoints[num], 10));
@@ -275,7 +276,8 @@ class FilterData implements MAppViews {
 
         //This notifies the sliders to change their values but only if the quarter slider changes
         const filterQuarter = this.quarterFilter.meetCriteria(json);
-        events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+        const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       }
     });
     this.quarterFilterRef = $('#timeSlider').data('ionRangeSlider');
@@ -290,6 +292,7 @@ class FilterData implements MAppViews {
       data.map(function (d: any) { return d.timeNode; })
     ).values().sort();
 
+    const newMin: number = Number(timePoints[0]);
     const newMax: number = Number(timePoints[timePoints.length - 1]);
     this.quarterFilter.changeRange(newMax, newMax);
     this.quarterFilterRef.update({
