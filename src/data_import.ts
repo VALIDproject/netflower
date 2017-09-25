@@ -390,18 +390,18 @@ class DataImport implements MAppViews {
   }
 
   /**
-   * ensure that all target node names are different from source node names.
+   * Ensure that all target node names are different from source node names.
    * In such a case, a whitespace is added.
    */
   private makeNodesUnique() {
     const json = this.parseResults.data;
-    // all source nodes
+    //All source nodes
     const sources = d3.set(
       json.map(function (d: any) { return d.sourceNode; })
     );
-    // all rows of orig data that have a known source node as target node
+    //All rows of orig data that have a known source node as target node
     const flowsToChange = json.filter((d) => {return sources.has(d.targetNode); });
-    // transform these rows
+    //Transform these rows
     flowsToChange.forEach((d) => {
       d.targetNode = d.targetNode + ' ';
     });
