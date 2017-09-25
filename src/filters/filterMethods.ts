@@ -34,12 +34,16 @@ export function setEntityFilterRange(filter, elemName: string, data: any)
   const myMin: number = roundToFull(filter.minValue);
   const myMax: number = roundToFull(filter.maxValue);
 
+  const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+  const valuePostFix = (columnLabels == null) ? '' : columnLabels.valueNode;
+
   $(elemName).ionRangeSlider({
     type: 'double',
     min: myMin,
     max: myMax,
     prettify_enabled: true,
     prettify_separator: '.',
+    postfix: ' ' + valuePostFix,
     force_edges: true,      //Lets the labels inside the container
     min_interval: myMin * 2,  //Forces at least 1000 to be shown in order to prevent errors
     drag_interval: true,    //Allows the interval to be dragged around
@@ -84,12 +88,16 @@ export function setMediaFilterRange(filter, elemName: string, data: any): void
   const myMin: number = roundToFull(filter.minValue);
   const myMax: number = roundToFull(filter.maxValue);
 
+  const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+  const valuePostFix = (columnLabels == null) ? '' : columnLabels.valueNode;
+
   $(elemName).ionRangeSlider({
     type: 'double',
     min: myMin,
     max: myMax,
     prettify_enabled: true,
     prettify_separator: '.',
+    postfix: ' ' + valuePostFix,
     force_edges: true,        //Lets the labels inside the container
     min_interval: myMin * 2,    //Forces at least 1000 to be shown in order to prevent errors
     drag_interval: true,      //Allows the interval to be dragged around
@@ -140,12 +148,16 @@ export function setEuroFilterRange(filter, elemName: string, data: any): void {
   myMax = roundToFull(myMax);
   filter.changeRange(myMin, myMax);
 
+  const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+  const valuePostFix = (columnLabels == null) ? '' : columnLabels.valueNode;
+
   $(elemName).ionRangeSlider({
     type: 'double',
     min: myMin,
     max: myMax,
     prettify_enabled: true,
     prettify_separator: '.',
+    postfix: ' ' + valuePostFix,
     force_edges: true,        //Lets the labels inside the container
     min_interval: myMin * 2,    //Forces at least 1000 to be shown in order to prevent errors
     drag_interval: true,      //Allows the interval to be dragged around

@@ -95,6 +95,10 @@ class SankeyDetail implements MAppViews {
     let targetName = clickedPath.target.name;
     let value = clickedPath.target.value;
 
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    /** unit of flows (e.g., '€'). Extracted from CSV header. */
+    const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
+
     //Tooltip for the bar chart
     let tooltip = this.$node.append('div')
       .attr('class', 'tooltip')
@@ -134,7 +138,7 @@ class SankeyDetail implements MAppViews {
         .attr('y', 16)
         .style('font-size', 11 + 'px')
         .text(function(d) {
-          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value) + valuePostFix;
         });
 
       const maxTextWidth = (w + margin.left + margin.right - 50);
@@ -187,7 +191,7 @@ class SankeyDetail implements MAppViews {
         .attr('y', 16)
         .style('font-size', 11 + 'px')
         .text(function(d) {
-          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value) + valuePostFix;
         });
 
       const maxTextWidth = (w + margin.left + margin.right - 50);

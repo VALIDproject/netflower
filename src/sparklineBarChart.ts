@@ -31,6 +31,9 @@ export default class SparklineBarChart implements MAppViews {
   private necessaryHeight = INITIAL_SVG_HEIGHT;
   private chartWidth: number = 120;        //Fallback if not calcualted dynamically
 
+  /** unit of flows (e.g., '€'). Extracted from CSV header. */
+  private valuePostFix = '';
+
   private activeQuarters: string[] = [];
 
   constructor(parent: Element, private options: any) {
@@ -104,6 +107,9 @@ export default class SparklineBarChart implements MAppViews {
 
   private build(data: any, nodeName: string, yMiddle: number, timePoints: string[]) {
     const _self = this;
+
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    this.valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
     if (this.necessaryHeight < yMiddle) {
       this.necessaryHeight = yMiddle;
@@ -183,7 +189,7 @@ export default class SparklineBarChart implements MAppViews {
       //Add the link titles - Hover Path
       .append('title')
       .text(function (d) {
-        return nodeName + '\nTime: ' + TimeFormat.format(d.key) + '\nFlow: ' + dotFormat(d.values);
+        return nodeName + '\nTime: ' + TimeFormat.format(d.key) + '\nFlow: ' + dotFormat(d.values) + _self.valuePostFix;
       });
   }
 }
