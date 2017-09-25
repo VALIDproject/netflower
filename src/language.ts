@@ -31,20 +31,34 @@ export const DOWNLOAD_DIALOG = `You can download the following sample files by k
 <table class='downloadTable'>
 	<tbody>
 	<tr>
-		<td>Media transperancy</td>
-		<td><a href=${AppConstants.FILE1} download=''>Media Transperancy</a></td>
+		<td class='leftTD'><strong>Simple Example</strong><br/>
+        A simple example file with only a few entries.
+    </td>
+		<td class='rightTD'><a href=${AppConstants.FILE4} download=''>Download Data (.csv)</a></td>
 	</tr>
 	<tr>
-		<td>Asylum stuff</td>
-		<td><a href=${AppConstants.FILE1} download=''>Media Transperancy</a></td>
+	  <td class='leftTD'><strong>Media Transparency Data</strong><br/>
+      Austrian governmental organizations are legally required to report the money flow for advertisement
+      and media sponsoring, which are collectively published as open government data on media transparency.
+      <a target='_blank' href='https://www.rtr.at/de/m/Medientransparenz'>Source</a>
+    </td>
+		<td class='rightTD'><a href=${AppConstants.MEDIA_FILE}>Download Data (.csv)</a></td>
 	</tr>
 	<tr>
-		<td>Farm stuff</td>
-		<td><a href=${AppConstants.FILE1} download=''>Media Transperancy</a></td>
+		<td class='leftTD'><strong>Asylum Data</strong><br/>  
+        The data presents information about asylum applications lodged in 38 European and 6 non-European 
+        countries. Data are broken down by month and origin.
+        <a target='_blank' href='http://popstats.unhcr.org/en/overview'>Source</a>
+    </td>
+		<td class='rightTD'><a href=${AppConstants.ASYLUM_FILE}>Download Data (.csv)</a></td>
 	</tr>
 	<tr>
-		<td>Other stuff</td>
-		<td><a href=${AppConstants.FILE1} download=''>Media Transperancy</a></td>
+		<td class='leftTD'><strong>Farm subsidies data</strong><br/>  
+       The data includes farm subsidy payments made in Austria as published directly by the government
+       of Austria or sourced via freedom of information requests.
+       <a target='_blank' href='https://www.ama.at/Fachliche-Informationen/Transparenzdatenbank'>Source</a>
+    </td>
+		<td class='rightTD'><a href=${AppConstants.FARM_FILE}>Download Data (.csv)</a></td>
 	</tr>
 	</tbody>
 </table>`

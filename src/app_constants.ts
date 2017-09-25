@@ -30,5 +30,8 @@ export class AppConstants {
 
 
   //FILE DOWNLOADS
-  static FILE1 = 'http://flock-1140.students.fhstp.ac.at/Sample_Data.csv';
+  static ASYLUM_FILE = 'https://dl.dropboxusercontent.com/s/cr3iu0adtb77de6/Asylum_Seekers_Data.csv?dl=0';
+  static FARM_FILE = 'https://dl.dropboxusercontent.com/s/zunih3hkcooh1gm/Farm_Subsidies_Data.csv?dl=0';
+  static MEDIA_FILE = 'https://dl.dropboxusercontent.com/s/34ev5sr6u3xdisq/Media_Transperency_Data.csv?dl=0';
+  static FILE4 = 'https://dl.dropboxusercontent.com/s/k4dhuh7hnmoclzf/Simple_Data.csv?dl=0';
 }

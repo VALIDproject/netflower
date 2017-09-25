@@ -73,6 +73,7 @@
   border:1px dashed #C0C0C0;
   border-collapse:collapse;
   padding:5px;
+  table-layout: fixed;
 }
 .demo th {
   border:1px dashed #C0C0C0;
@@ -83,6 +84,14 @@
   border:1px dashed #C0C0C0;
   text-align:left;
   padding:5px;
+}
+
+.leftTD {
+  width: 70%;
+}
+
+.rightTD {
+  width: 30%;
 }
 
 .downloadTable {
