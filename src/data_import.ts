@@ -7,9 +7,11 @@ import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
 import * as localforage from 'localforage';
+import * as bootbox from 'bootbox';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
+import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
 import SimpleLogging from './simpleLogging';
 
 const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
@@ -20,6 +22,7 @@ class DataImport implements MAppViews {
   private $fileContainer: d3.Selection<any>;
   private $displayContainer: d3.Selection<any>;
   private $chaningHeading: d3.Selection<any>;
+  private $helpInfo: d3.Selection<any>;
   private $tableRows: JQuery;
   private $btnNext: JQuery;
   private $btnPrev: JQuery;
@@ -58,7 +61,6 @@ class DataImport implements MAppViews {
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
-
 
   /**
    * Build the basic DOM elements
@@ -103,6 +105,34 @@ class DataImport implements MAppViews {
             <div id='valuesList'></div>
         </div>
 			</div>
+    `);
+
+    d3.select('.fileContainer').append('div').classed('helpInfo', true);
+    this.$helpInfo = d3.select('.helpInfo').html(`
+      <p>${USAGE_INFO}</p>
+      <table class='demo'>
+        <thead>
+        <tr>
+          <th>Source</th><th>Target</th><th>Time</th><th>Value</th><th>Attribute 1</th><th>Attribute...</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Assign an appropriate name for the source nodes of your visualization</td>
+          <td>Assign an appropriate name for the target nodes of your visualization</td>
+          <td>Assign the time column name here.</td>
+          <td>Assign the value column name here. Best to uses is a currency sign.</td>
+          <td>Add any attribute name here.</td>
+          <td>Further attributes...</td>
+        </tr>
+        </tbody>
+      </table>
+      <br/>
+      <p>${DOWNLOAD_INFO}</p>
+      <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
+      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
+        <i class='fa fa-download'></i> Sample Files</button>
+      <!--</a>-->
     `);
 
     //Initialize for text transition
@@ -231,6 +261,19 @@ class DataImport implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
+
+    //Listener for the download file button
+    this.$node.select('#sampleFile').on('click', (e) => {
+      bootbox.alert({
+        title: 'Sample Files',
+        message: `${DOWNLOAD_DIALOG}`
+      });
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+
+    d3.selectAll('a').on('click', (e) => {console.log('testaaaaaaa'); e.preventDefault();});
   }
 
   /**
