@@ -103,6 +103,11 @@ export class App implements MAppViews {
       view: 'SparklineBarChartTarget',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
+    },
+    {
+      view: 'SimpleLogging',
+      parent: 'dataVizView',
+      options: {'parentDOM' : 'div.clearBox'},
     }
   ];
 

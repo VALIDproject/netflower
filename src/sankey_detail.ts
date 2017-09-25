@@ -9,6 +9,7 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {dotFormat, d3TextWrap} from './utilities';
 import TimeFormat from './timeFormat';
+import SimpleLogging from './simpleLogging';
 
 class SankeyDetail implements MAppViews {
 
@@ -55,15 +56,18 @@ class SankeyDetail implements MAppViews {
     events.on(AppConstants.EVENT_CLICKED_PATH, (evt, data, json, coordinates) => {
       //console.log('Coordinaten, mouseclick evenet', coordinates, coordinates[0], coordinates[0]);
       if (this.clicked <= 1 ) {
+        SimpleLogging.log('flow detail clicked', [data.source.name, data.target.name]);
         this.drawDetails(data, json, coordinates);
         ++this.clicked;
       } else {
+        SimpleLogging.log('flow detail clicked -> too many', [data.source.name, data.target.name]);
         this.closeDetail();
         this.clicked = 0;
       }
     });
 
     events.on(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, (evt, d) => {
+      SimpleLogging.log('flow detail close', '');
       this.closeDetail();
       this.clicked = 0;
     });
@@ -90,6 +94,10 @@ class SankeyDetail implements MAppViews {
     let sourceName = clickedPath.source.name;
     let targetName = clickedPath.target.name;
     let value = clickedPath.target.value;
+
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    /** unit of flows (e.g., '€'). Extracted from CSV header. */
+    const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
     //Tooltip for the bar chart
     let tooltip = this.$node.append('div')
@@ -130,7 +138,7 @@ class SankeyDetail implements MAppViews {
         .attr('y', 16)
         .style('font-size', 11 + 'px')
         .text(function(d) {
-          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value) + valuePostFix;
         });
 
       const maxTextWidth = (w + margin.left + margin.right - 50);
@@ -183,7 +191,7 @@ class SankeyDetail implements MAppViews {
         .attr('y', 16)
         .style('font-size', 11 + 'px')
         .text(function(d) {
-          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value);
+          return sourceName + ' → ' + targetName + '\u00A0' +  dotFormat(value) + valuePostFix;
         });
 
       const maxTextWidth = (w + margin.left + margin.right - 50);
@@ -307,9 +315,10 @@ class SankeyDetail implements MAppViews {
       .style('text-anchor', 'start')
       .style('font-size', 9 + 'px');
 
+    const format = d3.format(',');
     this.detailSVG.append('g')
       .attr('class', 'y axis')
-      .call(yAxis.ticks(4).tickFormat(d3.format(',')));
+      .call(yAxis.ticks(4).tickFormat((d) => { return format(d).replace(',', '.'); }));
 
     //Append the close button or link to the SVG
     let close = this.detailSVG.append('g').attr('class', 'closeLink');

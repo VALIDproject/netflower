@@ -353,6 +353,15 @@ export function downloadFile(text, name, type) {
 }
 
 /**
+ * generate a random alphanumeric (base36) string of given length.
+ * Source: https://stackoverflow.com/a/10727155/1140589
+ * @param length number of characters
+ */
+export function randomString(length: number): string {
+  return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
+/**
  * This function fades in a text or fades over a text on a given html element
  * @param element html to fade the text onto
  * @param newText the text to show in the html elment

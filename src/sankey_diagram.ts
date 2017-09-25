@@ -25,6 +25,7 @@ import MediaSearchFilter from './filters/mediaSearchFilter';
 import PaymentEuroFilter from './filters/paymentEuroFilter';
 import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
+import SimpleLogging from './simpleLogging';
 
 
 class SankeyDiagram implements MAppViews {
@@ -49,7 +50,6 @@ class SankeyDiagram implements MAppViews {
   private entitySlider;
   private mediaSlider;
   private valueSlider;
-
 
   private activeQuarters: string[] = [];
 
@@ -99,7 +99,6 @@ class SankeyDiagram implements MAppViews {
     const sankeyDiagram = sankeyVis.append('div').attr('id', 'sankeyDiagram');
     const loadMore = sankeyVis.append('div').attr('class', 'load_more');
     const right = this.$node.append('div').attr('class', 'right_bars');
-    //let svgPattern = this.$node.append('svg').attr('class', 'invisibleClass');
 
     //Check if column meta data is in storage and provide some defaults
     let columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -107,11 +106,10 @@ class SankeyDiagram implements MAppViews {
       columnLabels = {};
       columnLabels.sourceNode = 'Source';
       columnLabels.targetNode = 'Target';
-      columnLabels.valueNode = 'Amount';
+      columnLabels.valueNode = '';
     } else {
       TimeFormat.setFormat(columnLabels.timeNode);
     }
-
 
     left.html(`
     <div class='controlBox'>
@@ -172,7 +170,6 @@ class SankeyDiagram implements MAppViews {
       </div>
     </div>
     `);
-
   }
 
   /**
@@ -203,7 +200,10 @@ class SankeyDiagram implements MAppViews {
     });
 
     //Listen for resize of the window
-    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => this.resize());
+    events.on(AppConstants.EVENT_RESIZE_WINDOW, () => {
+      SimpleLogging.log('resize window', '');
+      this.resize();
+    });
 
     //Listen for the change of the quarter slider and update others
     events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
@@ -220,37 +220,56 @@ class SankeyDiagram implements MAppViews {
       this.mediaSearchFilter.term = '';
     });
 
-    this.$node.select('#entitySearchButton').on('click', (d) => {
+    // full-text search in source node names
+    const sourceSearch = (d) => {
       const value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
 
+      SimpleLogging.log('source name filter', value);
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    };
+    $('#entitySearchFilter').keypress((e) => {
+      if (e.which === 13) {
+        sourceSearch(e);
+      }
     });
+    this.$node.select('#entitySearchButton').on('click', sourceSearch);
 
     this.$node.select('#clearEntity').on('click', (d) => {
       $('#entitySearchFilter').val('');
       this.entitySearchFilter.term = '';
+      SimpleLogging.log('source name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
-    this.$node.select('#mediaSearchButton').on('click', (d) => {
+    // full-text search in target node names
+    const targetSearch = (d) => {
       const value: string = $('#mediaSearchFilter').val();
       this.mediaSearchFilter.term = value;
 
+      SimpleLogging.log('target name filter', value);
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+    };
+    $('#mediaSearchFilter').keypress((e) => {
+      if (e.which === 13) {
+        targetSearch(e);
+      }
     });
+    this.$node.select('#mediaSearchButton').on('click', targetSearch);
 
     this.$node.select('#clearMedia').on('click', (d) => {
       $('#mediaSearchFilter').val('');
       this.mediaSearchFilter.term = '';
+      SimpleLogging.log('target name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
     //Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
       this.nodesToShow += 25;
+      SimpleLogging.log('show more flows', this.nodesToShow);
       if(this.nodesToShow > 25) {
         d3.select('#loadLessBtn').attr('disabled', null);
       }
@@ -283,6 +302,7 @@ class SankeyDiagram implements MAppViews {
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       this.nodesToShow -= 25;
+      SimpleLogging.log('show less flows', this.nodesToShow);
       if(this.nodesToShow <= 25) {
         d3.select('#loadLessBtn').attr('disabled', true);
         this.nodesToShow = 25;
@@ -325,6 +345,7 @@ class SankeyDiagram implements MAppViews {
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
 
         events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
+        SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));
       }
 
       //Filter the data before and then pass it to the draw function.
@@ -335,7 +356,6 @@ class SankeyDiagram implements MAppViews {
           d3.sum(v, function (d :any){ return d.valueNode;})
         ];})
         .entries(filteredData);
-
 
       this.valuesSumTarget =(<any>d3).nest()
         .key((d) => {return d.targetNode;})
@@ -348,7 +368,7 @@ class SankeyDiagram implements MAppViews {
       // console.log(originalData);
       // console.log('----------- Filtered Data -----------');
       // console.log(filteredData);
-      // this.pipeline.printFilters();
+      this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }
@@ -365,6 +385,13 @@ class SankeyDiagram implements MAppViews {
     const timePoints: any = d3.set(
       json.map(function (d: any) { return d.timeNode; })
     ).values().sort();
+    const selectedTimePointsAsString = (timePoints.length > 1)
+      ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1])
+      : TimeFormat.format(timePoints[0]);
+
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    /** unit of flows (e.g., '€'). Extracted from CSV header. */
+    const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
     const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;  //10 from padding of p tag
     const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
@@ -421,7 +448,7 @@ class SankeyDiagram implements MAppViews {
       for(const d of flatNest) {
         counter++;
         if(counter * 2 > that.nodesToShow) {
-          const textUp = `Flows below ${dotFormat(d.sum)} are not displayed.`;
+          const textUp = `Flows below ${dotFormat(d.sum)}${valuePostFix} are not displayed.`;
           textTransition(d3.select('#infoNodesLeft'), textUp, 350);
           const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
           textTransition(d3.select('#loadInfo'), textDown, 350);
@@ -469,11 +496,12 @@ class SankeyDiagram implements MAppViews {
 
       //Add the link titles - Hover Path
       link.append('title')
-        .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value); });
+        .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix; });
+        // + ' in ' + selectedTimePointsAsString
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
-        let coordinates = d3.mouse(svg.node());
+        const coordinates = d3.mouse(svg.node());
         events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson, coordinates);
       });
 
@@ -503,7 +531,7 @@ class SankeyDiagram implements MAppViews {
         .text(function(d) {
           // different preposition based on whether its a source or target node
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-          return dotFormat(d.value) + ' ' + direction + ' displayed elements';
+          return dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
         });
 
       //Create sparkline barcharts for newly enter-ing g.node elements
@@ -539,12 +567,7 @@ class SankeyDiagram implements MAppViews {
               result = val.values;
             }
           }
-          if(timePoints.length > 1) {
-            return  dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
-          } else {
-            return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
-          }
-
+          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
         })
         .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
         .text((d) => {
@@ -554,11 +577,7 @@ class SankeyDiagram implements MAppViews {
               result = val.values;
             }
           }
-          if(timePoints.length > 1) {
-            return  dotFormat(result) + ' ' + 'overall in' + ' ' + TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1]);
-          } else {
-            return dotFormat(result) + ' ' + 'overall in' + ' '+ TimeFormat.format(timePoints[0]);
-          }
+          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
         });
 
       //Add in the title for the nodes
