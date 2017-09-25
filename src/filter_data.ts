@@ -160,7 +160,8 @@ class FilterData implements MAppViews {
       });
 
       SimpleLogging.log('attribute filter', this.paragraphFilter.values);
-      const paraFilterData = this.paragraphFilter.meetCriteria(json);
+      const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
