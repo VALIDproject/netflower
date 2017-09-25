@@ -178,6 +178,7 @@ class FilterData implements MAppViews {
       SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
       this.updateQuarterFilter(json);
       const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
 
@@ -189,7 +190,7 @@ class FilterData implements MAppViews {
         }
       });
 
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
@@ -293,9 +294,9 @@ class FilterData implements MAppViews {
 
     const newMin: number = Number(timePoints[0]);
     const newMax: number = Number(timePoints[timePoints.length - 1]);
-    this.quarterFilter.changeRange(newMin, newMax);
+    this.quarterFilter.changeRange(newMax, newMax);
     this.quarterFilterRef.update({
-      from: 0,
+      from: timePoints.length - 1,
       to: timePoints.length - 1
     });
   }
