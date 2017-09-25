@@ -395,21 +395,16 @@ class DataImport implements MAppViews {
    */
   private makeNodesUnique() {
     const json = this.parseResults.data;
-
     // all source nodes
     const sources = d3.set(
       json.map(function (d: any) { return d.sourceNode; })
     );
-
     // all rows of orig data that have a known source node as target node
     const flowsToChange = json.filter((d) => {return sources.has(d.targetNode); });
-
     // transform these rows
     flowsToChange.forEach(d => {
       d.targetNode = d.targetNode + ' ';
     });
-
-    // console.log(flowsToChange);
   }
 
   /**

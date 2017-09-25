@@ -175,7 +175,7 @@ class SankeyDetail implements MAppViews {
     } else {
       this.$node.append('svg')
         .attr('class', 'sankey_details2')
-        .attr('transform', 'translate(' + xpositionSvg + ',' + (newYPositionSvg + 20) + ')')
+        .attr('transform', 'translate(' + xpositionSvg + ',' + (h + newYPositionSvg) + ')')
         .attr('width', w + margin.left + margin.right + 'px')
         .attr('height', h + margin.top + margin.bottom + 'px')
         .style('background-color',  '#e0e0e0')
