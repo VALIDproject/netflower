@@ -402,7 +402,7 @@ class DataImport implements MAppViews {
     // all rows of orig data that have a known source node as target node
     const flowsToChange = json.filter((d) => {return sources.has(d.targetNode); });
     // transform these rows
-    flowsToChange.forEach(d => {
+    flowsToChange.forEach((d) => {
       d.targetNode = d.targetNode + ' ';
     });
   }
