@@ -24,7 +24,7 @@ only accepted. If the required format isn't met, it will result in erros or no d
 table headings defines all further views but needs to be in a specific order:`;
 
 export const DOWNLOAD_INFO = `The <strong>button</strong> below let's you download a sample dataset for the application.
-It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`
+It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`;
 
 export const DOWNLOAD_DIALOG = `You can download the following sample files by klicking on their name:
 <br/>
@@ -61,4 +61,4 @@ export const DOWNLOAD_DIALOG = `You can download the following sample files by k
 		<td class='rightTD'><a href=${AppConstants.FARM_FILE}>Download Data (.csv)</a></td>
 	</tr>
 	</tbody>
-</table>`
+</table>`;
