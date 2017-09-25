@@ -106,7 +106,7 @@ class SankeyDiagram implements MAppViews {
       columnLabels = {};
       columnLabels.sourceNode = 'Source';
       columnLabels.targetNode = 'Target';
-      columnLabels.valueNode = 'Amount';
+      columnLabels.valueNode = '';
     } else {
       TimeFormat.setFormat(columnLabels.timeNode);
     }
