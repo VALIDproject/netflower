@@ -168,173 +168,173 @@ export function roundToFull(value: number) {
  * @returns {Array} Generated JSON
  */
 /*export function tableToJSON(table, opts?) {
-  // Set options
-  let defaults = {
-    ignoreColumns: [],
-    onlyColumns: null,
-    ignoreHiddenRows: true,
-    ignoreEmptyRows: false,
-    headings: null,
-    allowHTML: false,
-    includeRowId: false,
-    textDataOverride: 'data-override',
-    textExtractor: null
-  };
-  opts = $.extend(defaults, opts);
+ // Set options
+ let defaults = {
+ ignoreColumns: [],
+ onlyColumns: null,
+ ignoreHiddenRows: true,
+ ignoreEmptyRows: false,
+ headings: null,
+ allowHTML: false,
+ includeRowId: false,
+ textDataOverride: 'data-override',
+ textExtractor: null
+ };
+ opts = $.extend(defaults, opts);
 
-  let notNull = function(value) {
-    return value !== undefined && value !== null;
-  };
+ let notNull = function(value) {
+ return value !== undefined && value !== null;
+ };
 
-  let ignoredColumn = function(index) {
-    if( notNull(opts.onlyColumns) ) {
-      return $.inArray(index, opts.onlyColumns) === -1;
-    }
-    return $.inArray(index, opts.ignoreColumns) !== -1;
-  };
+ let ignoredColumn = function(index) {
+ if( notNull(opts.onlyColumns) ) {
+ return $.inArray(index, opts.onlyColumns) === -1;
+ }
+ return $.inArray(index, opts.ignoreColumns) !== -1;
+ };
 
-  let arraysToHash = function(keys, values) {
-    let result = {}, index = 0;
-    $.each(values, function(i, value) {
-      // when ignoring columns, the header option still starts
-      // with the first defined column
-      if ( index < keys.length && notNull(value) ) {
-        result[ keys[index] ] = value;
-        index++;
-      }
-    });
-    return result;
-  };
+ let arraysToHash = function(keys, values) {
+ let result = {}, index = 0;
+ $.each(values, function(i, value) {
+ // when ignoring columns, the header option still starts
+ // with the first defined column
+ if ( index < keys.length && notNull(value) ) {
+ result[ keys[index] ] = value;
+ index++;
+ }
+ });
+ return result;
+ };
 
-  let cellValues = function(cellIndex, cell, isHeader?) {
-    let $cell = $(cell),
-      // textExtractor
-      extractor = opts.textExtractor,
-      override = $cell.attr(opts.textDataOverride);
-    // don't use extractor for header cells
-    if ( extractor === null || isHeader ) {
-      return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
-    } else {
-      // overall extractor function
-      if ( $.isFunction(extractor) ) {
-        return $.trim( override || extractor(cellIndex, $cell) );
-      } else if ( typeof extractor === 'object' && $.isFunction( extractor[cellIndex] ) ) {
-        return $.trim( override || extractor[cellIndex](cellIndex, $cell) );
-      }
-    }
-    // fallback
-    return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
-  };
+ let cellValues = function(cellIndex, cell, isHeader?) {
+ let $cell = $(cell),
+ // textExtractor
+ extractor = opts.textExtractor,
+ override = $cell.attr(opts.textDataOverride);
+ // don't use extractor for header cells
+ if ( extractor === null || isHeader ) {
+ return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
+ } else {
+ // overall extractor function
+ if ( $.isFunction(extractor) ) {
+ return $.trim( override || extractor(cellIndex, $cell) );
+ } else if ( typeof extractor === 'object' && $.isFunction( extractor[cellIndex] ) ) {
+ return $.trim( override || extractor[cellIndex](cellIndex, $cell) );
+ }
+ }
+ // fallback
+ return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
+ };
 
-  let rowValues = function(row, isHeader) {
-    let result = [];
-    let includeRowId = opts.includeRowId;
-    let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
-    let rowIdName = (typeof includeRowId === 'string') === true ? includeRowId : 'rowId';
-    if (useRowId) {
-      if (typeof $(row).attr('id') === 'undefined') {
-        result.push(rowIdName);
-      }
-    }
-    $(row).children('td,th').each(function(cellIndex, cell) {
-      result.push( cellValues(cellIndex, cell, isHeader) );
-    });
-    return result;
-  };
+ let rowValues = function(row, isHeader) {
+ let result = [];
+ let includeRowId = opts.includeRowId;
+ let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
+ let rowIdName = (typeof includeRowId === 'string') === true ? includeRowId : 'rowId';
+ if (useRowId) {
+ if (typeof $(row).attr('id') === 'undefined') {
+ result.push(rowIdName);
+ }
+ }
+ $(row).children('td,th').each(function(cellIndex, cell) {
+ result.push( cellValues(cellIndex, cell, isHeader) );
+ });
+ return result;
+ };
 
-  let getHeadings = function(table) {
-    let firstRow = table.find('tr:first').first();
-    return notNull(opts.headings) ? opts.headings : rowValues(firstRow, true);
-  };
+ let getHeadings = function(table) {
+ let firstRow = table.find('tr:first').first();
+ return notNull(opts.headings) ? opts.headings : rowValues(firstRow, true);
+ };
 
-  let construct = function(table, headings) {
-    let i, j, len, len2, txt, $row, $cell,
-      tmpArray = [], cellIndex = 0, result = [];
-    table.children('tbody,*').children('tr').each(function(rowIndex, row) {
-      if( rowIndex > 0 || notNull(opts.headings) ) {
-        let includeRowId = opts.includeRowId;
-        let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
+ let construct = function(table, headings) {
+ let i, j, len, len2, txt, $row, $cell,
+ tmpArray = [], cellIndex = 0, result = [];
+ table.children('tbody,*').children('tr').each(function(rowIndex, row) {
+ if( rowIndex > 0 || notNull(opts.headings) ) {
+ let includeRowId = opts.includeRowId;
+ let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
 
-        $row = $(row);
+ $row = $(row);
 
-        let isEmpty = ($row.find('td').length === $row.find('td:empty').length) ? true : false;
+ let isEmpty = ($row.find('td').length === $row.find('td:empty').length) ? true : false;
 
-        if( ( $row.is(':visible') || !opts.ignoreHiddenRows ) && ( !isEmpty || !opts.ignoreEmptyRows ) && ( !$row.data('ignore') || $row.data('ignore') === 'false' ) ) {
-          cellIndex = 0;
-          if (!tmpArray[rowIndex]) {
-            tmpArray[rowIndex] = [];
-          }
-          if (useRowId) {
-            cellIndex = cellIndex + 1;
-            if (typeof $row.attr('id') !== 'undefined') {
-              tmpArray[rowIndex].push($row.attr('id'));
-            } else {
-              tmpArray[rowIndex].push('');
-            }
-          }
+ if( ( $row.is(':visible') || !opts.ignoreHiddenRows ) && ( !isEmpty || !opts.ignoreEmptyRows ) && ( !$row.data('ignore') || $row.data('ignore') === 'false' ) ) {
+ cellIndex = 0;
+ if (!tmpArray[rowIndex]) {
+ tmpArray[rowIndex] = [];
+ }
+ if (useRowId) {
+ cellIndex = cellIndex + 1;
+ if (typeof $row.attr('id') !== 'undefined') {
+ tmpArray[rowIndex].push($row.attr('id'));
+ } else {
+ tmpArray[rowIndex].push('');
+ }
+ }
 
-          $row.children().each(function(){
-            $cell = $(this);
-            // skip column if already defined
-            while (tmpArray[rowIndex][cellIndex]) { cellIndex++; }
+ $row.children().each(function(){
+ $cell = $(this);
+ // skip column if already defined
+ while (tmpArray[rowIndex][cellIndex]) { cellIndex++; }
 
-            // process rowspans
-            if ($cell.filter('[rowspan]').length) {
-              len = parseInt( $cell.attr('rowspan'), 10) - 1;
-              txt = cellValues(cellIndex, $cell);
-              for (i = 1; i <= len; i++) {
-                if (!tmpArray[rowIndex + i]) { tmpArray[rowIndex + i] = []; }
-                tmpArray[rowIndex + i][cellIndex] = txt;
-              }
-            }
-            // process colspans
-            if ($cell.filter('[colspan]').length) {
-              len = parseInt( $cell.attr('colspan'), 10) - 1;
-              txt = cellValues(cellIndex, $cell);
-              for (i = 1; i <= len; i++) {
-                // cell has both col and row spans
-                if ($cell.filter('[rowspan]').length) {
-                  len2 = parseInt( $cell.attr('rowspan'), 10);
-                  for (j = 0; j < len2; j++) {
-                    tmpArray[rowIndex + j][cellIndex + i] = txt;
-                  }
-                } else {
-                  tmpArray[rowIndex][cellIndex + i] = txt;
-                }
-              }
-            }
+ // process rowspans
+ if ($cell.filter('[rowspan]').length) {
+ len = parseInt( $cell.attr('rowspan'), 10) - 1;
+ txt = cellValues(cellIndex, $cell);
+ for (i = 1; i <= len; i++) {
+ if (!tmpArray[rowIndex + i]) { tmpArray[rowIndex + i] = []; }
+ tmpArray[rowIndex + i][cellIndex] = txt;
+ }
+ }
+ // process colspans
+ if ($cell.filter('[colspan]').length) {
+ len = parseInt( $cell.attr('colspan'), 10) - 1;
+ txt = cellValues(cellIndex, $cell);
+ for (i = 1; i <= len; i++) {
+ // cell has both col and row spans
+ if ($cell.filter('[rowspan]').length) {
+ len2 = parseInt( $cell.attr('rowspan'), 10);
+ for (j = 0; j < len2; j++) {
+ tmpArray[rowIndex + j][cellIndex + i] = txt;
+ }
+ } else {
+ tmpArray[rowIndex][cellIndex + i] = txt;
+ }
+ }
+ }
 
-            txt = tmpArray[rowIndex][cellIndex] || cellValues(cellIndex, $cell);
-            if (notNull(txt)) {
-              tmpArray[rowIndex][cellIndex] = txt;
-            }
-            cellIndex++;
-          });
-        }
-      }
-    });
-    $.each(tmpArray, function( i, row ){
-      if (notNull(row)) {
-        // remove ignoredColumns / add onlyColumns
-        let newRow = notNull(opts.onlyColumns) || opts.ignoreColumns.length ?
-            $.grep(row, function(v, index){ return !ignoredColumn(index); }) : row,
+ txt = tmpArray[rowIndex][cellIndex] || cellValues(cellIndex, $cell);
+ if (notNull(txt)) {
+ tmpArray[rowIndex][cellIndex] = txt;
+ }
+ cellIndex++;
+ });
+ }
+ }
+ });
+ $.each(tmpArray, function( i, row ){
+ if (notNull(row)) {
+ // remove ignoredColumns / add onlyColumns
+ let newRow = notNull(opts.onlyColumns) || opts.ignoreColumns.length ?
+ $.grep(row, function(v, index){ return !ignoredColumn(index); }) : row,
 
-          // remove ignoredColumns / add onlyColumns if headings is not defined
-          newHeadings = notNull(opts.headings) ? headings :
-            $.grep(headings, function(v, index){ return !ignoredColumn(index); });
+ // remove ignoredColumns / add onlyColumns if headings is not defined
+ newHeadings = notNull(opts.headings) ? headings :
+ $.grep(headings, function(v, index){ return !ignoredColumn(index); });
 
-        txt = arraysToHash(newHeadings, newRow);
-        result[result.length] = txt;
-      }
-    });
-    return result;
-  };
+ txt = arraysToHash(newHeadings, newRow);
+ result[result.length] = txt;
+ }
+ });
+ return result;
+ };
 
-  // Run
-  let headings = getHeadings(table);
-  return construct(table, headings);
-};
-*/
+ // Run
+ let headings = getHeadings(table);
+ return construct(table, headings);
+ };
+ */
 
 /**
  * This method creates a downloadable file which contains the json or data it was given. An example
@@ -397,4 +397,35 @@ export function d3TextEllipse(text, maxTextWidth) {
       ellipsis.remove();
     }
   });
+}
+
+export class Tooltip {
+  public static tooltip1 = d3.select('body').append('div')
+    .attr('class', 'tooltip')
+    .style('opacity', 0)
+    .style('z-index', '200000');
+
+  public static tooltip2 = d3.select('body').append('div')
+    .attr('class', 'tooltip2')
+    .style('opacity', 0)
+    .style('z-index', '200000');
+
+  public static mouseOver(data, text, type: string) {
+    if (type === 'T1') {
+      Tooltip.tooltip1.transition().duration(200).style('opacity', .9);
+      Tooltip.tooltip1.html(text)
+        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('top', ((<any>d3).event.pageY - 140) + 'px');
+    } else {
+      Tooltip.tooltip2.transition().duration(200).style('opacity', .9);
+      Tooltip.tooltip2.html(text)
+        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('top', ((<any>d3).event.pageY) + 'px');
+    }
+  }
+
+  public static mouseOut(type: string) {
+      Tooltip.tooltip1.transition().duration(500).style('opacity', 0);
+      Tooltip.tooltip2.transition().duration(500).style('opacity', 0);
+  }
 }

@@ -13,7 +13,7 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {roundToFull, dotFormat, textTransition, d3TextEllipse} from './utilities';
+import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
@@ -493,14 +493,12 @@ class SankeyDiagram implements MAppViews {
         .style('stroke-width', function(d) { return Math.max(1, d.dy); })
         //reduce edges crossing
         .sort(function(a, b) { return b.dy - a.dy; })
-        .on('mouseover', function (e) {
+        .on('mouseover', function (d) {
           d3.select(this).style('cursor', 'pointer');
-        });
-
-      //Add the link titles - Hover Path
-      link.append('title')
-        .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix; });
-        // + ' in ' + selectedTimePointsAsString
+          const text = d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
+          Tooltip.mouseOver(d, text, 'T2');
+        })
+        .on('mouseout', Tooltip.mouseOut);
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
@@ -529,13 +527,12 @@ class SankeyDiagram implements MAppViews {
         .attr('height', function(d) { return d.dy; })
         .attr('width', sankey.nodeWidth())
         .style('fill', '#DA5A6B')
-        //Title rectangle
-        .append('title')
-        .text(function(d) {
-          // different preposition based on whether its a source or target node
+        .on('mouseover', function (d) {
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-          return dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
-        });
+          const text = dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
+          Tooltip.mouseOver(d, text, 'T2');
+        })
+        .on('mouseout', Tooltip.mouseOut);
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);

@@ -60,6 +60,21 @@ div.tooltip {
   pointer-events: none;
 }
 
+div.tooltip2 {
+  position: absolute;
+  text-align: center;
+  width: 200px;
+  word-wrap: break-word;
+  height: auto;
+  padding: 2px;
+  margin-top: -20px;
+  font: 10px sans-serif;
+  background: white;
+  border: 0px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
 .caption {
   font:12px sans-serif;
 }
