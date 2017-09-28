@@ -492,7 +492,10 @@ class SankeyDiagram implements MAppViews {
         .attr('d', path)
         .style('stroke-width', function(d) { return Math.max(1, d.dy); })
         //reduce edges crossing
-        .sort(function(a, b) { return b.dy - a.dy; });
+        .sort(function(a, b) { return b.dy - a.dy; })
+        .on('mouseover', function (e) {
+          d3.select(this).style('cursor', 'pointer');
+        });
 
       //Add the link titles - Hover Path
       link.append('title')
