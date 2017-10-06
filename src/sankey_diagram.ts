@@ -559,25 +559,27 @@ class SankeyDiagram implements MAppViews {
         .attr('x', function (d){
           if (d.sourceLinks.length <= 0) { return sankey.nodeWidth()/2; };
         })
-        .append('title')
-        .text((d) => {
+        .on('mouseout', Tooltip.mouseOut)
+        .on('mouseover', (d) => {
           let result;
           for(const val of this.valuesSumSource) {
             if(val.key === d.name) {
               result = val.values;
             }
           }
-          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          Tooltip.mouseOver(d, text, 'T2');
         })
         .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
-        .text((d) => {
+        .on('mouseover', (d) => {
           let result;
           for(const val of this.valuesSumTarget) {
             if(val.key === d.name) {
               result = val.values;
             }
           }
-          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          Tooltip.mouseOver(d, text, 'T2');
         });
 
       //Add in the title for the nodes

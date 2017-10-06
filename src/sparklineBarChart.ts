@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {dotFormat} from './utilities';
+import {dotFormat, Tooltip} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFormat from './timeFormat';
 
@@ -187,10 +187,12 @@ export default class SparklineBarChart implements MAppViews {
       .attr('y', function (d) { return y(d.values) + yMiddle; })
       .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
       //Add the link titles - Hover Path
-      .append('title')
-      .text(function (d) {
-        return nodeName + '\nTime: ' + TimeFormat.format(d.key) + '\nFlow: ' + dotFormat(d.values) + _self.valuePostFix;
-      });
+      .on('mouseover', (d) => {
+        const text = nodeName + '<br/>Time: ' + TimeFormat.format(d.key) + '<br/>Flow: ' + dotFormat(d.values) + _self.valuePostFix;
+        console.log(text);
+        Tooltip.mouseOver(d, text, 'T2');
+      })
+      .on('mouseout', Tooltip.mouseOut);
   }
 }
 
