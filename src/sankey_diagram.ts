@@ -603,9 +603,14 @@ class SankeyDiagram implements MAppViews {
       d3TextEllipse(rightWrap, maxTextWidth);
 
       //On Hover titles for Sankey Diagram Text - after Text Elipsis
-      heading.append('title').text(function(d) {return d.name;});
-      rightWrap.append('title').text(function(d) {return d.name;});
-
+      heading.on('mouseover', (d) => {
+        Tooltip.mouseOver(d, d.name, 'T2');
+      })
+      .on('mouseout', Tooltip.mouseOut);
+      rightWrap.on('mouseover', (d) => {
+        Tooltip.mouseOver(d, d.name, 'T2');
+      })
+      .on('mouseout', Tooltip.mouseOut);
 
     } else {
       const svgPlain = d3.select('#sankeyDiagram svg');
