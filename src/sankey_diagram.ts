@@ -118,7 +118,7 @@ class SankeyDiagram implements MAppViews {
           <input id='entityFilter'/>
         </div>
         <div class='input-group input-group-xs'>
-          <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for Source Nodes...'/>
+          <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for ${columnLabels.sourceNode}...'/>
           <span class='input-group-btn'>
             <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
           </span>
@@ -160,7 +160,7 @@ class SankeyDiagram implements MAppViews {
         <input id='mediaFilter'/>
       </div>
       <div class='input-group input-group-xs'>
-        <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for Target Nodes...'/>
+        <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for ${columnLabels.targetNode}...'/>
         <span class='input-group-btn'>
           <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
         </span>
