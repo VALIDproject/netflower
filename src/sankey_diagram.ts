@@ -13,7 +13,7 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {roundToFull, dotFormat, textTransition, d3TextEllipse} from './utilities';
+import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
@@ -118,7 +118,7 @@ class SankeyDiagram implements MAppViews {
           <input id='entityFilter'/>
         </div>
         <div class='input-group input-group-xs'>
-          <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for Source Nodes...'/>
+          <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for ${columnLabels.sourceNode}...'/>
           <span class='input-group-btn'>
             <button type='button' id='entitySearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
           </span>
@@ -160,7 +160,7 @@ class SankeyDiagram implements MAppViews {
         <input id='mediaFilter'/>
       </div>
       <div class='input-group input-group-xs'>
-        <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for Target Nodes...'/>
+        <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for ${columnLabels.targetNode}...'/>
         <span class='input-group-btn'>
           <button type='button' id='mediaSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
         </span>
@@ -492,12 +492,13 @@ class SankeyDiagram implements MAppViews {
         .attr('d', path)
         .style('stroke-width', function(d) { return Math.max(1, d.dy); })
         //reduce edges crossing
-        .sort(function(a, b) { return b.dy - a.dy; });
-
-      //Add the link titles - Hover Path
-      link.append('title')
-        .text(function(d) { return d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix; });
-        // + ' in ' + selectedTimePointsAsString
+        .sort(function(a, b) { return b.dy - a.dy; })
+        .on('mouseover', function (d) {
+          d3.select(this).style('cursor', 'pointer');
+          const text = d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
+          Tooltip.mouseOver(d, text, 'T2');
+        })
+        .on('mouseout', Tooltip.mouseOut);
 
       //Add the on 'click' listener for the links
       link.on('click', function(d) {
@@ -526,13 +527,12 @@ class SankeyDiagram implements MAppViews {
         .attr('height', function(d) { return d.dy; })
         .attr('width', sankey.nodeWidth())
         .style('fill', '#DA5A6B')
-        //Title rectangle
-        .append('title')
-        .text(function(d) {
-          // different preposition based on whether its a source or target node
+        .on('mouseover', function (d) {
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-          return dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
-        });
+          const text = dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
+          Tooltip.mouseOver(d, text, 'T2');
+        })
+        .on('mouseout', Tooltip.mouseOut);
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
@@ -559,25 +559,27 @@ class SankeyDiagram implements MAppViews {
         .attr('x', function (d){
           if (d.sourceLinks.length <= 0) { return sankey.nodeWidth()/2; };
         })
-        .append('title')
-        .text((d) => {
+        .on('mouseout', Tooltip.mouseOut)
+        .on('mouseover', (d) => {
           let result;
           for(const val of this.valuesSumSource) {
             if(val.key === d.name) {
               result = val.values;
             }
           }
-          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          Tooltip.mouseOver(d, text, 'T2');
         })
         .filter(function (d, i) { return d.sourceLinks.length <= 0; }) //only for the targets
-        .text((d) => {
+        .on('mouseover', (d) => {
           let result;
           for(const val of this.valuesSumTarget) {
             if(val.key === d.name) {
               result = val.values;
             }
           }
-          return dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          Tooltip.mouseOver(d, text, 'T2');
         });
 
       //Add in the title for the nodes
@@ -601,9 +603,14 @@ class SankeyDiagram implements MAppViews {
       d3TextEllipse(rightWrap, maxTextWidth);
 
       //On Hover titles for Sankey Diagram Text - after Text Elipsis
-      heading.append('title').text(function(d) {return d.name;});
-      rightWrap.append('title').text(function(d) {return d.name;});
-
+      heading.on('mouseover', (d) => {
+        Tooltip.mouseOver(d, d.name, 'T2');
+      })
+      .on('mouseout', Tooltip.mouseOut);
+      rightWrap.on('mouseover', (d) => {
+        Tooltip.mouseOver(d, d.name, 'T2');
+      })
+      .on('mouseout', Tooltip.mouseOut);
 
     } else {
       const svgPlain = d3.select('#sankeyDiagram svg');
