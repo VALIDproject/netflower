@@ -6,6 +6,13 @@
   z-index: 1000;
 }
 
+#paragraph {
+  padding:5px 10px 5px 10px;
+  background-color: white;
+  //border: solid #333333 1px;
+  border-radius: 5px;
+}
+
 .slider-selection {
   background: $valid-color !important;
 }

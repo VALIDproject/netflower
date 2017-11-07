@@ -21,6 +21,9 @@ import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
+import TimeFormat from './timeFormat';
+import SimpleLogging from './simpleLogging';
+import {type} from 'os';
 
 class FilterData implements MAppViews {
 
@@ -29,6 +32,7 @@ class FilterData implements MAppViews {
   private quarterFilter: QuarterFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
+  private quarterFilterRef;
 
   constructor(parent: Element, private options: any)
   {
@@ -41,7 +45,7 @@ class FilterData implements MAppViews {
     //Add Filters to Pipeline
     this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
-    this.pipeline.addFilter(this.paragraphFilter);
+    this.pipeline.addAttributeFilter(this.paragraphFilter);
 
     this.$node = d3.select(parent)
       .append('div')
@@ -75,11 +79,11 @@ class FilterData implements MAppViews {
             <small>Top Filter</small>
           </div>
           <div class='col-sm-2'>
-            <small>Paragraph Filter</small>
+            <small id='attr1_label'>Paragraph Filter</small>
           </div>
-          <!--<div class='col-sm-2'>-->
-            <!--<small>Quartal Filter</small>-->
-          <!--</div>-->
+          <div class='col-sm-2'>
+            <small>Time Slider</small>
+          </div>
         </div>
 
         <div class='row'>
@@ -91,19 +95,17 @@ class FilterData implements MAppViews {
             </select>
           </div>
           <div class='col-sm-2'>
-            <select class='form-control input-sm' id='paragraph'>
-              <option value='-1' selected>disabled</option>
-            </select>
+            <div id='paragraph'>
+            </div>
           </div>
-          <!--<div class='col-sm-2'>-->
-          <!--<div>-->
-            <!--<input id='timeSlider'/>-->
-          <!--</div>-->
-          <!--</div>-->
+
         </div>
-       </div>
-       <div class='quarterSlider'>
-        <input id='timeSlider'/>
+        <div class='col-sm-2'>
+        <div class='quarterSlider'>
+         <input id='timeSlider'/>
+         </div>
+          </div>
+        </div>
        </div>
     `);
   }
@@ -113,7 +115,7 @@ class FilterData implements MAppViews {
    */
   private attachListener(json) {
     //Set the filters only if data is available
-    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
       this.setQuarterFilterRange(json);
       this.setParagraphFilterElements(json);
@@ -124,87 +126,179 @@ class FilterData implements MAppViews {
       $('#topFilter').val(-1);
     });
 
-
+    //Listener for the change fo the top filter
     this.$node.select('#topFilter').on('change', (d) => {
-      let value:number = $('#topFilter').val() as number;
+      const value:string = $('#topFilter').val().toString();
 
-      if(value == 0)
+      if(value === '0')
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(false);
-      }
-      else if(value == 1)
+        SimpleLogging.log('top filter', 'bottom');
+      } else if(value === '1')
       {
         this.topFilter.active = true;
         this.topFilter.changeFilterTop(true);
-      }
-      else {
+        SimpleLogging.log('top filter', 'top');
+      } else {
         this.topFilter.active = false;
+        SimpleLogging.log('top filter', 'disabled');
       }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
-    this.$node.select('#paragraph').on('change', (d) => {
-      let value:number = $('#paragraph').val() as number;
-      if(value < 0)
-      {
-        this.paragraphFilter.active = false;
-      }
+    //Listener for the change of the paragraph elements
+    $('.paraFilter').on('change', (d) => {
+      this.paragraphFilter.resetValues();
 
-      else {
-        this.paragraphFilter.active = true;
-        this.paragraphFilter.value = value;
-      }
+      $('.paraFilter').each((index, element) => {
+        const value = $(element).val() as string;
+        if($(element).is(':checked'))
+        {
+          this.paragraphFilter.addValue(value);
+        }
+      });
+
+      SimpleLogging.log('attribute filter', this.paragraphFilter.values);
+      const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    });
+
+    events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
+      const filterQuarter = this.quarterFilter.meetCriteria(data);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      // const filterQuarter = this.quarterFilter.meetCriteria(data);
+      // events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
+    });
+
+    //Clears all filters and updates the appropriate sliders
+    events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
+      this.updateQuarterFilter(json);
+      const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      d3.selectAll('input').property('checked', true);
+      this.paragraphFilter.resetValues();
+
+      $('.paraFilter').each((index, element) => {
+        const value = $(element).val() as string;
+        if($(element).is(':checked'))
+        {
+          this.paragraphFilter.addValue(value);
+        }
+      });
+
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
   }
 
+  /**
+   * This method adds all the elements and options for the paragraph filter.
+   * @param json with the data to be added.
+   */
   private setParagraphFilterElements(json)
   {
-    let paragraphs:Array<number> = [];
-
-    for(let entry of json)
+    const paragraphs:Array<string> = [];
+    for(const entry of json)
     {
-      let val:number = entry.attribute1;
-      if(paragraphs.indexOf(val) === -1)
-      {
-        paragraphs.push(val);
-        this.$node.select('#paragraph').append('option').attr('value',val).text(val);
+      const val:string = entry.attribute1;
+      // attribute1 column not present in row --> not add a checkbox here
+      if (val !== undefined) {
+        if(paragraphs.indexOf(val) === -1) {
+          paragraphs.push(val);
+          this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
+            .attr('class','paraFilter').attr('checked', true);
+          this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
+          this.$node.select('#paragraph').append('span').text(' ');
+        }
       }
+    }
+    this.paragraphFilter.values = paragraphs;
+
+    //Dirty hack to handle §31 in media transparency data
+    if (paragraphs.indexOf('31') !== -1) {
+      d3.select('input[value = \'31\']').attr('checked', null);
+      this.paragraphFilter.values = this.paragraphFilter.values.filter((e) => e.toString() !== '31');
+    }
+
+    //Set UI label dynamically based on CSV header
+    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    if (columnLabels != null) {
+      if (columnLabels.attribute1 !== undefined) {
+        this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
+      } else {
+        //Attribute1 column not present in header --> empty UI label
+        this.$node.select('#attr1_label').html('');
+      }
+    } else {
+      this.$node.select('#attr1_label').html('Attribute Filter');
     }
   }
 
+  /**
+   * This method adds the slider for the time range.
+   * @param json with the data to be added.
+   */
   private setQuarterFilterRange(json)
   {
-    let min: number = json[0].timeNode;
-    let max: number = json[0].timeNode;
-    for(let entry of json)
-    {
-      if(entry.timeNode < min)
-        min = entry.timeNode;
+    const timePoints = d3.set(
+      json.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
 
-      if(entry.timeNode > max)
-        max = entry.timeNode;
-    }
-
-    this.quarterFilter.changeRange(min, min);
+    const newMin: number = Number(timePoints[0]);
+    const newMax: number = Number(timePoints[timePoints.length - 1]);
+    this.quarterFilter.changeRange(newMax, newMax);
 
     $('#timeSlider').ionRangeSlider({
       type: 'double',
-      min: min,
-      max: max,
-      from: min,
-      to: min,
-      prefix: 'Q',
+      min: 0,
+      max: timePoints.length - 1,
+      from: timePoints.length - 1,
+      to: timePoints.length - 1,
+      prettify(num) {
+        return `` + TimeFormat.formatNumber(parseInt(timePoints[num], 10));
+      },
       force_edges: true,  //Lets the labels inside the container
       drag_interval: true, //Allows the interval to be dragged around
       onFinish: (sliderData) => {
-        let newMin: number = sliderData.from;
-        let newMax: number = sliderData.to;
+        // TODO here we rely on all timeNodes to be numbers
+        const newMin: number = Number(timePoints[sliderData.from]);
+        const newMax: number = Number(timePoints[sliderData.to]);
         this.quarterFilter.minValue = newMin;
         this.quarterFilter.maxValue = newMax;
+
+        SimpleLogging.log('time slider', [newMin, newMax]);
         events.fire(AppConstants.EVENT_FILTER_CHANGED, json);
+
+        //This notifies the sliders to change their values but only if the quarter slider changes
+        const filterQuarter = this.quarterFilter.meetCriteria(json);
+        const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       }
+    });
+    this.quarterFilterRef = $('#timeSlider').data('ionRangeSlider');
+  }
+
+  /**
+   * This method updates the filter range of the quarter slider.
+   * @param data the original data to read out the maximum number of time
+   */
+  private updateQuarterFilter(data) {
+    const timePoints = d3.set(
+      data.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
+
+    const newMin: number = Number(timePoints[0]);
+    const newMax: number = Number(timePoints[timePoints.length - 1]);
+    this.quarterFilter.changeRange(newMax, newMax);
+    this.quarterFilterRef.update({
+      from: timePoints.length - 1,
+      to: timePoints.length - 1
     });
   }
 }

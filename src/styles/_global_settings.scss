@@ -15,11 +15,15 @@
 
 .list-group, .showChange  {
   padding: 15px;
+
+  p {
+    font-size: 14px;
+    font-weight: bold;
+  }
 }
 
-.list-group, .showChange p {
-  font-size: 14px;
-  font-weight: bold;
+.clearBox {
+  padding: 15px;
 }
 
 .showChange {

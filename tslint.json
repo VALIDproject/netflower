@@ -25,8 +25,8 @@
       true,
       2
     ],
-    "interface-name": true,
-    "jsdoc-format": true,
+    "interface-name": false,
+    "jsdoc-format": false,
     "label-position": true,
     "max-line-length": false,
     "member-ordering": [
@@ -64,7 +64,6 @@
     "no-var-keyword": true,
     "one-line": [
       true,
-      "check-open-brace",
       "check-catch",
       "check-else",
       "check-whitespace"

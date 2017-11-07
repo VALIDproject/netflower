@@ -47,5 +47,9 @@ module.exports = function(registry) {
   registry.push('validView', 'SparklineBarChartTarget', function() { return System.import('./src/sparklineBarChart'); }, {
     'name': 'SparklineBarChartTarget',
   });
+
+  registry.push('validView', 'SimpleLogging', function() { return System.import('./src/simpleLogging'); }, {
+    'name': 'SimpleLogging',
+  });
   // generator-phovea:end
 };

@@ -10,11 +10,11 @@ import {AppConstants} from './app_constants';
 /**
  Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
  * Based on https://github.com/mbostock/d3/issues/1642
- * @exemple svg.append("g")
- *      .attr("class", "x axis")
- *      .attr("transform", "translate(0," + height + ")")
+ * @exemple svg.append('g')
+ *      .attr('class', 'x axis')
+ *      .attr('transform', 'translate(0,' + height + ')')
  *      .call(xAxis)
- *      .selectAll(".tick text")
+ *      .selectAll('.tick text')
  *          .call(d3TextWrap, x.rangeBand());
  *
  * @param text d3 selection for one or more <text> object
@@ -28,28 +28,30 @@ import {AppConstants} from './app_constants';
 export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
   paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
   paddingTopBottom = (paddingTopBottom || 5) - 2; //Default padding (5px), remove 2 pixels because of the borders
-  let maxWidth = width; //I store the tooltip max width
+  const maxWidth = width; //I store the tooltip max width
   width = width - (paddingRightLeft * 2); //Take the padding into account
 
-  let arrLineCreatedCount = [];
+  const arrLineCreatedCount = [];
   text.each(function() {
-    let text = d3.select(this),
+    const text = d3.select(this),
       words = text.text().split(/[ \f\n\r\t\v]+/).reverse(), //Don't cut non-breaking space (\xA0), as well as the Unicode characters \u00A0 \u2028 \u2029)
-      word,
-      line = [],
-      lineNumber = 0,
       lineHeight = 1.1, //Ems
-      x,
-      y = text.attr("y"),
-      dy = parseFloat(text.attr("dy")),
-      createdLineCount = 1, //Total line created count
       textAlign = text.style('text-anchor') || 'start'; //'start' by default (start, middle, end, inherit)
 
+    let word,
+      line = [],
+      lineNumber = 0,
+      x,
+      y = text.attr('y'),
+      dy = parseFloat(text.attr('dy')),
+      createdLineCount = 1; //Total line created count
+
+
     //Clean the data in case <text> does not define those values
-    if (isNaN(dy)) dy = 0; //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
+    if (isNaN(dy)) { dy = 0; } //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
 
     //Offset the text position based on the text-anchor
-    let wrapTickLabels = d3.select(text.node().parentNode).classed('tick'); //Don't wrap the 'normal untranslated' <text> element and the translated <g class='tick'><text></text></g> elements the same way..
+    const wrapTickLabels = d3.select(text.node().parentNode).classed('tick'); //Don't wrap the 'normal untranslated' <text> element and the translated <g class='tick'><text></text></g> elements the same way..
     if (wrapTickLabels) {
       switch (textAlign) {
         case 'start':
@@ -63,8 +65,7 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
           break;
         default :
       }
-    }
-    else { //untranslated <text> elements
+    } else { //untranslated <text> elements
       switch (textAlign) {
         case 'start':
           x = paddingRightLeft;
@@ -80,16 +81,16 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
     }
     y = (+((null === y)?paddingTopBottom:y) as any);
 
-    let tspan = (text as any).text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+    let tspan = (text as any).text(null).append('tspan').attr('x', x).attr('y', y).attr('dy', dy + 'em');
     //noinspection JSHint
     while (word = words.pop()) {
       line.push(word);
-      tspan.text(line.join(" "));
+      tspan.text(line.join(' '));
       if (tspan.node().getComputedTextLength() > width && line.length > 1) {
         line.pop();
-        tspan.text(line.join(" "));
+        tspan.text(line.join(' '));
         line = [word];
-        tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        tspan = text.append('tspan').attr('x', x).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
         ++createdLineCount;
       }
     }
@@ -107,20 +108,21 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
  *
  * Example: splitAt(4)(d.time) Splits the string at 4 from d.time
  */
-export const splitAt = index => it =>
+export const splitAt = (index) => (it) =>
   [it.slice(0, index), it.slice(index)];
 
+const formatNumber = d3.format(',.0f');    //Zero decimal places
+//  format = function(d) { return formatNumber(d); }, //Display number with unit sign
 /**
- * This method converts a given number to a String with dot fomrated thousands seperator.
+ * This method converts a given number to a String with dot formated thousands seperator.
  * @type {(n:number)=>string} the number to format
  */
-export const formatNumber = d3.format(',.0f'),    //Zero decimal places
-  format = function(d) { return formatNumber(d); }, //Display number with unit sign
-  dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'); }; //Replacing the , with .
+export const dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'); }; //Replacing the , with .
 
 /**
  * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
  * It's necessary but not very pretty. Not proud of it.....
+ * A 'prettier' solution might be a loop and Math.pow(10,i) (yet but better not touch working code).
  * @param value to round
  * @returns {number}
  */
@@ -165,170 +167,265 @@ export function roundToFull(value: number) {
  *     the header instead of the default rowId
  * @returns {Array} Generated JSON
  */
-export function tableToJSON(table, opts?) {
-  // Set options
-  let defaults = {
-    ignoreColumns: [],
-    onlyColumns: null,
-    ignoreHiddenRows: true,
-    ignoreEmptyRows: false,
-    headings: null,
-    allowHTML: false,
-    includeRowId: false,
-    textDataOverride: 'data-override',
-    textExtractor: null
-  };
-  opts = $.extend(defaults, opts);
+/*export function tableToJSON(table, opts?) {
+ // Set options
+ let defaults = {
+ ignoreColumns: [],
+ onlyColumns: null,
+ ignoreHiddenRows: true,
+ ignoreEmptyRows: false,
+ headings: null,
+ allowHTML: false,
+ includeRowId: false,
+ textDataOverride: 'data-override',
+ textExtractor: null
+ };
+ opts = $.extend(defaults, opts);
 
-  let notNull = function(value) {
-    return value !== undefined && value !== null;
-  };
+ let notNull = function(value) {
+ return value !== undefined && value !== null;
+ };
 
-  let ignoredColumn = function(index) {
-    if( notNull(opts.onlyColumns) ) {
-      return $.inArray(index, opts.onlyColumns) === -1;
+ let ignoredColumn = function(index) {
+ if( notNull(opts.onlyColumns) ) {
+ return $.inArray(index, opts.onlyColumns) === -1;
+ }
+ return $.inArray(index, opts.ignoreColumns) !== -1;
+ };
+
+ let arraysToHash = function(keys, values) {
+ let result = {}, index = 0;
+ $.each(values, function(i, value) {
+ // when ignoring columns, the header option still starts
+ // with the first defined column
+ if ( index < keys.length && notNull(value) ) {
+ result[ keys[index] ] = value;
+ index++;
+ }
+ });
+ return result;
+ };
+
+ let cellValues = function(cellIndex, cell, isHeader?) {
+ let $cell = $(cell),
+ // textExtractor
+ extractor = opts.textExtractor,
+ override = $cell.attr(opts.textDataOverride);
+ // don't use extractor for header cells
+ if ( extractor === null || isHeader ) {
+ return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
+ } else {
+ // overall extractor function
+ if ( $.isFunction(extractor) ) {
+ return $.trim( override || extractor(cellIndex, $cell) );
+ } else if ( typeof extractor === 'object' && $.isFunction( extractor[cellIndex] ) ) {
+ return $.trim( override || extractor[cellIndex](cellIndex, $cell) );
+ }
+ }
+ // fallback
+ return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
+ };
+
+ let rowValues = function(row, isHeader) {
+ let result = [];
+ let includeRowId = opts.includeRowId;
+ let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
+ let rowIdName = (typeof includeRowId === 'string') === true ? includeRowId : 'rowId';
+ if (useRowId) {
+ if (typeof $(row).attr('id') === 'undefined') {
+ result.push(rowIdName);
+ }
+ }
+ $(row).children('td,th').each(function(cellIndex, cell) {
+ result.push( cellValues(cellIndex, cell, isHeader) );
+ });
+ return result;
+ };
+
+ let getHeadings = function(table) {
+ let firstRow = table.find('tr:first').first();
+ return notNull(opts.headings) ? opts.headings : rowValues(firstRow, true);
+ };
+
+ let construct = function(table, headings) {
+ let i, j, len, len2, txt, $row, $cell,
+ tmpArray = [], cellIndex = 0, result = [];
+ table.children('tbody,*').children('tr').each(function(rowIndex, row) {
+ if( rowIndex > 0 || notNull(opts.headings) ) {
+ let includeRowId = opts.includeRowId;
+ let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
+
+ $row = $(row);
+
+ let isEmpty = ($row.find('td').length === $row.find('td:empty').length) ? true : false;
+
+ if( ( $row.is(':visible') || !opts.ignoreHiddenRows ) && ( !isEmpty || !opts.ignoreEmptyRows ) && ( !$row.data('ignore') || $row.data('ignore') === 'false' ) ) {
+ cellIndex = 0;
+ if (!tmpArray[rowIndex]) {
+ tmpArray[rowIndex] = [];
+ }
+ if (useRowId) {
+ cellIndex = cellIndex + 1;
+ if (typeof $row.attr('id') !== 'undefined') {
+ tmpArray[rowIndex].push($row.attr('id'));
+ } else {
+ tmpArray[rowIndex].push('');
+ }
+ }
+
+ $row.children().each(function(){
+ $cell = $(this);
+ // skip column if already defined
+ while (tmpArray[rowIndex][cellIndex]) { cellIndex++; }
+
+ // process rowspans
+ if ($cell.filter('[rowspan]').length) {
+ len = parseInt( $cell.attr('rowspan'), 10) - 1;
+ txt = cellValues(cellIndex, $cell);
+ for (i = 1; i <= len; i++) {
+ if (!tmpArray[rowIndex + i]) { tmpArray[rowIndex + i] = []; }
+ tmpArray[rowIndex + i][cellIndex] = txt;
+ }
+ }
+ // process colspans
+ if ($cell.filter('[colspan]').length) {
+ len = parseInt( $cell.attr('colspan'), 10) - 1;
+ txt = cellValues(cellIndex, $cell);
+ for (i = 1; i <= len; i++) {
+ // cell has both col and row spans
+ if ($cell.filter('[rowspan]').length) {
+ len2 = parseInt( $cell.attr('rowspan'), 10);
+ for (j = 0; j < len2; j++) {
+ tmpArray[rowIndex + j][cellIndex + i] = txt;
+ }
+ } else {
+ tmpArray[rowIndex][cellIndex + i] = txt;
+ }
+ }
+ }
+
+ txt = tmpArray[rowIndex][cellIndex] || cellValues(cellIndex, $cell);
+ if (notNull(txt)) {
+ tmpArray[rowIndex][cellIndex] = txt;
+ }
+ cellIndex++;
+ });
+ }
+ }
+ });
+ $.each(tmpArray, function( i, row ){
+ if (notNull(row)) {
+ // remove ignoredColumns / add onlyColumns
+ let newRow = notNull(opts.onlyColumns) || opts.ignoreColumns.length ?
+ $.grep(row, function(v, index){ return !ignoredColumn(index); }) : row,
+
+ // remove ignoredColumns / add onlyColumns if headings is not defined
+ newHeadings = notNull(opts.headings) ? headings :
+ $.grep(headings, function(v, index){ return !ignoredColumn(index); });
+
+ txt = arraysToHash(newHeadings, newRow);
+ result[result.length] = txt;
+ }
+ });
+ return result;
+ };
+
+ // Run
+ let headings = getHeadings(table);
+ return construct(table, headings);
+ };
+ */
+
+/**
+ * This method creates a downloadable file which contains the json or data it was given. An example
+ * call would be: downloadFile(JSON.stringify(json), 'output.txt', 'text/plain');
+ * This creates a file named output.txt if the user visits the website or presses a button.
+ * @param text is the text or json object which should be written to the file
+ * @param name is the file name
+ * @param type the type of the file which can be specified
+ */
+export function downloadFile(text, name, type) {
+  const a = document.createElement('a');
+  const file = new Blob([text], {type});
+  a.href = URL.createObjectURL(file);
+  a.download = name;
+  a.click();
+}
+
+/**
+ * generate a random alphanumeric (base36) string of given length.
+ * Source: https://stackoverflow.com/a/10727155/1140589
+ * @param length number of characters
+ */
+export function randomString(length: number): string {
+  return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
+/**
+ * This function fades in a text or fades over a text on a given html element
+ * @param element html to fade the text onto
+ * @param newText the text to show in the html elment
+ */
+export function textTransition(element: d3.Selection<any>, newText: string, duration: number) {
+  element.transition().duration(duration)
+    .style('opacity', 0)
+    .transition().duration(duration)
+    .style('opacity', 1)
+    .text(newText);
+}
+
+/**
+ * This function can be used to add text ellipses to overvlowing text. It will add dots to all text
+ * that is above the given width.
+ * @param text element in d3 which contains the text e.g. d3.selectAll('text');
+ * @param maxTextWidth the width in pixel where the text should be broken
+ */
+export function d3TextEllipse(text, maxTextWidth) {
+  text.each(function() {
+    const text = d3.select(this);
+    const words = text.text().split(/\s+/);
+    const ellipsis = text.text('').append('tspan').attr('class', 'elip').text('...');
+    const numWords = words.length;
+    const tspan = text.insert('tspan', ':first-child').text(words.join(' '));
+
+    //While it's too long and we have words left we keep removing words
+    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length) {
+      words.pop();
+      tspan.text(words.join(' '));
     }
-    return $.inArray(index, opts.ignoreColumns) !== -1;
-  };
+    if (words.length === numWords) {
+      ellipsis.remove();
+    }
+  });
+}
 
-  let arraysToHash = function(keys, values) {
-    let result = {}, index = 0;
-    $.each(values, function(i, value) {
-      // when ignoring columns, the header option still starts
-      // with the first defined column
-      if ( index < keys.length && notNull(value) ) {
-        result[ keys[index] ] = value;
-        index++;
-      }
-    });
-    return result;
-  };
+export class Tooltip {
+  public static tooltip1 = d3.select('body').append('div')
+    .attr('class', 'tooltip')
+    .style('opacity', 0)
+    .style('z-index', '200000');
 
-  let cellValues = function(cellIndex, cell, isHeader?) {
-    let $cell = $(cell),
-      // textExtractor
-      extractor = opts.textExtractor,
-      override = $cell.attr(opts.textDataOverride);
-    // don't use extractor for header cells
-    if ( extractor === null || isHeader ) {
-      return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
+  public static tooltip2 = d3.select('body').append('div')
+    .attr('class', 'tooltip2')
+    .style('opacity', 0)
+    .style('z-index', '200000');
+
+  public static mouseOver(data, text, type: string) {
+    if (type === 'T1') {
+      Tooltip.tooltip1.transition().duration(200).style('opacity', .9);
+      Tooltip.tooltip1.html(text)
+        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('top', ((<any>d3).event.pageY - 140) + 'px');
     } else {
-      // overall extractor function
-      if ( $.isFunction(extractor) ) {
-        return $.trim( override || extractor(cellIndex, $cell) );
-      } else if ( typeof extractor === 'object' && $.isFunction( extractor[cellIndex] ) ) {
-        return $.trim( override || extractor[cellIndex](cellIndex, $cell) );
-      }
+      Tooltip.tooltip2.transition().duration(200).style('opacity', .9);
+      Tooltip.tooltip2.html(text)
+        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('top', ((<any>d3).event.pageY) + 'px');
     }
-    // fallback
-    return $.trim( override || ( opts.allowHTML ? $cell.html() : cell.textContent || $cell.text() ) || '' );
-  };
+  }
 
-  let rowValues = function(row, isHeader) {
-    let result = [];
-    let includeRowId = opts.includeRowId;
-    let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
-    let rowIdName = (typeof includeRowId === 'string') === true ? includeRowId : 'rowId';
-    if (useRowId) {
-      if (typeof $(row).attr('id') === 'undefined') {
-        result.push(rowIdName);
-      }
-    }
-    $(row).children('td,th').each(function(cellIndex, cell) {
-      result.push( cellValues(cellIndex, cell, isHeader) );
-    });
-    return result;
-  };
-
-  let getHeadings = function(table) {
-    let firstRow = table.find('tr:first').first();
-    return notNull(opts.headings) ? opts.headings : rowValues(firstRow, true);
-  };
-
-  let construct = function(table, headings) {
-    let i, j, len, len2, txt, $row, $cell,
-      tmpArray = [], cellIndex = 0, result = [];
-    table.children('tbody,*').children('tr').each(function(rowIndex, row) {
-      if( rowIndex > 0 || notNull(opts.headings) ) {
-        let includeRowId = opts.includeRowId;
-        let useRowId = (typeof includeRowId === 'boolean') ? includeRowId : (typeof includeRowId === 'string') ? true : false;
-
-        $row = $(row);
-
-        let isEmpty = ($row.find('td').length === $row.find('td:empty').length) ? true : false;
-
-        if( ( $row.is(':visible') || !opts.ignoreHiddenRows ) && ( !isEmpty || !opts.ignoreEmptyRows ) && ( !$row.data('ignore') || $row.data('ignore') === 'false' ) ) {
-          cellIndex = 0;
-          if (!tmpArray[rowIndex]) {
-            tmpArray[rowIndex] = [];
-          }
-          if (useRowId) {
-            cellIndex = cellIndex + 1;
-            if (typeof $row.attr('id') !== 'undefined') {
-              tmpArray[rowIndex].push($row.attr('id'));
-            } else {
-              tmpArray[rowIndex].push('');
-            }
-          }
-
-          $row.children().each(function(){
-            $cell = $(this);
-            // skip column if already defined
-            while (tmpArray[rowIndex][cellIndex]) { cellIndex++; }
-
-            // process rowspans
-            if ($cell.filter('[rowspan]').length) {
-              len = parseInt( $cell.attr('rowspan'), 10) - 1;
-              txt = cellValues(cellIndex, $cell);
-              for (i = 1; i <= len; i++) {
-                if (!tmpArray[rowIndex + i]) { tmpArray[rowIndex + i] = []; }
-                tmpArray[rowIndex + i][cellIndex] = txt;
-              }
-            }
-            // process colspans
-            if ($cell.filter('[colspan]').length) {
-              len = parseInt( $cell.attr('colspan'), 10) - 1;
-              txt = cellValues(cellIndex, $cell);
-              for (i = 1; i <= len; i++) {
-                // cell has both col and row spans
-                if ($cell.filter('[rowspan]').length) {
-                  len2 = parseInt( $cell.attr('rowspan'), 10);
-                  for (j = 0; j < len2; j++) {
-                    tmpArray[rowIndex + j][cellIndex + i] = txt;
-                  }
-                } else {
-                  tmpArray[rowIndex][cellIndex + i] = txt;
-                }
-              }
-            }
-
-            txt = tmpArray[rowIndex][cellIndex] || cellValues(cellIndex, $cell);
-            if (notNull(txt)) {
-              tmpArray[rowIndex][cellIndex] = txt;
-            }
-            cellIndex++;
-          });
-        }
-      }
-    });
-    $.each(tmpArray, function( i, row ){
-      if (notNull(row)) {
-        // remove ignoredColumns / add onlyColumns
-        let newRow = notNull(opts.onlyColumns) || opts.ignoreColumns.length ?
-            $.grep(row, function(v, index){ return !ignoredColumn(index); }) : row,
-
-          // remove ignoredColumns / add onlyColumns if headings is not defined
-          newHeadings = notNull(opts.headings) ? headings :
-            $.grep(headings, function(v, index){ return !ignoredColumn(index); });
-
-        txt = arraysToHash(newHeadings, newRow);
-        result[result.length] = txt;
-      }
-    });
-    return result;
-  };
-
-  // Run
-  let headings = getHeadings(table);
-  return construct(table, headings);
-};
+  public static mouseOut(type: string) {
+      Tooltip.tooltip1.transition().duration(500).style('opacity', 0);
+      Tooltip.tooltip2.transition().duration(500).style('opacity', 0);
+  }
+}

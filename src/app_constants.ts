@@ -21,4 +21,17 @@ export class AppConstants {
   static EVENT_FILTER_CHANGED = 'eventFilterChanged';
 
   static EVENT_FILTER_DEACTIVATE_TOP_FILTER = 'eventFilterDeactivateTopFilter';
+
+  static EVENT_SLIDER_CHANGE = 'eventSliderChange';
+
+  static EVENT_UI_COMPLETE = 'eventUIComplete';
+
+  static EVENT_CLEAR_FILTERS = 'eventClearFilters';
+
+
+  //FILE DOWNLOADS
+  static ASYLUM_FILE = 'https://dl.dropboxusercontent.com/s/cr3iu0adtb77de6/Asylum_Seekers_Data.csv?dl=0';
+  static FARM_FILE = 'https://dl.dropboxusercontent.com/s/zunih3hkcooh1gm/Farm_Subsidies_Data.csv?dl=0';
+  static MEDIA_FILE = 'https://dl.dropboxusercontent.com/s/34ev5sr6u3xdisq/Media_Transperency_Data.csv?dl=0';
+  static FILE4 = 'https://dl.dropboxusercontent.com/s/k4dhuh7hnmoclzf/Simple_Data.csv?dl=0';
 }

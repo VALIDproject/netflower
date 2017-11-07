@@ -30,14 +30,19 @@ export default class TopFilter implements Filter
     this._active = act;
   }
 
+  //determine if the filter should filter the top or bottom 10
   public changeFilterTop(top: boolean)
   {
     this.filterTop = top;
   }
 
+  //method to find the top or bottom 10 legal entities and all their corresponding payments!
   public findTop(data: any): any
   {
+
+    //creating an empty map an fill group all entities and and calulcate the total of all payments
     let map = new Map<string, number>();
+    this.filterEntries = new Array<string>();
 
     for(let entry of data)
     {
@@ -55,6 +60,7 @@ export default class TopFilter implements Filter
       }
     }
 
+    //sort the entities from top to bottom
     let arr = [];
     map.forEach( (value, key, map) => {
       arr.push({key, value});
@@ -65,6 +71,8 @@ export default class TopFilter implements Filter
       return (<number>b.value) - (<number>a.value);
     });
 
+    //if filter top set the range from 0-10
+    //if filter bottom set the range from lenth-10 to length
     let index:number = 0;
     let max:number = 0;
 
@@ -78,6 +86,7 @@ export default class TopFilter implements Filter
       max = 10;
     }
 
+    //add the wanted entities to the filter entities
     while(index < max)
     {
       let entry = arr[index].key;
@@ -89,6 +98,7 @@ export default class TopFilter implements Filter
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
+    //console.log(data);
 
     if(!this._active)
       return data;
@@ -105,12 +115,12 @@ export default class TopFilter implements Filter
         }
       }
     }
-    //console.log(this.resultData);
+   // console.log(this.resultData);
     return this.resultData;
   }
 
   public printData(): void
   {
-    console.log('Top Filter: ');
+    console.log('Top Filter: ' + this.filterEntries);
   }
 }

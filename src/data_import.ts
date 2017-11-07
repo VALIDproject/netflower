@@ -6,10 +6,13 @@ import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
 import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
-import * as localforage from 'localforage'
-import {tableToJSON} from './utilities';
+import * as localforage from 'localforage';
+import * as bootbox from 'bootbox';
+import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
+import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
+import SimpleLogging from './simpleLogging';
 
 const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
@@ -19,6 +22,7 @@ class DataImport implements MAppViews {
   private $fileContainer: d3.Selection<any>;
   private $displayContainer: d3.Selection<any>;
   private $chaningHeading: d3.Selection<any>;
+  private $helpInfo: d3.Selection<any>;
   private $tableRows: JQuery;
   private $btnNext: JQuery;
   private $btnPrev: JQuery;
@@ -42,7 +46,7 @@ class DataImport implements MAppViews {
    * @returns {Promise<DataImport>}
    */
   init() {
-    let dataAvailable = localStorage.getItem('dataLoaded') == 'loaded' ? true : false;
+    const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
 
     if(!dataAvailable) {
       d3.select('.dataVizView').classed('invisibleClass', true);
@@ -57,7 +61,6 @@ class DataImport implements MAppViews {
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
-
 
   /**
    * Build the basic DOM elements
@@ -104,6 +107,34 @@ class DataImport implements MAppViews {
 			</div>
     `);
 
+    d3.select('.fileContainer').append('div').classed('helpInfo', true);
+    this.$helpInfo = d3.select('.helpInfo').html(`
+      <p>${USAGE_INFO}</p>
+      <table class='demo'>
+        <thead>
+        <tr>
+          <th>Source</th><th>Target</th><th>Time</th><th>Value</th><th>Attribute 1</th><th>Attribute...</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Assign an appropriate name for the source nodes of your visualization</td>
+          <td>Assign an appropriate name for the target nodes of your visualization</td>
+          <td>Assign the time column name here.</td>
+          <td>Assign the value column name here. Best to uses is a currency sign.</td>
+          <td>Add any attribute name here.</td>
+          <td>Further attributes...</td>
+        </tr>
+        </tbody>
+      </table>
+      <br/>
+      <p>${DOWNLOAD_INFO}</p>
+      <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
+      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
+        <i class='fa fa-download'></i> Sample Files</button>
+      <!--</a>-->
+    `);
+
     //Initialize for text transition
     this.$chaningHeading = d3.select('#informationText');
 
@@ -121,6 +152,7 @@ class DataImport implements MAppViews {
     //Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {
+        SimpleLogging.log('import submit button','');
         //Clear the log first
         d3.select('#errorLog').selectAll('*').remove();
         d3.select('#messageLog').html('');
@@ -136,7 +168,7 @@ class DataImport implements MAppViews {
         d3.select('#valuesList').selectAll('*').remove();
 
         //Change information and reset edit mode
-        this.textTransition(this.$chaningHeading, 'View data, upload new or proceed!!');
+        textTransition(this.$chaningHeading, 'View data, upload new or proceed!!', 500);
         this.editMode = false;
 
         //Start the uploading
@@ -152,8 +184,9 @@ class DataImport implements MAppViews {
     //Listener for the Edit Button
     this.$node.select('#showMoreBtn')
       .on('click', (e) => {
+        SimpleLogging.log('import preview show button','');
         //Plot the data in the table and enable edit mode
-        let resultData = this.parseResults.data;
+        const resultData = this.parseResults.data;
         this.previewData(resultData);
         this.editMode = true;
 
@@ -172,6 +205,7 @@ class DataImport implements MAppViews {
     //Listener for the 'Next' Button in the visual browser
     this.$node.select('#seeNextRecords')
       .on('click', (e) => {
+        SimpleLogging.log('import preview next button','');
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.$tableRows.slice(this.rowsToShow, this.rowsToShow + 10).show();
         this.rowsToShow += 10;
@@ -187,6 +221,7 @@ class DataImport implements MAppViews {
     //Listener for the 'Prev' Button in the visual browser
     this.$node.select('#seePrevRecords')
       .on('click', (e) => {
+        SimpleLogging.log('import preview prev button','');
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.rowsToShow -= 10;
         d3.select('#valueListMeta').html('Viewing page: ' + this.rowsToShow / 10
@@ -203,7 +238,9 @@ class DataImport implements MAppViews {
     this.$node.select('#specialBtn')
       .on('click', (e) => {
         //Before rework the keys of the data
+        SimpleLogging.log('import special button','');
         this.reworkKeys(this.parseResults);
+        this.makeNodesUnique();
 
         if(this.editMode) {
           d3.select('.dataLoadingView').classed('invisibleClass', true);
@@ -225,6 +262,19 @@ class DataImport implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
+
+    //Listener for the download file button
+    this.$node.select('#sampleFile').on('click', (e) => {
+      bootbox.alert({
+        title: 'Sample Files',
+        message: `${DOWNLOAD_DIALOG}`
+      });
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
+      evt.stopPropagation();
+    });
+
+    d3.selectAll('a').on('click', (e) => {console.log('testaaaaaaa'); e.preventDefault();});
   }
 
   /**
@@ -238,7 +288,7 @@ class DataImport implements MAppViews {
       chunk: (results, file) => {     //Limit is 10MB for files
         this.parseResults = results;
       },
-      error: function(err, file)      //Executes if there is an error loading the file
+      error(err, file)      //Executes if there is an error loading the file
       {
         d3.select('#errorLog').append('p')
           .text(new Date().toLocaleTimeString() + ' --- ' + err + ' :: ' + file);
@@ -246,6 +296,8 @@ class DataImport implements MAppViews {
       complete: (res, file) => {      //Needs arrow function in order to pass the this object globally and not the this of papaparse object
         this.uploadedFileName = file.name;
         this.displayData(this.parseResults);
+
+        SimpleLogging.log('import upload complete',file.name);
 
         //Enable the detail button and the start visualization button
         d3.select('#showMoreBtn').attr('disabled', null)
@@ -266,7 +318,7 @@ class DataImport implements MAppViews {
    * @param results The parsed results of the papaparse loader
    */
   private displayData(results) {
-    let resultError = results.errors;
+    const resultError = results.errors;
 
     //Resize the table appropriate and add scroll area if necessary
     d3.select('#valuesList')
@@ -275,8 +327,8 @@ class DataImport implements MAppViews {
 
     //Print out the parse errors in the file
     if (resultError.length > 0) {
-      for (let i = 0; i < resultError.length; i++) {
-        let elem = resultError[i];
+      for(const el of resultError) {
+        const elem = el;
         d3.select('#errorLog').append('p')
           .html('Date: ' + new Date().toLocaleTimeString() + '<br/>'
             + 'Error: ' + elem.message + '<br/>' + ' Search in Row: ' + elem.row);
@@ -299,7 +351,7 @@ class DataImport implements MAppViews {
       console.log('Saved data');
     }).catch(function (err) {
       console.log('Error: ', err);
-    })
+    });
 
     //Local Storage for small variables
     localStorage.setItem('dataLoaded', 'loaded');
@@ -312,7 +364,7 @@ class DataImport implements MAppViews {
    * @returns {any} object which  contains the saved column names and new names.
    */
   private reworkColumnLabels(keys: string[]): any {
-    let result : any = {};
+    const result : any = {};
     for (let i = 0; i < keys.length; i++) {
       result[keyRep[i]] = keys[i];
     }
@@ -324,8 +376,8 @@ class DataImport implements MAppViews {
    * @param json the raw data.
    */
   private reworkKeys(json) {
-    let data = json.data;
-    let keys = Object.keys(data[0]);
+    const data = json.data;
+    const keys = Object.keys(data[0]);
 
     data.forEach(function(e) {
       for(let i = 0; i < keys.length; i++) {
@@ -335,6 +387,24 @@ class DataImport implements MAppViews {
     });
 
     this.parseResults.data = data;
+  }
+
+  /**
+   * Ensure that all target node names are different from source node names.
+   * In such a case, a whitespace is added.
+   */
+  private makeNodesUnique() {
+    const json = this.parseResults.data;
+    //All source nodes
+    const sources = d3.set(
+      json.map(function (d: any) { return d.sourceNode; })
+    );
+    //All rows of orig data that have a known source node as target node
+    const flowsToChange = json.filter((d) => {return sources.has(d.targetNode); });
+    //Transform these rows
+    flowsToChange.forEach((d) => {
+      d.targetNode = d.targetNode + ' ';
+    });
   }
 
   /**
@@ -352,16 +422,20 @@ class DataImport implements MAppViews {
     let table = `<table class='table valueTable' >`;
     //Create the header of the table
     table += '<thead>';
-    for (var k in resultData[0] ) {
-      table += '<th>' + k + '</th>';
+    for (const k in resultData[0] ) {
+      if(resultData[0].hasOwnProperty(k)) {
+        table += '<th>' + k + '</th>';
+      }
     }
     table += '</thead>';
 
-    for (let i = 0; i < resultData.length; i++) {
-      let row = resultData[i];
+    for(const el of resultData) {
+      const row = el;
       table += '<tr>';
-      for (let key in row) {
-        table += '<td> ' + row[key] + '</td>';
+      for (const key in row) {
+        if(row.hasOwnProperty(key)) {
+          table += '<td> ' + row[key] + '</td>';
+        }
       }
       table += '</tr>';
     }
@@ -385,23 +459,10 @@ class DataImport implements MAppViews {
       this.$btnPrev.hide();
     }
 
-    if(this.rowsToShow == 10) {
+    if(this.rowsToShow === 10) {
       this.$btnNext.show();
       this.$btnPrev.hide();
     }
-  }
-
-  /**
-   * This function fades in a text or fades over a text on a given html element
-   * @param element html to fade the text onto
-   * @param newText the text to show in the html elment
-   */
-  private textTransition(element: d3.Selection<any>, newText: string) {
-    element.transition().duration(500)
-      .style('opacity', 0)
-      .transition().duration(500)
-      .style('opacity', 1)
-      .text(newText);
   }
 }
 

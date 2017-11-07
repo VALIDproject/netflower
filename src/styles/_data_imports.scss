@@ -16,7 +16,6 @@
 }
 
 .logContainer {
-  height: 80px;
   max-width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -67,4 +66,49 @@
 .btnContainer {
   margin-top: 18px;
   margin-left: 20px;
+}
+
+.demo {
+  width:100%;
+  border:1px dashed #C0C0C0;
+  border-collapse:collapse;
+  padding:5px;
+  table-layout: fixed;
+}
+.demo th {
+  border:1px dashed #C0C0C0;
+  padding:5px;
+  background:#CCCCCC;
+}
+.demo td {
+  border:1px dashed #C0C0C0;
+  text-align:left;
+  padding:5px;
+}
+
+.leftTD {
+  width: 70%;
+}
+
+.rightTD {
+  width: 30%;
+}
+
+.downloadTable {
+  width:100%;
+  border:1px dotted #C0C0C0;
+  border-collapse:collapse;
+  padding:5px;
+}
+.downloadTable th {
+  border:1px dotted #C0C0C0;
+  padding:5px;
+}
+.downloadTable td {
+  border:1px dotted #C0C0C0;
+  padding:5px;
+}
+
+#helpInfo {
+  margin-top: 40px;
 }
