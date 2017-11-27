@@ -3,7 +3,8 @@ import Entity from '../datatypes/entity';
 import EntityContainer from '../datatypes/entityContainer';
 
 /**
- * This class is used to describe a value filter or filtering by value of the data set.
+ * This class is used to describe a value filter or filtering by value of the the sourceNode.
+ * All filtering performed by this filter is for the source nodes.
  */
 export default class EntityEuroFilter implements Filter
 {
@@ -45,17 +46,22 @@ export default class EntityEuroFilter implements Filter
     this.maxValue = maxValue;
   }
 
-  // All entries which sourceNode is one of the before processed media entities will be added to the resultData
+  /**
+   *  All entries whos sourceNode is one of the before processed media entities will be added to the resultData
+   * @param data the data to perform the action on.
+   * @returns {Array<any>} of filtered entities.
+   */
   public meetCriteria(data: any): any
   {
     this._resultData = new Array<any>();
     this.processData(data);
 
+    console.log('Entity - SourceNode - Container: ', this._container);
     for(let entry of data)
     {
-      for(let entity of this._container.entities)
+      for (let entity of this._container.entities)
       {
-        if(entry.sourceNode === entity.identifier)
+        if (entry.sourceNode === entity.identifier)
           this._resultData.push(entry);
       }
     }
@@ -63,24 +69,29 @@ export default class EntityEuroFilter implements Filter
     return this._resultData;
   }
 
-  // Find all legal entities which totalAmount is between the min and max values
+  /**
+   *  Find all legal entities which totalAmount is between the min and max values.
+   * @param data where the entities should be found in.
+   */
   private processData(data: any): void
   {
     this.generateDataStructure(data);
-
-    //Filter DataStructure
-    for(let entity of this._container.entities)
+    // Filter DataStructure
+    for (let entity of this._container.entities)
     {
       let totalAmount = entity.totalAmount;
-
-      if(totalAmount < this._minValue || totalAmount > this._maxValue)
+      if (totalAmount < this._minValue || totalAmount > this._maxValue)
       {
         this._container.removeEntity(entity);
       }
     }
   }
 
-  // This method generates a datastructure where all legal entities and their totalAmount (total of all payments corresponding to this legal company) are stored
+  /**
+   *  This method generates a datastructure where all legal entities and their totalAmount
+   *  (total of all payments corresponding to this legal company) are stored.
+   * @param data or the raw values.
+   */
   private generateDataStructure(data: any): void
   {
     this._container.clearEntities();
@@ -88,18 +99,17 @@ export default class EntityEuroFilter implements Filter
     if(data === null || data === undefined)
       return;
 
-    //generating DataStructure
-    for(let entry of data)
+    // Generating DataStructure
+    for (let entry of data)
     {
       let ent = this._container.findEntity(entry.sourceNode);
 
-      if(ent === null)
+      if (ent === null)
       {
         ent = new Entity(entry.sourceNode);
         ent.addPayment(entry.valueNode);
         this._container.addEntity(ent);
       }
-
       else
       {
         ent.addPayment(entry.valueNode);
@@ -107,30 +117,34 @@ export default class EntityEuroFilter implements Filter
     }
   }
 
- //calculating the min and max value of the legal entities totalAmounts (total of all payments corresponding to this legal company)
+  /**
+   * Method for calculating the min and max value of the legal entities totalAmounts
+   * (total of all payments corresponding to this legal company).
+   * @param data for which the min and max should be calculated.
+   */
   public calculateMinMaxValues(data: any): void
   {
     this.generateDataStructure(data);
 
-    let minValue:number = 0;
-    let maxValue:number = 0;
-    let first:boolean = true;
+    let minValue: number = 0;
+    let maxValue: number = 0;
+    let first: boolean = true;
 
-    for(let entity of this._container.entities)
+    for (let entity of this._container.entities)
     {
       let totalAmount = entity.totalAmount;
 
-      if(first)
+      if (first)
       {
         minValue = totalAmount;
         maxValue = totalAmount;
         first = false;
       }
 
-      if(totalAmount < minValue)
+      if (totalAmount < minValue)
         minValue = totalAmount;
 
-      if(totalAmount > maxValue)
+      if (totalAmount > maxValue)
       {
         maxValue = totalAmount;
       }

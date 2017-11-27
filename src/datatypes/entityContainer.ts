@@ -53,7 +53,7 @@ export default class EntityContainer
   public removeEntity(ent: Entity): void
   {
     let index = this._entities.indexOf(ent);
-    this._entities.splice(index);
+    this._entities.splice(index, 1);
   }
 
   get entities():Array<Entity>

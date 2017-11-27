@@ -179,11 +179,13 @@ class SankeyDiagram implements MAppViews {
     //This redraws if new data is available
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
+      console.log('!!!!: DATA AVAILABLE');
       this.getStorageData(false);
     }
 
     //Listen to newly arrived data
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
+      console.log('!!!!: ', AppConstants.EVENT_DATA_PARSED);
       setTimeout(function () {
         location.reload();
       }, 500);
@@ -194,6 +196,7 @@ class SankeyDiagram implements MAppViews {
 
     //Listen for changed data and redraw all
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
+      console.log('!!!!: ', AppConstants.EVENT_FILTER_CHANGED);
       this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
       this.getStorageData(true);
@@ -201,12 +204,14 @@ class SankeyDiagram implements MAppViews {
 
     //Listen for resize of the window
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => {
+      console.log('!!!!: ', AppConstants.EVENT_RESIZE_WINDOW);
       SimpleLogging.log('resize window', '');
       this.resize();
     });
 
     //Listen for the change of the quarter slider and update others
     events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
+      console.log('!!!!: ', AppConstants.EVENT_SLIDER_CHANGE);
       updateEntityRange(this.entityEuroFilter, d);
       updateMediaRange(this.mediaEuroFilter, d);
       updateEuroRange(this.euroFilter, d);
@@ -214,6 +219,7 @@ class SankeyDiagram implements MAppViews {
 
     //Clear the search fields too
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
+      console.log('!!!!: ', AppConstants.EVENT_CLEAR_FILTERS);
       $('#entitySearchFilter').val('');
       this.entitySearchFilter.term = '';
       $('#mediaSearchFilter').val('');
@@ -336,7 +342,7 @@ class SankeyDiagram implements MAppViews {
   private getStorageData(redraw: boolean)
   {
     localforage.getItem('data').then((value) => {
-      //Store the unfiltered data too
+      // Store the unfiltered data too
       const originalData = value;
       if(!redraw)
       {
