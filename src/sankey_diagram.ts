@@ -364,10 +364,10 @@ class SankeyDiagram implements MAppViews {
         ];})
         .entries(filteredData);
 
-      // console.log('----------- Original Data -----------');
-      // console.log(originalData);
-      // console.log('----------- Filtered Data -----------');
-      // console.log(filteredData);
+      console.log('----------- Original Data -----------');
+      console.log(originalData);
+      console.log('----------- Filtered Data -----------');
+      console.log(filteredData);
       this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
@@ -389,7 +389,7 @@ class SankeyDiagram implements MAppViews {
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length-1])
       : TimeFormat.format(timePoints[0]);
 
-    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
+    const columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     /** unit of flows (e.g., '€'). Extracted from CSV header. */
     const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
@@ -637,6 +637,7 @@ class SankeyDiagram implements MAppViews {
         } else { return; }
       }
     });
+
   }
 }
 

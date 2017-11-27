@@ -45,7 +45,7 @@ export default class EntityEuroFilter implements Filter
     this.maxValue = maxValue;
   }
 
-  //all entries which sourceNode is one of the before processed media entities will be added to the resultData
+  // All entries which sourceNode is one of the before processed media entities will be added to the resultData
   public meetCriteria(data: any): any
   {
     this._resultData = new Array<any>();
@@ -63,7 +63,7 @@ export default class EntityEuroFilter implements Filter
     return this._resultData;
   }
 
-  //Find all legal entities which totalAmount is between the min and max values
+  // Find all legal entities which totalAmount is between the min and max values
   private processData(data: any): void
   {
     this.generateDataStructure(data);
@@ -80,7 +80,7 @@ export default class EntityEuroFilter implements Filter
     }
   }
 
-  //this method generates a datastructure where all legal entities and their totalAmount (total of all payments corresponding to this legal company) are stored
+  // This method generates a datastructure where all legal entities and their totalAmount (total of all payments corresponding to this legal company) are stored
   private generateDataStructure(data: any): void
   {
     this._container.clearEntities();
