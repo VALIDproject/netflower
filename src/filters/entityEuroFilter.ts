@@ -8,6 +8,7 @@ import EntityContainer from '../datatypes/entityContainer';
  */
 export default class EntityEuroFilter implements Filter
 {
+
   private _resultData: Array<any>;
 
   private _minValue: number;
@@ -47,17 +48,18 @@ export default class EntityEuroFilter implements Filter
   }
 
   /**
-   *  All entries whos sourceNode is one of the before processed media entities will be added to the resultData
+   * All entries whos sourceNode is one of the before processed media entities will be added to the resultData
    * @param data the data to perform the action on.
    * @returns {Array<any>} of filtered entities.
    */
   public meetCriteria(data: any): any
   {
     this._resultData = new Array<any>();
+    this._container.clearEntities();  // Clears the container before processing data
+    console.log('Container before processing: ', Object.assign({},this._container));
     this.processData(data);
-
-    console.log('Entity - SourceNode - Container: ', this._container);
-    for(let entry of data)
+    console.log('Container after processing: ', Object.assign({},this._container));
+    for (let entry of data)
     {
       for (let entity of this._container.entities)
       {
@@ -70,35 +72,36 @@ export default class EntityEuroFilter implements Filter
   }
 
   /**
-   *  Find all legal entities which totalAmount is between the min and max values.
+   * Find all legal entities which totalAmount is between the min and max values.
    * @param data where the entities should be found in.
    */
   private processData(data: any): void
   {
     this.generateDataStructure(data);
+    let toRemove: number[] = [];
     // Filter DataStructure
-    for (let entity of this._container.entities)
+    for (let entity in this._container.entities)
     {
-      let totalAmount = entity.totalAmount;
+      let totalAmount = this._container.entities[entity].totalAmount;
       if (totalAmount < this._minValue || totalAmount > this._maxValue)
       {
-        this._container.removeEntity(entity);
+        toRemove.push(parseInt(entity, 0));
       }
     }
+
+    this._container.filterEntityContainer(toRemove);
   }
 
   /**
-   *  This method generates a datastructure where all legal entities and their totalAmount
-   *  (total of all payments corresponding to this legal company) are stored.
+   * This method generates a datastructure where all legal entities and their totalAmount
+   * (total of all payments corresponding to this legal company) are stored.
    * @param data or the raw values.
    */
   private generateDataStructure(data: any): void
   {
     this._container.clearEntities();
-
     if(data === null || data === undefined)
       return;
-
     // Generating DataStructure
     for (let entry of data)
     {
@@ -115,6 +118,8 @@ export default class EntityEuroFilter implements Filter
         ent.addPayment(entry.valueNode);
       }
     }
+
+    console.log('Container after Data Structure generation: ', Object.assign({},this._container));
   }
 
   /**

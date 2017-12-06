@@ -66,7 +66,7 @@ class SankeyDiagram implements MAppViews {
     //Add Filters to pipeline
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
-    this.pipeline.addFilter(this.euroFilter);
+    // this.pipeline.addFilter(this.euroFilter);
     this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
     this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
 
@@ -370,10 +370,10 @@ class SankeyDiagram implements MAppViews {
         ];})
         .entries(filteredData);
 
-      console.log('----------- Original Data -----------');
-      console.log(originalData);
-      console.log('----------- Filtered Data -----------');
-      console.log(filteredData);
+      // console.log('----------- Original Data -----------');
+      // console.log(originalData);
+      // console.log('----------- Filtered Data -----------');
+      // console.log(filteredData);
       this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
@@ -435,6 +435,8 @@ class SankeyDiagram implements MAppViews {
       .entries(json)
       .map((o) => o.values) // remove key/values
       .sort(function(a: any, b: any){ return d3.descending(a.sum, b.sum); });
+
+    console.log('flatNest: ', flatNest);
 
     //Create reduced graph with only number of nodes shown
     const graph = {'nodes' : [], 'links' : []};

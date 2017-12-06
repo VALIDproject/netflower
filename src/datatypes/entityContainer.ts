@@ -1,4 +1,5 @@
 import Entity from './entity';
+import {type} from 'os';
 
 /**
  * This class is used to store a number of entity objects within a container. This arra yor list contains noraml
@@ -54,6 +55,18 @@ export default class EntityContainer
   {
     let index = this._entities.indexOf(ent);
     this._entities.splice(index, 1);
+  }
+
+  /**
+   * This filters an entity container by an array that is converted to a Set. The Set allows a iteration and guarantees
+   * that the indices stay as well as the uniqueness of the values. It will remove all entities that are in the passed
+   * array.
+   * @param toRemove array that contains indices that are removed.
+   */
+  public filterEntityContainer(toRemove: number[]): void
+  {
+    let set = new Set(toRemove);
+    this._entities = this._entities.filter((_, index) => !set.has(index));
   }
 
   get entities():Array<Entity>

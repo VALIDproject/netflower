@@ -41,16 +41,20 @@ export default class QuarterFilter implements Filter
     this.maxValue = maxValue;
   }
 
-  //check if the value is in the given range
+  /**
+   * This checks if the value is in the given range.
+   * @param data to perform the check on.
+   * @returns {Array<any>} the filtered data by the given criteria.
+   */
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
 
-    for(let entry of data)
+    for (let entry of data)
     {
       let quarter:number = entry.timeNode;
 
-      if(quarter >= this.minValue && quarter <= this.maxValue)
+      if (quarter >= this.minValue && quarter <= this.maxValue)
       {
         this.resultData.push(entry);
       }

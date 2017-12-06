@@ -41,16 +41,20 @@ export default class PaymentEuroFilter implements Filter
     this.maxValue = maxValue;
   }
 
-  //check if the value is in the given range
+  /**
+   * This checks if the value is in the given range.
+   * @param data to check for the value.
+   * @returns {Array<any>} the filtered data by the value.
+   */
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
 
-    for(let entry of data)
+    for (let entry of data)
     {
-      let euro:number = entry.valueNode;
+      let euro: number = entry.valueNode;
 
-      if(euro >= this.minValue && euro <= this.maxValue)
+      if (euro >= this.minValue && euro <= this.maxValue)
       {
         this.resultData.push(entry);
       }
