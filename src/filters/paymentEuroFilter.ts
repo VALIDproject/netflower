@@ -15,22 +15,22 @@ export default class PaymentEuroFilter implements Filter
     this.resultData = new Array<any>();
   }
 
-  get minValue():number
+  get minValue(): number
   {
     return this._minValue;
   }
 
-  set minValue(min:number)
+  set minValue(min: number)
   {
     this._minValue = min;
   }
 
-  get maxValue():number
+  get maxValue(): number
   {
     return this._maxValue;
   }
 
-  set maxValue(max:number)
+  set maxValue(max: number)
   {
     this._maxValue = max;
   }
@@ -49,17 +49,14 @@ export default class PaymentEuroFilter implements Filter
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
-
     for (let entry of data)
     {
       let euro: number = entry.valueNode;
-
       if (euro >= this.minValue && euro <= this.maxValue)
       {
         this.resultData.push(entry);
       }
-    }
-
+    };
     return this.resultData;
   }
 

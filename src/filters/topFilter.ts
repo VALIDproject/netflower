@@ -20,12 +20,12 @@ export default class TopFilter implements Filter
     this.filterTop = true;
   }
 
-  get active():boolean
+  get active(): boolean
   {
     return this._active;
   }
 
-  set active(act:boolean)
+  set active(act: boolean)
   {
     this._active = act;
   }
@@ -133,5 +133,11 @@ export default class TopFilter implements Filter
   }
 }
 
-// TODO: Find the bug with the top filter not updateing the euro filters for media and legal entity as this reduces
-// the array further to nearly nothing. The ranges have to be updated as well in order to reflect this in the euro filter.
+/**
+ * TODO (01.12.17): Find the bug with the top filter not updateing the euro filters for media and legal entity as this reduces
+ * the array further to nearly nothing. The ranges have to be updated as well in order to reflect this in the euro filter.
+ * --> May be solved: 07.12.17
+ *
+ * TODO (07.12.17): Check if the top filter should really apply to all time or only to the filtered. Currently he is applying for
+ * the whole time frame no matter what is filtered on the time slider.
+ */

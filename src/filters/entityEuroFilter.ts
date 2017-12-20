@@ -56,9 +56,8 @@ export default class EntityEuroFilter implements Filter
   {
     this._resultData = new Array<any>();
     this._container.clearEntities();  // Clears the container before processing data
-    console.log('Container before processing: ', Object.assign({},this._container));
     this.processData(data);
-    console.log('Container after processing: ', Object.assign({},this._container));
+
     for (let entry of data)
     {
       for (let entity of this._container.entities)
@@ -118,8 +117,6 @@ export default class EntityEuroFilter implements Filter
         ent.addPayment(entry.valueNode);
       }
     }
-
-    console.log('Container after Data Structure generation: ', Object.assign({},this._container));
   }
 
   /**
