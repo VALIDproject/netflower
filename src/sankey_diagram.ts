@@ -7,7 +7,6 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
-import * as tippy from 'tippy.js';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
@@ -170,11 +169,7 @@ class SankeyDiagram implements MAppViews {
         </span>
       </div>
     </div>
-    
-      <button class='btn' title='Test the tooltip stuff'>Click</button>
     `);
-
-    tippy('.btn');
   }
 
   /**
