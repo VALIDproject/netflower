@@ -17,6 +17,7 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
+import TagFilter from './filters/tagFilter';
 import TopFilter from './filters/topFilter';
 import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
@@ -30,6 +31,7 @@ class FilterData implements MAppViews {
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
+  private tagFilter: TagFilter;
   private topFilter: TopFilter;
   private paragraphFilter: ParagraphFilter;
   private quarterFilterRef;
@@ -40,12 +42,14 @@ class FilterData implements MAppViews {
     this.pipeline = FilterPipeline.getInstance();
     //Create Filters
     this.quarterFilter = new QuarterFilter();
+    this.tagFilter = new TagFilter();
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
     //Add Filters to Pipeline
     this.pipeline.changeTopFilter(this.topFilter); //must be first filter
     this.pipeline.addFilter(this.quarterFilter);
     this.pipeline.addAttributeFilter(this.paragraphFilter);
+    this.pipeline.addAttributeFilter(this.tagFilter);
 
     this.$node = d3.select(parent)
       .append('div')
@@ -79,6 +83,9 @@ class FilterData implements MAppViews {
             <small>Top Filter</small>
           </div>
           <div class='col-sm-2'>
+            <small>Tag Filter</small>
+          </div>
+          <div class='col-sm-2'>
             <small id='attr1_label'>Paragraph Filter</small>
           </div>
           <div class='col-sm-2'>
@@ -93,6 +100,11 @@ class FilterData implements MAppViews {
               <option value='0'>Bottom 10</option>
               <option value='1'>Top 10</option>
             </select>
+          </div>
+          <div class='col-sm-2'>
+            <div id='tag'>
+              <!--<input class='form-control input-sm' id='tagFilter' type='button' value='Update filter'>-->
+            </div>
           </div>
           <div class='col-sm-2'>
             <div id='paragraph'>
@@ -119,6 +131,7 @@ class FilterData implements MAppViews {
     if(dataAvailable) {
       this.setQuarterFilterRange(json);
       this.setParagraphFilterElements(json);
+      this.setTagFilterElements(json);
     }
 
     events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
@@ -162,13 +175,35 @@ class FilterData implements MAppViews {
       SimpleLogging.log('attribute filter', this.paragraphFilter.values);
       const filterQuarter = this.quarterFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      const tagFilterData = this.tagFilter.meetCriteria(paraFilterData);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, tagFilterData);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    });
+
+    //Listener for the change of the paragraph elements
+    $('.tagFilter').on('change', (d) => {
+      this.tagFilter.resetValues();
+
+      $('.tagFilter').each((index, element) => {
+        const value = $(element).val() as string;
+        if($(element).is(':checked'))
+        {
+          this.tagFilter.addValue(value);
+        }
+      });
+
+      SimpleLogging.log('tag filter', this.tagFilter.values);
+      const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      const tagFilterData = this.tagFilter.meetCriteria(paraFilterData);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, tagFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
       const filterQuarter = this.quarterFilter.meetCriteria(data);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      const tagFilterData = this.tagFilter.meetCriteria(paraFilterData);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       // const filterQuarter = this.quarterFilter.meetCriteria(data);
       // events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
@@ -180,8 +215,10 @@ class FilterData implements MAppViews {
       this.updateQuarterFilter(json);
       const filterQuarter = this.quarterFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      const tagFilterData = this.tagFilter.meetCriteria(paraFilterData);
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
+      this.tagFilter.resetValues();
 
       $('.paraFilter').each((index, element) => {
         const value = $(element).val() as string;
@@ -191,7 +228,15 @@ class FilterData implements MAppViews {
         }
       });
 
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      $('.tagFilter').each((index, element) => {
+        const value = $(element).val() as string;
+        if($(element).is(':checked'))
+        {
+          this.tagFilter.addValue(value);
+        }
+      });
+
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, tagFilterData);
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
@@ -241,6 +286,42 @@ class FilterData implements MAppViews {
   }
 
   /**
+   * This method adds all the elements and options for the tag filter.
+   * @param json with the data to be added.
+   */
+  private setTagFilterElements(json)
+  {
+    const tags:Array<string> = [];
+    for(const entry of json)
+    {
+      const val:string = entry.sourceTag;
+      // source tag column not present in row --> not add a checkbox here
+      if (val !== undefined) {
+        if(val !== '' && tags.indexOf(val) === -1) {
+          tags.push(val);
+          this.$node.select('#tag').append('input').attr('value',val).attr('type', 'checkbox')
+            .attr('class','tagFilter').attr('checked', true);
+          this.$node.select('#tag').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
+          this.$node.select('#tag').append('span').text(' ');
+        }
+      }
+
+      const val2:string = entry.targetTag;
+      // target tag column not present in row --> not add a checkbox here
+      if (val2 !== '' && val2 !== undefined) {
+        if(tags.indexOf(val2) === -1) {
+          tags.push(val2);
+          this.$node.select('#tag').append('input').attr('value',val2).attr('type', 'checkbox')
+            .attr('class','tagFilter').attr('checked', true);
+          this.$node.select('#tag').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val2);
+          this.$node.select('#tag').append('span').text(' ');
+        }
+      }
+    }
+    this.tagFilter.values = tags;
+  }
+
+  /**
    * This method adds the slider for the time range.
    * @param json with the data to be added.
    */
@@ -278,7 +359,8 @@ class FilterData implements MAppViews {
         //This notifies the sliders to change their values but only if the quarter slider changes
         const filterQuarter = this.quarterFilter.meetCriteria(json);
         const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
-        events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+        const tagFilterData = this.tagFilter.meetCriteria(paraFilterData);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, tagFilterData);
       }
     });
     this.quarterFilterRef = $('#timeSlider').data('ionRangeSlider');
