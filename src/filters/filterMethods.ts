@@ -52,6 +52,8 @@ export function setEntityFilterRange(filter, elemName: string, data: any)
       const newMax: number = sliderData.to;
       filter.minValue = newMin;
       filter.maxValue = newMax;
+
+      $('.left_bars').find('.irs-bar').css('background', '#DA5A6B');
       SimpleLogging.log('source value slider', [newMin, newMax]);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     },
@@ -114,6 +116,8 @@ export function setMediaFilterRange(filter, elemName: string, data: any): void
       const newMax: number = sliderData.to;
       filter.minValue = newMin;
       filter.maxValue = newMax;
+
+      $('.right_bars').find('.irs-bar').css('background', '#DA5A6B');
       SimpleLogging.log('target value slider', [newMin, newMax]);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     }
@@ -180,6 +184,8 @@ export function setEuroFilterRange(filter, elemName: string, data: any): void {
       const newMax: number = sliderData.to;
       filter.minValue = newMin;
       filter.maxValue = newMax;
+
+      $('.middle_bars').find('.irs-bar').css('background', '#DA5A6B');
       SimpleLogging.log('flow value slider', [newMin, newMax]);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, data);
     }
