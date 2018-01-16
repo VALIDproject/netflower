@@ -31,8 +31,8 @@ let valueFilterRef;
 export function setEntityFilterRange(filter, elemName: string, data: any)
 {
   filter.calculateMinMaxValues(data);
-  const myMin: number = roundToFull(filter.minValue);
-  const myMax: number = roundToFull(filter.maxValue);
+  const myMin: number = filter.minValue;
+  const myMax: number = filter.maxValue;
 
   const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
   const valuePostFix = (columnLabels == null) ? '' : columnLabels.valueNode;
@@ -44,9 +44,9 @@ export function setEntityFilterRange(filter, elemName: string, data: any)
     prettify_enabled: true,
     prettify_separator: '.',
     postfix: ' ' + valuePostFix,
-    force_edges: true,      //Lets the labels inside the container
-    min_interval: myMin * 2,  //Forces at least 1000 to be shown in order to prevent errors
-    drag_interval: true,    //Allows the interval to be dragged around
+    force_edges: true,          // Lets the labels inside the container
+    min_interval: myMin * 2,    // Forces at least 1000 to be shown in order to prevent errors
+    drag_interval: true,        // Allows the interval to be dragged around
     onFinish: (sliderData) => {
       const newMin: number = sliderData.from;
       const newMax: number = sliderData.to;
@@ -67,13 +67,21 @@ export function setEntityFilterRange(filter, elemName: string, data: any)
  */
 export function updateEntityRange(filter, data: any) {
   filter.calculateMinMaxValues(data);
-  const myMin: number = roundToFull(filter.minValue);
-  const myMax: number = roundToFull(filter.maxValue);
+  const myMin: number = filter.minValue;
+  const myMax: number = filter.maxValue;
 
   entityFilterRef.update({
     min: myMin,
     max: myMax
   });
+}
+
+/**
+ * This function returns a reference to the entity range slider.
+ * @returns {any} a reference to the slider
+ */
+export function getEntityRef() {
+  return entityFilterRef;
 }
 
 /**
@@ -85,8 +93,8 @@ export function updateEntityRange(filter, data: any) {
 export function setMediaFilterRange(filter, elemName: string, data: any): void
 {
   filter.calculateMinMaxValues(data);
-  const myMin: number = roundToFull(filter.minValue);
-  const myMax: number = roundToFull(filter.maxValue);
+  const myMin: number = filter.minValue;
+  const myMax: number = filter.maxValue;
 
   const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
   const valuePostFix = (columnLabels == null) ? '' : columnLabels.valueNode;
@@ -98,9 +106,9 @@ export function setMediaFilterRange(filter, elemName: string, data: any): void
     prettify_enabled: true,
     prettify_separator: '.',
     postfix: ' ' + valuePostFix,
-    force_edges: true,        //Lets the labels inside the container
-    min_interval: myMin * 2,    //Forces at least 1000 to be shown in order to prevent errors
-    drag_interval: true,      //Allows the interval to be dragged around
+    force_edges: true,            // Lets the labels inside the container
+    min_interval: myMin * 2,      // Forces at least 1000 to be shown in order to prevent errors
+    drag_interval: true,          // Allows the interval to be dragged around
     onFinish: (sliderData) => {
       const newMin: number = sliderData.from;
       const newMax: number = sliderData.to;
@@ -121,13 +129,21 @@ export function setMediaFilterRange(filter, elemName: string, data: any): void
  */
 export function updateMediaRange(filter, data: any) {
   filter.calculateMinMaxValues(data);
-  const myMin: number = roundToFull(filter.minValue);
-  const myMax: number = roundToFull(filter.maxValue);
+  const myMin: number = filter.minValue;
+  const myMax: number = filter.maxValue;
 
   mediaFilterRef.update({
     min: myMin,
     max: myMax
   });
+}
+
+/**
+ * This function returns a reference to the media range slider.
+ * @returns {any} a reference to the slider
+ */
+export function getMediaRef() {
+  return mediaFilterRef;
 }
 
 /**
@@ -144,8 +160,6 @@ export function setEuroFilterRange(filter, elemName: string, data: any): void {
     if (value < myMin) myMin = value;
     if (value > myMax) myMax = value;
   }
-  myMin = roundToFull(myMin);
-  myMax = roundToFull(myMax);
   filter.changeRange(myMin, myMax);
 
   const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -158,9 +172,9 @@ export function setEuroFilterRange(filter, elemName: string, data: any): void {
     prettify_enabled: true,
     prettify_separator: '.',
     postfix: ' ' + valuePostFix,
-    force_edges: true,        //Lets the labels inside the container
-    min_interval: myMin * 2,    //Forces at least 1000 to be shown in order to prevent errors
-    drag_interval: true,      //Allows the interval to be dragged around
+    force_edges: true,            // Lets the labels inside the container
+    min_interval: myMin * 2,      // Forces at least 1000 to be shown in order to prevent errors
+    drag_interval: true,          // Allows the interval to be dragged around
     onFinish: (sliderData) => {
       const newMin: number = sliderData.from;
       const newMax: number = sliderData.to;
@@ -187,12 +201,18 @@ export function updateEuroRange(filter, data: any) {
     if (value < min) min = value;
     if (value > max) max = value;
   }
-  min = roundToFull(min);
-  max = roundToFull(max);
   filter.changeRange(min, max);
 
   valueFilterRef.update({
     min: min,
     max: max
   });
+}
+
+/**
+ * This function returns a reference to the value range slider.
+ * @returns {any} a reference to the slider
+ */
+export function getValueRef() {
+  return valueFilterRef;
 }

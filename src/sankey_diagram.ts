@@ -16,7 +16,8 @@ import {MAppViews} from './app';
 import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './utilities';
 import {
   setEntityFilterRange, updateEntityRange, setMediaFilterRange,
-  updateMediaRange, setEuroFilterRange, updateEuroRange
+  updateMediaRange, setEuroFilterRange, updateEuroRange,
+  getEntityRef, getMediaRef, getValueRef
 } from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
 import FilterPipeline from './filters/filterpipeline';
@@ -49,28 +50,22 @@ class SankeyDiagram implements MAppViews {
   private euroFilter: PaymentEuroFilter;
 
   //Sliders
-  private entitySlider;
-  private mediaSlider;
-  private valueSlider;
-  private entityFrom;
-  private entityTo;
-  private mediaFrom;
-  private mediaTo;
-  private euroFrom;
-  private euroTo;
+  private entitySlider; private entityFrom = 0; private entityTo = 0;
+  private mediaSlider; private mediaFrom = 0; private mediaTo = 0;
+  private valueSlider; private euroFrom = 0; private euroTo = 0;
 
   private activeQuarters: string[] = [];
 
   constructor(parent: Element, private options: any) {
-    //Get FilterPipeline
+    // Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
-    //Create Filters
+    // Create Filters
     this.entityEuroFilter = new EntityEuroFilter();
     this.mediaEuroFilter = new MediaEuroFilter();
     this.euroFilter = new PaymentEuroFilter();
     this.entitySearchFilter = new EntitySearchFilter();
     this.mediaSearchFilter = new MediaSearchFilter();
-    //Add Filters to pipeline
+    // Add Filters to pipeline
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
     this.pipeline.addFilter(this.euroFilter);
@@ -134,9 +129,9 @@ class SankeyDiagram implements MAppViews {
           <div id='collapseContentEntity' class='collapse'>
               <div class='input-group input-group-xs'>
                 <span class='input-group-addon'>Min:</span>
-                <input type='text' value='0' class='sliderInput' id='entityFrom' />
+                <input type='number' value='${this.entityFrom}' class='sliderInput' id='entityFrom' />
                 <span class='input-group-addon'>Max:</span>
-                <input type='text' value='1000' class='sliderInput' id='entityTo' />
+                <input type='number' value='${this.entityTo}' class='sliderInput' id='entityTo' />
               </div>
           </div>
         
@@ -156,7 +151,7 @@ class SankeyDiagram implements MAppViews {
     <div class='controlBox'>
       <div class='sankey_heading'><p id='sankeyHeadingMiddle'>Flow</p><p id='infoNodesLeft'></p></div>
         <div class='row' style='width: 50%; margin: auto;'>
-          <div class='col-sm-10'>
+          <div class='col-sm-11'>
             <input id='valueSlider'/>
           </div>
           <div class='col-sm-1' style='margin-top: 24px;'>
@@ -167,9 +162,9 @@ class SankeyDiagram implements MAppViews {
         <div id='collapseContentEntity3' class='collapse' style='width: 60%; margin: auto;'>
             <div class='input-group input-group-xs'>
               <span class='input-group-addon'>Min:</span>
-              <input type='text' value='0' class='sliderInput' id='euroFrom' />
+              <input type='number' value='${this.euroFrom}' class='sliderInput' id='euroFrom' />
               <span class='input-group-addon'>Max:</span>
-              <input type='text' value='1000' class='sliderInput' id='euroTo' />
+              <input type='number' value='${this.euroTo}' class='sliderInput' id='euroTo' />
             </div>
         </div>
     </div>
@@ -205,9 +200,9 @@ class SankeyDiagram implements MAppViews {
       <div id='collapseContentEntity2' class='collapse'>
           <div class='input-group input-group-xs'>
             <span class='input-group-addon'>Min:</span>
-            <input type='text' value='0' class='sliderInput' id='mediaFrom' />
+            <input type='number' value='${this.mediaFrom}' class='sliderInput' id='mediaFrom' />
             <span class='input-group-addon'>Max:</span>
-            <input type='text' value='1000' class='sliderInput' id='mediaTo' />
+            <input type='number' value='${this.mediaTo}' class='sliderInput' id='mediaTo' />
           </div>
       </div>
       
@@ -231,11 +226,10 @@ class SankeyDiagram implements MAppViews {
     //This redraws if new data is available
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if (dataAvailable) {
-      console.log('!!!!: DATA AVAILABLE');
       this.getStorageData(false);
     }
 
-    //Listen to newly arrived data
+    // Listen to newly arrived data
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
       console.log('!!!!: ', AppConstants.EVENT_DATA_PARSED);
       setTimeout(function () {
@@ -246,30 +240,34 @@ class SankeyDiagram implements MAppViews {
       this.getStorageData(false);
     });
 
-    //Listen for changed data and redraw all
+    // Listen for changed data and redraw all
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      console.log('!!!!: ', AppConstants.EVENT_FILTER_CHANGED);
       this.$node.select('#sankeyDiagram').html('');
       //Redraw Sankey Diagram
       this.getStorageData(true);
+      this.updateInputValues('#entityFrom', '#entityTo', this.entityEuroFilter.minValue, this.entityEuroFilter.maxValue);
+      this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaEuroFilter.minValue, this.mediaEuroFilter.maxValue);
+      this.updateInputValues('#euroFrom', '#euroTo', this.euroFilter.minValue, this.euroFilter.maxValue);
     });
 
-    //Listen for resize of the window
+    // Listen for resize of the window
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => {
       console.log('!!!!: ', AppConstants.EVENT_RESIZE_WINDOW);
       SimpleLogging.log('resize window', '');
       this.resize();
     });
 
-    //Listen for the change of the quarter slider and update others
+    // Listen for the change of the quarter slider and update others
     events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
-      console.log('!!!!: ', AppConstants.EVENT_SLIDER_CHANGE);
       updateEntityRange(this.entityEuroFilter, d);
       updateMediaRange(this.mediaEuroFilter, d);
       updateEuroRange(this.euroFilter, d);
+      this.updateInputValues('#entityFrom', '#entityTo', this.entityEuroFilter.minValue, this.entityEuroFilter.maxValue);
+      this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaEuroFilter.minValue, this.mediaEuroFilter.maxValue);
+      this.updateInputValues('#euroFrom', '#euroTo', this.euroFilter.minValue, this.euroFilter.maxValue);
     });
 
-    //Clear the search fields too
+    // Clear the search fields too
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
       console.log('!!!!: ', AppConstants.EVENT_CLEAR_FILTERS);
       $('#entitySearchFilter').val('');
@@ -300,35 +298,31 @@ class SankeyDiagram implements MAppViews {
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
 
         events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
+
+        // Initialize Slider Inputs and update them with the right values
+        this.entityFrom = this.entityEuroFilter.minValue;
+        this.entityTo = this.entityEuroFilter.maxValue;
+        this.updateInputValues('#entityFrom', '#entityTo', this.entityFrom, this.entityTo);
+        this.mediaFrom = this.mediaEuroFilter.minValue;
+        this.mediaTo = this.mediaEuroFilter.maxValue;
+        this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaFrom, this.mediaTo);
+        this.euroFrom = this.euroFilter.minValue;
+        this.euroTo = this.euroFilter.maxValue;
+        this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
+
         SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));
       }
 
       //Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
       this.valuesSumSource = (<any>d3).nest()
-        .key((d) => {
-          return d.sourceNode;
-        })
-        .rollup(function (v) {
-          return [
-            d3.sum(v, function (d: any) {
-              return d.valueNode;
-            })
-          ];
-        })
+        .key((d) => { return d.sourceNode; })
+        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
         .entries(filteredData);
 
       this.valuesSumTarget = (<any>d3).nest()
-        .key((d) => {
-          return d.targetNode;
-        })
-        .rollup(function (v) {
-          return [
-            d3.sum(v, function (d: any) {
-              return d.valueNode;
-            })
-          ];
-        })
+        .key((d) => { return d.targetNode; })
+        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
         .entries(filteredData);
 
       // console.log('----------- Original Data -----------');
@@ -739,6 +733,8 @@ class SankeyDiagram implements MAppViews {
       if (this.entityFrom > this.entityTo) {
         this.entityFrom = this.entityTo
       }
+      this.updateInputValues('#entityFrom', '#entityTo', this.entityFrom, this.entityTo);
+      this.updateSliderRange(getEntityRef(), this.entityFrom, this.entityTo);
     });
 
     // Change detection for the input TO of the ENTITY slider
@@ -750,6 +746,8 @@ class SankeyDiagram implements MAppViews {
       if (this.entityTo < this.entityFrom) {
         this.entityTo = this.entityFrom;
       }
+      this.updateInputValues('#entityFrom', '#entityTo', this.entityFrom, this.entityTo);
+      this.updateSliderRange(getEntityRef(), this.entityFrom, this.entityTo);
     });
 
     // Change detection for the input FROM of the MEDIA slider.
@@ -761,6 +759,8 @@ class SankeyDiagram implements MAppViews {
       if (this.mediaFrom > this.mediaTo) {
         this.mediaFrom = this.mediaTo
       }
+      this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaFrom, this.mediaTo);
+      this.updateSliderRange(getMediaRef(), this.mediaFrom, this.mediaTo);
     });
 
     // Change detection for the input TO of the MEDIA slider
@@ -772,6 +772,8 @@ class SankeyDiagram implements MAppViews {
       if (this.mediaTo < this.mediaFrom) {
         this.mediaTo = this.mediaFrom;
       }
+      this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaFrom, this.mediaTo);
+      this.updateSliderRange(getMediaRef(), this.mediaFrom, this.mediaTo);
     });
 
     // Change detection for the input FROM of the EURO slider.
@@ -783,6 +785,8 @@ class SankeyDiagram implements MAppViews {
       if (this.euroFrom > this.euroTo) {
         this.euroFrom = this.euroTo
       }
+      this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
+      this.updateSliderRange(getValueRef(), this.euroFrom, this.euroTo);
     });
 
     // Change detection for the input TO of the EURO slider
@@ -794,6 +798,33 @@ class SankeyDiagram implements MAppViews {
       if (this.euroTo < this.euroFrom) {
         this.euroTo = this.euroFrom;
       }
+      this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
+      this.updateSliderRange(getValueRef(), this.euroFrom, this.euroTo);
+    });
+  }
+
+  /**
+   * This method updates the input values of each slider present.
+   * @param fromElem input element with the 'From'
+   * @param toElem input element with the 'To'
+   * @param from value of 'From'
+   * @param to value of 'To'
+   */
+  private updateInputValues(fromElem: string, toElem: string, from: number, to: number): void {
+    $(fromElem).prop('value', from);
+    $(toElem).prop('value', to);
+  }
+
+  /**
+   * This method updates the slider Ranges with the input fields.
+   * @param sliderRef is a reference to the current slider object
+   * @param from value of 'From'
+   * @param to value of 'To'
+   */
+  private updateSliderRange(sliderRef, from: number, to: number): void {
+    sliderRef.update({
+      from: from,
+      to: to
     });
   }
 
