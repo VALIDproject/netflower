@@ -12,7 +12,7 @@ import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
-import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';

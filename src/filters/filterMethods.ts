@@ -7,7 +7,7 @@ import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
-import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinFlat.css';
+import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css';
 import {AppConstants} from '../app_constants';
 import {roundToFull} from '../utilities';
 import FilterPipeline from './filterpipeline';

@@ -88,8 +88,7 @@
     "papaparse": "^4.2.0",
     "phovea_core": "github:phovea/phovea_core#v0.0.5",
     "phovea_d3": "github:phovea/phovea_d3#v0.0.5",
-    "phovea_ui": "github:phovea/phovea_ui#v0.0.5",
-    "tippy.js": "^2.0.8"
+    "phovea_ui": "github:phovea/phovea_ui#v0.0.5"
   },
   "name": "valid",
   "description": "Visually exploring flows in weighted dynamic netowrks for data journalists",

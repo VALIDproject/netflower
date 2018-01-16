@@ -16,7 +16,7 @@ Sankey diagram part.
 
 .left_bars {
   //border: 1px solid grey;
-  width: 15%;
+  width: 18%;
   float: right;
   height: 100%;
 }
@@ -25,7 +25,7 @@ Sankey diagram part.
 .sankey_vis {
   float: right;
   //border: 1px solid grey;
-  width: 70%;
+  width: 64%;
   //height: 100%;
 }
 
@@ -33,7 +33,7 @@ Sankey diagram part.
   float: right;
   height: 100%;
   //border: 1px solid grey;
-  width: 15%;
+  width: 18%;
 }
 
 .axis text {
@@ -222,4 +222,40 @@ svg text.yaxisunit {
 
 #mediaSearchButton, #entitySearchButton {
   border-radius: 0;
+}
+
+// SLIDER CONTROLS:
+// ------------------------------------
+//.collapseBox .fa {
+//  transition: .3s transform ease-in-out;
+//}
+//.collapseBox .collapsed .fa {
+//  transform: rotate(-90deg);
+//}
+
+.row .fa {
+  color: #808080;
+  font-size: 1.3em;
+}
+
+.sliderInput {
+    font-size: 11px;
+    width: 50px;
+    text-align: center;
+}
+.sliderInput + .sliderInput {
+    float: right;
+}
+
+#collapseContentEntity {
+  margin-bottom: 10px;
+}
+
+#collapseContentEntity2 {
+  margin-bottom: 10px;
+}
+
+#collapseContentEntity3 {
+  padding-left: 45px;
+  margin-bottom: 10px !important;
 }
