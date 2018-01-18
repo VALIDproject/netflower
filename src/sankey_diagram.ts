@@ -15,13 +15,16 @@ import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
-  updateMediaRange, setEuroFilterRange, updateEuroRange} from './filters/filterMethods';
+  updateMediaRange, setEuroFilterRange, updateEuroRange,
+  setEntityTagFilter, updateEntityTagFilter,setMediaTagFilter, updateMediaTagFilter } from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
 import EntitySearchFilter from './filters/entitySearchFilter';
 import MediaSearchFilter from './filters/mediaSearchFilter';
+import EntityTagFilter from './filters/entityTagFilter';
+import MediaTagFilter from './filters/mediaTagFilter';
 import PaymentEuroFilter from './filters/paymentEuroFilter';
 import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
@@ -44,6 +47,8 @@ class SankeyDiagram implements MAppViews {
   private mediaEuroFilter: MediaEuroFilter;
   private entitySearchFilter: EntitySearchFilter;
   private mediaSearchFilter: MediaSearchFilter;
+  private entityTagFilter: EntityTagFilter;
+  private mediaTagFilter: MediaTagFilter;
   private euroFilter: PaymentEuroFilter;
 
   //Sliders
@@ -63,10 +68,14 @@ class SankeyDiagram implements MAppViews {
     this.euroFilter = new PaymentEuroFilter();
     this.entitySearchFilter = new EntitySearchFilter();
     this.mediaSearchFilter = new MediaSearchFilter();
+    this.entityTagFilter = new EntityTagFilter();
+    this.mediaTagFilter = new MediaTagFilter();
     //Add Filters to pipeline
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
     this.pipeline.addFilter(this.euroFilter);
+    //this.pipeline.addFilter(this.entityTagFilter);
+    //this.pipeline.addFilter(this.mediaTagFilter);
     this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
     this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
 
@@ -126,6 +135,12 @@ class SankeyDiagram implements MAppViews {
             <button type='button' id='clearEntity' class='btn btn-secondary'><i class='fa fa-times'></i></button>
           </span>
         </div>
+        <div class='input-group input-group-xs' style='margin: 15px auto;'>
+          <input class='form-control input-sm' id='entityTagFilterButton' type='button' value='${columnLabels.sourceNode} Tags'>
+          <span class='input-group-btn'>
+            <button type='button' id='clearEntityTag' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+          </span>
+        </div>
       </div>
     `);
 
@@ -168,6 +183,12 @@ class SankeyDiagram implements MAppViews {
           <button type='button' id='clearMedia' class='btn btn-secondary'><i class='fa fa-times'></i></button>
         </span>
       </div>
+      <div class='input-group input-group-xs' style='margin: 15px auto;'>
+          <input class='form-control input-sm' id='mediaTagFilterButton' type='button' value='${columnLabels.targetNode} Tags'>
+          <span class='input-group-btn'>
+            <button type='button' id='clearMediaTag' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+          </span>
+        </div>
     </div>
     `);
   }
@@ -266,6 +287,36 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
+    // Functionality to open the tag filter window for legal entites
+    const entityFilterTags = (d) => {
+      var message = "<p>";
+      this.entityTagFilter.values.forEach((value:String) => message += "<button type='button'>" + value + "</button>");
+      message = message + "</p>";
+
+      var dialog = bootbox.dialog({
+        title: 'Filter tags',
+        message: message,
+        buttons: {
+            cancel: {
+                label: "Cancel",
+                className: 'btn-cancel',
+                callback: function(){
+                    console.log('Custom cancel clicked');
+                }
+            },
+            ok: {
+                label: "Apply",
+                className: 'btn-info',
+                callback: function(){
+                    console.log('Custom OK clicked');
+                    return false;
+                }
+            }
+        }
+      });
+    };
+    this.$node.select('#entityTagFilterButton').on('click', entityFilterTags);
+
     //Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
       this.nodesToShow += 25;
@@ -343,6 +394,8 @@ class SankeyDiagram implements MAppViews {
         setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
+        setEntityTagFilter(this.entityTagFilter, originalData);
+        setMediaTagFilter(this.mediaTagFilter, originalData);
 
         events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
         SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));

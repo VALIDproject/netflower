@@ -103,7 +103,6 @@ class FilterData implements MAppViews {
           </div>
           <div class='col-sm-2'>
             <div id='tag'>
-              <!--<input class='form-control input-sm' id='tagFilter' type='button' value='Update filter'>-->
             </div>
           </div>
           <div class='col-sm-2'>
@@ -181,7 +180,7 @@ class FilterData implements MAppViews {
     });
 
     //Listener for the change of the paragraph elements
-    $('.tagFilter').on('change', (d) => {
+    /*$('.tagFilter').on('change', (d) => {
       this.tagFilter.resetValues();
 
       $('.tagFilter').each((index, element) => {
@@ -198,7 +197,7 @@ class FilterData implements MAppViews {
       const tagFilterData = this.tagFilter.meetCriteria(paraFilterData);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, tagFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
-    });
+    });*/
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
       const filterQuarter = this.quarterFilter.meetCriteria(data);

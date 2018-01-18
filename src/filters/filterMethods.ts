@@ -196,3 +196,41 @@ export function updateEuroRange(filter, data: any) {
     max: max
   });
 }
+
+export function setEntityTagFilter(filter, data: any)
+{
+  let tags:Array<string> = [];
+
+  for(let entry of data) {
+    const val:string = entry.sourceTag;
+    if (val !== undefined) {
+      if(val !== '' && tags.indexOf(val) === -1) {
+        tags.push(val);
+      }
+    }
+  }
+  filter.values = tags;
+}
+
+export function setMediaTagFilter(filter, data: any)
+{
+  let tags:Array<string> = [];
+
+  for(let entry of data) {
+    const val:string = entry.sourceTag;
+    if (val !== undefined) {
+      if(val !== '' && tags.indexOf(val) === -1) {
+        tags.push(val);
+      }
+    }
+  }
+  filter.values = tags;
+}
+
+export function updateEntityTagFilter(filter, data: any) {
+  // TODO:
+}
+
+export function updateMediaTagFilter(filter, data: any) {
+  // TODO:
+}
