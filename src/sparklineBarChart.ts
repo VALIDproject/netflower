@@ -189,7 +189,6 @@ export default class SparklineBarChart implements MAppViews {
       //Add the link titles - Hover Path
       .on('mouseover', (d) => {
         const text = nodeName + '<br/>Time: ' + TimeFormat.format(d.key) + '<br/>Flow: ' + dotFormat(d.values) + _self.valuePostFix;
-        console.log(text);
         Tooltip.mouseOver(d, text, 'T2');
       })
       .on('mouseout', Tooltip.mouseOut);

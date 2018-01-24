@@ -1,9 +1,11 @@
 import Payment from './payment';
 
-
+/**
+ * This class is used to describe an entity, e.g. "Agrarmarkt Austria" and all it's properties as well as the
+ * total amount of money they spent or got in a given time frame.
+ */
 export default class Entity
 {
-
   private _payments: Array<Payment>;
   private _totalAmount: number;
   private _identifier: String;
@@ -15,6 +17,10 @@ export default class Entity
     this._identifier = id;
   }
 
+  /**
+   * Pushes a new payment to the properties array of an entity, if the payment is defined and not null.
+   * @param value of the payment that should be added to an entities property.
+   */
   public addPayment(value: number):void
   {
     let p = new Payment(value);
@@ -24,6 +30,9 @@ export default class Entity
     }
   }
 
+  /**
+   * Calculates the total amount of payments from an entity it recived in the given time frame.
+   */
   private calculateTotalAmount()
   {
     let calc: number = 0;

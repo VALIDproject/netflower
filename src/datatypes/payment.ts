@@ -1,3 +1,6 @@
+/**
+ * This class is used to describe a payment object which has a property amount.
+ */
 export default class Payment
 {
   private _amount: number;
@@ -16,5 +19,4 @@ export default class Payment
   {
     this._amount = a;
   }
-
 }

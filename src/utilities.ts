@@ -429,3 +429,9 @@ export class Tooltip {
       Tooltip.tooltip2.transition().duration(500).style('opacity', 0);
   }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+/*
+* Create a copy of an object to log it out:
+* Object.assign({},this._container)
+*/

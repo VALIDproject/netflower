@@ -8,7 +8,10 @@ export default class TimeFormat {
     private static func: (raw: string) => string = passThrough;
 
     public static format(raw: string): string {
-        return TimeFormat.func(raw);
+      if (raw === null || raw === undefined) {
+        return
+      }
+      return TimeFormat.func(raw);
     }
 
     public static formatNumber(raw: number): string {
