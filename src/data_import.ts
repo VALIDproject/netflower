@@ -78,7 +78,7 @@ class DataImport implements MAppViews {
         </div>
         <div class='form-group'>
           <button type='submit' id='submitFile' class='btn btn-primary'>
-            <i class='fa fa-upload'>&nbsp;</i>Upload File</button>
+            <i class='fa fa-upload'>&nbsp;</i>Load File</button>
           <button type='button' id='showMoreBtn' class='btn btn-info'>
             <i class='fa fa-pencil-square-o'>&nbsp;</i>View Data</button>
         </div>
@@ -168,7 +168,7 @@ class DataImport implements MAppViews {
         d3.select('#valuesList').selectAll('*').remove();
 
         //Change information and reset edit mode
-        textTransition(this.$chaningHeading, 'View data, upload new or proceed!!', 500);
+        textTransition(this.$chaningHeading, 'View data, load new or proceed!!', 500);
         this.editMode = false;
 
         //Start the uploading

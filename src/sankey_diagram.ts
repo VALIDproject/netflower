@@ -159,7 +159,7 @@ class SankeyDiagram implements MAppViews {
             <i class='fa fa-pencil-square-o pull-right'></i></a>
           </div>
         </div>
-        <div id='collapseContentEntity3' class='collapse' style='width: 60%; margin: auto;'>
+        <div id='collapseContentEntity3' class='collapse' style='width: 67%; margin-left: 21%;'>
             <div class='input-group input-group-xs'>
               <span class='input-group-addon'>Min:</span>
               <input type='number' value='${this.euroFrom}' class='sliderInput' id='euroFrom' />

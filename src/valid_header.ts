@@ -41,15 +41,8 @@ class ValidHeader implements MAppViews {
     <div class='logo'></div>
     <div class='btn_preupload'>
       <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
-      <i class='fa fa-hand-o-left'>&nbsp;</i>Reupload Data</button>
+      <i class='fa fa-hand-o-left'>&nbsp;</i>Change Data</button>
     </div>
-
-
-    <!--<div class='col-md-2'>
-      <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
-        <i class='fa fa-hand-o-left'>&nbsp;</i>Reupload Data</button>
-    </div>-->
-
     <div id='socialMedia'>
         <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
         <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
@@ -69,7 +62,7 @@ class ValidHeader implements MAppViews {
         bootbox.confirm({
           className: 'dialogBox',
           title: 'Information',
-          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data upload page.<br/>
+          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data load page.<br/>
           <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
           Be sure you don't lose anything important or save your progress before you proceed.`,
           callback(result) {
