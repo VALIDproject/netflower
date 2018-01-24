@@ -731,7 +731,7 @@ class SankeyDiagram implements MAppViews {
         this.entityFrom = this.entityEuroFilter.minValue;
       }
       if (this.entityFrom > this.entityTo) {
-        this.entityFrom = this.entityTo
+        this.entityFrom = this.entityTo;
       }
       this.updateInputValues('#entityFrom', '#entityTo', this.entityFrom, this.entityTo);
       this.updateSliderRange(getEntityRef(), this.entityFrom, this.entityTo);
@@ -757,7 +757,7 @@ class SankeyDiagram implements MAppViews {
         this.mediaFrom = this.mediaEuroFilter.minValue;
       }
       if (this.mediaFrom > this.mediaTo) {
-        this.mediaFrom = this.mediaTo
+        this.mediaFrom = this.mediaTo;
       }
       this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaFrom, this.mediaTo);
       this.updateSliderRange(getMediaRef(), this.mediaFrom, this.mediaTo);
@@ -783,7 +783,7 @@ class SankeyDiagram implements MAppViews {
         this.euroFrom = this.euroFilter.minValue;
       }
       if (this.euroFrom > this.euroTo) {
-        this.euroFrom = this.euroTo
+        this.euroFrom = this.euroTo;
       }
       this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
       this.updateSliderRange(getValueRef(), this.euroFrom, this.euroTo);
@@ -821,10 +821,10 @@ class SankeyDiagram implements MAppViews {
    * @param from value of 'From'
    * @param to value of 'To'
    */
-  private updateSliderRange(sliderRef, from: number, to: number): void {
+  private updateSliderRange(sliderRef, fromNumber: number, toNumber: number): void {
     sliderRef.update({
-      from: from,
-      to: to
+      from: fromNumber,
+      to: toNumber
     });
   }
 

@@ -9,7 +9,7 @@ export default class TimeFormat {
 
     public static format(raw: string): string {
       if (raw === null || raw === undefined) {
-        return
+        return;
       }
       return TimeFormat.func(raw);
     }
