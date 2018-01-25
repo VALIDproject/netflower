@@ -188,7 +188,7 @@ node text {
   border-radius: 5px;
 }
 
-// push source sparkline barcharts to right of parent element
+// Push source sparkline barcharts to right of parent element
 div.left_bars svg.barchart {
   display: block;
   margin-left: auto;
@@ -223,15 +223,6 @@ svg text.yaxisunit {
 #mediaSearchButton, #entitySearchButton {
   border-radius: 0;
 }
-
-// SLIDER CONTROLS:
-// ------------------------------------
-//.collapseBox .fa {
-//  transition: .3s transform ease-in-out;
-//}
-//.collapseBox .collapsed .fa {
-//  transform: rotate(-90deg);
-//}
 
 .specialIcon {
   color: #808080;

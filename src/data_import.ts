@@ -164,43 +164,43 @@ class DataImport implements MAppViews {
       .on('click', (e) => {
         SimpleLogging.log('import submit button','');
         // Clear the log first
-        d3.select('#errorLog').selectAll('*').remove();
-        d3.select('#messageLog').html('');
+        // d3.select('#errorLog').selectAll('*').remove();
+        // d3.select('#messageLog').html('');
 
-        //Then disable the unwanted buttons
+        // Then disable the unwanted buttons
         d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
         d3.select('#showMoreBtn').attr('disabled', true).style('opacity', 0);
         this.$btnNext = $('#seeNextRecords').hide();
         this.$btnPrev = $('#seePrevRecords').hide();
 
-        //Clear the table if present
+        // Clear the table if present
         d3.select('.ctrlContainer').classed('invisibleClass', true);
         d3.select('#valuesList').selectAll('*').remove();
 
-        //Change information and reset edit mode
+        // Change information and reset edit mode
         textTransition(this.$chaningHeading, 'View data, load new or proceed!!', 500);
         this.editMode = false;
 
-        //Start the uploading
+        // Start the uploading
         const filesInput = <HTMLInputElement>d3.select('#files').node();
         this.handleFileUpload(filesInput);
 
-        //Necessary in order to prevent the reload of the page.
+        // Necessary in order to prevent the reload of the page.
         const evt = <MouseEvent>d3.event;
         evt.preventDefault();
         evt.stopPropagation();
       });
 
-    //Listener for the Edit Button
+    // Listener for the Edit Button
     this.$node.select('#showMoreBtn')
       .on('click', (e) => {
         SimpleLogging.log('import preview show button','');
-        //Plot the data in the table and enable edit mode
+        // Plot the data in the table and enable edit mode
         const resultData = this.parseResults.data;
         this.previewData(resultData);
         this.editMode = true;
 
-        //Get necessary variables for Browsing in the table
+        // Get necessary variables for Browsing in the table
         this.$tableRows = $('.valueTable tbody tr');
         this.trLength = this.$tableRows.length;
         this.$tableRows.hide();
@@ -212,7 +212,7 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the 'Next' Button in the visual browser
+    // Listener for the 'Next' Button in the visual browser
     this.$node.select('#seeNextRecords')
       .on('click', (e) => {
         SimpleLogging.log('import preview next button','');
@@ -228,7 +228,7 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the 'Prev' Button in the visual browser
+    // Listener for the 'Prev' Button in the visual browser
     this.$node.select('#seePrevRecords')
       .on('click', (e) => {
         SimpleLogging.log('import preview prev button','');
@@ -244,10 +244,10 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the finished visualization Button
+    // Listener for the finished visualization Button
     this.$node.select('#specialBtn')
       .on('click', (e) => {
-        //Before rework the keys of the data
+        // Before rework the keys of the data
         SimpleLogging.log('import special button','');
         this.reworkKeys(this.parseResults);
         this.makeNodesUnique();
@@ -273,11 +273,12 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the download file button
+    // Listener for the download file button
     this.$node.select('#sampleFile').on('click', (e) => {
       bootbox.alert({
         title: 'Sample Files',
-        message: `${DOWNLOAD_DIALOG}`
+        message: `${DOWNLOAD_DIALOG}`,
+        className: 'alternateBootboxDialog'
       });
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
