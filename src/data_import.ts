@@ -8,6 +8,7 @@ import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
 import * as localforage from 'localforage';
 import * as bootbox from 'bootbox';
+import * as alertify from 'alertify.js';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
@@ -50,15 +51,17 @@ class DataImport implements MAppViews {
 
     if(!dataAvailable) {
       d3.select('.dataVizView').classed('invisibleClass', true);
+      d3.select('#backBtn').classed('invisibleClass', true);
     } else {
       d3.select('.dataVizView').classed('invisibleClass', false);
+      d3.select('#backBtn').classed('invisibleClass', false);
       d3.select('.dataLoadingView').classed('invisibleClass', true);
     }
 
     this.build();
     this.attachListener();
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -66,15 +69,22 @@ class DataImport implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    //Add the upload form and whole container
+    // Add the upload form and whole container
     this.$fileContainer = this.$node.html(`
     <div class='fileContainer'>
     <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>
-    <center><h2 id='informationText'>Upload your data here!!</h2></center>
+    <center><h2 id='informationText'>Load your data here!!</h2></center>
       <form class='form-inline well'>
         <div class='form-group'>
-          <label for='files'>Upload a CSV file:</label>
-          <input type='file' id='files' class='form-control' accept='.csv' required />
+          <div class='input-group'>
+              <span class='input-group-btn' style='padding-right: 2px;'>
+                <span class='btn btn-default btn-file'>
+                  Load CSV file... 
+                  <input type='file' id='files' accept='.csv' required />
+                </span>
+              </span>
+            <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
+          </div>
         </div>
         <div class='form-group'>
           <button type='submit' id='submitFile' class='btn btn-primary'>
@@ -84,7 +94,7 @@ class DataImport implements MAppViews {
         </div>
       </form>`);
 
-    //Add the display conatiner and the logs
+    // Add the display conatiner and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
     this.$displayContainer = d3.select('.additionalInfo').html(`
         <div class='logContainer'>
@@ -275,6 +285,10 @@ class DataImport implements MAppViews {
     });
 
     d3.selectAll('a').on('click', (e) => {console.log('testaaaaaaa'); e.preventDefault();});
+
+    $('#files').change(function(){
+      $('#filename').val($(this).val().replace('C:\\fakepath\\', ''));
+    });
   }
 
   /**

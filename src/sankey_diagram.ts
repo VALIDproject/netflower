@@ -123,7 +123,7 @@ class SankeyDiagram implements MAppViews {
             </div>
             <div class='col-sm-1' style='margin-top: 24px;'>
               <a data-toggle='collapse' href='#collapseContentEntity' aria-expanded='true' class='collapsed'>
-              <i class='fa fa-pencil-square-o pull-right'></i></a>
+              <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
             </div>
           </div>
           <div id='collapseContentEntity' class='collapse'>
@@ -156,7 +156,7 @@ class SankeyDiagram implements MAppViews {
           </div>
           <div class='col-sm-1' style='margin-top: 24px;'>
             <a data-toggle='collapse' href='#collapseContentEntity3' aria-expanded='true' class='collapsed'>
-            <i class='fa fa-pencil-square-o pull-right'></i></a>
+            <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
           </div>
         </div>
         <div id='collapseContentEntity3' class='collapse' style='width: 67%; margin-left: 21%;'>
@@ -194,7 +194,7 @@ class SankeyDiagram implements MAppViews {
         </div>
         <div class='col-sm-1' style='margin-top: 24px;'>
           <a data-toggle='collapse' href='#collapseContentEntity2' aria-expanded='true' class='collapsed'>
-          <i class='fa fa-pencil-square-o pull-right'></i></a>
+          <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
         </div>
       </div>
       <div id='collapseContentEntity2' class='collapse'>
