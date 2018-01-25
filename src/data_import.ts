@@ -79,7 +79,7 @@ class DataImport implements MAppViews {
           <div class='input-group'>
               <span class='input-group-btn' style='padding-right: 2px;'>
                 <span class='btn btn-default btn-file'>
-                  Load CSV file... 
+                  Select CSV file... 
                   <input type='file' id='files' accept='.csv' required />
                 </span>
               </span>
@@ -97,10 +97,10 @@ class DataImport implements MAppViews {
     // Add the display conatiner and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
     this.$displayContainer = d3.select('.additionalInfo').html(`
-        <div class='logContainer'>
-          <div id='errorLog'></div>
-          <div id='messageLog'></div>
-        </div>
+        <!--<div class='logContainer'>-->
+          <!--<div id='errorLog'></div>-->
+          <!--<div id='messageLog'></div>-->
+        <!--</div>-->
         <div class='row'>
           <div class='ctrlContainer'>
             <h3 id='valueListName'></h3>
@@ -159,11 +159,11 @@ class DataImport implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    //Listener for the upload button
+    // Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {
         SimpleLogging.log('import submit button','');
-        //Clear the log first
+        // Clear the log first
         d3.select('#errorLog').selectAll('*').remove();
         d3.select('#messageLog').html('');
 

@@ -116,6 +116,21 @@
 .btn-file {
   position: relative;
   overflow: hidden;
+  background:
+  /* On "top" */
+  repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    #fbfbfb 10px,
+    #fbfbfb 20px
+  ),
+  /* on "bottom" */
+  linear-gradient(
+    to bottom,
+    #fbfbfb,
+    #dfdfdf
+  );
 }
 
 .btn-file input[type=file] {

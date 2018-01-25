@@ -252,7 +252,6 @@ class SankeyDiagram implements MAppViews {
 
     // Listen for resize of the window
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => {
-      console.log('!!!!: ', AppConstants.EVENT_RESIZE_WINDOW);
       SimpleLogging.log('resize window', '');
       this.resize();
     });
