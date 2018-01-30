@@ -10,8 +10,20 @@ export default class EntityTagFilter extends TagFilter
   //Find all media entities which totalAmount is between the min and max values
   protected processData(data: any): void
   {
+    let that = this;
     this._resultData = data.filter((d) => {
-      return this._activeTags.has(d.sourceTag);
+      const tagsAsText:string = d.sourceTag;
+      if (tagsAsText !== undefined) {
+        if (tagsAsText !== '') {
+          const values:d3.Set = d3.set(tagsAsText.split(","));
+          if(that._activeTags.size() <= values.size()) {
+            return that._activeTags.values().every(function(activeTag) {
+              return values.has(activeTag);
+            });
+          }
+        }
+      }
+      return false;
     });
   }
 
