@@ -6,7 +6,7 @@
  */
 import {AppConstants} from './app_constants';
 
-export const APP_NAME = 'Valid';
+export const APP_NAME = 'VALiD';
 export const HELLO_WORLD = 'Hello World this is VALID... or will be...';
 
 export const ERROR_TOOMANYNODES = `Your current <font color='#DA5A6B'><strong>FILTER</strong></font> 
