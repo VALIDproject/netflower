@@ -56,15 +56,10 @@ export default class TagFilter implements Filter
   public meetCriteria(data: any): any
   {
     if(this._active) {
-      this._activeTags.forEach((value: string) => console.log(value));
       this.processData(data);
-      console.log(this._resultData);
       return this._resultData;
-    } else
-      return data;
-    /*this.resultData = data.filter((d) => {
-        return this.queriedValues.has(d.sourceTag) || this.queriedValues.has(d.targetTag);
-    });*/
+    }
+    return data;
   }
 
   // Find all legal or media entities which are tagged by one of the selected tags
