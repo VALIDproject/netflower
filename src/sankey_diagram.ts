@@ -16,7 +16,7 @@ import {MAppViews} from './app';
 import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './utilities';
 import {setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange,
-  setEntityTagFilter, updateEntityTagFilter,setMediaTagFilter, updateMediaTagFilter } from './filters/filterMethods';
+  setEntityTagFilter, setMediaTagFilter} from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
@@ -29,7 +29,7 @@ import PaymentEuroFilter from './filters/paymentEuroFilter';
 import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
-
+import FilterTagDialog from './dialogs/filterTagDialog';
 
 class SankeyDiagram implements MAppViews {
 
@@ -74,10 +74,10 @@ class SankeyDiagram implements MAppViews {
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
     this.pipeline.addFilter(this.euroFilter);
-    //this.pipeline.addFilter(this.entityTagFilter);
-    //this.pipeline.addFilter(this.mediaTagFilter);
     this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
     this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
+    this.pipeline.addFilter(this.entityTagFilter);
+    this.pipeline.addFilter(this.mediaTagFilter);
 
     this.$node = d3.select(parent)
       .append('div')
@@ -135,12 +135,10 @@ class SankeyDiagram implements MAppViews {
             <button type='button' id='clearEntity' class='btn btn-secondary'><i class='fa fa-times'></i></button>
           </span>
         </div>
-        <div class='input-group input-group-xs' style='margin: 15px auto;'>
+        <div class='input-group input-group-xs' style='width: 100%; margin: 10px auto;'>
           <input class='form-control input-sm' id='entityTagFilterButton' type='button' value='${columnLabels.sourceNode} Tags'>
-          <span class='input-group-btn'>
-            <button type='button' id='clearEntityTag' class='btn btn-secondary'><i class='fa fa-times'></i></button>
-          </span>
         </div>
+        <div id="activeEntityTags"></div>
       </div>
     `);
 
@@ -183,12 +181,10 @@ class SankeyDiagram implements MAppViews {
           <button type='button' id='clearMedia' class='btn btn-secondary'><i class='fa fa-times'></i></button>
         </span>
       </div>
-      <div class='input-group input-group-xs' style='margin: 15px auto;'>
-          <input class='form-control input-sm' id='mediaTagFilterButton' type='button' value='${columnLabels.targetNode} Tags'>
-          <span class='input-group-btn'>
-            <button type='button' id='clearMediaTag' class='btn btn-secondary'><i class='fa fa-times'></i></button>
-          </span>
-        </div>
+      <div class='input-group input-group-xs' style='width: 100%; margin: 10px auto;'>
+        <input class='form-control input-sm' id='mediaTagFilterButton' type='button' value='${columnLabels.targetNode} Tags'>
+      </div>
+      <div id="activeMediaTags"></div>
     </div>
     `);
   }
@@ -289,33 +285,15 @@ class SankeyDiagram implements MAppViews {
 
     // Functionality to open the tag filter window for legal entites
     const entityFilterTags = (d) => {
-      var message = "<p>";
-      this.entityTagFilter.values.forEach((value:String) => message += "<button type='button'>" + value + "</button>");
-      message = message + "</p>";
-
-      var dialog = bootbox.dialog({
-        title: 'Filter tags',
-        message: message,
-        buttons: {
-            cancel: {
-                label: "Cancel",
-                className: 'btn-cancel',
-                callback: function(){
-                    console.log('Custom cancel clicked');
-                }
-            },
-            ok: {
-                label: "Apply",
-                className: 'btn-info',
-                callback: function(){
-                    console.log('Custom OK clicked');
-                    return false;
-                }
-            }
-        }
-      });
+      let dialog = new FilterTagDialog(this.entityTagFilter, d);
     };
     this.$node.select('#entityTagFilterButton').on('click', entityFilterTags);
+
+    // Functionality to open the tag filter window for media institutes
+    const mediaFilterTags = (d) => {
+      let dialog = new FilterTagDialog(this.mediaTagFilter, d);
+    };
+    this.$node.select('#mediaTagFilterButton').on('click', mediaFilterTags);
 
     //Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {

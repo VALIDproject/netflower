@@ -199,38 +199,30 @@ export function updateEuroRange(filter, data: any) {
 
 export function setEntityTagFilter(filter, data: any)
 {
-  let tags:Array<string> = [];
+  let tags:d3.Set = d3.set([]);
 
   for(let entry of data) {
     const val:string = entry.sourceTag;
     if (val !== undefined) {
-      if(val !== '' && tags.indexOf(val) === -1) {
-        tags.push(val);
+      if(val !== '' && !tags.has(val)) {
+        tags.add(val);
       }
     }
   }
-  filter.values = tags;
+  filter.availableTags = tags;
 }
 
 export function setMediaTagFilter(filter, data: any)
 {
-  let tags:Array<string> = [];
+  let tags:d3.Set = d3.set([]);
 
   for(let entry of data) {
-    const val:string = entry.sourceTag;
+    const val:string = entry.targetTag;
     if (val !== undefined) {
-      if(val !== '' && tags.indexOf(val) === -1) {
-        tags.push(val);
+      if(val !== '' && !tags.has(val)) {
+        tags.add(val);
       }
     }
   }
-  filter.values = tags;
-}
-
-export function updateEntityTagFilter(filter, data: any) {
-  // TODO:
-}
-
-export function updateMediaTagFilter(filter, data: any) {
-  // TODO:
+  filter.availableTags = tags;
 }
