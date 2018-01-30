@@ -1,119 +1,87 @@
-import Filter from './filter';
 import * as d3 from 'd3';
+import Filter from './filter';
+import EntityContainer from '../datatypes/entityContainer';
 
 /**
  * This class is used to describe a value filter or filtering by value of the data set.
  */
 export default class TagFilter implements Filter
 {
-  private resultData: Array<any>;
-
-  private queriedValues: d3.Set;
-  //private _selectedTags: Array<String>;
-  //private _container: EntityContainer;
+  protected _resultData: Array<any>;
+  protected _active: boolean;
+  protected _availableTags: d3.Set;
+  protected _activeTags: d3.Set;
+  protected _container: EntityContainer;
 
   constructor()
   {
-    this.queriedValues = d3.set([]);
-    //this._resultData = new Array<any>();
-    //this._container = new EntityContainer();
+    this._availableTags = d3.set([]);
+    this._activeTags = d3.set([]);
+    this._resultData = new Array<any>();
+    this._container = new EntityContainer();
+    this._active = false;
   }
 
-  get values():Array<string>
+  get active():boolean
   {
-    return this.queriedValues.values();
+    return this._active;
   }
 
-  set values(val:Array<string>)
+  set active(active:boolean)
   {
-    this.queriedValues = d3.set(val);
+    this._active = active;
   }
 
-  /*get selectedTags():Array<String>
+  get availableTags():d3.Set
   {
-    return this._selectedTags;
+    return this._availableTags;
   }
 
-  set selectedTags(val:Array<String>)
+  set availableTags(tags:d3.Set)
   {
-    this._selectedTags = val;
-  }*/
+    this._availableTags = tags;
+  }
+
+  get activeTags():d3.Set
+  {
+    return this._activeTags;
+  }
+
+  set activeTags(tags:d3.Set)
+  {
+    this._activeTags = tags;
+  }
 
   //check if the value meets the entries tag value
   public meetCriteria(data: any): any
   {
-    this.queriedValues.forEach((value:String) => console.log(value));
-
-    this.resultData = data.filter((d) => {
+    if(this._active) {
+      this._activeTags.forEach((value: string) => console.log(value));
+      this.processData(data);
+      console.log(this._resultData);
+      return this._resultData;
+    } else
+      return data;
+    /*this.resultData = data.filter((d) => {
         return this.queriedValues.has(d.sourceTag) || this.queriedValues.has(d.targetTag);
-    });
-
-    return this.resultData;
+    });*/
   }
 
-  // Find all media entities which are tagged by one of the selected tags
-  /*private processData(data: any): void
+  // Find all legal or media entities which are tagged by one of the selected tags
+  protected processData(data: any): void
   {
-    this.generateDataStructure(data);
-
-    //Filter DataStructure
-    for(let entity of this._container.entities)
-    {
-      let tagName = entity.tagName;
-      if(this._selectedTags.indexOf(tagName) === -1)
-      {
-        this._container.removeEntity(entity);
-      }
-    }
   }
 
-  private generateDataStructure(data: any): void
-  {
-    this._container.clearEntities();
-
-    if(data === null || data === undefined)
-      return;
-
-    //generating DataStructure
-    for(let entry of data)
-    {
-      let ent = this._container.findEntity(entry.sourceNode);
-      if(ent === null) {
-
-        ent = new Entity(entry.sourceNode);
-        ent.addPayment(entry.valueNode);
-        this._container.addEntity(ent);
-      }
-      else
-      {
-        ent.addPayment(entry.valueNode);
-      }
-
-      ent = this._container.findEntity(entry.targetNode);
-
-      if(ent === null)
-      {
-        ent = new Entity(entry.targetNode);
-        ent.addPayment(entry.valueNode);
-        this._container.addEntity(ent);
-      }
-      else
-      {
-        ent.addPayment(entry.valueNode);
-      }
-    }
-  }*/
-
-  public resetValues(): void {
-    this.queriedValues = d3.set([]);
+  public resetTags(): void {
+    this._activeTags.forEach((value:string) => this._availableTags.add(value));
+    this._activeTags = d3.set([]);
   }
 
-  public addValue(val: string): void {
-    this.queriedValues.add(val);
+  public addTag(val: string): void {
+    this._availableTags.add(val);
   }
 
   public printData(): void
   {
-    console.log('Tag Filter: ' + this.values);
   }
 }
