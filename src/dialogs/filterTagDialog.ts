@@ -10,6 +10,9 @@ export default class FilterTagDialog {
 
   private _activeTags: d3.Set;
   private _availableTags: d3.Set;
+  private _term: string = "";
+  private _searchResult: d3.Set;
+
   private message: string;
   private dialog;
 
@@ -27,37 +30,63 @@ export default class FilterTagDialog {
   private updateDialogMessage() {
     this._activeTags = d3.set(this.sortTagsByAlphabet(this._activeTags));
     this._availableTags = d3.set(this.sortTagsByAlphabet(this._availableTags));
-    this.message = this.buildActiveTagsHtml() + this.buildAvailableTagsHtml();
+    this.message = this.buildActiveTagsHtml() + this.buildSearchTagsHtml() + this.buildAvailableTagsHtml();
     $('.bootbox-body').html(this.message);
     this.initTagButtons();
   }
 
   private buildActiveTagsHtml() {
-    let message = "<p>Tags selected:";
+    let message = "<small>Tags selected:";
     if(this._activeTags.empty()) {
-      return message + "None</p></br>";
+      return message + "<b>None</b></small>";
     } else {
-      message += "</p>";
+      message += "</small><div style=\"margin: 10px 0px 20px 0px;\">";
       this._activeTags.forEach((value:string) =>
-        message += "<button type=\"button\" class=\"tagBtn active btn btn-primary btn-sm waves-light\" " +
-          "style=\"margin-right: 10px;\">" + value + "</button>"
+        message += this.createButtonHtmlByValue(value, true)
       );
-      return message + "</p>";
+      return message + "</div>";
     }
   }
 
+  private buildSearchTagsHtml() {
+    let placeholder = this._term == "" ? "Search for tag..." : this._term;
+    let message = `
+      <div class='input-group input-group-xs' style='margin: 10px 0px; width: 60%;'>
+        <input type='text' id='tagSearchFilter' class='form-control' placeholder='${placeholder}'/>
+        <span class='input-group-btn'>
+          <button type='button' id='tagSearchButton' class='btn btn-primary'><i class='fa fa-search'></i></button>
+        </span>
+        <span class='input-group-btn'>
+          <button type='button' id='clearTagSearch' class='btn btn-secondary'><i class='fa fa-times'></i></button>
+        </span>
+      </div>
+    `
+    return message;
+  }
+
   private buildAvailableTagsHtml() {
-    let message = "<p>Tags available:";
+    let message = "<small>Tags available:";
     if(this._availableTags.empty()) {
-      return message += "None</p>";
+      return message += "<b>None</b></small>";
     } else {
-      message += "</p>";
-      this._availableTags.forEach((value: string) =>
-        message += "<button type=\"button\" class=\"tagBtn btn btn-primary btn-sm waves-light\" " +
-          "style=\"margin-right: 10px;\">" + value + "</button>"
-      );
+      message += "</small><div style=\"margin: 10px 0px\">";
+      if(this._term == "") {
+        this._availableTags.forEach((value: string) =>
+        message += this.createButtonHtmlByValue(value, false)
+        );
+      } else {
+        this._searchResult = d3.set(this.sortTagsByAlphabet(this._searchResult));
+        this._searchResult.forEach((value: string) =>
+        message += this.createButtonHtmlByValue(value, false)
+        );
+      }
     }
-    return message + "</p>";
+    return message + "</div>";
+  }
+
+  private createButtonHtmlByValue(value: string, active: boolean) {
+    return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
+          "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px;\">" + value + "</button>";
   }
 
   private initTagButtons() {
@@ -66,11 +95,40 @@ export default class FilterTagDialog {
       if($(this).hasClass('active')) {
         that._availableTags.add($(this).html());
         that._activeTags.remove($(this).html());
+        if(that._term != "")
+          if($(this).html().toLowerCase().startsWith(that._term))
+            that._searchResult.add($(this).html());
       } else {
         that._activeTags.add($(this).html());
         that._availableTags.remove($(this).html());
+        if(that._term != "")
+          that._searchResult.remove($(this).html());
       }
       that.updateDialogMessage();
+    });
+
+    const tagSearch = (d) => {
+      const value: string = $('#tagSearchFilter').val();
+      // search
+      that._term = value.toLowerCase();
+
+      that._searchResult = d3.set();
+      //value contains term?
+      that._availableTags.forEach((value:string) => {
+        if(value.toLowerCase().startsWith(that._term))
+          that._searchResult.add(value);
+      });
+      that.updateDialogMessage();
+    };
+    $('#tagSearchFilter').keypress((e) => {
+      if (e.which === 13) {
+        tagSearch(e);
+      }
+    });
+    $('.tagSearchButton').on('click', tagSearch);
+
+    $('.clearTagSearch').on('click', (d) => {
+      $('#tagSearchFilter').val('');
     });
   }
 
