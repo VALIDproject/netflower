@@ -105,6 +105,12 @@ export class App implements MAppViews {
       options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
     },
     {
+      view: 'Export',
+      parent: 'dataVizView',
+      // options: {'parentDOM' : 'div.clearBox'},
+      options: {'parentDOM' : 'div.sankey_features div.col-md-4'},
+    },
+    {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},

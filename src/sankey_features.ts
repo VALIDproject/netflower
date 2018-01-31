@@ -39,10 +39,10 @@ class SankeyFeatures implements MAppViews {
      this.$node.html(`
       <div class='container'>
         <div class='row align-items-start'>
-          <div class='col-md-9'>
+          <div class='col-md-8'>
             <div class='heading'><h4>Media Transparency Data set</h4></div>
           </div>
-          <div class='col-md-3'>
+          <div class='col-md-4'>
             <div class='button_bar'>
               <div class='btn-group' role='group' aria-label='...'>
                 <button type='button' class='btn btn-default'>  <i class='fa fa-arrows-h fa-lg' aria-hidden='true'></i></button>
