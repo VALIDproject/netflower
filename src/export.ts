@@ -60,7 +60,7 @@ export default class Export implements MAppViews {
         columnLabels = {};
         columnLabels.sourceNode = 'source';
         columnLabels.targetNode = 'target';
-        columnLabels.valueNode = 'values';
+        columnLabels.valueNode = 'value';
       }
       const dataAsArray = [[columnLabels.sourceNode, columnLabels.targetNode, columnLabels.valueNode]];
 
@@ -79,7 +79,39 @@ export default class Export implements MAppViews {
       }
     });
   }
+
+  public static exportSingleFlowOverTime(selector: string, comment: string) {
+    console.log('export ' + selector);
+
+    // column headers (based on input metadata if available)
+    let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+    if (columnLabels == null) {
+      columnLabels = {};
+      columnLabels.timeNode = 'time';
+      columnLabels.valueNode = 'value';
+    }
+    const dataAsArray = [[columnLabels.timeNode, columnLabels.valueNode]];
+
+    d3.selectAll(selector).each((d, i) => {
+      dataAsArray.push([d.timeNode, d.valueNode]);
+    });
+
+    // CSV export using D3.js
+    let dataAsStr = d3.csv.format(dataAsArray);
+    if (comment.length > 0) {
+      dataAsStr = '# ' + comment + '\n' + dataAsStr;
+    }
+    console.log(dataAsStr);
+    const filename = 'timeseries.csv';
+    if (dataAsArray.length === 1) {
+      bootbox.alert('No time steps are visible.');
+    } else {
+      downloadFile(dataAsStr, filename, 'text/csv');
+    }
+
+  }
 }
+
 
 /**
  * Factory method to create a new SimpleLogging instance
