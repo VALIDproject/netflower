@@ -192,6 +192,11 @@ export default class SparklineBarChart implements MAppViews {
         Tooltip.mouseOver(d, text, 'T2');
       })
       .on('mouseout', Tooltip.mouseOut);
+
+    group.on('mouseover', (d) => {
+      console.log(d);
+      console.log(_self);
+    });
   }
 }
 
