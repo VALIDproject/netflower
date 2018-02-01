@@ -10,6 +10,7 @@ import {AppConstants} from './app_constants';
 import {dotFormat, d3TextWrap} from './utilities';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
+import Export from './export';
 
 class SankeyDetail implements MAppViews {
 
@@ -170,6 +171,30 @@ class SankeyDetail implements MAppViews {
           alert('Save NOTES in a feature version!!');
         });
 
+      this.toolbox.append('text')
+        .attr('font-family', 'FontAwesome')
+        .text(function (d) { return ' ' + '\uf019'; })
+        .style('z-index', '200000')
+        .attr('x', '336')
+        .attr('y', '10')
+        .attr('class', 'export')
+        .on('mouseover', function (d) {
+          tooltip.transition().duration(200).style('opacity', .9);
+          tooltip.html('Export time series as a CSV file.')
+            .style('left', ((<any>d3).event.pageX - 40) + 'px')
+            .style('top', ((<any>d3).event.pageY - 20) + 'px');
+        })
+        .on('mouseout', function (d) {
+          tooltip.transition().duration(500).style('opacity', 0);
+        })
+        .on('click', (d) => {
+          const sourceAndTarget = d3.selectAll('svg.sankey_details g.headingDetailSankey').text();
+          SimpleLogging.log('export time series', sourceAndTarget);
+
+          Export.exportSingleFlowOverTime('svg.sankey_details rect.bar', sourceAndTarget);
+          // Export.exportSingleFlowOverTime('svg.sankey_details2 rect.bar');
+        });
+
       ++this.drawSvg;
 
     } else {
@@ -222,6 +247,30 @@ class SankeyDetail implements MAppViews {
         .on('click', function(d){
           alert('Save NOTES in a feature version!!');
         });
+
+      this.toolbox2.append('text')
+        .attr('font-family', 'FontAwesome')
+        .text(function (d) { return ' ' + '\uf019'; })
+        .style('z-index', '200000')
+        .attr('x', '336')
+        .attr('y', '10')
+        .attr('class', 'export')
+        .on('mouseover', function (d) {
+          tooltip.transition().duration(200).style('opacity', .9);
+          tooltip.html('Export time series as a CSV file.')
+            .style('left', ((<any>d3).event.pageX - 40) + 'px')
+            .style('top', ((<any>d3).event.pageY - 20) + 'px');
+        })
+        .on('mouseout', function (d) {
+          tooltip.transition().duration(500).style('opacity', 0);
+        })
+        .on('click', (d) => {
+          const sourceAndTarget = d3.selectAll('svg.sankey_details2 g.headingDetailSankey2').text();
+          SimpleLogging.log('export time series', sourceAndTarget);
+
+          Export.exportSingleFlowOverTime('svg.sankey_details2 rect.bar', sourceAndTarget);
+        });
+
       this.drawSvg = 0;
     }
 
