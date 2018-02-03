@@ -33,6 +33,10 @@ export default class FilterTagDialog {
     this.message = this.buildActiveTagsHtml() + this.buildSearchTagsHtml() + this.buildAvailableTagsHtml();
     $('.bootbox-body').html(this.message);
     this.initTagButtons();
+    if (this._term != "") {
+      $('#tagSearchFilter').val(this._term);
+      $('#tagSearchFilter').focus();
+    }
   }
 
   private buildActiveTagsHtml() {
@@ -49,7 +53,7 @@ export default class FilterTagDialog {
   }
 
   private buildSearchTagsHtml() {
-    let placeholder = this._term == "" ? "Search for tag..." : this._term;
+    let placeholder = "Search for tag...";
     let message = `
       <div class='input-group input-group-xs' style='margin: 10px 0px; width: 60%;'>
         <input type='text' id='tagSearchFilter' class='form-control' placeholder='${placeholder}'/>
@@ -125,10 +129,12 @@ export default class FilterTagDialog {
         tagSearch(e);
       }
     });
-    $('.tagSearchButton').on('click', tagSearch);
+    $('#tagSearchButton').on('click', tagSearch);
 
-    $('.clearTagSearch').on('click', (d) => {
-      $('#tagSearchFilter').val('');
+    $('#clearTagSearch').on('click', (e) => {
+      this._term = "";
+      $('#tagSearchFilter').val("");
+      tagSearch(e);
     });
   }
 

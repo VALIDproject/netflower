@@ -18,6 +18,7 @@ import {AppConstants} from './app_constants';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
 import TopFilter from './filters/topFilter';
+import TagFlowFilter from './filters/tagFlowFilter';
 import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -31,6 +32,7 @@ class FilterData implements MAppViews {
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
   private topFilter: TopFilter;
+  private tagFlowFilter: TagFlowFilter;
   private paragraphFilter: ParagraphFilter;
   private quarterFilterRef;
 
@@ -42,8 +44,10 @@ class FilterData implements MAppViews {
     this.quarterFilter = new QuarterFilter();
     this.topFilter = new TopFilter();
     this.paragraphFilter = new ParagraphFilter();
+    this.tagFlowFilter = new TagFlowFilter();
     //Add Filters to Pipeline
     this.pipeline.changeTopFilter(this.topFilter); //must be first filter
+    this.pipeline.changeTagFlowFilter(this.tagFlowFilter);
     this.pipeline.addFilter(this.quarterFilter);
     this.pipeline.addAttributeFilter(this.paragraphFilter);
 
@@ -76,10 +80,10 @@ class FilterData implements MAppViews {
       <div class='container'>
         <div class='row'>
           <div class='col-sm-2'>
-            <small>Top Filter</small>
+            <small>Show Tag Flow</small>
           </div>
           <div class='col-sm-2'>
-            <small>Tag Filter</small>
+            <small>Top Filter</small>
           </div>
           <div class='col-sm-2'>
             <small id='attr1_label'>Paragraph Filter</small>
@@ -91,6 +95,12 @@ class FilterData implements MAppViews {
 
         <div class='row'>
           <div class='col-sm-2'>
+            <select class='form-control input-sm' id='tagFlowFilter'>
+              <option value='-1' selected>disabled</option>
+              <option value='1'>enabled</option>
+            </select>
+          </div>
+          <div class='col-sm-2'>
             <select class='form-control input-sm' id='topFilter'>
               <option value='-1' selected>disabled</option>
               <option value='0'>Bottom 10</option>
@@ -101,12 +111,10 @@ class FilterData implements MAppViews {
             <div id='paragraph'>
             </div>
           </div>
-
         </div>
         <div class='col-sm-2'>
-        <div class='quarterSlider'>
-         <input id='timeSlider'/>
-         </div>
+          <div class='quarterSlider'>
+            <input id='timeSlider'/>
           </div>
         </div>
        </div>
@@ -129,7 +137,7 @@ class FilterData implements MAppViews {
       $('#topFilter').val(-1);
     });
 
-    //Listener for the change fo the top filter
+    //Listener for the change of the top filter
     this.$node.select('#topFilter').on('change', (d) => {
       const value:string = $('#topFilter').val().toString();
 
@@ -149,6 +157,26 @@ class FilterData implements MAppViews {
       }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
+
+    events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TAG_FLOW_FILTER, (evt, data) => {
+      this.tagFlowFilter.active = false;
+      $('#tagFlowFilter').val(-1);
+    })
+
+    // Listener for the change of the tag flow filter
+    this.$node.select('#tagFlowFilter').on('change', (d) => {
+      const value:string = $('#tagFlowFilter').val().toString();
+
+      if(value === '1')
+      {
+        this.tagFlowFilter.active = true;
+        SimpleLogging.log('tag flow filter', 'activated');
+      } else {
+        this.tagFlowFilter.active = false;
+        SimpleLogging.log('tag flow filter', ' disabled');
+      }
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    })
 
     //Listener for the change of the paragraph elements
     $('.paraFilter').on('change', (d) => {
@@ -194,6 +222,7 @@ class FilterData implements MAppViews {
       });
 
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TAG_FLOW_FILTER, 'changed');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
   }
