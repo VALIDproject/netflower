@@ -235,6 +235,8 @@ class SankeyDiagram implements MAppViews {
       this.entitySearchFilter.term = '';
       $('#mediaSearchFilter').val('');
       this.mediaSearchFilter.term = '';
+      this.entityTagFilter.resetTags();
+      this.mediaTagFilter.resetTags();
     });
 
     // full-text search in source node names
@@ -381,19 +383,35 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
-      this.valuesSumSource =(<any>d3).nest()
+      if(this.pipeline.getTagFlowFilterStatus()) {
+        this.valuesSumSource =(<any>d3).nest()
+          .key((d) => { return d.sourceTag;})
+          .rollup(function (v) {return [
+            d3.sum(v, function (d :any){ return d.valueNode;})
+          ];})
+          .entries(filteredData);
+
+        this.valuesSumTarget =(<any>d3).nest()
+          .key((d) => {return d.targetTag;})
+          .rollup(function (v) {return [
+            d3.sum(v, function (d :any){ return d.valueNode;})
+          ];})
+          .entries(filteredData);
+      } else {
+        this.valuesSumSource =(<any>d3).nest()
         .key((d) => {return d.sourceNode;})
         .rollup(function (v) {return [
           d3.sum(v, function (d :any){ return d.valueNode;})
         ];})
         .entries(filteredData);
 
-      this.valuesSumTarget =(<any>d3).nest()
+        this.valuesSumTarget =(<any>d3).nest()
         .key((d) => {return d.targetNode;})
         .rollup(function (v) {return [
           d3.sum(v, function (d :any){ return d.valueNode;})
         ];})
         .entries(filteredData);
+      }
 
       // console.log('----------- Original Data -----------');
       // console.log(originalData);
@@ -449,17 +467,19 @@ class SankeyDiagram implements MAppViews {
     const path = sankey.link();
 
     // aggregate flow by source and target (i.e. sum multiple times and attributes)
-    const flatNest = d3.nest()
+    let flatNest = d3.nest()
       .key((d: any) => {return d.sourceNode + '|$|' + d.targetNode;})
       .rollup(function (v: any[]) {return {
-        source: v[0].sourceNode,
-        target: v[0].targetNode,
+        source: ((that.pipeline.getTagFlowFilterStatus()) ? v[0].sourceTag : v[0].sourceNode),
+        target: ((that.pipeline.getTagFlowFilterStatus()) ? v[0].targetTag : v[0].targetNode),
         time: v[0].timeNode,
         sum: d3.sum(v, function (d :any){ return d.valueNode;})
       };})
       .entries(json)
       .map((o) => o.values) // remove key/values
       .sort(function(a: any, b: any){ return d3.descending(a.sum, b.sum); });
+    if(that.pipeline.getTagFlowFilterStatus())
+      flatNest = flatNest.filter(function (d) { return (d.source != "") && (d.target != "") });
 
     //Create reduced graph with only number of nodes shown
     const graph = {'nodes' : [], 'links' : []};
@@ -526,7 +546,13 @@ class SankeyDiagram implements MAppViews {
         .sort(function(a, b) { return b.dy - a.dy; })
         .on('mouseover', function (d) {
           d3.select(this).style('cursor', 'pointer');
-          const text = d.source.name + ' → ' +  d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
+          let text;
+          if(that.pipeline.getTagFlowFilterStatus()) {
+            const re = /-/gi;
+            text = d.source.name.replace(re, ', ') + ' → ' + d.target.name.replace(re, ', ') + '\n' + dotFormat(d.value) + valuePostFix;
+          } else {
+            text = d.source.name + ' → ' + d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
+          }
           Tooltip.mouseOver(d, text, 'T2');
         })
         .on('mouseout', Tooltip.mouseOut);
@@ -620,7 +646,10 @@ class SankeyDiagram implements MAppViews {
         .attr('dy', '1.0em')
         .attr('text-anchor', 'start')
         .attr('class', 'rightText')
-        .text(function(d) {return `${d.name}`;})
+        .text(function(d) {
+          if(that.pipeline.getTagFlowFilterStatus()) return `${d.name.replace(/-/gi, ', ')}`
+          else return `${d.name}`;
+        })
         .filter(function(d, i) { return d.x < width / 2;})
         .attr('x', -45 + sankey.nodeWidth())
         .attr('text-anchor', 'end')
