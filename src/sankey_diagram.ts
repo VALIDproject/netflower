@@ -402,8 +402,6 @@ class SankeyDiagram implements MAppViews {
       })
       .filter((e) => {return e.sum > 0});
 
-    console.log('test3');
-
     //Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
     console.log('changed', that.nodesToShow);
