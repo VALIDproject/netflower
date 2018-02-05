@@ -399,9 +399,10 @@ class SankeyDiagram implements MAppViews {
       .map((o) => o.values) // remove key/values
       .sort(function (a: any, b: any) {
         return d3.descending(a.sum, b.sum);
-      });
+      })
+      .filter((e) => {return e.sum > 0});
 
-    console.log('flatNest: ', flatNest);
+    console.log('test3');
 
     //Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
@@ -410,7 +411,7 @@ class SankeyDiagram implements MAppViews {
     that.maximumNodes = flatNest.length;
 
     //============ CHECK IF SHOULD DRAW ============
-    if (json.length === 0) {                                  //ERROR: Too strong filtered
+    if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
       that.drawReally = false;
       this.showErrorDialog(ERROR_TOOMANYFILTER);
     } else {
