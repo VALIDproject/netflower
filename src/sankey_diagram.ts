@@ -400,7 +400,7 @@ class SankeyDiagram implements MAppViews {
       .sort(function (a: any, b: any) {
         return d3.descending(a.sum, b.sum);
       })
-      .filter((e) => {return e.sum > 0});
+      .filter((e) => {return e.sum > 0;});
 
     //Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
