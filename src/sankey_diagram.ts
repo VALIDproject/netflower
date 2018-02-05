@@ -548,7 +548,7 @@ class SankeyDiagram implements MAppViews {
           d3.select(this).style('cursor', 'pointer');
           let text;
           if(that.pipeline.getTagFlowFilterStatus()) {
-            const re = /-/gi;
+            const re = /\|/g;
             text = d.source.name.replace(re, ', ') + ' → ' + d.target.name.replace(re, ', ') + '\n' + dotFormat(d.value) + valuePostFix;
           } else {
             text = d.source.name + ' → ' + d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
@@ -647,7 +647,7 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'start')
         .attr('class', 'rightText')
         .text(function(d) {
-          if(that.pipeline.getTagFlowFilterStatus()) return `${d.name.replace(/-/gi, ', ')}`
+          if(that.pipeline.getTagFlowFilterStatus()) return `${d.name.replace(/\|/gi, ', ')}`
           else return `${d.name}`;
         })
         .filter(function(d, i) { return d.x < width / 2;})

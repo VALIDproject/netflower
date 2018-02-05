@@ -90,7 +90,7 @@ export default class FilterTagDialog {
 
   private createButtonHtmlByValue(value: string, active: boolean) {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-          "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px;\">" + value + "</button>";
+          "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
   }
 
   private initTagButtons() {

@@ -96,7 +96,6 @@ export default class FilterPipeline
       if(this._tagFlowFilter !== null && this._tagFlowFilter !== undefined) {
         console.log("tagflowFfilter: " + (this._tagFlowFilter !== null) + ", " + (this._tagFlowFilter !== undefined));
         data = this._tagFlowFilter.meetCriteria(data);
-        return data;
       }
     } else {
       if(this._topFilter !== null && this._topFilter !== undefined)
