@@ -17,7 +17,8 @@ import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './
 import {
   setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange,
-  getEntityRef, getMediaRef, getValueRef
+  getEntityRef, getMediaRef, getValueRef,
+  setEntityTagFilter, setMediaTagFilter
 } from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
 import FilterPipeline from './filters/filterpipeline';
@@ -26,9 +27,12 @@ import MediaEuroFilter from './filters/mediaEuroFilter';
 import EntitySearchFilter from './filters/entitySearchFilter';
 import MediaSearchFilter from './filters/mediaSearchFilter';
 import PaymentEuroFilter from './filters/paymentEuroFilter';
+import EntityTagFilter from './filters/entityTagFilter';
+import MediaTagFilter from './filters/mediaTagFilter';
 import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
+import FilterTagDialog from './dialogs/filterTagDialog';
 
 
 class SankeyDiagram implements MAppViews {
@@ -48,6 +52,8 @@ class SankeyDiagram implements MAppViews {
   private entitySearchFilter: EntitySearchFilter;
   private mediaSearchFilter: MediaSearchFilter;
   private euroFilter: PaymentEuroFilter;
+  private entityTagFilter: EntityTagFilter;
+  private mediaTagFilter: MediaTagFilter;
 
   //Sliders
   private entitySlider; private entityFrom = 0; private entityTo = 0;
@@ -65,10 +71,14 @@ class SankeyDiagram implements MAppViews {
     this.euroFilter = new PaymentEuroFilter();
     this.entitySearchFilter = new EntitySearchFilter();
     this.mediaSearchFilter = new MediaSearchFilter();
+    this.entityTagFilter = new EntityTagFilter();
+    this.mediaTagFilter = new MediaTagFilter();
     // Add Filters to pipeline
     this.pipeline.addFilter(this.entityEuroFilter);
     this.pipeline.addFilter(this.mediaEuroFilter);
     this.pipeline.addFilter(this.euroFilter);
+    this.pipeline.addFilter(this.entityTagFilter);
+    this.pipeline.addFilter(this.mediaTagFilter);
     this.pipeline.changeEntitySearchFilter(this.entitySearchFilter);
     this.pipeline.changeMediaSearchFilter(this.mediaSearchFilter);
 
@@ -144,6 +154,9 @@ class SankeyDiagram implements MAppViews {
             <button type='button' id='clearEntity' class='btn btn-secondary'><i class='fa fa-times'></i></button>
           </span>
         </div>
+        <div class='input-group input-group-xs' style='width: 100%; margin: 10px auto;'>
+          <input class='form-control input-sm' id='entityTagFilterButton' type='button' value='${columnLabels.sourceNode} Tags'>
+        </div>
       </div>
     `);
 
@@ -215,6 +228,9 @@ class SankeyDiagram implements MAppViews {
           <button type='button' id='clearMedia' class='btn btn-secondary'><i class='fa fa-times'></i></button>
         </span>
       </div>
+      <div class='input-group input-group-xs' style='width: 100%; margin: 10px auto;'>
+        <input class='form-control input-sm' id='mediaTagFilterButton' type='button' value='${columnLabels.targetNode} Tags'>
+      </div>
     </div>
     `);
   }
@@ -274,6 +290,8 @@ class SankeyDiagram implements MAppViews {
       this.entitySearchFilter.term = '';
       $('#mediaSearchFilter').val('');
       this.mediaSearchFilter.term = '';
+      this.entityTagFilter.resetTags();
+      this.mediaTagFilter.resetTags();
     });
   }
 
@@ -296,6 +314,8 @@ class SankeyDiagram implements MAppViews {
         setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
+        setEntityTagFilter(this.entityTagFilter, originalData);
+        setMediaTagFilter(this.mediaTagFilter, originalData);
 
         events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
 
@@ -315,7 +335,18 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
-      this.valuesSumSource = (<any>d3).nest()
+      if(this.pipeline.getTagFlowFilterStatus()) {
+        this.valuesSumSource = (<any>d3).nest()
+        .key((d) => { return d.sourceTag; })
+        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
+        .entries(filteredData);
+
+      this.valuesSumTarget = (<any>d3).nest()
+        .key((d) => { return d.targetTag; })
+        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
+        .entries(filteredData);
+      } else {
+        this.valuesSumSource = (<any>d3).nest()
         .key((d) => { return d.sourceNode; })
         .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
         .entries(filteredData);
@@ -324,6 +355,8 @@ class SankeyDiagram implements MAppViews {
         .key((d) => { return d.targetNode; })
         .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
         .entries(filteredData);
+      }
+
 
       // console.log('----------- Original Data -----------');
       // console.log(originalData);
@@ -381,14 +414,14 @@ class SankeyDiagram implements MAppViews {
     const path = sankey.link();
 
     // aggregate flow by source and target (i.e. sum multiple times and attributes)
-    const flatNest = d3.nest()
+    let flatNest = d3.nest()
       .key((d: any) => {
         return d.sourceNode + '|$|' + d.targetNode;
       })
       .rollup(function (v: any[]) {
         return {
-          source: v[0].sourceNode,
-          target: v[0].targetNode,
+          source: ((that.pipeline.getTagFlowFilterStatus()) ? v[0].sourceTag : v[0].sourceNode),
+          target: ((that.pipeline.getTagFlowFilterStatus()) ? v[0].targetTag : v[0].targetNode),
           time: v[0].timeNode,
           sum: d3.sum(v, function (d: any) {
             return d.valueNode;
@@ -400,6 +433,8 @@ class SankeyDiagram implements MAppViews {
       .sort(function (a: any, b: any) {
         return d3.descending(a.sum, b.sum);
       });
+    if(that.pipeline.getTagFlowFilterStatus())
+      flatNest = flatNest.filter(function (d) { return (d.source != "") && (d.target != "") });
 
     console.log('flatNest: ', flatNest);
 
@@ -478,7 +513,13 @@ class SankeyDiagram implements MAppViews {
         })
         .on('mouseover', function (d) {
           d3.select(this).style('cursor', 'pointer');
-          const text = d.source.name + ' → ' + d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
+          let text;
+          if(that.pipeline.getTagFlowFilterStatus()) {
+            const re = /\|/g;
+            text = d.source.name.replace(re, ', ') + ' → ' + d.target.name.replace(re, ', ') + '\n' + dotFormat(d.value) + valuePostFix;
+          } else {
+            text = d.source.name + ' → ' + d.target.name + '\n' + dotFormat(d.value) + valuePostFix;
+          }
           Tooltip.mouseOver(d, text, 'T2');
         })
         .on('mouseout', Tooltip.mouseOut);
@@ -582,7 +623,10 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'start')
         .attr('class', 'rightText')
         .text(function (d) {
-          return `${d.name}`;
+          if(that.pipeline.getTagFlowFilterStatus())
+            return `${d.name.replace(/\|/gi, ', ')}`
+          else
+            return `${d.name}`;
         })
         .filter(function (d, i) {
           return d.x < width / 2;
@@ -668,6 +712,18 @@ class SankeyDiagram implements MAppViews {
       SimpleLogging.log('target name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
+
+    // Functionality to open the tag filter window for legal entites
+    const entityFilterTags = (d) => {
+      let dialog = new FilterTagDialog(this.entityTagFilter, d);
+    };
+    this.$node.select('#entityTagFilterButton').on('click', entityFilterTags);
+
+    // Functionality to open the tag filter window for media institutes
+    const mediaFilterTags = (d) => {
+      let dialog = new FilterTagDialog(this.mediaTagFilter, d);
+    };
+    this.$node.select('#mediaTagFilterButton').on('click', mediaFilterTags);
 
     // Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
