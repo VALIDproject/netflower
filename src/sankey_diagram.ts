@@ -548,8 +548,11 @@ class SankeyDiagram implements MAppViews {
 
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
-        .attr('height', function (d) {
-          return d.dy;
+        .attr('y', (d) => {
+          return d.dy * d.value / d.overall;
+        })
+        .attr('height', (d) => {
+            return Math.max(d.dy - d.dy * d.value / d.overall, 0);
         })
         .style('fill', 'url(#diagonalHatch)')
         .attr('width', sankey.nodeWidth() / 2)
@@ -561,14 +564,7 @@ class SankeyDiagram implements MAppViews {
         })
         .on('mouseout', Tooltip.mouseOut)
         .on('mouseover', (d) => {
-          const text = dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
-          Tooltip.mouseOver(d, text, 'T2');
-        })
-        .filter(function (d, i) {
-          return d.sourceLinks.length <= 0;
-        }) //only for the targets
-        .on('mouseover', (d) => {
-          const text = dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat((d.overall - d.value)) + valuePostFix + ' of ' + dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString + ' are not displayed';
           Tooltip.mouseOver(d, text, 'T2');
         });
 
