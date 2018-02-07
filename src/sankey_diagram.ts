@@ -38,8 +38,8 @@ class SankeyDiagram implements MAppViews {
   private sankeyHeight: number = 0;
   private maximumNodes: number = 0;
   private drawReally: boolean = true;
-  private valuesSumSource;
-  private valuesSumTarget;
+  private valuesSumSource : {key: string, values: number}[];
+  private valuesSumTarget : {key: string, values: number}[];
 
   //Filters
   private pipeline: FilterPipeline;
@@ -315,14 +315,14 @@ class SankeyDiagram implements MAppViews {
 
       //Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
-      this.valuesSumSource = (<any>d3).nest()
-        .key((d) => { return d.sourceNode; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
+      this.valuesSumSource = d3.nest()
+        .key((d: any) => { return d.sourceNode; })
+        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
         .entries(filteredData);
 
-      this.valuesSumTarget = (<any>d3).nest()
-        .key((d) => { return d.targetNode; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
+      this.valuesSumTarget = d3.nest()
+        .key((d: any) => { return d.targetNode; })
+        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
         .entries(filteredData);
 
       // console.log('----------- Original Data -----------');
@@ -452,8 +452,21 @@ class SankeyDiagram implements MAppViews {
       });
 
       //This makes out of the array of strings a array of objects with the key 'name'
-      graph.nodes.forEach(function (d, i) {
-        graph.nodes[i] = {'name': d};
+      graph.nodes.forEach((d, i) => {
+        // also store the overall sum of (filtered) flows for the node
+        let overall = 0;
+        for (const val of this.valuesSumSource) {
+          if (val.key === d) {
+            overall = val.values;
+          }
+        }
+        for (const val of this.valuesSumTarget) {
+          if (val.key === d) {
+            overall = val.values;
+          }
+        }
+
+        graph.nodes[i] = {'name': d, 'overall': overall};
       });
 
       //Basic parameters for the diagram
@@ -548,26 +561,14 @@ class SankeyDiagram implements MAppViews {
         })
         .on('mouseout', Tooltip.mouseOut)
         .on('mouseover', (d) => {
-          let result;
-          for (const val of this.valuesSumSource) {
-            if (val.key === d.name) {
-              result = val.values;
-            }
-          }
-          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
           Tooltip.mouseOver(d, text, 'T2');
         })
         .filter(function (d, i) {
           return d.sourceLinks.length <= 0;
         }) //only for the targets
         .on('mouseover', (d) => {
-          let result;
-          for (const val of this.valuesSumTarget) {
-            if (val.key === d.name) {
-              result = val.values;
-            }
-          }
-          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
+          const text = dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
           Tooltip.mouseOver(d, text, 'T2');
         });
 
