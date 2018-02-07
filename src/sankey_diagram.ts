@@ -546,6 +546,17 @@ class SankeyDiagram implements MAppViews {
         .attr('stroke', '#000000')
         .attr('stroke-width', 1);
 
+      node.append('rect')
+        .style('fill', 'white')
+        .attr('width', sankey.nodeWidth() / 3)
+        .style('stroke', 'white')
+        .attr('height', (d) => {
+          return d.dy;
+        })
+        .attr('x', function (d) {
+          return sankey.nodeWidth() / 3;
+        });
+
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
         .attr('y', (d) => {
@@ -555,18 +566,36 @@ class SankeyDiagram implements MAppViews {
             return Math.max(d.dy - d.dy * d.value / d.overall, 0);
         })
         .style('fill', 'url(#diagonalHatch)')
-        .attr('width', sankey.nodeWidth() / 2)
+        .attr('width', sankey.nodeWidth() / 3)
         .attr('x', function (d) {
           if (d.sourceLinks.length <= 0) {
-            return sankey.nodeWidth() / 2;
+            return sankey.nodeWidth() * 2 / 3;
           }
-          ;
         })
         .on('mouseout', Tooltip.mouseOut)
         .on('mouseover', (d) => {
           const text = dotFormat((d.overall - d.value)) + valuePostFix + ' of ' + dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString + ' are not displayed';
           Tooltip.mouseOver(d, text, 'T2');
         });
+
+      node.append('line')
+        .attr('x1', (d) => { return sankey.nodeWidth() / 3; })
+        .attr('x2', (d) => { return sankey.nodeWidth() * 2 / 3; })
+        .attr('y1', 0)
+        .attr('y2', 0)
+        .style('stroke', 'black')
+        .style('stroke-width', '1');
+
+      node.append('line')
+        .attr('x1', (d) => { return sankey.nodeWidth() / 3; })
+        .attr('x2', (d) => { return sankey.nodeWidth() * 2 / 3; })
+        .attr('y1', (d) => { return d.dy * d.value / d.overall; })
+        .attr('y2', (d) => { return d.dy; })
+        .style('stroke', 'black')
+        .style('stroke-width', '1')
+        .filter((d, i) => { return d.sourceLinks.length <= 0; }) //only for the targets
+          .attr('y1', (d) => { return d.dy; })
+          .attr('y2', (d) => { return d.dy * d.value / d.overall; });
 
       //Add in the title for the nodes
       const heading = node.append('g').append('text')
