@@ -29,14 +29,17 @@ export default class Export implements MAppViews {
    */
   init(): Promise<MAppViews> {
 
-    this.btnExportFlowData = d3.select(this.parentDOM)
+    /*this.btnExportFlowData = d3.select(this.parentDOM)
       .append('button')
       .attr('type', 'button')
       .attr('id', 'exportData')
       .attr('class', 'btn btn-primary btn-sm')
       .style('margin-top', '10px')
       .style('display', 'block')
-      .text('Export Flows');
+      .text('Export Flows');*/
+
+      this.btnExportFlowData = d3.select('#exportData');
+      console.log('BUTTON EXPORT', this.btnExportFlowData);
 
     this.$node = this.btnExportFlowData;
 

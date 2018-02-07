@@ -38,7 +38,7 @@ class ValidHeader implements MAppViews {
    */
   private build() {
     this.$node.html(`
-    <div class='logo'></div>
+    <div class='logo'>NETFLOWER</div>
     <div class='btn_preupload'>
       <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
       <i class='fa fa-hand-o-left'>&nbsp;</i>Change Data</button>

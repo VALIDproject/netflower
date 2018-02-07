@@ -73,7 +73,7 @@ class FilterData implements MAppViews {
    */
   private build() {
     this.$node.html(`
-      <div class='container'>
+      <!--<div class='container'>
         <div class='row'>
           <div class='col-sm-2'>
             <small>Top Filter</small>
@@ -106,7 +106,7 @@ class FilterData implements MAppViews {
          </div>
           </div>
         </div>
-       </div>
+       </div>-->
     `);
   }
 

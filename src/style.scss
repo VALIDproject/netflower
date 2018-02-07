@@ -44,16 +44,41 @@ The other styles of the page.
   border-bottom: 2px solid $border-color;
 }
 
+/*.col-md-4, .col-md-3 {
+  background-color: lightgrey;
+  padding: 18px;
+  border-radius: 18px;
+}*/
+
+.sankey_features{
+
+  background-color:$background-color;
+
+}
+
 .logo {
   float: left;
-  width: 25%;
-  height: 40px;
-  background-image: url('media/valid_logo_claim.png');
+  //width: 15%;
+  //height: 40px;
+  //background-image: url('media/valid_logo_claim.png');
+  //background-image: url('media/logo_netflower.png');
   background-repeat: no-repeat;
-  background-size: 240px;
-  margin-top: 10px;
-  padding-left: 250px;
-  font-size: 250%;
+  //background-size: 240px;
+  //margin-top: 10px;
+  //padding-left: 250px;
+  margin-right:20px;
+  font-size: 200%;
+  font-family: 'Oswald', sans-serif;
+}
+
+#validFooter {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  background-color: #efefef;
+  text-align: center;
 }
 
 #socialMedia {

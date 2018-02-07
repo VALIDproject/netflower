@@ -16,6 +16,10 @@ module.exports = function(registry) {
     'name': 'ValidHeader'
   });
 
+  registry.push('validView', 'ValidFooter', function() { return System.import('./src/valid_footer'); }, {
+    'name': 'ValidFooter'
+  });
+
   registry.push('validView', 'FilterData', function() { return System.import('./src/filter_data'); }, {
     'name': 'FilterData'
   });

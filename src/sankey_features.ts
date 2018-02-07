@@ -37,7 +37,7 @@ class SankeyFeatures implements MAppViews {
    */
   private build() {
      this.$node.html(`
-      <div class='container'>
+      <!--<div class='container'>
         <div class='row align-items-start'>
           <div class='col-md-8'>
             <div class='heading'><h4>Media Transparency Data set</h4></div>
@@ -53,7 +53,140 @@ class SankeyFeatures implements MAppViews {
             </div>
           </div>
         </div>
+      </div>-->
+
+
+      <div class="container-fluid">
+      	<div class="row">
+      		<div class="col-md-4">
+      			<h5>
+      				Filter
+      			</h5>
+      			<div class="row">
+            <div class="col-md-3">
+              <button type="button" class="btn btn-default">
+                Clear All
+              </button>
+            </div>
+      				<div class="col-md-3">
+      					<div class="btn-group">
+      						<button class="btn btn-default">
+      							Time
+      						</button>
+      						<button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+      							<span class="caret"></span>
+      						</button>
+      						<ul class="dropdown-menu">
+      							<li>
+      								<a href="#">Action</a>
+      							</li>
+      							<li class="disabled">
+      								<a href="#">Another action</a>
+      							</li>
+      							<li class="divider">
+      							</li>
+      							<li>
+      								<a href="#">Something else here</a>
+      							</li>
+      						</ul>
+      					</div>
+      				</div>
+      				<div class="col-md-4">
+      					<div class="btn-group">
+      						<button class="btn btn-default">
+      							Paragraph
+      						</button>
+      						<button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
+      							<span class="caret"></span>
+      						</button>
+      						<ul class="dropdown-menu">
+      							<li>
+      								<a href="#">Action</a>
+      							</li>
+      							<li class="disabled">
+      								<a href="#">Another action</a>
+      							</li>
+      							<li class="divider">
+      							</li>
+      							<li>
+      								<a href="#">Something else here</a>
+      							</li>
+      						</ul>
+      					</div>
+      				</div>
+
+      			</div>
+      			<div class="row">
+            <p>
+      				<div class="col-md-12">
+      					 <span class="label label-default">2016Q2 - 2017Q1</span>
+      				</div>
+              </p>
+      			</div>
+      		</div>
+
+          <!--Global Filters-->
+          <div class="col-md-3">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h5>
+                      Show State
+                    </h5>
+                    <button type="button" class="btn btn-default">
+                      Absolute Value
+                    </button>
+                    <button type="button" class="btn btn-default">
+                      Number of Links
+                    </button>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>
+                      Show Change
+                    </h5>
+                    <button type="button" class="btn btn-default">
+                      Absolute Value
+                    </button>
+                    <button type="button" class="btn btn-default">
+                      Relative Value
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+                    <!--Export Settings-->
+                		<div class="col-md-2">
+                			<h5>
+                				Export Settings
+                			</h5>
+                			<button type="button" class="btn btn-default" id="exportData">
+                				Export Data
+                			</button>
+                		</div>
+
+
+
+          <!--Notebook-->
+      		<div class="col-md-2">
+      			<h5>
+      				Notebook
+      			</h5>
+      			<button type="button" class="btn btn-default">
+      				Notebook
+      			</button>
+      		</div>
+      	</div>
       </div>
+
+
+
     `);
 
   }

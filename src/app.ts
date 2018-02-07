@@ -114,6 +114,11 @@ export class App implements MAppViews {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
+    },
+    {
+      view: 'ValidFooter',
+      parent: 'app',
+      options: {},
     }
   ];
 
@@ -123,6 +128,7 @@ export class App implements MAppViews {
 
     this.$node.append('div').classed('dataLoadingView', true);
     this.$node.append('div').classed('dataVizView', true);
+    d3.select('#app').append('div').attr('id', 'validFooter');
   }
 
   /**
