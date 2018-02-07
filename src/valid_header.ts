@@ -38,12 +38,13 @@ class ValidHeader implements MAppViews {
    */
   private build() {
     this.$node.html(`
-    <div class='logo'>NETFLOWER</div>
+    <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
       <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
-      <i class='fa fa-hand-o-left'>&nbsp;</i>Change Data</button>
+      Change Data</button>
     </div>
-    <div id='socialMedia'>
+    <div class="valid_logo"></div>
+    <div id='socialMedia'>    
         <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
         <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
         <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x' id='web'></i></a></p>

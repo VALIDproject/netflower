@@ -91,22 +91,26 @@ div.tooltip2 {
   margin-left: 25%;
   width: 50%;
   text-align: center;
-}
+ }
 
 #loadMoreBtn, #loadLessBtn {
   width: 98%;
+  //background: #49B17C;
+  color: #49B17C; 
+  border: 2px solid #49B17C;
+  font-size: 13px;
+  font-weight: 700;  
+  border-radius: 6px;
 }
 
+
 #loadInfo {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 /**
 Sankey detail part.
  */
-.sankey_details {
-  //background-color: grey;
-}
 
 .closeLink {
   font: 12px sans-serif;

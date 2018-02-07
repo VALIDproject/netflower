@@ -22,6 +22,40 @@ The other styles of the page.
 
 }
 
+button.btn_design {
+  display: inline-block;
+  //padding: 4px 9px;
+  margin-bottom: 0;
+  font-size: 13px;
+  font-weight: 400;  
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-image: none;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  padding: 5px 16px;
+  color: #49B17C;  
+  border-color: #49B17C;  
+}
+
+button.btn_design:hover, button.btn_design :focus, button.btn_design:active {
+	color: #33a6cc;
+	border-color: #33a6cc;
+}
+
+#btn_above button{
+  margin-bottom: 5px;
+}
+
+
+
 .dataVizView {
   //width:75%;
   display: flex;
@@ -50,10 +84,12 @@ The other styles of the page.
   border-radius: 18px;
 }*/
 
-.sankey_features{
+.btn {
+  font-size: 12px;
+}
 
-  background-color:$background-color;
-
+.label-default {
+  background-color: $valid-color;
 }
 
 .logo {
@@ -71,14 +107,19 @@ The other styles of the page.
   font-family: 'Oswald', sans-serif;
 }
 
-#validFooter {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 1rem;
-  background-color: #efefef;
-  text-align: center;
+.valid_logo{
+  background-image: url('media/valid_logo_claim.png');
+  background-repeat: no-repeat;
+  background-size: 200px;  
+  //padding-left: 20px;  
+  //margin-left: 150px;
+  //position: absolute;
+  float:right;
+  width: 15%;
+  height: 40px; 
+  margin-top:10px;
+  margin-right: 20px;
+  
 }
 
 #socialMedia {
@@ -87,11 +128,12 @@ The other styles of the page.
   height: 80px;
   margin-left: auto;
   margin-right: 20px;
-  width: 30%;
+  width: 40%; 
 
   p {
     float: right;
-    padding: 15px;
+    padding: 15px; 
+    margin-top:-40px;  
   }
 
 }

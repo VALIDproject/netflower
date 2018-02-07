@@ -8,6 +8,7 @@ import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 import {MAppViews} from './app';
+import {AppConstants} from './app_constants';
 
 class SankeyFeatures implements MAppViews {
 
@@ -37,81 +38,30 @@ class SankeyFeatures implements MAppViews {
    */
   private build() {
      this.$node.html(`
-      <!--<div class='container'>
-        <div class='row align-items-start'>
-          <div class='col-md-8'>
-            <div class='heading'><h4>Media Transparency Data set</h4></div>
-          </div>
-          <div class='col-md-4'>
-            <div class='button_bar'>
-              <div class='btn-group' role='group' aria-label='...'>
-                <button type='button' class='btn btn-default'>  <i class='fa fa-arrows-h fa-lg' aria-hidden='true'></i></button>
-                <button type='button' class='btn btn-default'><i class='fa fa-object-group fa-lg' aria-hidden='true'></i></button>
-                <button type='button' class='btn btn-default'><i class='fa fa-thumb-tack fa-lg' aria-hidden='true'></i></button>
-                <button type='button' class='btn btn-default'><i class='fa fa-camera fa-lg' aria-hidden='true'></i></button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>-->
-
-
       <div class="container-fluid">
       	<div class="row">
-      		<div class="col-md-4">
+      		<div class="col-md-3">
       			<h5>
       				Filter
       			</h5>
       			<div class="row">
             <div class="col-md-3">
-              <button type="button" class="btn btn-default">
+              <button type="button"  class= 'btn_design'  id='clearAllFilters' class="btn btn-default">
                 Clear All
               </button>
             </div>
       				<div class="col-md-3">
       					<div class="btn-group">
-      						<button class="btn btn-default">
+      						<button  class= 'btn_design' class="btn btn-default">
       							Time
-      						</button>
-      						<button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
-      							<span class="caret"></span>
-      						</button>
-      						<ul class="dropdown-menu">
-      							<li>
-      								<a href="#">Action</a>
-      							</li>
-      							<li class="disabled">
-      								<a href="#">Another action</a>
-      							</li>
-      							<li class="divider">
-      							</li>
-      							<li>
-      								<a href="#">Something else here</a>
-      							</li>
-      						</ul>
-      					</div>
+      						</button>      						
+      						</div>
       				</div>
-      				<div class="col-md-4">
+      				<div class="col-md-3">
       					<div class="btn-group">
-      						<button class="btn btn-default">
+      						<button class ='btn_design' class="btn btn-default">
       							Paragraph
-      						</button>
-      						<button data-toggle="dropdown" class="btn btn-default dropdown-toggle">
-      							<span class="caret"></span>
-      						</button>
-      						<ul class="dropdown-menu">
-      							<li>
-      								<a href="#">Action</a>
-      							</li>
-      							<li class="disabled">
-      								<a href="#">Another action</a>
-      							</li>
-      							<li class="divider">
-      							</li>
-      							<li>
-      								<a href="#">Something else here</a>
-      							</li>
-      						</ul>
+      						</button>      						
       					</div>
       				</div>
 
@@ -130,63 +80,42 @@ class SankeyFeatures implements MAppViews {
             <div class="row">
               <div class="col-md-12">
                 <div class="row">
-                  <div class="col-md-6">
-                    <h5>
-                      Show State
-                    </h5>
-                    <button type="button" class="btn btn-default">
-                      Absolute Value
-                    </button>
-                    <button type="button" class="btn btn-default">
-                      Number of Links
-                    </button>
+                  <div class="col-md-6" id = 'btn_above'>
+                    <h5>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
+                    <button type="button" class ='btn_design' class="btn btn-default">Absolute Value</button>                   
+                    <button type="button" class ='btn_design' class="btn btn-default">Number of Links</button>
                   </div>
-                  <div class="col-md-6">
-                    <h5>
-                      Show Change
-                    </h5>
-                    <button type="button" class="btn btn-default">
-                      Absolute Value
-                    </button>
-                    <button type="button" class="btn btn-default">
-                      Relative Value
-                    </button>
+                  <div class="col-md-6" id = 'btn_above'>
+                    <h5>Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
+                    <button type="button" class ='btn_design' class="btn btn-default">Absolute Value</button>
+                    <button type="button" class ='btn_design' class="btn btn-default">Relative Value</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-
-
-
-
-                    <!--Export Settings-->
-                		<div class="col-md-2">
-                			<h5>
-                				Export Settings
-                			</h5>
-                			<button type="button" class="btn btn-default" id="exportData">
-                				Export Data
-                			</button>
-                		</div>
-
-
+        <!--Export Settings-->
+        <div class="col-md-2">
+          <h5>
+            Export Settings
+          </h5>
+          <button type="button"  class= 'btn_design' class="btn btn-default" id="exportData">
+            Export Data
+          </button>
+        </div>
 
           <!--Notebook-->
       		<div class="col-md-2">
       			<h5>
       				Notebook
       			</h5>
-      			<button type="button" class="btn btn-default">
+      			<button type="button" class= 'btn_design' class="btn btn-default">
       				Notebook
       			</button>
       		</div>
       	</div>
       </div>
-
-
-
     `);
 
   }
@@ -196,11 +125,14 @@ class SankeyFeatures implements MAppViews {
    */
   private attachListener() {
     //this.createButtonBar();
+    this.$node.select('#clearAllFilters').on('click', (d) => {
+      events.fire(AppConstants.EVENT_CLEAR_FILTERS, d, null);
+    });
   }
 
-  private createButtonBar () {
+ /* private createButtonBar () {
     const buttonBar = this.$node.select('.button_bar');
-  }
+  }*/
 
 }
 
