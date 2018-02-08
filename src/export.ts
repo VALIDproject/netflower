@@ -12,10 +12,8 @@ import SimpleLogging from './simpleLogging';
 
 export default class Export implements MAppViews {
 
-  // for the UI (= button)
   private $node: d3.Selection<any>;
   private parentDOM: string;
-
   private btnExportFlowData: d3.Selection<any>;
 
   constructor(parent: Element, private options: any) {
@@ -29,23 +27,12 @@ export default class Export implements MAppViews {
    */
   init(): Promise<MAppViews> {
 
-    /*this.btnExportFlowData = d3.select(this.parentDOM)
-      .append('button')
-      .attr('type', 'button')
-      .attr('id', 'exportData')
-      .attr('class', 'btn btn-primary btn-sm')
-      .style('margin-top', '10px')
-      .style('display', 'block')
-      .text('Export Flows');*/
-
-      this.btnExportFlowData = d3.select('#exportData');
-      console.log('BUTTON EXPORT', this.btnExportFlowData);
-
+    this.btnExportFlowData = d3.select('#exportData');
     this.$node = this.btnExportFlowData;
 
     this.attachListener();
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -53,11 +40,11 @@ export default class Export implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    // retrieve the log file
+    // Retrieve the log file
     this.btnExportFlowData.on('click', (d) => {
       SimpleLogging.log('export flows clicked', '');
 
-      // column headers (based on input metadata if available)
+      // Column headers (based on input metadata if available)
       let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
       if (columnLabels == null) {
         columnLabels = {};
@@ -67,7 +54,7 @@ export default class Export implements MAppViews {
       }
       const dataAsArray = [[columnLabels.sourceNode, columnLabels.targetNode, columnLabels.valueNode]];
 
-      // flows extracted from data properties of the sankey links
+      // Flows extracted from data properties of the sankey links
       d3.selectAll('#sankeyDiagram path.link').each((d, i) => {
         dataAsArray.push([d.source.name, d.target.name, d.value]);
       });
@@ -83,10 +70,13 @@ export default class Export implements MAppViews {
     });
   }
 
+  /**
+   * This method exports a single flow over time and saves it into a csv file.
+   * @param selector of the element which should be exported
+   * @param comment to the exported data
+   */
   public static exportSingleFlowOverTime(selector: string, comment: string) {
-    console.log('export ' + selector);
-
-    // column headers (based on input metadata if available)
+    // Column headers (based on input metadata if available)
     let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     if (columnLabels == null) {
       columnLabels = {};
@@ -104,17 +94,14 @@ export default class Export implements MAppViews {
     if (comment.length > 0) {
       dataAsStr = '# ' + comment + '\n' + dataAsStr;
     }
-    console.log(dataAsStr);
     const filename = 'timeseries.csv';
     if (dataAsArray.length === 1) {
       bootbox.alert('No time steps are visible.');
     } else {
       downloadFile(dataAsStr, filename, 'text/csv');
     }
-
   }
 }
-
 
 /**
  * Factory method to create a new SimpleLogging instance
