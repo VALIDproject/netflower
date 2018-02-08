@@ -43,17 +43,14 @@ class SankeyFeatures implements MAppViews {
       		<div class='col-md-3'>
       			<h5>Filter</h5>
       			<div class='row'>
-              <div class='col-md-3'>
-                <button type='button' class= 'btn_design' id='clearAllFilters' class='btn btn-default'>
-                  Clear All
-                </button>
+              <!--<div class='col-md-3'>-->
+                <!--<button type='button' class= 'btn_design' id='clearAllFilters' class='btn btn-default'>Clear-->
+                <!--</button>-->
+              <!--</div>-->
+              <div class='col-md-4'>
+                <button class= 'btn_design' class='btn btn-default'>Time</button>      						
               </div>
-              <div class='col-md-3'>
-                  <div class='btn-group'>
-                    <button class= 'btn_design' class='btn btn-default'>Time</button>      						
-                  </div>
-                </div>
-              <div class='col-md-3'>
+              <div class='col-md-4'>
                   <div class='btn-group'>
                     <button class ='btn_design' class='btn btn-default'>Attribute</button>      						
                   </div>
@@ -61,7 +58,7 @@ class SankeyFeatures implements MAppViews {
       			</div>
       			<div class='row'>
       			<p>
-      				<div class='col-md-12'>
+      				<div class='col-md-3'>
       					 <span class='label label-default'>2016Q2 - 2017Q1</span>
       				</div>
       			</p>

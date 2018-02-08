@@ -112,10 +112,10 @@ div.tooltip2 {
   width: 98%;
   height:100%;
   //background: #49B17C;
-  /*color: #49B17C; 
+  /*color: #49B17C;
   border: 2px solid #49B17C;
   font-size: 13px;
-  font-weight: 700;  
+  font-weight: 700;
   border-radius: 6px;*/
 }
 
@@ -130,7 +130,7 @@ Sankey detail part.
 
 .closeLink {
   font: 12px sans-serif;
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 .addNotes {
@@ -207,7 +207,7 @@ node text {
 
 #backBtn {
   cursor: pointer;
-  margin-top: -8px; 
+  margin-top: -8px;
 }
 
 // Push source sparkline barcharts to right of parent element
@@ -244,6 +244,10 @@ svg text.yaxisunit {
 
 #mediaSearchButton, #entitySearchButton {
   border-radius: 0;
+}
+
+#clearMedia, #clearEntity {
+  background: #f0f0f0;
 }
 
 .specialIcon {
