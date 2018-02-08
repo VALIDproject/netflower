@@ -546,10 +546,10 @@ class SankeyDiagram implements MAppViews {
         .attr('stroke', '#000000')
         .attr('stroke-width', 1);
 
+      // white rectangle on top of middle of node
       node.append('rect')
         .style('fill', 'white')
         .attr('width', sankey.nodeWidth() / 3)
-        .style('stroke', 'white')
         .attr('height', (d) => {
           return d.dy;
         })
@@ -578,24 +578,17 @@ class SankeyDiagram implements MAppViews {
           Tooltip.mouseOver(d, text, 'T2');
         });
 
-      node.append('line')
-        .attr('x1', (d) => { return sankey.nodeWidth() / 3; })
-        .attr('x2', (d) => { return sankey.nodeWidth() * 2 / 3; })
-        .attr('y1', 0)
-        .attr('y2', 0)
-        .style('stroke', 'black')
-        .style('stroke-width', '1');
+      // gray callout polygon to illustrate fraction of currently visible flows
+      node.append('polygon')
+        .attr('points', (d) => {
+          const lX = sankey.nodeWidth() / 3;
+          const rX = sankey.nodeWidth() * 2 / 3;
+          const lY2 = d.sourceLinks.length <= 0 ? d.dy : d.dy * d.value / d.overall;
+          const rY2 = d.sourceLinks.length > 0 ? d.dy : d.dy * d.value / d.overall;
 
-      node.append('line')
-        .attr('x1', (d) => { return sankey.nodeWidth() / 3; })
-        .attr('x2', (d) => { return sankey.nodeWidth() * 2 / 3; })
-        .attr('y1', (d) => { return d.dy * d.value / d.overall; })
-        .attr('y2', (d) => { return d.dy; })
-        .style('stroke', 'black')
-        .style('stroke-width', '1')
-        .filter((d, i) => { return d.sourceLinks.length <= 0; }) //only for the targets
-          .attr('y1', (d) => { return d.dy; })
-          .attr('y2', (d) => { return d.dy * d.value / d.overall; });
+          return lX + ',0 ' + rX + ',0 ' + rX + ',' + rY2 + ' ' + lX + ',' + lY2;
+        })
+        .style('fill', '#cccccc');
 
       //Add in the title for the nodes
       const heading = node.append('g').append('text')
