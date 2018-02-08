@@ -27,6 +27,7 @@ class ValidHeader implements MAppViews {
   init() {
     this.build();
     this.attachListener();
+    this.shrinkHeader();
 
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
@@ -88,6 +89,32 @@ class ValidHeader implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
+  }
+
+  private shrinkHeader () {
+  //console.log('Shrink Header');
+  $(document).on('scroll', function(){
+		if
+      ($(document).scrollTop() > 100) {        
+        $('.logo').addClass('shrink');
+        $('#validHeader').addClass('shrink');	
+        $('#socialMedia').addClass('shrink');
+        $('.valid_logo').addClass('shrink');
+        $('.btn_preupload ').addClass('shrink');
+        
+        
+		}
+		else
+		{
+      console.log('remove class shrinking');
+      $('.logo').removeClass('shrink');
+      $('#validHeader').removeClass('shrink');
+      $('#socialMedia').removeClass('shrink');
+      $('.valid_logo').removeClass('shrink');
+      $('.btn_preupload ').removeClass('shrink');	
+      
+		}
+	});
   }
 
 }

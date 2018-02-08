@@ -39,13 +39,13 @@ button.btn_design, #loadMoreBtn, #loadLessBtn {
   border: 1.5px solid transparent;
   border-radius: 4px;
   padding: 5px 16px;
-  color: #49B17C;  
-  border-color: #49B17C;  
+  color: $valid-color3;  
+  border-color: $valid-color3;  
 }
 
 button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
-	color: #33a6cc;
-	border-color: #33a6cc;
+	color: $valid-color2;
+	border-color: $valid-color2;
 }
 
 #btn_above button{
@@ -72,6 +72,11 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   background-color: $background-color;
   padding: 10px;
   border-bottom: 2px solid $border-color;
+}
+
+#validHeader.shrink {
+  height: 40px;
+  //background-color: $valid_color;
 }
 
 /*.col-md-4, .col-md-3 {
@@ -103,7 +108,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   font-family: 'Oswald', sans-serif;
 }
 
-.valid_logo{
+.valid_logo {
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
   background-size: 200px;  
@@ -114,9 +119,13 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   width: 15%;
   height: 40px; 
   margin-top:10px;
-  margin-right: 20px;
-  
+  margin-right: 20px;  
 }
+
+.valid_logo.shrink {
+  display: none;
+}
+
 
 #socialMedia {
   float: right;
@@ -125,20 +134,28 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   margin-left: auto;
   margin-right: 20px;
   width: 40%; 
-
   p {
     float: right;
     padding: 15px; 
     margin-top:-40px;  
   }
+}
+
+#socialMedia.shrink {
+  display:none;
 
 }
+
 
 .btn_preupload {
   float: left;
   width: 40%;
-
 }
+
+.btn_preupload.shrink {
+  display: none;
+}
+
 
 #web {
   color: $valid-color;
@@ -182,3 +199,10 @@ span.from {
     font-size: 12px;
     line-height: 1.5;
 }
+
+.shrink {  
+  font-size: 100%;  
+}
+
+
+
