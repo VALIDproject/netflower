@@ -1,4 +1,4 @@
-VALiD Dynamic Network Flows  [![Phovea][phovea-image]][phovea-url] <!-- [![NPM version][npm-image]][npm-url] -->
+VALiD netflower [![Phovea][phovea-image]][phovea-url] <!-- [![NPM version][npm-image]][npm-url] -->
 =====================
 
 Visually exploring flows in weighted dynamic networks for data journalists.
@@ -9,8 +9,8 @@ Open your Git Bash or Commandline tool and navigate to the preferred working dir
 There execute the following commands, which will clone the latest version and install all dependencies.
 
 ```
-git clone https://github.com/VALIDproject/DyNetFlowVis.git
-cd DyNetFlowVis
+git clone https://github.com/VALIDproject/netflower.git
+cd netflower
 npm install
 ```
 
@@ -40,7 +40,7 @@ npm start
 Test the application on a local webserver at http://127.0.0.1:8080/
 
 ***
-For more Information about the setup process and general Workflow visit the [WIKI](https://github.com/VALIDproject/DyNetFlowVis/wiki/Get-Started) of this repository.
+For more Information about the setup process and general Workflow visit the [WIKI](https://github.com/VALIDproject/netflower/wiki/Get-Started) of this repository.
 
 
 [phovea-image]: https://img.shields.io/badge/Phovea-Application-1BA64E.svg
