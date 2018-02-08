@@ -95,12 +95,13 @@ div.tooltip2 {
 
 #loadMoreBtn, #loadLessBtn {
   width: 98%;
+  height:100%;
   //background: #49B17C;
-  color: #49B17C; 
+  /*color: #49B17C; 
   border: 2px solid #49B17C;
   font-size: 13px;
   font-weight: 700;  
-  border-radius: 6px;
+  border-radius: 6px;*/
 }
 
 
@@ -154,6 +155,7 @@ node text {
 
 .link:hover {
   stroke-opacity: .5;
+  stroke: #DA5A6B;
 }
 
 .left_bar_heading {

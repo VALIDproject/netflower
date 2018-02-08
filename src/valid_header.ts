@@ -54,8 +54,8 @@ class ValidHeader implements MAppViews {
   /**
    * Attach the event listeners
    */
-  private attachListener() {
-            //Listener for the Back Button
+  private attachListener() {  
+    //Listener for the Back Button
     this.$node.select('#backBtn')
       .on('click', (e) => {
         SimpleLogging.log('reupload data clicked', '');

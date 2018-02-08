@@ -510,7 +510,7 @@ class SankeyDiagram implements MAppViews {
           return d.dy;
         })
         .attr('width', sankey.nodeWidth())
-        .style('fill', '#777777')
+        .style('fill', '#DA5A6B ')
         .on('mouseover', function (d) {
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
           const text = dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
@@ -530,7 +530,7 @@ class SankeyDiagram implements MAppViews {
         .attr('height', 4)
         .append('path')
         .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-        .attr('stroke', '#FFFFFF')
+        .attr('stroke', '#000000')
         .attr('stroke-width', 1);
 
       //This is how the overlays for the rects can be done after they have been added

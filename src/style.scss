@@ -18,7 +18,9 @@ The other styles of the page.
 @import 'styles/global_settings';
 
 
-button.btn_design {
+//Button Design Filter Area
+
+button.btn_design, #loadMoreBtn, #loadLessBtn {
   display: inline-block;
   //padding: 4px 9px;
   margin-bottom: 0;
@@ -41,7 +43,7 @@ button.btn_design {
   border-color: #49B17C;  
 }
 
-button.btn_design:hover, button.btn_design :focus, button.btn_design:active {
+button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
 	color: #33a6cc;
 	border-color: #33a6cc;
 }
