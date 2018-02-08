@@ -27,23 +27,24 @@ class ValidHeader implements MAppViews {
   init() {
     this.build();
     this.attachListener();
+    this.shrinkHeader();
 
     //Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
-
 
   /**
    * Build the basic DOM elements
    */
   private build() {
     this.$node.html(`
-    <div class='logo'></div>
+    <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
-      <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>
-      <i class='fa fa-hand-o-left'>&nbsp;</i>Change Data</button>
+    <i class='fa fa-angle-left fa-4x' id='backBtn'></i>   
+      <!--<button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change DAta</button>-->
     </div>
-    <div id='socialMedia'>
+    <div class="valid_logo"></div>
+    <div id='socialMedia'>    
         <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
         <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
         <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x' id='web'></i></a></p>
@@ -54,8 +55,8 @@ class ValidHeader implements MAppViews {
   /**
    * Attach the event listeners
    */
-  private attachListener() {
-            //Listener for the Back Button
+  private attachListener() {  
+    //Listener for the Back Button
     this.$node.select('#backBtn')
       .on('click', (e) => {
         SimpleLogging.log('reupload data clicked', '');
@@ -88,6 +89,30 @@ class ValidHeader implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
+  }
+
+  private shrinkHeader () {
+  //console.log('Shrink Header');
+  $(document).on('scroll', function(){
+		if
+      ($(document).scrollTop() > 100) { 
+        $('.logo').addClass('shrink');
+        $('#validHeader').addClass('shrink');	
+        $('#socialMedia').addClass('shrink');
+        $('.valid_logo').addClass('shrink');   
+        $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');      
+        $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');        
+		}
+		else
+		{
+      $('.logo').removeClass('shrink');
+      $('#validHeader').removeClass('shrink');
+      $('#socialMedia').removeClass('shrink');
+      $('.valid_logo').removeClass('shrink');
+      $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');      
+      $('.btn_preupload i').addClass('fa fa-angle-left fa-4x'); 
+		}
+	});
   }
 
 }
