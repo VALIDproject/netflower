@@ -33,7 +33,6 @@ class ValidHeader implements MAppViews {
     return Promise.resolve(this);
   }
 
-
   /**
    * Build the basic DOM elements
    */
@@ -41,7 +40,8 @@ class ValidHeader implements MAppViews {
     this.$node.html(`
     <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
-      <button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change Data</button>
+    <i class='fa fa-angle-left fa-4x' id='backBtn'></i>   
+      <!--<button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change DAta</button>-->
     </div>
     <div class="valid_logo"></div>
     <div id='socialMedia'>    
@@ -100,8 +100,7 @@ class ValidHeader implements MAppViews {
         $('#validHeader').addClass('shrink');	
         $('#socialMedia').addClass('shrink');
         $('.valid_logo').addClass('shrink');
-        $('.btn_preupload ').addClass('shrink');
-        
+        $('.btn_preupload ').addClass('shrink'); 
         
 		}
 		else
@@ -111,8 +110,7 @@ class ValidHeader implements MAppViews {
       $('#validHeader').removeClass('shrink');
       $('#socialMedia').removeClass('shrink');
       $('.valid_logo').removeClass('shrink');
-      $('.btn_preupload ').removeClass('shrink');	
-      
+      $('.btn_preupload ').removeClass('shrink');	      
 		}
 	});
   }

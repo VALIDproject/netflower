@@ -206,8 +206,8 @@ node text {
 }
 
 #backBtn {
-  margin-top: 5px;
-  border-radius: 5px;
+  cursor: pointer;
+  margin-top: -8px; 
 }
 
 // push source sparkline barcharts to right of parent element

@@ -60,7 +60,7 @@ class SankeyFeatures implements MAppViews {
       				<div class="col-md-3">
       					<div class="btn-group">
       						<button class ='btn_design' class="btn btn-default">
-      							Paragraph
+      							Attribute
       						</button>      						
       					</div>
       				</div>
