@@ -15,7 +15,7 @@ class ValidHeader implements MAppViews {
 
   private $node;
 
- constructor(parent: Element, private options: any) {
+  constructor(parent: Element, private options: any) {
     this.$node = d3.select('#validHeader');
   }
 
@@ -29,7 +29,7 @@ class ValidHeader implements MAppViews {
     this.attachListener();
     this.shrinkHeader();
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -43,7 +43,7 @@ class ValidHeader implements MAppViews {
     <i class='fa fa-angle-left fa-4x' id='backBtn'></i>   
       <!--<button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change DAta</button>-->
     </div>
-    <div class="valid_logo"></div>
+    <div class='valid_logo'></div>
     <div id='socialMedia'>    
         <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
         <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
@@ -55,8 +55,8 @@ class ValidHeader implements MAppViews {
   /**
    * Attach the event listeners
    */
-  private attachListener() {  
-    //Listener for the Back Button
+  private attachListener() {
+    // Listener for the Back Button
     this.$node.select('#backBtn')
       .on('click', (e) => {
         SimpleLogging.log('reupload data clicked', '');
@@ -69,14 +69,14 @@ class ValidHeader implements MAppViews {
           callback(result) {
             if (result) {
               SimpleLogging.log('reupload data confirmed', '');
-              //Clear both storage facilities
+              // Clear both storage facilities
               localStorage.removeItem('dataLoaded');
               localStorage.removeItem('columnLabels');
               SimpleLogging.trimLogFile();
               localforage.clear();
-              //Remove all elements that get not created from the DOM
+              // Remove all elements that get not created from the DOM
               d3.select('.dataVizView').selectAll('*').remove();
-              //Force reload and loose all data
+              // Force reload and loose all data
               location.reload(true);
             } else {
               SimpleLogging.log('reupload data aborted', '');
@@ -92,29 +92,24 @@ class ValidHeader implements MAppViews {
   }
 
   private shrinkHeader () {
-  //console.log('Shrink Header');
-  $(document).on('scroll', function(){
-		if
-      ($(document).scrollTop() > 100) { 
+    $(document).on('scroll', function(){
+      if ($(document).scrollTop() > 100) {
         $('.logo').addClass('shrink');
-        $('#validHeader').addClass('shrink');	
+        $('#validHeader').addClass('shrink');
         $('#socialMedia').addClass('shrink');
-        $('.valid_logo').addClass('shrink');   
-        $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');      
-        $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');        
-		}
-		else
-		{
-      $('.logo').removeClass('shrink');
-      $('#validHeader').removeClass('shrink');
-      $('#socialMedia').removeClass('shrink');
-      $('.valid_logo').removeClass('shrink');
-      $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');      
-      $('.btn_preupload i').addClass('fa fa-angle-left fa-4x'); 
-		}
-	});
+        $('.valid_logo').addClass('shrink');
+        $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');
+        $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');
+      } else {
+        $('.logo').removeClass('shrink');
+        $('#validHeader').removeClass('shrink');
+        $('#socialMedia').removeClass('shrink');
+        $('.valid_logo').removeClass('shrink');
+        $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');
+        $('.btn_preupload i').addClass('fa fa-angle-left fa-4x');
+      }
+    });
   }
-
 }
 
 /**
