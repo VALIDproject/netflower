@@ -40,6 +40,7 @@ class SankeyDiagram implements MAppViews {
   private drawReally: boolean = true;
   private valuesSumSource : {key: string, values: number}[];
   private valuesSumTarget : {key: string, values: number}[];
+  private minFraction: number = 1;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -455,19 +456,32 @@ class SankeyDiagram implements MAppViews {
       graph.nodes.forEach((d, i) => {
         // also store the overall sum of (filtered) flows for the node
         let overall = 0;
+        let visible = -1;
         for (const val of this.valuesSumSource) {
           if (val.key === d) {
             overall = val.values;
-          }
+
+            visible = graph.links
+              .filter((d) => { return d.source === i; })
+              .map((d) => d.value)
+              .reduce((total, current) => total + current);
+            }
         }
         for (const val of this.valuesSumTarget) {
           if (val.key === d) {
             overall = val.values;
+
+            visible = graph.links
+              .filter((d) => { return d.target === i; })
+              .map((d) => d.value)
+              .reduce((total, current) => total + current);
           }
         }
 
-        graph.nodes[i] = {'name': d, 'overall': overall};
+        graph.nodes[i] = {'name': d, 'overall': overall, 'fraction': visible/overall};
       });
+
+      this.minFraction = Math.min(... graph.nodes.map((d) => d.fraction));
 
       //Basic parameters for the diagram
       sankey
@@ -519,10 +533,17 @@ class SankeyDiagram implements MAppViews {
 
       //Add the rectangles for the nodes
       node.append('rect')
-        .attr('height', function (d) {
-          return d.dy;
+        .attr('height', (d) => { return d.dy; })
+        .attr('width', (d) => {
+          return Math.max(this.minFraction * sankey.nodeWidth()  / d.fraction, 1);
         })
-        .attr('width', sankey.nodeWidth())
+        .attr('x', (d) => {
+          if (d.sourceLinks.length <= 0) {
+            return 0;
+          } else {
+            return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() / d.fraction, 1);
+          }
+        })
         .style('fill', '#DA5A6B')
         .on('mouseover', function (d) {
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
@@ -548,25 +569,24 @@ class SankeyDiagram implements MAppViews {
 
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
-        .attr('y', (d) => {
-          return d.dy * d.value / d.overall;
-        })
-        .attr('height', (d) => {
-            return Math.max(d.dy - d.dy * d.value / d.overall, 0);
-        })
-        .style('fill', 'url(#diagonalHatch)')
-        .attr('width', sankey.nodeWidth() / 2)
-        .attr('x', function (d) {
-          if (d.sourceLinks.length <= 0) {
-            return sankey.nodeWidth() / 2;
-          }
-          ;
-        })
-        .on('mouseout', Tooltip.mouseOut)
-        .on('mouseover', (d) => {
-          const text = dotFormat((d.overall - d.value)) + valuePostFix + ' of ' + dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString + ' are not displayed';
-          Tooltip.mouseOver(d, text, 'T2');
-        });
+        .filter((d) => {return d.overall > d.value; })
+          .attr('width', (d) =>  {
+            return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
+          })
+          .attr('height', (d) => { return d.dy; })
+          .style('fill', 'url(#diagonalHatch)')
+          .attr('x', (d) => {
+            if (d.sourceLinks.length <= 0) {
+              return this.minFraction * sankey.nodeWidth();
+            } else {
+              return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
+            }
+          })
+          .on('mouseout', Tooltip.mouseOut)
+          .on('mouseover', (d) => {
+            const text = dotFormat((d.overall - d.value)) + valuePostFix + ' of ' + dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString + ' are not displayed';
+            Tooltip.mouseOver(d, text, 'T2');
+          });
 
       //Add in the title for the nodes
       const heading = node.append('g').append('text')
