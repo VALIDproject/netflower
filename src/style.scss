@@ -18,10 +18,6 @@ The other styles of the page.
 @import 'styles/global_settings';
 
 
-.dataLoadingView {
-
-}
-
 button.btn_design {
   display: inline-block;
   //padding: 4px 9px;
@@ -53,8 +49,6 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active {
 #btn_above button{
   margin-bottom: 5px;
 }
-
-
 
 .dataVizView {
   //width:75%;
