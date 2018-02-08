@@ -191,7 +191,7 @@ span.from {
   cursor: pointer !important;
 }
 
-//Make input search smaller
+// Make input search smaller
 .input-group-xs>.form-control,
 .input-group-xs>.input-group-addon,
 .input-group-xs>.input-group-btn>.btn {
@@ -201,9 +201,15 @@ span.from {
     line-height: 1.5;
 }
 
+// Brings down the bootbox dialog a bit.
+.alternateBootboxDialog {
+  margin-top: 10%;
+}
+
+.alertify-logs {
+  opacity: 0.8 !important;
+}
+
 .shrink {  
   font-size: 100%;  
 }
-
-
-

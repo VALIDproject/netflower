@@ -210,7 +210,7 @@ node text {
   margin-top: -8px; 
 }
 
-// push source sparkline barcharts to right of parent element
+// Push source sparkline barcharts to right of parent element
 div.left_bars svg.barchart {
   display: block;
   margin-left: auto;
@@ -246,16 +246,7 @@ svg text.yaxisunit {
   border-radius: 0;
 }
 
-// SLIDER CONTROLS:
-// ------------------------------------
-//.collapseBox .fa {
-//  transition: .3s transform ease-in-out;
-//}
-//.collapseBox .collapsed .fa {
-//  transform: rotate(-90deg);
-//}
-
-.row .fa {
+.specialIcon {
   color: #808080;
   font-size: 1.3em;
 }

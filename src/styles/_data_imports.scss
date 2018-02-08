@@ -10,6 +10,11 @@
   border: none;
 }
 
+.toned {
+  -webkit-filter: saturate(0.5); /* Safari 6.0 - 9.0 */
+  filter: saturate(0.5);
+}
+
 .scrollArea {
   max-height: 1000px;
   overflow: auto;
@@ -42,6 +47,18 @@
 
 #informationText {
   margin-bottom: 10px;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  border: none;
+  font: normal 20px/normal "Anton", Helvetica, sans-serif;
+  color: rgb(112, 112, 112);
+  text-align: center;
+  text-transform: uppercase;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  letter-spacing: 6px;
+  text-shadow: 1px 1px 0 rgb(238,238,238) , 2px 2px 0 rgb(112,112,112) ;
 }
 
 #submitFile {
@@ -69,21 +86,21 @@
 }
 
 .demo {
-  width:100%;
-  border:1px dashed #C0C0C0;
-  border-collapse:collapse;
-  padding:5px;
+  width: 100%;
+  border: 1px dashed #C0C0C0;
+  border-collapse: collapse;
+  padding: 5px;
   table-layout: fixed;
 }
 .demo th {
-  border:1px dashed #C0C0C0;
-  padding:5px;
-  background:#CCCCCC;
+  border: 1px dashed #C0C0C0;
+  padding: 5px;
+  background: #CCCCCC;
 }
 .demo td {
-  border:1px dashed #C0C0C0;
-  text-align:left;
-  padding:5px;
+  border: 1px dashed #C0C0C0;
+  text-align: left;
+  padding: 5px;
 }
 
 .leftTD {
@@ -95,20 +112,64 @@
 }
 
 .downloadTable {
-  width:100%;
-  border:1px dotted #C0C0C0;
-  border-collapse:collapse;
-  padding:5px;
+  width: 100%;
+  border: 1px dotted #C0C0C0;
+  border-collapse: collapse;
+  padding: 5px;
 }
 .downloadTable th {
-  border:1px dotted #C0C0C0;
-  padding:5px;
+  border: 1px dotted #C0C0C0;
+  padding: 5px;
 }
 .downloadTable td {
-  border:1px dotted #C0C0C0;
-  padding:5px;
+  border: 1px dotted #C0C0C0;
+  padding: 5px;
 }
 
 #helpInfo {
   margin-top: 40px;
+}
+
+.btn-file {
+  position: relative;
+  overflow: hidden;
+  background:
+    /* On "top" */
+    repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        #fbfbfb 10px,
+        #fbfbfb 20px
+    ),
+      /* on "bottom" */
+    linear-gradient(
+        to bottom,
+        #fbfbfb,
+        #dfdfdf
+    );
+}
+
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 999px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  background: red;
+  cursor: inherit;
+  display: block;
+}
+
+input[readonly] {
+  background-color: white !important;
+  cursor: text !important;
+}
+
+#filename {
+  margin-right: 100px;
 }

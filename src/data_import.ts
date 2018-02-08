@@ -8,6 +8,7 @@ import * as papaparse from 'papaparse';
 import * as $ from 'jquery';
 import * as localforage from 'localforage';
 import * as bootbox from 'bootbox';
+import * as alertify from 'alertify.js';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
@@ -50,15 +51,18 @@ class DataImport implements MAppViews {
 
     if(!dataAvailable) {
       d3.select('.dataVizView').classed('invisibleClass', true);
+      d3.select('#backBtn').classed('invisibleClass', true);
     } else {
       d3.select('.dataVizView').classed('invisibleClass', false);
+      d3.select('#backBtn').classed('invisibleClass', false);
       d3.select('.dataLoadingView').classed('invisibleClass', true);
     }
 
+    alertify.maxLogItems(10);
     this.build();
     this.attachListener();
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -66,38 +70,41 @@ class DataImport implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-    //Add the upload form and whole container
+    // Add the upload form and whole container
     this.$fileContainer = this.$node.html(`
     <div class='fileContainer'>
     <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>
-    <center><h2 id='informationText'>Upload your data here!!</h2></center>
+    <center><h2 id='informationText'>Load your data here!!</h2></center>
       <form class='form-inline well'>
         <div class='form-group'>
-          <label for='files'>Upload a CSV file:</label>
-          <input type='file' id='files' class='form-control' accept='.csv' required />
+          <div class='input-group'>
+              <span class='input-group-btn' style='padding-right: 2px;'>
+                <span class='btn btn-default btn-file'>
+                  Select CSV file... 
+                  <input type='file' id='files' accept='.csv' required />
+                </span>
+              </span>
+            <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
+          </div>
         </div>
         <div class='form-group'>
-          <button type='submit' id='submitFile' class='btn btn-primary'>
+          <button type='submit' id='submitFile' class='btn btn-primary toned'>
             <i class='fa fa-upload'>&nbsp;</i>Load File</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info'>
+          <button type='button' id='showMoreBtn' class='btn btn-info toned'>
             <i class='fa fa-pencil-square-o'>&nbsp;</i>View Data</button>
         </div>
       </form>`);
 
-    //Add the display conatiner and the logs
+    // Add the display conatiner and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
     this.$displayContainer = d3.select('.additionalInfo').html(`
-        <div class='logContainer'>
-          <div id='errorLog'></div>
-          <div id='messageLog'></div>
-        </div>
         <div class='row'>
           <div class='ctrlContainer'>
             <h3 id='valueListName'></h3>
             <div class='btnContainer'>
-              <button type='button' id='seePrevRecords' class='btn btn-primary btn-sm'>
+              <button type='button' id='seePrevRecords' class='btn btn-primary btn-sm toned'>
                 <i class='fa fa-arrow-left'></i></button>
-              <button type='button' id='seeNextRecords' class='btn btn-primary btn-sm'>
+              <button type='button' id='seeNextRecords' class='btn btn-primary btn-sm toned'>
                 <i class='fa fa-arrow-right'></i></button>
             </div>
             <h4 id='valueListMeta'></h4>
@@ -130,7 +137,7 @@ class DataImport implements MAppViews {
       <br/>
       <p>${DOWNLOAD_INFO}</p>
       <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
-      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
+      <button type='button' id='sampleFile' class='btn btn-primary btn-large toned' style='float: right'>
         <i class='fa fa-download'></i> Sample Files</button>
       <!--</a>-->
     `);
@@ -149,48 +156,47 @@ class DataImport implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    //Listener for the upload button
+    // Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {
         SimpleLogging.log('import submit button','');
-        //Clear the log first
-        d3.select('#errorLog').selectAll('*').remove();
-        d3.select('#messageLog').html('');
+        alertify.delay(4000).log('Data import started.');
 
-        //Then disable the unwanted buttons
+        // Disable the unwanted buttons
         d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
         d3.select('#showMoreBtn').attr('disabled', true).style('opacity', 0);
         this.$btnNext = $('#seeNextRecords').hide();
         this.$btnPrev = $('#seePrevRecords').hide();
 
-        //Clear the table if present
+        // Clear the table if present
         d3.select('.ctrlContainer').classed('invisibleClass', true);
         d3.select('#valuesList').selectAll('*').remove();
 
-        //Change information and reset edit mode
+        // Change information and reset edit mode
         textTransition(this.$chaningHeading, 'View data, load new or proceed!!', 500);
         this.editMode = false;
 
-        //Start the uploading
+        // Start the uploading
         const filesInput = <HTMLInputElement>d3.select('#files').node();
         this.handleFileUpload(filesInput);
 
-        //Necessary in order to prevent the reload of the page.
+        // Necessary in order to prevent the reload of the page.
         const evt = <MouseEvent>d3.event;
         evt.preventDefault();
         evt.stopPropagation();
       });
 
-    //Listener for the Edit Button
+    // Listener for the Edit Button
     this.$node.select('#showMoreBtn')
       .on('click', (e) => {
         SimpleLogging.log('import preview show button','');
-        //Plot the data in the table and enable edit mode
+        alertify.delay(4000).log('Viewing the detail table.');
+        // Plot the data in the table and enable edit mode
         const resultData = this.parseResults.data;
         this.previewData(resultData);
         this.editMode = true;
 
-        //Get necessary variables for Browsing in the table
+        // Get necessary variables for Browsing in the table
         this.$tableRows = $('.valueTable tbody tr');
         this.trLength = this.$tableRows.length;
         this.$tableRows.hide();
@@ -202,7 +208,7 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the 'Next' Button in the visual browser
+    // Listener for the 'Next' Button in the visual browser
     this.$node.select('#seeNextRecords')
       .on('click', (e) => {
         SimpleLogging.log('import preview next button','');
@@ -218,7 +224,7 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the 'Prev' Button in the visual browser
+    // Listener for the 'Prev' Button in the visual browser
     this.$node.select('#seePrevRecords')
       .on('click', (e) => {
         SimpleLogging.log('import preview prev button','');
@@ -234,10 +240,10 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the finished visualization Button
+    // Listener for the finished visualization Button
     this.$node.select('#specialBtn')
       .on('click', (e) => {
-        //Before rework the keys of the data
+        // Before rework the keys of the data
         SimpleLogging.log('import special button','');
         this.reworkKeys(this.parseResults);
         this.makeNodesUnique();
@@ -263,11 +269,12 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    //Listener for the download file button
+    // Listener for the download file button
     this.$node.select('#sampleFile').on('click', (e) => {
       bootbox.alert({
         title: 'Sample Files',
-        message: `${DOWNLOAD_DIALOG}`
+        message: `${DOWNLOAD_DIALOG}`,
+        className: 'alternateBootboxDialog'
       });
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
@@ -275,6 +282,11 @@ class DataImport implements MAppViews {
     });
 
     d3.selectAll('a').on('click', (e) => {console.log('testaaaaaaa'); e.preventDefault();});
+
+    // This little trick removes the fakepath form the filepath in the input field.
+    $('#files').change(function(){
+      $('#filename').val($(this).val().replace('C:\\fakepath\\', ''));
+    });
   }
 
   /**
@@ -283,23 +295,29 @@ class DataImport implements MAppViews {
    */
   private handleFileUpload(filesInput: HTMLInputElement) {
     papaparse.parse(filesInput.files[0], {
-      header: true,                   //First row of parsed data is interpreted as field name
-      skipEmptyLines: true,           //Skips empty lines in .csv
-      chunk: (results, file) => {     //Limit is 10MB for files
+      header: true,                   // First row of parsed data is interpreted as field name
+      skipEmptyLines: true,           // Skips empty lines in .csv
+      chunk: (results, file) => {     // Limit is 10MB for files
         this.parseResults = results;
       },
-      error(err, file)      //Executes if there is an error loading the file
+      error(err, file)      // Executes if there is an error loading the file
       {
-        d3.select('#errorLog').append('p')
-          .text(new Date().toLocaleTimeString() + ' --- ' + err + ' :: ' + file);
+        const msg = `<small>${new Date().toLocaleString()}</small>:
+                     <br/>${err}<br/>File: ${file.name}`;
+        alertify.delay(7000).error(msg);
       },
-      complete: (res, file) => {      //Needs arrow function in order to pass the this object globally and not the this of papaparse object
+      complete: (res, file) => {      // Needs arrow function in order to pass the this object globally and not the this of papaparse object
         this.uploadedFileName = file.name;
         this.displayData(this.parseResults);
 
+        const msg = `<small>${new Date().toLocaleString()}</small>:
+                     <br/>File: ${file.name}<br/><strong>Loaded successfully!</strong>`;
+        setTimeout(function(){
+          alertify.delay(5000).success(msg);
+        }, 1000);
         SimpleLogging.log('import upload complete',file.name);
 
-        //Enable the detail button and the start visualization button
+        // Enable the detail button and the start visualization button
         d3.select('#showMoreBtn').attr('disabled', null)
           .transition()
           .duration(1250)
@@ -320,25 +338,29 @@ class DataImport implements MAppViews {
   private displayData(results) {
     const resultError = results.errors;
 
-    //Resize the table appropriate and add scroll area if necessary
+    // Resize the table appropriate and add scroll area if necessary
     d3.select('#valuesList')
       .attr('max-width', ($(window).innerWidth() / 2))
       .classed('scrollArea', true);
 
-    //Print out the parse errors in the file
+    // Print out the parse errors in the file
     if (resultError.length > 0) {
       for(const el of resultError) {
         const elem = el;
-        d3.select('#errorLog').append('p')
-          .html('Date: ' + new Date().toLocaleTimeString() + '<br/>'
-            + 'Error: ' + elem.message + '<br/>' + ' Search in Row: ' + elem.row);
+        const msg = `<small>${new Date().toLocaleString()}</small>:
+                     <br/><strong>Error:</strong>${elem.message}
+                     <br/><strong>Search in Row: </strong> ${elem.row}`
+        alertify.closeLogOnClick(true).delay(0).error(msg);
       }
     }
-    //Show a success message
-    // d3.select('#messageLog').html('Date: ' + new Date().toLocaleTimeString()
-    //   + ' --- Success!! Data is loaded.');
-    // d3.select('#messageLog').html('Rows-preview: ' + this.rowsToShow +'<br/>'
-    //   + 'Rows-total: ' + this.parseResults.data.length);
+
+    // Show a success message
+    const msg = `<strong>Success!!</strong> Data is loaded.
+                 <br/>Rows-preview: ${this.rowsToShow}
+                 <br/>Rows-total: ${this.parseResults.data.length}`;
+    setTimeout(function(){
+      alertify.delay(5000).log(msg);
+    }, 1500);
   }
 
   /**

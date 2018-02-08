@@ -123,7 +123,7 @@ class SankeyDiagram implements MAppViews {
             </div>
             <div class='col-sm-1' style='margin-top: 24px;'>
               <a data-toggle='collapse' href='#collapseContentEntity' aria-expanded='true' class='collapsed'>
-              <i class='fa fa-pencil-square-o pull-right'></i></a>
+              <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
             </div>
           </div>
           <div id='collapseContentEntity' class='collapse'>
@@ -156,7 +156,7 @@ class SankeyDiagram implements MAppViews {
           </div>
           <div class='col-sm-1' style='margin-top: 24px;'>
             <a data-toggle='collapse' href='#collapseContentEntity3' aria-expanded='true' class='collapsed'>
-            <i class='fa fa-pencil-square-o pull-right'></i></a>
+            <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
           </div>
         </div>
         <div id='collapseContentEntity3' class='collapse' style='width: 67%; margin-left: 21%;'>
@@ -194,7 +194,7 @@ class SankeyDiagram implements MAppViews {
         </div>
         <div class='col-sm-1' style='margin-top: 24px;'>
           <a data-toggle='collapse' href='#collapseContentEntity2' aria-expanded='true' class='collapsed'>
-          <i class='fa fa-pencil-square-o pull-right'></i></a>
+          <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
         </div>
       </div>
       <div id='collapseContentEntity2' class='collapse'>
@@ -223,7 +223,7 @@ class SankeyDiagram implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    //This redraws if new data is available
+    // This redraws if new data is available
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if (dataAvailable) {
       this.getStorageData(false);
@@ -231,7 +231,6 @@ class SankeyDiagram implements MAppViews {
 
     // Listen to newly arrived data
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
-      console.log('!!!!: ', AppConstants.EVENT_DATA_PARSED);
       setTimeout(function () {
         location.reload();
       }, 500);
@@ -243,8 +242,9 @@ class SankeyDiagram implements MAppViews {
     // Listen for changed data and redraw all
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       this.$node.select('#sankeyDiagram').html('');
-      //Redraw Sankey Diagram
+      // Redraw Sankey Diagram
       this.getStorageData(true);
+      // Update the input fields
       this.updateInputValues('#entityFrom', '#entityTo', this.entityEuroFilter.minValue, this.entityEuroFilter.maxValue);
       this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaEuroFilter.minValue, this.mediaEuroFilter.maxValue);
       this.updateInputValues('#euroFrom', '#euroTo', this.euroFilter.minValue, this.euroFilter.maxValue);
@@ -252,7 +252,6 @@ class SankeyDiagram implements MAppViews {
 
     // Listen for resize of the window
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => {
-      console.log('!!!!: ', AppConstants.EVENT_RESIZE_WINDOW);
       SimpleLogging.log('resize window', '');
       this.resize();
     });
@@ -313,7 +312,7 @@ class SankeyDiagram implements MAppViews {
         SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));
       }
 
-      //Filter the data before and then pass it to the draw function.
+      // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
       this.valuesSumSource = (<any>d3).nest()
         .key((d) => { return d.sourceNode; })
@@ -339,7 +338,6 @@ class SankeyDiagram implements MAppViews {
    * @param json data from the read functionality
    */
   private buildSankey(json, origJson) {
-
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
@@ -352,6 +350,7 @@ class SankeyDiagram implements MAppViews {
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length - 1])
       : TimeFormat.format(timePoints[0]);
 
+    console.log('Timte points: ', timePoints);
     const columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     /** unit of flows (e.g., '€'). Extracted from CSV header. */
     const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
