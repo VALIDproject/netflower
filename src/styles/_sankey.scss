@@ -12,6 +12,21 @@ Sankey diagram part.
   margin-top: 30px;
   margin-bottom: 20px;
   margin-right: 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  padding: 7px;
+}
+
+.sankey_details, .sankey_details2 {
+  background-color: #fff;
+  overflow: hidden;
+  //padding: 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #DDDDDD;
+  border-radius: 0;
+  box-shadow: 0 0 15px 1px #777777;
+
 }
 
 .left_bars {
@@ -115,7 +130,7 @@ Sankey detail part.
 
 .closeLink {
   font: 12px sans-serif;
-  cursor: pointer;
+  cursor: pointer;  
 }
 
 .addNotes {
@@ -127,7 +142,8 @@ Sankey detail part.
 Sankey features part.
  */
 .sankey_features {
-  //background-color: yellow transparent;
+  background-color: #f0f0f0;
+  border-radius: 4px;
   //opacity: 20%;
   //border-bottom: 1px solid grey;
   //background: rgba(54, 25, 25, .5);

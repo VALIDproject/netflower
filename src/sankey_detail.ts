@@ -126,7 +126,7 @@ class SankeyDetail implements MAppViews {
         .attr('transform', 'translate(' + xpositionSvg + ',' + newYPositionSvg + ')')
         .attr('width', w + margin.left + margin.right + 'px')
         .attr('height', h + margin.top + margin.bottom + 'px')
-        .style('background-color',  '#e0e0e0')
+        //.style('background-color',  '#e0e0e0')
         .style('z-index', '10000');
 
       this.$node.select('svg.sankey_details').append('g')
@@ -203,7 +203,7 @@ class SankeyDetail implements MAppViews {
         .attr('transform', 'translate(' + xpositionSvg + ',' + (h + newYPositionSvg) + ')')
         .attr('width', w + margin.left + margin.right + 'px')
         .attr('height', h + margin.top + margin.bottom + 'px')
-        .style('background-color',  '#e0e0e0')
+        //.style('background-color',  '#e0e0e0')
         .style('z-index', '10000');
 
       this.$node.select('svg.sankey_details2').append('g')
@@ -382,17 +382,15 @@ class SankeyDetail implements MAppViews {
     const close = this.detailSVG.append('g').attr('class', 'closeLink');
     close.append('text')
       .attr('font-family', 'FontAwesome')
-      .text(function(d) { return ' ' + '\uf00d';})
+      .text(function(d) { return ' ' + '\uf057';})
       .style('z-index', '200000')
-      .attr('font-size', 14 + 'px')
+      .attr('font-size', 15 + 'px')
       .attr('x', '310')
       .attr('y', '-28')
       .on('click', function (d) {
         events.fire(AppConstants.EVENT_CLOSE_DETAIL_SANKEY, d);
       });
   }
-
-
 }
 /**
  * Factory method to create a new SankeyDiagram instance
