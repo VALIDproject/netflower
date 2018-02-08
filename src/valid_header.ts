@@ -95,22 +95,22 @@ class ValidHeader implements MAppViews {
   //console.log('Shrink Header');
   $(document).on('scroll', function(){
 		if
-      ($(document).scrollTop() > 100) {        
+      ($(document).scrollTop() > 100) { 
         $('.logo').addClass('shrink');
         $('#validHeader').addClass('shrink');	
         $('#socialMedia').addClass('shrink');
-        $('.valid_logo').addClass('shrink');
-        $('.btn_preupload ').addClass('shrink'); 
-        
+        $('.valid_logo').addClass('shrink');   
+        $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');      
+        $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');        
 		}
 		else
 		{
-      console.log('remove class shrinking');
       $('.logo').removeClass('shrink');
       $('#validHeader').removeClass('shrink');
       $('#socialMedia').removeClass('shrink');
       $('.valid_logo').removeClass('shrink');
-      $('.btn_preupload ').removeClass('shrink');	      
+      $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');      
+      $('.btn_preupload i').addClass('fa fa-angle-left fa-4x'); 
 		}
 	});
   }
