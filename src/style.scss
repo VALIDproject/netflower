@@ -18,8 +18,40 @@ The other styles of the page.
 @import 'styles/global_settings';
 
 
-.dataLoadingView {
+//Button Design Filter Area
 
+button.btn_design, #loadMoreBtn, #loadLessBtn, button {
+  display: inline-block;
+  //padding: 4px 9px;
+  margin-bottom: 0;
+  background-color:white;
+  font-size: 13px;
+  font-weight: 400;  
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-image: none;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  padding: 5px 16px;
+  color: $valid-color3;  
+  border-color: $valid-color3;  
+}
+
+button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
+	color: $valid-color2;
+  border-color: $valid-color2;
+  background-color:white;
+}
+
+#btn_above button{
+  margin-bottom: 5px;
 }
 
 .dataVizView {
@@ -44,15 +76,58 @@ The other styles of the page.
   border-bottom: 2px solid $border-color;
 }
 
+#validHeader.shrink {
+  height: 40px;
+  //background-color: $valid_color;
+}
+
+/*.col-md-4, .col-md-3 {
+  background-color: lightgrey;
+  padding: 18px;
+  border-radius: 18px;
+}*/
+
+.btn {
+  font-size: 12px;
+}
+
+.label-default {
+  background-color: $valid-color;
+}
+
 .logo {
   float: left;
-  width: 25%;
-  height: 40px;
+  //width: 15%;
+  //height: 40px;
+  //background-image: url('media/valid_logo_claim.png');
+  //background-image: url('media/logo_netflower.png');
+  background-repeat: no-repeat;
+  //background-size: 240px;
+  //margin-top: 10px;
+  //padding-left: 250px;
+  margin-right:20px;  
+  font-size: 200%;
+  font-family: 'Oswald', sans-serif;
+}
+
+.valid_logo {
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
-  background-size: 240px;
-  margin-top: 10px;
+  background-size: 200px;  
+  //padding-left: 20px;  
+  //margin-left: 150px;
+  //position: absolute;
+  float:right;
+  width: 15%;
+  height: 40px; 
+  margin-top:10px;
+  margin-right: 20px;  
 }
+
+.valid_logo.shrink {
+  display: none;
+}
+
 
 #socialMedia {
   float: right;
@@ -60,21 +135,29 @@ The other styles of the page.
   height: 80px;
   margin-left: auto;
   margin-right: 20px;
-  width: 30%;
-
+  margin-top: -50px;
+  width: 40%; 
   p {
     float: right;
-    padding: 15px;
+    padding: 15px; 
+    //margin-top:-40px;  
   }
+}
+
+#socialMedia.shrink {
+  display:none;
 
 }
+
 
 .btn_preupload {
   float: left;
   width: 40%;
-
 }
 
+.btn_preupload.shrink {
+  font-size: 14px;
+}
 #web {
   color: $valid-color;
 
@@ -108,7 +191,7 @@ span.from {
   cursor: pointer !important;
 }
 
-//Make input search smaller
+// Make input search smaller
 .input-group-xs>.form-control,
 .input-group-xs>.input-group-addon,
 .input-group-xs>.input-group-btn>.btn {
@@ -125,4 +208,8 @@ span.from {
 
 .alertify-logs {
   opacity: 0.8 !important;
+}
+
+.shrink {  
+  font-size: 100%;  
 }

@@ -6,7 +6,7 @@
 }
 
 .btn-primary {
-  background-color: $valid-color !important;
+  background-color: $valid-color3 !important;
   border: none;
 }
 
@@ -51,13 +51,13 @@
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   border: none;
-  font: normal 24px/normal "Anton", Helvetica, sans-serif;
+  font: normal 26px/normal "Oswald", Helvetica, sans-serif;
   color: rgb(112, 112, 112);
   text-align: center;
   // text-transform: uppercase;
   -o-text-overflow: clip;
   text-overflow: clip;
-  letter-spacing: 3px;
+  letter-spacing: 6px;
   // text-shadow: 1px 1px 0 rgb(238,238,238) , 2px 2px 0 rgb(112,112,112) ;
 }
 

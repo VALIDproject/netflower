@@ -88,9 +88,9 @@ class DataImport implements MAppViews {
           </div>
         </div>
         <div class='form-group'>
-          <button type='submit' id='submitFile' class='btn btn-primary toned'>
+          <button type='submit' id='submitFile' class='btn btn-primary'>
             <i class='fa fa-upload'>&nbsp;</i>Load File</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info toned'>
+          <button type='button' id='showMoreBtn' class='btn btn-info'>
             <i class='fa fa-pencil-square-o'>&nbsp;</i>View Data</button>
         </div>
       </form>`);
@@ -102,9 +102,9 @@ class DataImport implements MAppViews {
           <div class='ctrlContainer'>
             <h3 id='valueListName'></h3>
             <div class='btnContainer'>
-              <button type='button' id='seePrevRecords' class='btn btn-primary btn-sm toned'>
+              <button type='button' id='seePrevRecords' class='btn btn-primary btn-sm'>
                 <i class='fa fa-arrow-left'></i></button>
-              <button type='button' id='seeNextRecords' class='btn btn-primary btn-sm toned'>
+              <button type='button' id='seeNextRecords' class='btn btn-primary btn-sm'>
                 <i class='fa fa-arrow-right'></i></button>
             </div>
             <h4 id='valueListMeta'></h4>
@@ -137,7 +137,7 @@ class DataImport implements MAppViews {
       <br/>
       <p>${DOWNLOAD_INFO}</p>
       <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
-      <button type='button' id='sampleFile' class='btn btn-primary btn-large toned' style='float: right'>
+      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
         <i class='fa fa-download'></i> Sample Files</button>
       <!--</a>-->
     `);

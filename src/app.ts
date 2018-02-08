@@ -105,10 +105,16 @@ export class App implements MAppViews {
       options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
     },
     {
+      view: 'Export',
+      parent: 'dataVizView',
+      // options: {'parentDOM' : 'div.clearBox'},
+      options: {'parentDOM' : 'div.sankey_features div.col-md-4'},
+    },
+    {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
-    }
+    }    
   ];
 
   constructor(parent:Element) {
@@ -117,6 +123,7 @@ export class App implements MAppViews {
 
     this.$node.append('div').classed('dataLoadingView', true);
     this.$node.append('div').classed('dataVizView', true);
+    
   }
 
   /**

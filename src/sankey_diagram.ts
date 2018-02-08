@@ -116,7 +116,7 @@ class SankeyDiagram implements MAppViews {
 
     left.html(`
     <div class='controlBox'>
-        <div class='left_bar_heading'><p>${columnLabels.sourceNode}</p></div>
+        <div class='left_bar_heading'><p>Source: ${columnLabels.sourceNode}</p></div>
           <div class='row'>
             <div class='col-sm-10'>
               <input id='entityFilter'/>
@@ -174,12 +174,12 @@ class SankeyDiagram implements MAppViews {
       <span id='loadInfo' style='text-align: center;'>X/Y elements displayed</span>
       <div class='input-group input-group-xs'>
         <span class='input-group-btn'>
-          <button id='loadLessBtn' type='button' class='btn btn-secondary btn-xs' disabled='true'>
-          <span style='font-size:smaller;'>Show Less</span></button>
+          <button id='loadLessBtn' type='button' class='btn btn-secondary ' disabled='true'>
+          <span>Show Less</span></button>
         </span>
         <span class='input-group-btn'>
-          <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs'>
-          <span style='font-size:smaller;'>Show More</span></button>
+          <button id='loadMoreBtn' type='button' class='btn btn-secondary '>
+          <span class='btnText'>Show More</span></button>
         </span>
       </div>
 
@@ -187,7 +187,7 @@ class SankeyDiagram implements MAppViews {
 
     right.html(`
     <div class='controlBox'>
-      <div class='right_bar_heading'><p>${columnLabels.targetNode}</p></div>
+      <div class='right_bar_heading'><p>Target: ${columnLabels.targetNode}</p></div>
       <div class='row'>
         <div class='col-sm-10'>
           <input id='mediaFilter'/>
@@ -395,9 +395,8 @@ class SankeyDiagram implements MAppViews {
       .map((o) => o.values) // remove key/values
       .sort(function (a: any, b: any) {
         return d3.descending(a.sum, b.sum);
-      });
-
-    console.log('flatNest: ', flatNest);
+      })
+      .filter((e) => {return e.sum > 0;});
 
     //Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
@@ -406,7 +405,7 @@ class SankeyDiagram implements MAppViews {
     that.maximumNodes = flatNest.length;
 
     //============ CHECK IF SHOULD DRAW ============
-    if (json.length === 0) {                                  //ERROR: Too strong filtered
+    if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
       that.drawReally = false;
       this.showErrorDialog(ERROR_TOOMANYFILTER);
     } else {
@@ -507,7 +506,7 @@ class SankeyDiagram implements MAppViews {
           return d.dy;
         })
         .attr('width', sankey.nodeWidth())
-        .style('fill', '#DA5A6B')
+        .style('fill', '#DA5A6B ')
         .on('mouseover', function (d) {
           const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
           const text = dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';

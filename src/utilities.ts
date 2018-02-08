@@ -417,9 +417,16 @@ export class Tooltip {
         .style('left', ((<any>d3).event.pageX - 20) + 'px')
         .style('top', ((<any>d3).event.pageY - 140) + 'px');
     } else {
+      let left = (<any>d3).event.pageX;
+      const screenWidth = document.documentElement.clientWidth;
+      if ((left + 200) > screenWidth) {
+        left = screenWidth - 200; // Reduce by tooltip width = 200 and offset = 20
+      } else {
+        left = left - 20;
+      }
       Tooltip.tooltip2.transition().duration(200).style('opacity', .9);
       Tooltip.tooltip2.html(text)
-        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('left', left + 'px')
         .style('top', ((<any>d3).event.pageY) + 'px');
     }
   }
