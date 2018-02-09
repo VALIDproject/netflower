@@ -48,11 +48,11 @@ class SankeyFeatures implements MAppViews {
                 <!--</button>-->
               <!--</div>-->
               <div class='col-md-4'>
-                <button class= 'btn_design' class='btn btn-default'>Time</button>      						
+                <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
               </div>
               <div class='col-md-4'>
                   <div class='btn-group'>
-                    <button class ='btn_design' class='btn btn-default'>Attribute</button>      						
+                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Attribute</button>      						
                   </div>
                 </div>
       			</div>

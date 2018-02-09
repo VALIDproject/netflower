@@ -101,35 +101,43 @@ class FilterData implements MAppViews {
           </div>
         
           <div class='col-sm-2'>
-             <!--<input id='timeSlider'/>-->
-            <button id='btnTimeDialog' type='button' class='btn btn-default btn-sm'>Change Timerange</button>
-            
-            <div id='timeForm' class='form-content popup'>
-            <h2>Time Range Selection:</h2>
-            <p>Select here the time range of the visualization. You have various controls avaialbe for the selection.
-            The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
-            you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
-            to change the visualization.</p>
-            <br/>
-              <div class='form-group' style='display: flex;'>
-                 <ul class='list-group list-inline' id='selectable'></ul>
-                 <p id='informationTextTimeSelection'>1) Click & Drag mouse for rectangle selection.<br/>
-                 2) Click one elment to make a single selection.<br/>
-                 3) CTRL + Click to make a multi selection.</p>
-              </div>
-              <div class='form-group'>
-                <button id='btnSelectAll' class='btn btn-xs btn-info'>Select All</button>
-                <button id='btnUnSelectAll' class='btn btn-xs btn-info'>Unselect All</button>
-                <button id='btnSelectedTime' class='btn btn-secondary btn-sm pull-right'>Submit</button>
-                <br/>
-                <hr/>
-                <span class='resultarea'><strong>Current Time selected:</strong></span>
-                <span id='result' class='resultarea'></span>
-              </div>
-              <div class='close'><i class='fa fa-times-circle'></i></div>
-            </div>
+             <!--<input id='timeSlider'/>
           </div>
-       </div>-->
+      </div>-->
+      <div id='timeForm' class='form-content popup'>
+       <h2>Time Range Selection:</h2>
+       <p>Select here the time range of the visualization. You have various controls avaialbe for the selection.
+       The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
+       you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
+       to change the visualization.</p>
+       <br/>
+         <div class='form-group' style='display: flex;'>
+            <ul class='list-group list-inline' id='selectable'></ul>
+            <p id='informationTextTimeSelection'>1) Click & Drag mouse for rectangle selection.<br/>
+            2) Click one elment to make a single selection.<br/>
+            3) CTRL + Click to make a multi selection.</p>
+         </div>
+         <div class='form-group'>
+           <button id='btnSelectAll' class='btn btn-xs btn-info'>Select All</button>
+           <button id='btnUnSelectAll' class='btn btn-xs btn-info'>Unselect All</button>
+           <button id='btnSelectedTime' class='btn btn-default btn_design pull-right'>Submit</button>
+           <br/>
+           <hr/>
+           <span class='resultarea'><strong>Current Time selected:</strong></span>
+           <span id='result' class='resultarea'></span>
+         </div>
+         <div id='timeClose' class='close'><i class='fa fa-times-circle'></i></div>
+       </div>
+       
+       <div id='attributeForm' class='form-content popup'>
+        <h2>Attribute Selection:</h2>
+        <p>Select here the attributes you want to filter for on the current visualization. The attributes
+        are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.</p>
+        <br/>
+        <hr/>
+          <div id='paragraph' class='form-check form-check-inline'></div>
+          <div id='attributeClose' class='close'><i class='fa fa-times-circle'></i></div>
+       </div>
     `);
   }
 
@@ -225,6 +233,12 @@ class FilterData implements MAppViews {
       // The Popup fades in just after
       $('#timeForm').fadeIn(600, function() {});
     });
+
+    // Initializes the dialog for the attribute filter
+    $('#btnAttributeDialog').on('click', (e) => {
+      // The Popup fades in just after
+      $('#attributeForm').fadeIn(600, function() {});
+    });
   }
 
   /**
@@ -242,9 +256,11 @@ class FilterData implements MAppViews {
         if(paragraphs.indexOf(val) === -1) {
           paragraphs.push(val);
           this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
-            .attr('class','paraFilter').attr('checked', true);
-          this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
-          this.$node.select('#paragraph').append('span').text(' ');
+            .attr('class','paraFilter form-check-input').attr('checked', true);
+          this.$node.select('#paragraph').append('span')
+            .attr('class', 'form-check-label')
+            .attr('style', 'font-size: 1.0em; margin-left: 5px;').text(val);
+          this.$node.select('#paragraph').append('span').attr('style', 'margin-left: 10px;');
         }
       }
     }
@@ -268,6 +284,10 @@ class FilterData implements MAppViews {
     } else {
       this.$node.select('#attr1_label').html('Attribute Filter');
     }
+
+    $('#attributeClose').on('click', function() {
+      $('#attributeForm').fadeOut(200, function() {});
+    });
   }
 
   private initializeQuarterFilter(json) {
@@ -325,7 +345,7 @@ class FilterData implements MAppViews {
       $('#timeForm').fadeOut(200, function() {});
     });
 
-    $('.close').on('click', function() {
+    $('#timeClose').on('click', function() {
       $('#timeForm').fadeOut(200, function() {});
     });
   }
