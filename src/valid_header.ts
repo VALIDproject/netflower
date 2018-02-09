@@ -100,6 +100,7 @@ class ValidHeader implements MAppViews {
         $('.valid_logo').addClass('shrink');
         $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');
         $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');
+        $('#backBtn').attr('style', 'margin-top: -4px;');
       } else {
         $('.logo').removeClass('shrink');
         $('#validHeader').removeClass('shrink');
@@ -107,6 +108,7 @@ class ValidHeader implements MAppViews {
         $('.valid_logo').removeClass('shrink');
         $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');
         $('.btn_preupload i').addClass('fa fa-angle-left fa-4x');
+        $('#backBtn').attr('style', 'margin-top: -8px;');
       }
     });
   }
