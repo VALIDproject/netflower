@@ -268,7 +268,6 @@ class SankeyDiagram implements MAppViews {
 
     // Clear the search fields too
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
-      console.log('!!!!: ', AppConstants.EVENT_CLEAR_FILTERS);
       $('#entitySearchFilter').val('');
       this.entitySearchFilter.term = '';
       $('#mediaSearchFilter').val('');
@@ -349,8 +348,6 @@ class SankeyDiagram implements MAppViews {
     const selectedTimePointsAsString = (timePoints.length > 1)
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length - 1])
       : TimeFormat.format(timePoints[0]);
-
-    console.log('Timte points: ', timePoints);
     const columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     /** unit of flows (e.g., '€'). Extracted from CSV header. */
     const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;

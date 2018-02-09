@@ -235,21 +235,23 @@ svg text.yaxisunit {
   font: 10px sans-serif;
 }
 
-//REMOVE LATER
-.quarterSlider {
-  width: 250px;
-  margin-top: -30px;
-  margin-left: 234%;
-}
+// REMOVE LATER
+//.quarterSlider {
+//  width: 250px;
+//  margin-top: -30px;
+//  margin-left: 234%;
+//}
 
 #mediaSearchButton, #entitySearchButton {
   border-radius: 0;
 }
 
+/**
+Section for the input fields of the sliders.
+ */
 #clearMedia, #clearEntity {
   background: #f0f0f0;
 }
-
 .specialIcon {
   color: #808080;
   font-size: 1.3em;
