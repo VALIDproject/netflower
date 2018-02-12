@@ -114,7 +114,7 @@ export class App implements MAppViews {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
-    }
+    }    
   ];
 
   constructor(parent:Element) {
@@ -123,6 +123,7 @@ export class App implements MAppViews {
 
     this.$node.append('div').classed('dataLoadingView', true);
     this.$node.append('div').classed('dataVizView', true);
+    
   }
 
   /**
@@ -149,7 +150,9 @@ export class App implements MAppViews {
     $(window).resize(function () {
       clearTimeout(id);
       id = setTimeout(function () {
-        events.fire(AppConstants.EVENT_RESIZE_WINDOW);
+        if(!$('.dataVizView').hasClass('invisibleClass')) {
+          events.fire(AppConstants.EVENT_RESIZE_WINDOW);
+        }
       }, 300);
     });
   }

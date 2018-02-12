@@ -22,3 +22,87 @@
   height: 16px !important;
   background: lightgrey !important;
 }
+
+/**
+Part for the Time overlay box
+ */
+
+#selectable .ui-selecting {
+  background: #9FE3C2;
+}
+
+#selectable .ui-selected {
+  background: #2A9D66;
+  color: white;
+}
+
+#selectable {
+  margin: 0;
+  padding: 3px;
+  cursor: pointer;
+  width: 70%;
+  border: 1px dashed #e5e5e5;
+}
+
+#selectable li {
+  margin: 3px;
+  padding: 0.4em;
+  font-size: 1.0em;
+}
+
+.resultarea {
+  color: #333333;
+  font-size: 14px;
+}
+
+#btnSelectedTime {
+  background-color: $valid-color3 !important;
+  border: none !important;
+  color: white;
+}
+
+#btnSelectAll, #btnUnSelectAll {
+  background-color: #9FE3C2 !important;
+  border: none !important;
+  color: black;
+}
+
+.popup{
+  display: none; /* Default Hidden */
+  position: fixed;
+  left: 50%;
+  top: 10%;
+  z-index: 2;
+  background-color: #fff;
+  height: auto;
+  width: auto;
+  overflow: hidden;
+  padding: 40px;
+  transform: translate(-50%, 0);
+  border-width: 1px;
+  border-style: solid;
+  border-color: #DDDDDD;
+  border-radius: 0;
+  box-shadow: 0 0 15px 1px #777777;
+}
+
+.close{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: block;
+  color: #4a4a4a;
+  font-family: sans-serif;
+}
+
+.close:hover{
+  cursor: pointer;
+  color: #181818;
+}
+
+#informationTextTimeSelection {
+  margin-left: 5px;
+  font-size: 0.9em;
+  word-break: break-all;
+  width: 30%;
+}

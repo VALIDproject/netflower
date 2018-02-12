@@ -117,14 +117,14 @@ class SankeyDiagram implements MAppViews {
 
     left.html(`
     <div class='controlBox'>
-        <div class='left_bar_heading'><p>${columnLabels.sourceNode}</p></div>
+        <div class='left_bar_heading'><p>Source: ${columnLabels.sourceNode}</p></div>
           <div class='row'>
             <div class='col-sm-10'>
               <input id='entityFilter'/>
             </div>
             <div class='col-sm-1' style='margin-top: 24px;'>
               <a data-toggle='collapse' href='#collapseContentEntity' aria-expanded='true' class='collapsed'>
-              <i class='fa fa-pencil-square-o pull-right'></i></a>
+              <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
             </div>
           </div>
           <div id='collapseContentEntity' class='collapse'>
@@ -135,7 +135,7 @@ class SankeyDiagram implements MAppViews {
                 <input type='number' value='${this.entityTo}' class='sliderInput' id='entityTo' />
               </div>
           </div>
-        
+
         <div class='input-group input-group-xs'>
           <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for ${columnLabels.sourceNode}...'/>
           <span class='input-group-btn'>
@@ -157,7 +157,7 @@ class SankeyDiagram implements MAppViews {
           </div>
           <div class='col-sm-1' style='margin-top: 24px;'>
             <a data-toggle='collapse' href='#collapseContentEntity3' aria-expanded='true' class='collapsed'>
-            <i class='fa fa-pencil-square-o pull-right'></i></a>
+            <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
           </div>
         </div>
         <div id='collapseContentEntity3' class='collapse' style='width: 67%; margin-left: 21%;'>
@@ -175,12 +175,12 @@ class SankeyDiagram implements MAppViews {
       <span id='loadInfo' style='text-align: center;'>X/Y elements displayed</span>
       <div class='input-group input-group-xs'>
         <span class='input-group-btn'>
-          <button id='loadLessBtn' type='button' class='btn btn-secondary btn-xs' disabled='true'>
-          <span style='font-size:smaller;'>Show Less</span></button>
+          <button id='loadLessBtn' type='button' class='btn btn-secondary ' disabled='true'>
+          <span>Show Less</span></button>
         </span>
         <span class='input-group-btn'>
-          <button id='loadMoreBtn' type='button' class='btn btn-secondary btn-xs'>
-          <span style='font-size:smaller;'>Show More</span></button>
+          <button id='loadMoreBtn' type='button' class='btn btn-secondary '>
+          <span class='btnText'>Show More</span></button>
         </span>
       </div>
 
@@ -188,14 +188,14 @@ class SankeyDiagram implements MAppViews {
 
     right.html(`
     <div class='controlBox'>
-      <div class='right_bar_heading'><p>${columnLabels.targetNode}</p></div>
+      <div class='right_bar_heading'><p>Target: ${columnLabels.targetNode}</p></div>
       <div class='row'>
         <div class='col-sm-10'>
           <input id='mediaFilter'/>
         </div>
         <div class='col-sm-1' style='margin-top: 24px;'>
           <a data-toggle='collapse' href='#collapseContentEntity2' aria-expanded='true' class='collapsed'>
-          <i class='fa fa-pencil-square-o pull-right'></i></a>
+          <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
         </div>
       </div>
       <div id='collapseContentEntity2' class='collapse'>
@@ -206,7 +206,7 @@ class SankeyDiagram implements MAppViews {
             <input type='number' value='${this.mediaTo}' class='sliderInput' id='mediaTo' />
           </div>
       </div>
-      
+
       <div class='input-group input-group-xs'>
         <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for ${columnLabels.targetNode}...'/>
         <span class='input-group-btn'>
@@ -224,7 +224,7 @@ class SankeyDiagram implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    //This redraws if new data is available
+    // This redraws if new data is available
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if (dataAvailable) {
       this.getStorageData(false);
@@ -232,7 +232,6 @@ class SankeyDiagram implements MAppViews {
 
     // Listen to newly arrived data
     events.on(AppConstants.EVENT_DATA_PARSED, (evt, data) => {
-      console.log('!!!!: ', AppConstants.EVENT_DATA_PARSED);
       setTimeout(function () {
         location.reload();
       }, 500);
@@ -244,8 +243,9 @@ class SankeyDiagram implements MAppViews {
     // Listen for changed data and redraw all
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
       this.$node.select('#sankeyDiagram').html('');
-      //Redraw Sankey Diagram
+      // Redraw Sankey Diagram
       this.getStorageData(true);
+      // Update the input fields
       this.updateInputValues('#entityFrom', '#entityTo', this.entityEuroFilter.minValue, this.entityEuroFilter.maxValue);
       this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaEuroFilter.minValue, this.mediaEuroFilter.maxValue);
       this.updateInputValues('#euroFrom', '#euroTo', this.euroFilter.minValue, this.euroFilter.maxValue);
@@ -253,7 +253,6 @@ class SankeyDiagram implements MAppViews {
 
     // Listen for resize of the window
     events.on(AppConstants.EVENT_RESIZE_WINDOW, () => {
-      console.log('!!!!: ', AppConstants.EVENT_RESIZE_WINDOW);
       SimpleLogging.log('resize window', '');
       this.resize();
     });
@@ -270,7 +269,6 @@ class SankeyDiagram implements MAppViews {
 
     // Clear the search fields too
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
-      console.log('!!!!: ', AppConstants.EVENT_CLEAR_FILTERS);
       $('#entitySearchFilter').val('');
       this.entitySearchFilter.term = '';
       $('#mediaSearchFilter').val('');
@@ -314,7 +312,7 @@ class SankeyDiagram implements MAppViews {
         SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));
       }
 
-      //Filter the data before and then pass it to the draw function.
+      // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
       this.valuesSumSource = d3.nest()
         .key((d: any) => { return d.sourceNode; })
@@ -340,7 +338,6 @@ class SankeyDiagram implements MAppViews {
    * @param json data from the read functionality
    */
   private buildSankey(json, origJson) {
-
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
@@ -352,7 +349,6 @@ class SankeyDiagram implements MAppViews {
     const selectedTimePointsAsString = (timePoints.length > 1)
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length - 1])
       : TimeFormat.format(timePoints[0]);
-
     const columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     /** unit of flows (e.g., '€'). Extracted from CSV header. */
     const valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;

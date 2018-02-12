@@ -12,6 +12,21 @@ Sankey diagram part.
   margin-top: 30px;
   margin-bottom: 20px;
   margin-right: 10px;
+  //background-color: #f0f0f0;
+  border-radius: 4px;
+  padding: 7px;
+}
+
+.sankey_details, .sankey_details2 {
+  background-color: #fff;
+  overflow: hidden;
+  //padding: 10px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #DDDDDD;
+  border-radius: 0;
+  box-shadow: 0 0 15px 1px #777777;
+
 }
 
 .left_bars {
@@ -91,22 +106,27 @@ div.tooltip2 {
   margin-left: 25%;
   width: 50%;
   text-align: center;
-}
+ }
 
 #loadMoreBtn, #loadLessBtn {
   width: 98%;
+  height:100%;
+  //background: #49B17C;
+  /*color: #49B17C;
+  border: 2px solid #49B17C;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 6px;*/
 }
 
+
 #loadInfo {
-  font-size: 11px !important;
+  font-size: 13px !important;
 }
 
 /**
 Sankey detail part.
  */
-.sankey_details {
-  //background-color: grey;
-}
 
 .closeLink {
   font: 12px sans-serif;
@@ -122,9 +142,10 @@ Sankey detail part.
 Sankey features part.
  */
 .sankey_features {
-  //background-color: yellow transparent;
+  background-color: #f0f0f0;
+  border-radius: 4px;
   //opacity: 20%;
-  border-bottom: 1px solid grey;
+  //border-bottom: 1px solid grey;
   //background: rgba(54, 25, 25, .5);
   width: 96%;
   height: 117px;
@@ -150,6 +171,7 @@ node text {
 
 .link:hover {
   stroke-opacity: .5;
+  stroke: #DA5A6B;
 }
 
 .left_bar_heading {
@@ -184,11 +206,11 @@ node text {
 }
 
 #backBtn {
-  margin-top: 5px;
-  border-radius: 5px;
+  cursor: pointer;
+  margin-top: -8px;
 }
 
-// push source sparkline barcharts to right of parent element
+// Push source sparkline barcharts to right of parent element
 div.left_bars svg.barchart {
   display: block;
   margin-left: auto;
@@ -213,27 +235,24 @@ svg text.yaxisunit {
   font: 10px sans-serif;
 }
 
-//REMOVE LATER
-.quarterSlider {
-  width: 250px;
-  margin-top: -30px;
-  margin-left: 234%;
-}
+// REMOVE LATER
+//.quarterSlider {
+//  width: 250px;
+//  margin-top: -30px;
+//  margin-left: 234%;
+//}
 
 #mediaSearchButton, #entitySearchButton {
   border-radius: 0;
 }
 
-// SLIDER CONTROLS:
-// ------------------------------------
-//.collapseBox .fa {
-//  transition: .3s transform ease-in-out;
-//}
-//.collapseBox .collapsed .fa {
-//  transform: rotate(-90deg);
-//}
-
-.row .fa {
+/**
+Section for the input fields of the sliders.
+ */
+#clearMedia, #clearEntity {
+  background: #f0f0f0;
+}
+.specialIcon {
   color: #808080;
   font-size: 1.3em;
 }

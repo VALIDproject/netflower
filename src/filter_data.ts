@@ -10,11 +10,13 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
+import 'jqueryui';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
+import {splitAt} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
 import TopFilter from './filters/topFilter';
@@ -63,7 +65,7 @@ class FilterData implements MAppViews {
       this.attachListener(value);
     });
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -73,7 +75,7 @@ class FilterData implements MAppViews {
    */
   private build() {
     this.$node.html(`
-      <div class='container'>
+      <!--<div class='container'>
         <div class='row'>
           <div class='col-sm-2'>
             <small>Top Filter</small>
@@ -95,17 +97,46 @@ class FilterData implements MAppViews {
             </select>
           </div>
           <div class='col-sm-2'>
-            <div id='paragraph'>
-            </div>
+            <div id='paragraph'></div>
           </div>
-
-        </div>
-        <div class='col-sm-2'>
-        <div class='quarterSlider'>
-         <input id='timeSlider'/>
+        
+          <div class='col-sm-2'>
+             <!--<input id='timeSlider'/>
+          </div>
+      </div>-->
+      <div id='timeForm' class='form-content popup'>
+       <h2>Time Range Selection:</h2>
+       <p>Select here the time range of the visualization. You have various controls avaialbe for the selection.
+       The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
+       you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
+       to change the visualization.</p>
+       <br/>
+         <div class='form-group' style='display: flex;'>
+            <ul class='list-group list-inline' id='selectable'></ul>
+            <p id='informationTextTimeSelection'>1) Click & Drag mouse for rectangle selection.<br/>
+            2) Click one elment to make a single selection.<br/>
+            3) CTRL + Click to make a multi selection.</p>
          </div>
-          </div>
-        </div>
+         <div class='form-group'>
+           <button id='btnSelectAll' class='btn btn-xs btn-info'>Select All</button>
+           <button id='btnUnSelectAll' class='btn btn-xs btn-info'>Unselect All</button>
+           <button id='btnSelectedTime' class='btn btn-default btn_design pull-right'>Submit</button>
+           <br/>
+           <hr/>
+           <span class='resultarea'><strong>Current Time selected:</strong></span>
+           <span id='result' class='resultarea'></span>
+         </div>
+         <div id='timeClose' class='close'><i class='fa fa-times-circle'></i></div>
+       </div>
+       
+       <div id='attributeForm' class='form-content popup'>
+        <h2>Attribute Selection:</h2>
+        <p>Select here the attributes you want to filter for on the current visualization. The attributes
+        are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.</p>
+        <br/>
+        <hr/>
+          <div id='paragraph' class='form-check form-check-inline'></div>
+          <div id='attributeClose' class='close'><i class='fa fa-times-circle'></i></div>
        </div>
     `);
   }
@@ -114,56 +145,17 @@ class FilterData implements MAppViews {
    * Attach the event listeners
    */
   private attachListener(json) {
-    //Set the filters only if data is available
+    // Set the filters only if data is available
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
       this.setQuarterFilterRange(json);
+      this.initializeQuarterFilter(json);
       this.setParagraphFilterElements(json);
     }
 
     events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
       this.topFilter.active = false;
       $('#topFilter').val(-1);
-    });
-
-    //Listener for the change fo the top filter
-    this.$node.select('#topFilter').on('change', (d) => {
-      const value:string = $('#topFilter').val().toString();
-
-      if(value === '0')
-      {
-        this.topFilter.active = true;
-        this.topFilter.changeFilterTop(false);
-        SimpleLogging.log('top filter', 'bottom');
-      } else if(value === '1')
-      {
-        this.topFilter.active = true;
-        this.topFilter.changeFilterTop(true);
-        SimpleLogging.log('top filter', 'top');
-      } else {
-        this.topFilter.active = false;
-        SimpleLogging.log('top filter', 'disabled');
-      }
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
-    });
-
-    //Listener for the change of the paragraph elements
-    $('.paraFilter').on('change', (d) => {
-      this.paragraphFilter.resetValues();
-
-      $('.paraFilter').each((index, element) => {
-        const value = $(element).val() as string;
-        if($(element).is(':checked'))
-        {
-          this.paragraphFilter.addValue(value);
-        }
-      });
-
-      SimpleLogging.log('attribute filter', this.paragraphFilter.values);
-      const filterQuarter = this.quarterFilter.meetCriteria(json);
-      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
@@ -174,7 +166,7 @@ class FilterData implements MAppViews {
       // events.fire(AppConstants.EVENT_SLIDER_CHANGE, filterQuarter);
     });
 
-    //Clears all filters and updates the appropriate sliders
+    // Clears all filters and updates the appropriate sliders
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
       SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
       this.updateQuarterFilter(json);
@@ -195,6 +187,58 @@ class FilterData implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
+
+    // Listener for the change fo the top filter
+    this.$node.select('#topFilter').on('change', (d) => {
+      const value:string = $('#topFilter').val().toString();
+
+      if(value === '0')
+      {
+        this.topFilter.active = true;
+        this.topFilter.changeFilterTop(false);
+        SimpleLogging.log('top filter', 'bottom');
+      } else if(value === '1')
+      {
+        this.topFilter.active = true;
+        this.topFilter.changeFilterTop(true);
+        SimpleLogging.log('top filter', 'top');
+      } else {
+        this.topFilter.active = false;
+        SimpleLogging.log('top filter', 'disabled');
+      }
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    });
+
+    // Listener for the change of the paragraph elements
+    $('.paraFilter').on('change', (d) => {
+      this.paragraphFilter.resetValues();
+
+      $('.paraFilter').each((index, element) => {
+        const value = $(element).val() as string;
+        if($(element).is(':checked'))
+        {
+          this.paragraphFilter.addValue(value);
+        }
+      });
+
+      SimpleLogging.log('attribute filter', this.paragraphFilter.values);
+      const filterQuarter = this.quarterFilter.meetCriteria(json);
+      const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
+      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    });
+
+    // Initializes the dialog for the time filter
+    $('#btnTimeDialog').on('click', (e) => {
+      // The Popup fades in just after
+      $('#timeForm').fadeIn(600, function() {});
+    });
+
+    // Initializes the dialog for the attribute filter
+    $('#btnAttributeDialog').on('click', (e) => {
+      // The Popup fades in just after
+      $('#attributeForm').fadeIn(600, function() {});
+    });
   }
 
   /**
@@ -212,9 +256,11 @@ class FilterData implements MAppViews {
         if(paragraphs.indexOf(val) === -1) {
           paragraphs.push(val);
           this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
-            .attr('class','paraFilter').attr('checked', true);
-          this.$node.select('#paragraph').append('b').attr('style', 'font-size: 1.0em; margin-left: 6px;').text(val);
-          this.$node.select('#paragraph').append('span').text(' ');
+            .attr('class','paraFilter form-check-input').attr('checked', true);
+          this.$node.select('#paragraph').append('span')
+            .attr('class', 'form-check-label')
+            .attr('style', 'font-size: 1.0em; margin-left: 5px;').text(val);
+          this.$node.select('#paragraph').append('span').attr('style', 'margin-left: 10px;');
         }
       }
     }
@@ -238,8 +284,71 @@ class FilterData implements MAppViews {
     } else {
       this.$node.select('#attr1_label').html('Attribute Filter');
     }
+
+    $('#attributeClose').on('click', function() {
+      $('#attributeForm').fadeOut(200, function() {});
+    });
   }
 
+  private initializeQuarterFilter(json) {
+    const timePoints = d3.set(
+      json.map(function (d: any) { return d.timeNode; })
+    ).values().sort();
+    const ul = d3.select('#selectable');
+
+    const result = $('#result');
+
+    ul.selectAll('li')
+      .data(timePoints)
+      .enter()
+      .append('li')
+      .text((txt) => {
+        const textParts = splitAt(4)(txt);
+        return textParts[0] + 'Q' + textParts[1];
+      })
+      .attr('class', 'list-group-item')
+      .filter(function(d, i) {
+        return i === (timePoints.length - 1);
+      })
+      .attr('class', 'list-group-item ui-selected');
+
+    let selectedTime = [];
+    $('#selectable').selectable({
+      selected: function() {
+        result.empty();
+        $('li.ui-selected').each(function(i, e) {
+          const valueSelected = e.innerHTML
+          result.append(' ' + valueSelected + ' ');
+        });
+      }
+    });
+
+    $('#btnUnSelectAll').on('click', function() {
+      d3.select('#selectable').selectAll('li').classed('ui-selected', false);
+      result.empty();
+      result.append('Nothing selected');
+    });
+
+    $('#btnSelectAll').on('click', function() {
+      d3.select('#selectable').selectAll('li').classed('ui-selected', true);
+      result.empty();
+      result.append('All selected');
+    });
+
+    $('#btnSelectedTime').on('click', function() {
+      selectedTime = [];
+      $('li.ui-selected').each(function(i, e) {
+        const valueSelected = e.innerHTML;
+        selectedTime.push(valueSelected.replace('Q', ''));
+      });
+      console.log('Selected time frame: ', selectedTime);
+      $('#timeForm').fadeOut(200, function() {});
+    });
+
+    $('#timeClose').on('click', function() {
+      $('#timeForm').fadeOut(200, function() {});
+    });
+  }
   /**
    * This method adds the slider for the time range.
    * @param json with the data to be added.
