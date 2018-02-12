@@ -135,7 +135,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   height: 80px;
   margin-left: auto;
   margin-right: 20px;
-  margin-top: -35px;
+  //margin-top: 50px;
   width: 40%; 
   p {
     float: right;
@@ -212,4 +212,8 @@ span.from {
 
 .shrink {  
   font-size: 100%;  
+}
+
+#sampleFile {
+  margin-left: 200px;
 }

@@ -73,11 +73,11 @@ class DataImport implements MAppViews {
     // Add the upload form and whole container
     this.$fileContainer = this.$node.html(`
     <div class='fileContainer'>
-    <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>
-    <center><h2 id='informationText'>Load your data here!!</h2></center>
+   <!-- <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
+    <h3 id='informationText'>Load your data here:</h3>
       <form class='form-inline well'>
         <div class='form-group'>
-          <div class='input-group'>
+          <div class='input-group'>         
               <span class='input-group-btn' style='padding-right: 2px;'>
                 <span class='btn btn-default btn-file'>
                   Select CSV file... 
@@ -87,13 +87,21 @@ class DataImport implements MAppViews {
             <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
           </div>
         </div>
-        <div class='form-group'>
+        <div class='form-group'>        
           <button type='submit' id='submitFile' class='btn btn-primary'>
-            <i class='fa fa-upload'>&nbsp;</i>Load File</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info'>
-            <i class='fa fa-pencil-square-o'>&nbsp;</i>View Data</button>
+            <!--<i class='fa fa-upload'>&nbsp;</i>Load File</button>-->
+            Load File</button>          
+          <button type='button' id='showMoreBtn' class='btn btn-info'> View Data</button>
+             
+            <!--<p>${DOWNLOAD_INFO}</p>-->
+            <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
+            <button type='button' id='sampleFile' class='btn btn-primary btn-large'>
+            <i class='fa fa-download'></i> Sample Files</button>
+            <!--</a>-->
+
         </div>
-      </form>`);
+      </form>`   
+    );
 
     // Add the display conatiner and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
@@ -116,7 +124,8 @@ class DataImport implements MAppViews {
 
     d3.select('.fileContainer').append('div').classed('helpInfo', true);
     this.$helpInfo = d3.select('.helpInfo').html(`
-      <p>${USAGE_INFO}</p>
+    <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button> 
+    <p>${USAGE_INFO}</p>
       <table class='demo'>
         <thead>
         <tr>
@@ -134,12 +143,7 @@ class DataImport implements MAppViews {
         </tr>
         </tbody>
       </table>
-      <br/>
-      <p>${DOWNLOAD_INFO}</p>
-      <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
-      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
-        <i class='fa fa-download'></i> Sample Files</button>
-      <!--</a>-->
+      <br/>      
     `);
 
     //Initialize for text transition
@@ -173,7 +177,7 @@ class DataImport implements MAppViews {
         d3.select('#valuesList').selectAll('*').remove();
 
         // Change information and reset edit mode
-        textTransition(this.$chaningHeading, 'View data, load new or proceed!!', 500);
+        textTransition(this.$chaningHeading, 'View data, load new or proceed', 500);
         this.editMode = false;
 
         // Start the uploading

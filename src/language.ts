@@ -18,7 +18,7 @@ export const ERROR_TOOMANYFILTER = `Your current <font color='#DA5A6B'><strong>F
 too restrictive. There is <strong>NO DATA</strong> to show!<br/>Please change your filter settings in order to show
 data on the visualization.`;
 
-export const USAGE_INFO = `<strong><font color='#45B07C'><h3>Data format:</h3></font></strong><br/>
+export const USAGE_INFO = `<strong><h3>Data format:</h3></strong><br/>
 This tool requires a specific format for the tables in order to visualize them appropriate. Also <strong>.CSV</strong> are
 only accepted. If the required format isn't met, it will result in erros or no displayed data. The format of the 
 table headings defines all further views but needs to be in a specific order:`;
