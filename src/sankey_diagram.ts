@@ -490,6 +490,17 @@ class SankeyDiagram implements MAppViews {
         .links(graph.links)
         .layout(10); //Difference only by 0, 1 and otherwise always the same
 
+      svg.append('defs')
+        .append('pattern')
+        .attr('id', 'diagonalHatch')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 4)
+        .attr('height', 4)
+        .append('path')
+        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+        .attr('stroke', '#ffffff')
+        .attr('stroke-width', 1);
+
       const link = svg.append('g').selectAll('.link')
         .data(graph.links)
         .enter().append('path')
@@ -545,27 +556,13 @@ class SankeyDiagram implements MAppViews {
           }
         })
         .style('fill', '#DA5A6B')
-        .on('mouseover', function (d) {
-          const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-          const text = dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
-          Tooltip.mouseOver(d, text, 'T2');
+        .on('mouseover', (d) => {
+          this.assembleNodeTooltip(d, valuePostFix);
         })
         .on('mouseout', Tooltip.mouseOut);
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
-
-      node.append('svg')
-        .append('defs')
-        .append('pattern')
-        .attr('id', 'diagonalHatch')
-        .attr('patternUnits', 'userSpaceOnUse')
-        .attr('width', 4)
-        .attr('height', 4)
-        .append('path')
-        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-        .attr('stroke', '#000000')
-        .attr('stroke-width', 1);
 
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
@@ -584,8 +581,7 @@ class SankeyDiagram implements MAppViews {
           })
           .on('mouseout', Tooltip.mouseOut)
           .on('mouseover', (d) => {
-            const text = dotFormat((d.overall - d.value)) + valuePostFix + ' of ' + dotFormat(d.overall) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString + ' are not displayed';
-            Tooltip.mouseOver(d, text, 'T2');
+            this.assembleNodeTooltip(d, valuePostFix);
           });
 
       //Add in the title for the nodes
@@ -616,11 +612,11 @@ class SankeyDiagram implements MAppViews {
 
       //On Hover titles for Sankey Diagram Text - after Text Elipsis
       heading.on('mouseover', (d) => {
-        Tooltip.mouseOver(d, d.name, 'T2');
+        this.assembleNodeTooltip(d, valuePostFix);
       })
         .on('mouseout', Tooltip.mouseOut);
       rightWrap.on('mouseover', (d) => {
-        Tooltip.mouseOver(d, d.name, 'T2');
+        this.assembleNodeTooltip(d, valuePostFix);
       })
         .on('mouseout', Tooltip.mouseOut);
 
@@ -842,6 +838,46 @@ class SankeyDiagram implements MAppViews {
       from: fromNumber,
       to: toNumber
     });
+  }
+
+  /**
+   * displays a tooltip about a node
+   * @param d data of a node as received from D3
+   * @param valuePostFix either "to" or "from"
+   */
+  private assembleNodeTooltip(d: any, valuePostFix: string) {
+    const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
+
+    // table because of aligned decimal numbers
+
+    const text = `
+    ${d.name}
+    <br />
+
+    <table class='node'>
+    <tr><td>
+    <svg width='8' height='8'>
+    <rect width='8' height='8' fill='#DA5A6B' />
+    </svg>
+    ${dotFormat(d.value) + valuePostFix}
+    </td><td> ${direction} displayed elements.</td></tr>
+    `;
+
+    const hiddenFlows = (d.overall - d.value) > 0 ? `
+    <tr><td>
+    <svg width='8' height='8'>
+    <defs>
+    <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
+    <rect width='4' height='4' fill='#DA5A6B' />
+    <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
+    </pattern>
+    </defs>
+    <rect width='8' height='8' fill='url(#diagonalHatch2)' />
+    </svg>
+    ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
+    ` : '';
+
+    Tooltip.mouseOver(d, text + hiddenFlows + '</table>', 'T2');
   }
 
   /**

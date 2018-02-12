@@ -259,3 +259,12 @@ svg text.yaxisunit {
   padding-left: 45px;
   margin-bottom: 10px !important;
 }
+
+.tooltip2 .node td:first-child {
+  text-align: right;
+  padding-right: 4px;
+}
+
+.tooltip2 .node td:last-child {
+  text-align: left;
+}
