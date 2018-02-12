@@ -38,8 +38,9 @@ class SankeyDiagram implements MAppViews {
   private sankeyHeight: number = 0;
   private maximumNodes: number = 0;
   private drawReally: boolean = true;
-  private valuesSumSource;
-  private valuesSumTarget;
+  private valuesSumSource : {key: string, values: number}[];
+  private valuesSumTarget : {key: string, values: number}[];
+  private minFraction: number = 1;
 
   //Filters
   private pipeline: FilterPipeline;
@@ -134,7 +135,7 @@ class SankeyDiagram implements MAppViews {
                 <input type='number' value='${this.entityTo}' class='sliderInput' id='entityTo' />
               </div>
           </div>
-        
+
         <div class='input-group input-group-xs'>
           <input type='text' id='entitySearchFilter' class='form-control' placeholder='Search for ${columnLabels.sourceNode}...'/>
           <span class='input-group-btn'>
@@ -205,7 +206,7 @@ class SankeyDiagram implements MAppViews {
             <input type='number' value='${this.mediaTo}' class='sliderInput' id='mediaTo' />
           </div>
       </div>
-      
+
       <div class='input-group input-group-xs'>
         <input type='text' id='mediaSearchFilter' class='form-control' placeholder='Search for ${columnLabels.targetNode}...'/>
         <span class='input-group-btn'>
@@ -313,14 +314,14 @@ class SankeyDiagram implements MAppViews {
 
       // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
-      this.valuesSumSource = (<any>d3).nest()
-        .key((d) => { return d.sourceNode; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
+      this.valuesSumSource = d3.nest()
+        .key((d: any) => { return d.sourceNode; })
+        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
         .entries(filteredData);
 
-      this.valuesSumTarget = (<any>d3).nest()
-        .key((d) => { return d.targetNode; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
+      this.valuesSumTarget = d3.nest()
+        .key((d: any) => { return d.targetNode; })
+        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
         .entries(filteredData);
 
       // console.log('----------- Original Data -----------');
@@ -448,9 +449,35 @@ class SankeyDiagram implements MAppViews {
       });
 
       //This makes out of the array of strings a array of objects with the key 'name'
-      graph.nodes.forEach(function (d, i) {
-        graph.nodes[i] = {'name': d};
+      graph.nodes.forEach((d, i) => {
+        // also store the overall sum of (filtered) flows for the node
+        let overall = 0;
+        let visible = -1;
+        for (const val of this.valuesSumSource) {
+          if (val.key === d) {
+            overall = val.values;
+
+            visible = graph.links
+              .filter((d) => { return d.source === i; })
+              .map((d) => d.value)
+              .reduce((total, current) => total + current);
+            }
+        }
+        for (const val of this.valuesSumTarget) {
+          if (val.key === d) {
+            overall = val.values;
+
+            visible = graph.links
+              .filter((d) => { return d.target === i; })
+              .map((d) => d.value)
+              .reduce((total, current) => total + current);
+          }
+        }
+
+        graph.nodes[i] = {'name': d, 'overall': overall, 'fraction': visible/overall};
       });
+
+      this.minFraction = Math.min(... graph.nodes.map((d) => d.fraction));
 
       //Basic parameters for the diagram
       sankey
@@ -458,6 +485,17 @@ class SankeyDiagram implements MAppViews {
         //.links(linksorted)
         .links(graph.links)
         .layout(10); //Difference only by 0, 1 and otherwise always the same
+
+      svg.append('defs')
+        .append('pattern')
+        .attr('id', 'diagonalHatch')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 4)
+        .attr('height', 4)
+        .append('path')
+        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+        .attr('stroke', '#ffffff')
+        .attr('stroke-width', 1);
 
       const link = svg.append('g').selectAll('.link')
         .data(graph.links)
@@ -502,70 +540,45 @@ class SankeyDiagram implements MAppViews {
 
       //Add the rectangles for the nodes
       node.append('rect')
-        .attr('height', function (d) {
-          return d.dy;
+        .attr('height', (d) => { return d.dy; })
+        .attr('width', (d) => {
+          return Math.max(this.minFraction * sankey.nodeWidth()  / d.fraction, 1);
         })
-        .attr('width', sankey.nodeWidth())
-        .style('fill', '#DA5A6B ')
-        .on('mouseover', function (d) {
-          const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-          const text = dotFormat(d.value) + valuePostFix + ' ' + direction + ' displayed elements';
-          Tooltip.mouseOver(d, text, 'T2');
+        .attr('x', (d) => {
+          if (d.sourceLinks.length <= 0) {
+            return 0;
+          } else {
+            return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() / d.fraction, 1);
+          }
+        })
+        .style('fill', '#DA5A6B')
+        .on('mouseover', (d) => {
+          this.assembleNodeTooltip(d, valuePostFix);
         })
         .on('mouseout', Tooltip.mouseOut);
 
       //Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
 
-      node.append('svg')
-        .append('defs')
-        .append('pattern')
-        .attr('id', 'diagonalHatch')
-        .attr('patternUnits', 'userSpaceOnUse')
-        .attr('width', 4)
-        .attr('height', 4)
-        .append('path')
-        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
-        .attr('stroke', '#000000')
-        .attr('stroke-width', 1);
-
       //This is how the overlays for the rects can be done after they have been added
       node.append('rect')
-        .attr('height', function (d) {
-          return d.dy;
-        })
-        .style('fill', 'url(#diagonalHatch)')
-        .attr('width', sankey.nodeWidth() / 2)
-        .attr('x', function (d) {
-          if (d.sourceLinks.length <= 0) {
-            return sankey.nodeWidth() / 2;
-          }
-          ;
-        })
-        .on('mouseout', Tooltip.mouseOut)
-        .on('mouseover', (d) => {
-          let result;
-          for (const val of this.valuesSumSource) {
-            if (val.key === d.name) {
-              result = val.values;
+        .filter((d) => {return d.overall > d.value; })
+          .attr('width', (d) =>  {
+            return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
+          })
+          .attr('height', (d) => { return d.dy; })
+          .style('fill', 'url(#diagonalHatch)')
+          .attr('x', (d) => {
+            if (d.sourceLinks.length <= 0) {
+              return this.minFraction * sankey.nodeWidth();
+            } else {
+              return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
             }
-          }
-          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
-          Tooltip.mouseOver(d, text, 'T2');
-        })
-        .filter(function (d, i) {
-          return d.sourceLinks.length <= 0;
-        }) //only for the targets
-        .on('mouseover', (d) => {
-          let result;
-          for (const val of this.valuesSumTarget) {
-            if (val.key === d.name) {
-              result = val.values;
-            }
-          }
-          const text = dotFormat(result) + valuePostFix + ' ' + 'overall in' + ' ' + selectedTimePointsAsString;
-          Tooltip.mouseOver(d, text, 'T2');
-        });
+          })
+          .on('mouseout', Tooltip.mouseOut)
+          .on('mouseover', (d) => {
+            this.assembleNodeTooltip(d, valuePostFix);
+          });
 
       //Add in the title for the nodes
       const heading = node.append('g').append('text')
@@ -595,11 +608,11 @@ class SankeyDiagram implements MAppViews {
 
       //On Hover titles for Sankey Diagram Text - after Text Elipsis
       heading.on('mouseover', (d) => {
-        Tooltip.mouseOver(d, d.name, 'T2');
+        this.assembleNodeTooltip(d, valuePostFix);
       })
         .on('mouseout', Tooltip.mouseOut);
       rightWrap.on('mouseover', (d) => {
-        Tooltip.mouseOver(d, d.name, 'T2');
+        this.assembleNodeTooltip(d, valuePostFix);
       })
         .on('mouseout', Tooltip.mouseOut);
 
@@ -821,6 +834,46 @@ class SankeyDiagram implements MAppViews {
       from: fromNumber,
       to: toNumber
     });
+  }
+
+  /**
+   * displays a tooltip about a node
+   * @param d data of a node as received from D3
+   * @param valuePostFix either "to" or "from"
+   */
+  private assembleNodeTooltip(d: any, valuePostFix: string) {
+    const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
+
+    // table because of aligned decimal numbers
+
+    const text = `
+    ${d.name}
+    <br />
+
+    <table class='node'>
+    <tr><td>
+    <svg width='8' height='8'>
+    <rect width='8' height='8' fill='#DA5A6B' />
+    </svg>
+    ${dotFormat(d.value) + valuePostFix}
+    </td><td> ${direction} displayed elements.</td></tr>
+    `;
+
+    const hiddenFlows = (d.overall - d.value) > 0 ? `
+    <tr><td>
+    <svg width='8' height='8'>
+    <defs>
+    <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
+    <rect width='4' height='4' fill='#DA5A6B' />
+    <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
+    </pattern>
+    </defs>
+    <rect width='8' height='8' fill='url(#diagonalHatch2)' />
+    </svg>
+    ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
+    ` : '';
+
+    Tooltip.mouseOver(d, text + hiddenFlows + '</table>', 'T2');
   }
 
   /**
