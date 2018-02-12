@@ -130,7 +130,7 @@ class FilterData implements MAppViews {
        </div>
        
        <div id='attributeForm' class='form-content popup'>
-        <h2>Attribute Selection:</h2>
+        <h2>Connection Filter:</h2>
         <p>Select here the attributes you want to filter for on the current visualization. The attributes
         are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.</p>
         <br/>

@@ -135,7 +135,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   height: 80px;
   margin-left: auto;
   margin-right: 20px;
-  margin-top: -50px;
+  margin-top: -35px;
   width: 40%; 
   p {
     float: right;
@@ -159,7 +159,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   font-size: 14px;
 }
 #web {
-  color: $valid-color;
+  color: $valid-color3;
 
   &:hover {
     color: $icon-hover;

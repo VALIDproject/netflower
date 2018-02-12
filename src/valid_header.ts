@@ -40,7 +40,8 @@ class ValidHeader implements MAppViews {
     this.$node.html(`
     <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
-    <i class='fa fa-angle-left fa-4x' id='backBtn'></i>   
+    <span id='backBtn'><i class='fa fa-folder-open-o fa-2x' id='backBtn'></i> File Name Change Data</span>
+    <!--<i class='fa fa-angle-left fa-4x' id='backBtn'></i> -->  
       <!--<button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change DAta</button>-->
     </div>
     <div class='valid_logo'></div>
@@ -98,16 +99,16 @@ class ValidHeader implements MAppViews {
         $('#validHeader').addClass('shrink');
         $('#socialMedia').addClass('shrink');
         $('.valid_logo').addClass('shrink');
-        $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');
-        $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');
+        $('.btn_preupload i').removeClass('fa fa-folder-open-o fa-2x');
+        $('.btn_preupload i').addClass('fa fa-folder-open-o');
         $('#backBtn').attr('style', 'margin-top: -4px;');
       } else {
         $('.logo').removeClass('shrink');
         $('#validHeader').removeClass('shrink');
         $('#socialMedia').removeClass('shrink');
         $('.valid_logo').removeClass('shrink');
-        $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');
-        $('.btn_preupload i').addClass('fa fa-angle-left fa-4x');
+        $('.btn_preupload i').removeClass('fa fa-folder-open-o');
+        $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
         $('#backBtn').attr('style', 'margin-top: -8px;');
       }
     });
