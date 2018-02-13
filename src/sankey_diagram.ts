@@ -183,7 +183,6 @@ class SankeyDiagram implements MAppViews {
           <span class='btnText'>Show More</span></button>
         </span>
       </div>
-
     `);
 
     right.html(`
@@ -236,7 +235,7 @@ class SankeyDiagram implements MAppViews {
         location.reload();
       }, 500);
 
-      //Draw Sankey Diagram
+      // Draw Sankey Diagram
       this.getStorageData(false);
     });
 
@@ -325,7 +324,7 @@ class SankeyDiagram implements MAppViews {
         .entries(filteredData);
 
       // console.log('----------- Original Data -----------');
-      // console.log(originalData);
+      console.log(originalData);
       // console.log('----------- Filtered Data -----------');
       // console.log(filteredData);
       this.pipeline.printFilters();
@@ -341,11 +340,7 @@ class SankeyDiagram implements MAppViews {
     const that = this;
     const sankey = (<any>d3).sankey();
     const units = '€';
-    const timePoints: any = d3.set(
-      json.map(function (d: any) {
-        return d.timeNode;
-      })
-    ).values().sort();
+    const timePoints: any = d3.set(json.map(function (d: any) {return d.timeNode;})).values().sort();
     const selectedTimePointsAsString = (timePoints.length > 1)
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length - 1])
       : TimeFormat.format(timePoints[0]);
@@ -363,26 +358,26 @@ class SankeyDiagram implements MAppViews {
     const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
     const widthOffset = 80;
 
-    //Append the svg canvas to the page
+    // Append the svg canvas to the page
     const svg = d3.select('#sankeyDiagram').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')
       .attr('transform', 'translate(' + (margin.left + widthOffset / 2) + ',' + margin.top + ')');
 
-    //Set the diagram properties
+    // Set the diagram properties
     sankey.nodeWidth(35)
       .nodePadding(20)
       .size([width - widthOffset, height]);
 
     const path = sankey.link();
 
-    // aggregate flow by source and target (i.e. sum multiple times and attributes)
+    // Aggregate flow by source and target (i.e. sum multiple times and attributes)
     const flatNest = d3.nest()
       .key((d: any) => {
-        return d.sourceNode + '|$|' + d.targetNode;
+        return d.sourceNode + '|$|' + d.targetNode; // First define keys
       })
-      .rollup(function (v: any[]) {
+      .rollup(function (v: any[]) { // construct object
         return {
           source: v[0].sourceNode,
           target: v[0].targetNode,
@@ -393,16 +388,16 @@ class SankeyDiagram implements MAppViews {
         };
       })
       .entries(json)
-      .map((o) => o.values) // remove key/values
-      .sort(function (a: any, b: any) {
+      .map((o) => o.values) // Remove key/values
+      .sort(function (a: any, b: any) { // Sort the array of objects by sum
         return d3.descending(a.sum, b.sum);
       })
-      .filter((e) => {return e.sum > 0;});
+      .filter((e) => {return e.sum > 0;}); // Remove entries whos sum is smaller than 0
 
-    //Create reduced graph with only number of nodes shown
+    // Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
     console.log('changed', that.nodesToShow);
-    //Ceep track of number of flows (distinct source target pairs)
+    // Keep track of number of flows (distinct source target pairs)
     that.maximumNodes = flatNest.length;
 
     //============ CHECK IF SHOULD DRAW ============
@@ -434,23 +429,19 @@ class SankeyDiagram implements MAppViews {
         });
       }
 
-      //d3.keys - returns array of keys from the nest function
-      //d3.nest - groups the values of an array by the given key
-      //d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
-      graph.nodes = (<any>d3).keys((<any>d3).nest()
-        .key((d) => {
-          return d.name;
-        })
-        .map(graph.nodes));
+      // d3.keys - returns array of keys from the nest function
+      // d3.nest - groups the values of an array by the given key
+      // d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
+      graph.nodes = (<any>d3).keys((<any>d3).nest().key((d) => {return d.name;}).map(graph.nodes));
 
       graph.links.forEach(function (d, i) {
         graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
         graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
       });
 
-      //This makes out of the array of strings a array of objects with the key 'name'
+      // This makes out of the array of strings a array of objects with the key 'name'
       graph.nodes.forEach((d, i) => {
-        // also store the overall sum of (filtered) flows for the node
+        // Also store the overall sum of (filtered) flows for the node
         let overall = 0;
         let visible = -1;
         for (const val of this.valuesSumSource) {
@@ -477,16 +468,16 @@ class SankeyDiagram implements MAppViews {
         graph.nodes[i] = {'name': d, 'overall': overall, 'fraction': visible/overall};
       });
 
-      this.minFraction = Math.min(... graph.nodes.map((d) => d.fraction));
+      this.minFraction = Math.min(...graph.nodes.map((d) => d.fraction));
 
-      //Basic parameters for the diagram
+      // Basic parameters for the diagram
       sankey
         .nodes(graph.nodes)
         //.links(linksorted)
         .links(graph.links)
         .layout(10); //Difference only by 0, 1 and otherwise always the same
 
-      svg.append('defs')
+      svg.append('defs')  // Cretae a reusable pattern defs are basically templates that are not immediately rendered.
         .append('pattern')
         .attr('id', 'diagonalHatch')
         .attr('patternUnits', 'userSpaceOnUse')
@@ -505,7 +496,7 @@ class SankeyDiagram implements MAppViews {
         .style('stroke-width', function (d) {
           return Math.max(1, d.dy);
         })
-        //reduce edges crossing
+        // Reduce edges crossing
         .sort(function (a, b) {
           return b.dy - a.dy;
         })
@@ -516,18 +507,18 @@ class SankeyDiagram implements MAppViews {
         })
         .on('mouseout', Tooltip.mouseOut);
 
-      //Add the on 'click' listener for the links
+      // Add the on 'click' listener for the links
       link.on('click', function (d) {
         const coordinates = d3.mouse(svg.node());
         events.fire(AppConstants.EVENT_CLICKED_PATH, d, origJson, coordinates);
       });
 
-      //Add in the nodes
+      // Add in the nodes
       const node = svg.append('g').selectAll('.node')
         .data(graph.nodes)
         .enter().append('g')
         .attr('class', function (d: any, i: number) {
-          //Save type of node in DOM
+          // Save type of node in DOM
           if (d.sourceLinks.length > 0) {
             return 'node source';
           } else {
@@ -538,7 +529,7 @@ class SankeyDiagram implements MAppViews {
           return 'translate(' + d.x + ',' + d.y + ')';
         });
 
-      //Add the rectangles for the nodes
+      // Add the rectangles for the nodes
       node.append('rect')
         .attr('height', (d) => { return d.dy; })
         .attr('width', (d) => {
@@ -557,10 +548,10 @@ class SankeyDiagram implements MAppViews {
         })
         .on('mouseout', Tooltip.mouseOut);
 
-      //Create sparkline barcharts for newly enter-ing g.node elements
+      // Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
 
-      //This is how the overlays for the rects can be done after they have been added
+      // This is how the overlays for the rects can be done after they have been added
       node.append('rect')
         .filter((d) => {return d.overall > d.value; })
           .attr('width', (d) =>  {
@@ -580,7 +571,7 @@ class SankeyDiagram implements MAppViews {
             this.assembleNodeTooltip(d, valuePostFix);
           });
 
-      //Add in the title for the nodes
+      // Add in the title for the nodes
       const heading = node.append('g').append('text')
         .attr('x', 45)
         .attr('y', function (d) {
@@ -599,14 +590,14 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'end')
         .attr('class', 'leftText');
 
-
+      // Here the textwrapping happens of the nodes
       const maxTextWidth = (margin.left + margin.right - 10) / 2;
       const leftWrap = this.$node.selectAll('.leftText');
       d3TextEllipse(leftWrap, maxTextWidth);
       const rightWrap = this.$node.selectAll('.rightText');
       d3TextEllipse(rightWrap, maxTextWidth);
 
-      //On Hover titles for Sankey Diagram Text - after Text Elipsis
+      // On Hover titles for Sankey Diagram Text - after Text Elipsis
       heading.on('mouseover', (d) => {
         this.assembleNodeTooltip(d, valuePostFix);
       })
@@ -631,7 +622,7 @@ class SankeyDiagram implements MAppViews {
    * triggered several times, but need to be registered only once.
    */
   private attachElemListeners() {
-    // full-text search in source node names
+    // Full-text search in source node names
     const sourceSearch = (d) => {
       const value: string = $('#entitySearchFilter').val();
       this.entitySearchFilter.term = value;
@@ -654,7 +645,7 @@ class SankeyDiagram implements MAppViews {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     });
 
-    // full-text search in target node names
+    // Full-text search in target node names
     const targetSearch = (d) => {
       const value: string = $('#mediaSearchFilter').val();
       this.mediaSearchFilter.term = value;
@@ -688,14 +679,14 @@ class SankeyDiagram implements MAppViews {
         this.nodesToShow = this.maximumNodes;
       }
 
-      //Increase the height of the svg to fit the data
+      // Increase the height of the svg to fit the data
       this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
       this.sankeyHeight += (10 * this.nodesToShow);
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       d3.select('#sankeyDiagram').html('');
       d3.selectAll('.barchart').html('');
-      //This is necessary in order to increase the height of the barchart svgs
+      // This is necessary in order to increase the height of the barchart svgs
       const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;
       const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
       d3.selectAll('.barchart').attr('height', this.sankeyHeight - headingOffset - footerOffset + 'px');
@@ -722,7 +713,7 @@ class SankeyDiagram implements MAppViews {
       d3.select('#sankeyDiagram').html('');
       d3.selectAll('.barchart').html('');
       this.getStorageData(true);
-      //This is necessary in order to reduce the height of the barchart svgs
+      // This is necessary in order to reduce the height of the barchart svgs
       const headingOffset = this.$node.select('.controlBox').node().getBoundingClientRect().height;
       const footerOffset = this.$node.select('.load_more').node().getBoundingClientRect().height + 15;
       d3.selectAll('.barchart').attr('height', this.sankeyHeight - headingOffset - footerOffset + 'px');
@@ -837,39 +828,35 @@ class SankeyDiagram implements MAppViews {
   }
 
   /**
-   * displays a tooltip about a node
+   * Displays a tooltip about a node.
    * @param d data of a node as received from D3
    * @param valuePostFix either "to" or "from"
    */
   private assembleNodeTooltip(d: any, valuePostFix: string) {
     const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-
-    // table because of aligned decimal numbers
-
-    const text = `
-    ${d.name}
+    // Table because of aligned decimal numbers
+    const text = `${d.name}
     <br />
-
     <table class='node'>
-    <tr><td>
-    <svg width='8' height='8'>
-    <rect width='8' height='8' fill='#DA5A6B' />
-    </svg>
-    ${dotFormat(d.value) + valuePostFix}
-    </td><td> ${direction} displayed elements.</td></tr>
+      <tr><td>
+        <svg width='8' height='8'>
+          <rect width='8' height='8' fill='#DA5A6B' />
+        </svg>
+        ${dotFormat(d.value) + valuePostFix}
+      </td><td> ${direction} displayed elements.</td></tr>
     `;
 
     const hiddenFlows = (d.overall - d.value) > 0 ? `
     <tr><td>
-    <svg width='8' height='8'>
-    <defs>
-    <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
-    <rect width='4' height='4' fill='#DA5A6B' />
-    <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
-    </pattern>
-    </defs>
-    <rect width='8' height='8' fill='url(#diagonalHatch2)' />
-    </svg>
+      <svg width='8' height='8'>
+        <defs>
+          <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
+            <rect width='4' height='4' fill='#DA5A6B' />
+            <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
+          </pattern>
+        </defs>
+      <rect width='8' height='8' fill='url(#diagonalHatch2)' />
+      </svg>
     ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
     ` : '';
 
