@@ -30,6 +30,7 @@ import PaymentEuroFilter from './filters/paymentEuroFilter';
 import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
+import FlowSorter from './flowSorter';
 
 
 const FLOW_TO_SHOW_INC = 12;
@@ -381,7 +382,6 @@ class SankeyDiagram implements MAppViews {
         return {
           source: v[0].sourceNode,
           target: v[0].targetNode,
-          time: v[0].timeNode,
           sum: d3.sum(v, function (d: any) {
             return d.valueNode;
           })
@@ -393,6 +393,10 @@ class SankeyDiagram implements MAppViews {
         return d3.descending(a.sum, b.sum);
       })
       .filter((e) => {return e.sum > 0;}); // Remove entries whos sum is smaller than 0
+
+    const flowSorter = FlowSorter.getInstance();
+    flowSorter.topFlows(flatNest);
+
 
     // Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
