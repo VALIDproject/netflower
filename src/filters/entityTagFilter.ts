@@ -7,23 +7,54 @@ import Entity from '../datatypes/entity';
  */
 export default class EntityTagFilter extends TagFilter
 {
-  //Find all media entities which totalAmount is between the min and max values
+  //Find all legal entities which are associated with the active tags
   protected processData(data: any): void
   {
     let that = this;
-    this._resultData = data.filter((d) => {
-      const tagsAsText:string = d.sourceTag;
-      if (tagsAsText !== undefined) {
-        if (tagsAsText !== '') {
-          const values:d3.Set = d3.set(tagsAsText.split(","));
-          if(that._activeTags.size() <= values.size()) {
-            return that._activeTags.values().every(function(activeTag) {
-              return values.has(activeTag);
-            });
+    let tags:d3.Set = d3.set([]);
+    let map = new Map<string, d3.Set>();
+
+    for(let entry of data) {
+      let key = entry.sourceNode;
+      let value: d3.Set = map.get(key);
+
+      const tagsAsText:string = entry.sourceTag;
+      const tagValues:Array<string> = tagsAsText.split("|");
+      if (tagsAsText !== '') {
+        if(value === null || value === undefined) {
+          value = d3.set();
+          tagValues.forEach(function (tag) {
+            value.add(tag);
+          })
+        } else {
+          tagValues.forEach(function (tag) {
+            if(tag !== '' && !value.has(tag))
+              value.add(tag);
+          })
+        }
+        map.set(key, value);
+      }
+    }
+
+    this._resultData = data.filter((entry) => {
+      const key = entry.sourceNode;
+      if(key === null || key === undefined) {
+        return false;
+      }
+      else {
+        const values = map.get(key);
+        if(values === null || values === undefined) {
+          return false;
+        }
+        else {
+          let bool = false;
+          for (const activeTag of that._activeTags.values()) {
+            if (values.has(activeTag))
+              bool = true;
           }
+          return bool;
         }
       }
-      return false;
     });
   }
 

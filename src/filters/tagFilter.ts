@@ -11,14 +11,12 @@ export default class TagFilter implements Filter
   protected _active: boolean;
   protected _availableTags: d3.Set;
   protected _activeTags: d3.Set;
-  protected _container: EntityContainer;
 
   constructor()
   {
     this._availableTags = d3.set([]);
     this._activeTags = d3.set([]);
     this._resultData = new Array<any>();
-    this._container = new EntityContainer();
     this._active = false;
   }
 

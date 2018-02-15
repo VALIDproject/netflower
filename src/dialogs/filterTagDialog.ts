@@ -5,6 +5,7 @@ import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 
 import TagFilter from '../filters/tagFilter';
+import EntityTagFilter from '../filters/entityTagFilter';
 
 export default class FilterTagDialog {
 
@@ -16,7 +17,7 @@ export default class FilterTagDialog {
   private message: string;
   private dialog;
 
-  constructor(private tagFilter: TagFilter, private d) {
+  constructor(private d, private tagFilter: TagFilter, private tagGroupHTMLElement) {
     this._activeTags = d3.set(tagFilter.activeTags.values());
     this._availableTags = d3.set(tagFilter.availableTags.values());
     this.setAvailableTags();
@@ -76,12 +77,12 @@ export default class FilterTagDialog {
       message += "</small><div style=\"margin: 10px 0px\">";
       if(this._term == "") {
         this._availableTags.forEach((value: string) =>
-        message += this.createButtonHtmlByValue(value, false)
+          message += this.createButtonHtmlByValue(value, false)
         );
       } else {
         this._searchResult = d3.set(this.sortTagsByAlphabet(this._searchResult));
         this._searchResult.forEach((value: string) =>
-        message += this.createButtonHtmlByValue(value, false)
+          message += this.createButtonHtmlByValue(value, false)
         );
       }
     }
@@ -138,11 +139,18 @@ export default class FilterTagDialog {
     });
   }
 
+  private getDialogTitle() {
+    if(this.tagFilter instanceof EntityTagFilter)
+      return 'Filter Legal Entities By Tags';
+    else
+      return 'Filter Media Insitutions By Tags';
+  }
+
   private buildDialog() {
     let that = this;
     this.dialog = bootbox.dialog({
         className: 'dialogBox',
-        title: 'Filter tags',
+        title: that.getDialogTitle(),
         message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>',
         buttons: {
           clear: {
@@ -171,6 +179,42 @@ export default class FilterTagDialog {
               that.tagFilter.activeTags = that._activeTags;
               that.tagFilter.availableTags = that._availableTags;
               that.tagFilter.active = that._activeTags.empty() ? false : true;
+              const $tagFilterBox = that.tagGroupHTMLElement.select('.tagFilterBox');
+              const $tagFilterBtn = that.tagGroupHTMLElement.select('.tagFilterBtn');
+              $tagFilterBox.html('');
+              let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+              if(that.tagFilter.active) {
+                $tagFilterBtn
+                  .style('background-color', '#DA5A6B')
+                  .style('color', '#FFF')
+                  .style('border:', 'none');
+                if(that.tagFilter instanceof EntityTagFilter)
+                  $tagFilterBtn.html(`Change Legal Entity Tags`);
+                else
+                  $tagFilterBtn.html(`Change Media Institution Tags`);
+                const $tagContainer = $tagFilterBox
+                                        .append('div')
+                                        .style('padding', '5px')
+                                        .style('border', '1px solid #ddd')
+                                        .style('border-radius', '4px');
+                that._activeTags.forEach((value:string) =>
+                  $tagContainer
+                    .append('button')
+                    .attr('type', 'button')
+                    .attr('class', 'btn-primary btn-xs waves-light')
+                    .attr('style', 'margin: 5px 5px 0px 0px;')
+                    .html(value)
+                );
+              } else {
+                $tagFilterBtn
+                  .style('background-color', '#FFF')
+                  .style('color', '#555')
+                  .style('border:', '1px solid #CCC')
+                if(that.tagFilter instanceof EntityTagFilter)
+                  $tagFilterBtn.html(`Set Legal Entity Tags`);
+                else
+                  $tagFilterBtn.html(`Set Media Institution Tags`);
+              }
               events.fire(AppConstants.EVENT_FILTER_CHANGED, that.d, null);
             }
           }

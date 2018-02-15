@@ -276,7 +276,8 @@ class SankeyDetail implements MAppViews {
 
     //Filter data based on the clicked path (sourceName and targetName) and store it
     const path = json.filter((obj) => {
-      return obj.sourceNode === sourceName && obj.targetNode === targetName;
+      return (obj.sourceNode === sourceName && obj.targetNode === targetName) ||
+        (obj.sourceTag === sourceName && obj.targetTag === targetName);
     });
 
     //Data for the bar chart

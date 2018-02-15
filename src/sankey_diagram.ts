@@ -154,8 +154,9 @@ class SankeyDiagram implements MAppViews {
             <button type='button' id='clearEntity' class='btn btn-secondary'><i class='fa fa-times'></i></button>
           </span>
         </div>
-        <div class='input-group input-group-xs' style='width: 100%; margin: 10px auto;'>
-          <input class='form-control input-sm' id='entityTagFilterButton' type='button' value='${columnLabels.sourceNode} Tags'>
+        <div class='input-group input-group-xs' id='entityTagFilterGroup' style='width: 100%; margin: 10px auto;'>
+          <button type='button' class='tagFilterBtn form-control' id='entityTagFilterButton'>Set ${columnLabels.sourceNode} Tags</button>
+          <div class="tagFilterBox"></div>
         </div>
       </div>
     `);
@@ -228,8 +229,9 @@ class SankeyDiagram implements MAppViews {
           <button type='button' id='clearMedia' class='btn btn-secondary'><i class='fa fa-times'></i></button>
         </span>
       </div>
-      <div class='input-group input-group-xs' style='width: 100%; margin: 10px auto;'>
-        <input class='form-control input-sm' id='mediaTagFilterButton' type='button' value='${columnLabels.targetNode} Tags'>
+      <div class='input-group input-group-xs' id='mediaTagFilterGroup' style='width: 100%; margin: 10px auto;'>
+        <button type='button' class='tagFilterBtn form-control' id='mediaTagFilterButton'>Set ${columnLabels.targetNode} Tags</button>
+        <div class="tagFilterBox"></div>
       </div>
     </div>
     `);
@@ -341,7 +343,7 @@ class SankeyDiagram implements MAppViews {
         .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
         .entries(filteredData);
 
-      this.valuesSumTarget = (<any>d3).nest()
+        this.valuesSumTarget = (<any>d3).nest()
         .key((d) => { return d.targetTag; })
         .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
         .entries(filteredData);
@@ -416,7 +418,10 @@ class SankeyDiagram implements MAppViews {
     // aggregate flow by source and target (i.e. sum multiple times and attributes)
     let flatNest = d3.nest()
       .key((d: any) => {
-        return d.sourceNode + '|$|' + d.targetNode;
+        if(that.pipeline.getTagFlowFilterStatus())
+          return d.sourceTag + '|$|' + d.targetTag;
+        else
+          return d.sourceNode + '|$|' + d.targetNode;
       })
       .rollup(function (v: any[]) {
         return {
@@ -715,13 +720,13 @@ class SankeyDiagram implements MAppViews {
 
     // Functionality to open the tag filter window for legal entites
     const entityFilterTags = (d) => {
-      let dialog = new FilterTagDialog(this.entityTagFilter, d);
+      let dialog = new FilterTagDialog(d, this.entityTagFilter, this.$node.select('#entityTagFilterGroup'));
     };
     this.$node.select('#entityTagFilterButton').on('click', entityFilterTags);
 
     // Functionality to open the tag filter window for media institutes
     const mediaFilterTags = (d) => {
-      let dialog = new FilterTagDialog(this.mediaTagFilter, d);
+      let dialog = new FilterTagDialog(d, this.mediaTagFilter, this.$node.select('#mediaTagFilterGroup'));
     };
     this.$node.select('#mediaTagFilterButton').on('click', mediaFilterTags);
 
