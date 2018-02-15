@@ -59,7 +59,7 @@ class SankeyFeatures implements MAppViews {
       			<div class='row'>
       			<p>
       				<div class='col-md-3'>
-      					 <span class='label label-default'>2016Q2 - 2017Q1</span>
+      					 <span id='currentTimeInfo' class='label label-default'>2016Q2 - 2017Q1</span>
       				</div>
       			</p>
       			</div>
@@ -72,13 +72,13 @@ class SankeyFeatures implements MAppViews {
                 <div class='row'>
                   <div class='col-md-6' id = 'btn_above'>
                     <h5>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class ='btn_design' class='btn btn-default'>Absolute Value</button>                   
-                    <button type='button' class ='btn_design' class='btn btn-default'>Number of Links</button>
+                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>                   
+                    <button type='button' class='btn btn-default btn_design'>Number of Links</button>
                   </div>
                   <div class='col-md-6' id = 'btn_above'>
                     <h5>Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class ='btn_design' class='btn btn-default'>Absolute Value</button>
-                    <button type='button' class ='btn_design' class='btn btn-default'>Relative Value</button>
+                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>
+                    <button type='button' class='btn btn-default btn_design'>Relative Value</button>
                   </div>
                 </div>
               </div>
@@ -88,7 +88,7 @@ class SankeyFeatures implements MAppViews {
         <!--Export Settings-->
         <div class='col-md-2'>
           <h5>Export Settings</h5>
-          <button type='button' class= 'btn_design' class='btn btn-default' id='exportData'>
+          <button type='button' class='btn btn-default btn_design' id='exportData'>
             Export Data
           </button>
         </div>
@@ -96,7 +96,7 @@ class SankeyFeatures implements MAppViews {
           <!--Notebook-->
       		<div class='col-md-2'>
       			<h5>Notebook</h5>
-      			<button type='button' class= 'btn_design' class='btn btn-default'>
+      			<button type='button' class='btn btn-default btn_design'>
       				Notebook
       			</button>
       		</div>

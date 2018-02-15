@@ -628,7 +628,6 @@ class SankeyDiagram implements MAppViews {
       this.entitySearchFilter.term = value;
 
       SimpleLogging.log('source name filter', value);
-      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     };
     $('#entitySearchFilter').keypress((e) => {
@@ -651,7 +650,6 @@ class SankeyDiagram implements MAppViews {
       this.mediaSearchFilter.term = value;
 
       SimpleLogging.log('target name filter', value);
-      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, d, null);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
     };
     $('#mediaSearchFilter').keypress((e) => {

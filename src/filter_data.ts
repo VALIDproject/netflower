@@ -19,7 +19,7 @@ import {AppConstants} from './app_constants';
 import {splitAt} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import QuarterFilter from './filters/quarterFilter';
-import TopFilter from './filters/topFilter';
+import TimeFilter from './filters/timeFilter';
 import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -32,20 +32,19 @@ class FilterData implements MAppViews {
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private quarterFilter: QuarterFilter;
-  private topFilter: TopFilter;
+  private timeFilter: TimeFilter;
   private paragraphFilter: ParagraphFilter;
   private quarterFilterRef;
 
   constructor(parent: Element, private options: any)
   {
-    //Get FilterPipeline
+    // Get FilterPipeline
     this.pipeline = FilterPipeline.getInstance();
-    //Create Filters
+    // Create Filters
     this.quarterFilter = new QuarterFilter();
-    this.topFilter = new TopFilter();
+    this.timeFilter = new TimeFilter();
     this.paragraphFilter = new ParagraphFilter();
-    //Add Filters to Pipeline
-    this.pipeline.changeTopFilter(this.topFilter); //must be first filter
+    // Add Filters to Pipeline
     this.pipeline.addFilter(this.quarterFilter);
     this.pipeline.addAttributeFilter(this.paragraphFilter);
 
@@ -153,11 +152,6 @@ class FilterData implements MAppViews {
       this.setParagraphFilterElements(json);
     }
 
-    events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, (evt, data) => {
-      this.topFilter.active = false;
-      $('#topFilter').val(-1);
-    });
-
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
       const filterQuarter = this.quarterFilter.meetCriteria(data);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterQuarter);
@@ -184,29 +178,7 @@ class FilterData implements MAppViews {
       });
 
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
-      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TOP_FILTER, 'changed');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
-    });
-
-    // Listener for the change fo the top filter
-    this.$node.select('#topFilter').on('change', (d) => {
-      const value:string = $('#topFilter').val().toString();
-
-      if(value === '0')
-      {
-        this.topFilter.active = true;
-        this.topFilter.changeFilterTop(false);
-        SimpleLogging.log('top filter', 'bottom');
-      } else if(value === '1')
-      {
-        this.topFilter.active = true;
-        this.topFilter.changeFilterTop(true);
-        SimpleLogging.log('top filter', 'top');
-      } else {
-        this.topFilter.active = false;
-        SimpleLogging.log('top filter', 'disabled');
-      }
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
     // Listener for the change of the paragraph elements
@@ -335,17 +307,22 @@ class FilterData implements MAppViews {
       result.append('All selected');
     });
 
-    $('#btnSelectedTime').on('click', function() {
+    $('#btnSelectedTime').on('click', () => {
       selectedTime = [];
+
       $('li.ui-selected').each(function(i, e) {
         const valueSelected = e.innerHTML;
         selectedTime.push(valueSelected.replace('Q', ''));
       });
-      console.log('Selected time frame: ', selectedTime);
+
+      let filteredTime = this.timeFilter.meetCriteria(json, selectedTime);
+      this.timeFilter.printData();
+      console.log('Filtered time: ', filteredTime);
+
       $('#timeForm').fadeOut(200, function() {});
     });
 
-    $('#timeClose').on('click', function() {
+    $('#timeClose').on('click', () => {
       $('#timeForm').fadeOut(200, function() {});
     });
   }
