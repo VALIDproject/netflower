@@ -1,13 +1,15 @@
 /**
  * Created by Florian on 13.02.2018.
  */
+import Filter from './filter';
+
 /**
  * This class is used to describe a filter by the time aspect of the data.
  */
-export default class TimeFilter
+export default class TimeFilter implements Filter
 {
   private resultData: Array<any>;
-  private timePoints: string[];
+  private _timePoints: string[];
   private _minValue: number;
   private _maxValue: number;
 
@@ -26,10 +28,18 @@ export default class TimeFilter
     return this._maxValue;
   }
 
-  public meetCriteria(data: any, timePoints: string[]): any
+  set timePoints(timeArray: string[]) {
+    this._timePoints = timeArray;
+  }
+
+  public changeTimePoints(timeArray: string[]) {
+    this._timePoints = timeArray;
+  }
+
+  public meetCriteria(data: any): any
   {
-    // Store the time points locally
-    this.timePoints = timePoints;
+    // Create local copy of the time points
+    const timePoints = this._timePoints;
 
     // Convert array of strings to array of numbers and find min and max
     const timePointsNumbers = timePoints.map(Number);
@@ -40,11 +50,12 @@ export default class TimeFilter
     this.resultData = data.filter((e) => {
       return timePoints.indexOf(e.timeNode) > -1;
     });
+
     return this.resultData;
   }
 
   public printData(): void
   {
-    console.log('Time Filter: ' + this.timePoints.join(','));
+    console.log('Time Filter: ' + this._timePoints.join(','));
   }
 }

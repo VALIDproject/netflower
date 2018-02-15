@@ -295,8 +295,6 @@ class SankeyDiagram implements MAppViews {
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
 
-        events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
-
         // Initialize Slider Inputs and update them with the right values
         this.entityFrom = this.entityEuroFilter.minValue;
         this.entityTo = this.entityEuroFilter.maxValue;
@@ -308,6 +306,7 @@ class SankeyDiagram implements MAppViews {
         this.euroTo = this.euroFilter.maxValue;
         this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
 
+        events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
         SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));
       }
 
@@ -324,10 +323,10 @@ class SankeyDiagram implements MAppViews {
         .entries(filteredData);
 
       // console.log('----------- Original Data -----------');
-      console.log(originalData);
+      // console.log(originalData);
       // console.log('----------- Filtered Data -----------');
       // console.log(filteredData);
-      this.pipeline.printFilters();
+      // this.pipeline.printFilters();
       this.buildSankey(filteredData, originalData);
     });
   }

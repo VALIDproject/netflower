@@ -13,7 +13,7 @@ import TimeFormat from './timeFormat';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
-const OFFSET = 20;                         //Offset for the chart in px
+const OFFSET = 20;                         // Offset for the chart in px
 
 interface IKeyValue {
   key: string;
@@ -21,7 +21,7 @@ interface IKeyValue {
 }
 
 export default class SparklineBarChart implements MAppViews {
-  //2 singletons for both views
+  // 2 singletons for both views
   private static sourceChart: SparklineBarChart;
   private static targetChart: SparklineBarChart;
 
@@ -29,7 +29,7 @@ export default class SparklineBarChart implements MAppViews {
   private parentDOM: string;
   private field: string;
   private necessaryHeight = INITIAL_SVG_HEIGHT;
-  private chartWidth: number = 120;        //Fallback if not calcualted dynamically
+  private chartWidth: number = 120;        // Fallback if not calcualted dynamically
 
   /** unit of flows (e.g., '€'). Extracted from CSV header. */
   private valuePostFix = '';
