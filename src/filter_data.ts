@@ -14,6 +14,7 @@ import 'jqueryui';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css';
+import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {splitAt} from './utilities';
@@ -309,12 +310,14 @@ class FilterData implements MAppViews {
         selectedTime.push(valueSelected.replace('Q', ''));
       });
 
-      // Selection happened now update all other filters and the view
       this.timeFilter.changeTimePoints(selectedTime);
+      // Selection happened now update all other filters and the view
       const filterTime = this.timeFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
+      textTransition(d3.select('#currentTimeInfo'),
+        `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
 
       $('#timeForm').fadeOut(200, function() {});
     });

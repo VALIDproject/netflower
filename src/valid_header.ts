@@ -91,7 +91,7 @@ class ValidHeader implements MAppViews {
       });
   }
 
-  private shrinkHeader () {
+  private shrinkHeader() {
     $(document).on('scroll', function(){
       if ($(document).scrollTop() > 100) {
         $('.logo').addClass('shrink');

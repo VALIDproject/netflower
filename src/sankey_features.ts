@@ -59,7 +59,7 @@ class SankeyFeatures implements MAppViews {
       			<div class='row'>
       			<p>
       				<div class='col-md-3'>
-      					 <span id='currentTimeInfo' class='label label-default'>2016Q2 - 2017Q1</span>
+      					 <span id='currentTimeInfo' class='label label-default' style='background: #45B07C'>Nothing</span>
       				</div>
       			</p>
       			</div>

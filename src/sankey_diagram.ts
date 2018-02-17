@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
+import 'jqueryui';
 import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css';
@@ -38,11 +39,11 @@ class SankeyDiagram implements MAppViews {
   private sankeyHeight: number = 0;
   private maximumNodes: number = 0;
   private drawReally: boolean = true;
-  private valuesSumSource : {key: string, values: number}[];
-  private valuesSumTarget : {key: string, values: number}[];
+  private valuesSumSource: {key: string, values: number}[];
+  private valuesSumTarget: {key: string, values: number}[];
   private minFraction: number = 1;
 
-  //Filters
+  // Filters
   private pipeline: FilterPipeline;
   private entityEuroFilter: EntityEuroFilter;
   private mediaEuroFilter: MediaEuroFilter;
@@ -50,7 +51,7 @@ class SankeyDiagram implements MAppViews {
   private mediaSearchFilter: MediaSearchFilter;
   private euroFilter: PaymentEuroFilter;
 
-  //Sliders
+  // Sliders
   private entitySlider; private entityFrom = 0; private entityTo = 0;
   private mediaSlider; private mediaFrom = 0; private mediaTo = 0;
   private valueSlider; private euroFrom = 0; private euroTo = 0;
@@ -451,7 +452,7 @@ class SankeyDiagram implements MAppViews {
               .filter((d) => { return d.source === i; })
               .map((d) => d.value)
               .reduce((total, current) => total + current);
-            }
+          }
         }
         for (const val of this.valuesSumTarget) {
           if (val.key === d) {
@@ -553,22 +554,22 @@ class SankeyDiagram implements MAppViews {
       // This is how the overlays for the rects can be done after they have been added
       node.append('rect')
         .filter((d) => {return d.overall > d.value; })
-          .attr('width', (d) =>  {
-            return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
-          })
-          .attr('height', (d) => { return d.dy; })
-          .style('fill', 'url(#diagonalHatch)')
-          .attr('x', (d) => {
-            if (d.sourceLinks.length <= 0) {
-              return this.minFraction * sankey.nodeWidth();
-            } else {
-              return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
-            }
-          })
-          .on('mouseout', Tooltip.mouseOut)
-          .on('mouseover', (d) => {
-            this.assembleNodeTooltip(d, valuePostFix);
-          });
+        .attr('width', (d) =>  {
+          return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
+        })
+        .attr('height', (d) => { return d.dy; })
+        .style('fill', 'url(#diagonalHatch)')
+        .attr('x', (d) => {
+          if (d.sourceLinks.length <= 0) {
+            return this.minFraction * sankey.nodeWidth();
+          } else {
+            return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
+          }
+        })
+        .on('mouseout', Tooltip.mouseOut)
+        .on('mouseover', (d) => {
+          this.assembleNodeTooltip(d, valuePostFix);
+        });
 
       // Add in the title for the nodes
       const heading = node.append('g').append('text')
@@ -731,6 +732,7 @@ class SankeyDiagram implements MAppViews {
       }
       this.updateInputValues('#entityFrom', '#entityTo', this.entityFrom, this.entityTo);
       this.updateSliderRange(getEntityRef(), this.entityFrom, this.entityTo);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
 
     // Change detection for the input TO of the ENTITY slider
@@ -744,6 +746,7 @@ class SankeyDiagram implements MAppViews {
       }
       this.updateInputValues('#entityFrom', '#entityTo', this.entityFrom, this.entityTo);
       this.updateSliderRange(getEntityRef(), this.entityFrom, this.entityTo);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
 
     // Change detection for the input FROM of the MEDIA slider.
@@ -757,6 +760,7 @@ class SankeyDiagram implements MAppViews {
       }
       this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaFrom, this.mediaTo);
       this.updateSliderRange(getMediaRef(), this.mediaFrom, this.mediaTo);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
 
     // Change detection for the input TO of the MEDIA slider
@@ -770,6 +774,7 @@ class SankeyDiagram implements MAppViews {
       }
       this.updateInputValues('#mediaFrom', '#mediaTo', this.mediaFrom, this.mediaTo);
       this.updateSliderRange(getMediaRef(), this.mediaFrom, this.mediaTo);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
 
     // Change detection for the input FROM of the EURO slider.
@@ -783,6 +788,7 @@ class SankeyDiagram implements MAppViews {
       }
       this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
       this.updateSliderRange(getValueRef(), this.euroFrom, this.euroTo);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
 
     // Change detection for the input TO of the EURO slider
@@ -796,6 +802,7 @@ class SankeyDiagram implements MAppViews {
       }
       this.updateInputValues('#euroFrom', '#euroTo', this.euroFrom, this.euroTo);
       this.updateSliderRange(getValueRef(), this.euroFrom, this.euroTo);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
     });
   }
 
@@ -822,6 +829,22 @@ class SankeyDiagram implements MAppViews {
       from: fromNumber,
       to: toNumber
     });
+
+    const currentSlider = sliderRef.input.id;
+    // Update the appropriate sliders min and max value too
+
+    if (currentSlider === 'entityFilter') {
+      this.entityEuroFilter.minValue = fromNumber;
+      this.entityEuroFilter.maxValue = toNumber;
+    }
+    if (currentSlider === 'valueSlider') {
+      this.euroFilter.minValue = fromNumber;
+      this.euroFilter.maxValue = toNumber;
+    }
+    if (currentSlider === 'mediaFilter') {
+      this.mediaEuroFilter.minValue = fromNumber;
+      this.mediaEuroFilter.maxValue = toNumber;
+    }
   }
 
   /**
