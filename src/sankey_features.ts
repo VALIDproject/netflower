@@ -41,12 +41,16 @@ class SankeyFeatures implements MAppViews {
       <div class='container-fluid'>
       	<div class='row'>
       		<div class='col-md-3'>
-      			<h5>Filter</h5>
+            <div class='row'>
+              <div class='col-sm-4'>
+                <h5>Filter</h5>
+              </div>
+              <div class='col-sm-4' style='margin-top: 7px;'>
+                <button id='clearAllBtn' class='badge'
+                  style='background: #45B07C; font-weight: normal;'><i class='fa fa-times'></i> Clear All</button>
+              </div>
+            </div>
       			<div class='row'>
-              <!--<div class='col-md-3'>-->
-                <!--<button type='button' class= 'btn_design' id='clearAllFilters' class='btn btn-default'>Clear-->
-                <!--</button>-->
-              <!--</div>-->
               <div class='col-md-4'>
                 <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
               </div>
@@ -109,7 +113,7 @@ class SankeyFeatures implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    this.$node.select('#clearAllFilters').on('click', (d) => {
+    this.$node.select('#clearAllBtn').on('click', (d) => {
       events.fire(AppConstants.EVENT_CLEAR_FILTERS, d, null);
     });
   }
