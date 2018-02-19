@@ -264,6 +264,8 @@ class FilterData implements MAppViews {
     const result = $('#result');
 
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
+    textTransition(d3.select('#currentTimeInfo'),
+        `Between: ${timePoints[timePoints.length - 1]} - ${timePoints[timePoints.length - 1]}`, 200);
 
     ul.selectAll('li')
       .data(timePoints)
