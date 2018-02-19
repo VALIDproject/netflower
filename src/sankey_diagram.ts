@@ -724,8 +724,8 @@ class SankeyDiagram implements MAppViews {
     // Change detection for the input FROM of the ENTITY slider.
     $('#entityFrom').on('change', () => {
       this.entityFrom = +$('#entityFrom').prop('value');
-      if (this.entityFrom < this.entityEuroFilter.minValue) {
-        this.entityFrom = this.entityEuroFilter.minValue;
+      if (this.entityFrom < getEntityRef().result.min) {
+        this.entityFrom = getEntityRef().result.min;
       }
       if (this.entityFrom > this.entityTo) {
         this.entityFrom = this.entityTo;
@@ -738,8 +738,8 @@ class SankeyDiagram implements MAppViews {
     // Change detection for the input TO of the ENTITY slider
     $('#entityTo').on('change', () => {
       this.entityTo = +$('#entityTo').prop('value');
-      if (this.entityTo > this.entityEuroFilter.maxValue) {
-        this.entityTo = this.entityEuroFilter.maxValue;
+      if (this.entityTo > getEntityRef().result.max) {
+        this.entityTo = getEntityRef().result.max;
       }
       if (this.entityTo < this.entityFrom) {
         this.entityTo = this.entityFrom;
@@ -752,8 +752,8 @@ class SankeyDiagram implements MAppViews {
     // Change detection for the input FROM of the MEDIA slider.
     $('#mediaFrom').on('change', () => {
       this.mediaFrom = +$('#mediaFrom').prop('value');
-      if (this.mediaFrom < this.mediaEuroFilter.minValue) {
-        this.mediaFrom = this.mediaEuroFilter.minValue;
+      if (this.mediaFrom < getMediaRef().result.min) {
+        this.mediaFrom = getMediaRef().result.min;
       }
       if (this.mediaFrom > this.mediaTo) {
         this.mediaFrom = this.mediaTo;
@@ -766,8 +766,8 @@ class SankeyDiagram implements MAppViews {
     // Change detection for the input TO of the MEDIA slider
     $('#mediaTo').on('change', () => {
       this.mediaTo = +$('#mediaTo').prop('value');
-      if (this.mediaTo > this.mediaEuroFilter.maxValue) {
-        this.mediaTo = this.mediaEuroFilter.maxValue;
+      if (this.mediaTo > getMediaRef().result.max) {
+        this.mediaTo = getMediaRef().result.max;
       }
       if (this.mediaTo < this.mediaFrom) {
         this.mediaTo = this.mediaFrom;
@@ -780,8 +780,8 @@ class SankeyDiagram implements MAppViews {
     // Change detection for the input FROM of the EURO slider.
     $('#euroFrom').on('change', () => {
       this.euroFrom = +$('#euroFrom').prop('value');
-      if (this.euroFrom < this.euroFilter.minValue) {
-        this.euroFrom = this.euroFilter.minValue;
+      if (this.euroFrom < getValueRef().result.min) {
+        this.euroFrom = getValueRef().result.min;
       }
       if (this.euroFrom > this.euroTo) {
         this.euroFrom = this.euroTo;
@@ -794,8 +794,8 @@ class SankeyDiagram implements MAppViews {
     // Change detection for the input TO of the EURO slider
     $('#euroTo').on('change', () => {
       this.euroTo = +$('#euroTo').prop('value');
-      if (this.euroTo > this.euroFilter.maxValue) {
-        this.euroTo = this.euroFilter.maxValue;
+      if (this.euroTo > getValueRef().result.max) {
+        this.euroTo = getValueRef().result.max;
       }
       if (this.euroTo < this.euroFrom) {
         this.euroTo = this.euroFrom;
@@ -827,7 +827,7 @@ class SankeyDiagram implements MAppViews {
   private updateSliderRange(sliderRef, fromNumber: number, toNumber: number): void {
     sliderRef.update({
       from: fromNumber,
-      to: toNumber
+      to: toNumber,
     });
 
     const currentSlider = sliderRef.input.id;
