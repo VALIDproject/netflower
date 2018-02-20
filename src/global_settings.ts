@@ -42,7 +42,10 @@ class GlobalSettings implements MAppViews {
     this.$node.html(`
     <div id='sideMenu'>
       <div class='list-group'>
-        <h4>Global Settings</h4>
+      <h4>Notebook</h4>
+      <input type='text' name='' value=''>
+      <button type='button' class='btn btn-primary btn-sm'>Save Note</button>
+        <!--<h4>Global Settings</h4>
         <p>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></p>
         <button type='button' class='btn btn-default active'>Absolute Value</button>
         <button type='button' class='btn btn-default'>Number of Links</button>
@@ -52,7 +55,7 @@ class GlobalSettings implements MAppViews {
       <p>Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></p>
         <button type='button' class='btn btn-default'>Absolute Value</button>
         <button type='button' class='btn btn-default'>Relative Value</button>
-      </div>
+      </div>-->
       
       <div class='clearBox'>
         <hr/>
