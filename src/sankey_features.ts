@@ -93,13 +93,13 @@ class SankeyFeatures implements MAppViews {
           </button>
         </div>
 
-          <!--Notebook-->
+          <!--Notebook
       		<div class='col-md-2'>
       			<h5>Notebook</h5>
       			<button type='button' class= 'btn_design' class='btn btn-default'>
       				Notebook
       			</button>
-      		</div>
+      		</div>-->
       	</div>
       </div>
     `);
