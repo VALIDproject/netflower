@@ -73,6 +73,7 @@ class DataImport implements MAppViews {
     // Add the upload form and whole container
     this.$fileContainer = this.$node.html(`
     <div class='fileContainer'>
+    <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button> 
    <!-- <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
     <h3 id='informationText'>Load your data here:</h3>
       <form class='form-inline well'>
@@ -89,8 +90,8 @@ class DataImport implements MAppViews {
         </div>
         <div class='form-group'>        
           <button type='submit' id='submitFile' class='btn btn-primary'>
-            <!--<i class='fa fa-upload'>&nbsp;</i>Load File</button>-->
-            Load File</button>          
+            <!--<i class='fa fa-upload'>&nbsp;</i>Load & Show</button>-->
+            Load & Show</button>          
           <button type='button' id='showMoreBtn' class='btn btn-info'> View Data</button>
              
             <!--<p>${DOWNLOAD_INFO}</p>-->
@@ -124,7 +125,7 @@ class DataImport implements MAppViews {
 
     d3.select('.fileContainer').append('div').classed('helpInfo', true);
     this.$helpInfo = d3.select('.helpInfo').html(`
-    <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button> 
+    <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>--> 
     <p>${USAGE_INFO}</p>
       <table class='demo'>
         <thead>
