@@ -10,6 +10,7 @@ import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 import {MAppViews} from './app';
 import SimpleLogging from './simpleLogging';
+import {BACK_INFO} from './language';
 
 class ValidHeader implements MAppViews {
 
@@ -40,11 +41,9 @@ class ValidHeader implements MAppViews {
     this.$node.html(`
     <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
-    <!--<span id='backBtn'><i class='fa fa-folder-open-o fa-2x' id='backBtn'></i> File Name Change Data</span>-->
-    <span id='backBtn'><i class='fa fa-folder-open-o fa-2x' id='backBtn'></i></span>
-    <span id='textBackBtn'>File Name Change Data</span>
-    <!--<i class='fa fa-angle-left fa-4x' id='backBtn'></i> -->  
-      <!--<button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change DAta</button>-->
+    <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
+     <span id='textBackBtn'>File Name Change Data</span>
+    </span>
     </div>
     <div class='valid_logo'></div>
     <div id='socialMedia'>    
@@ -66,9 +65,7 @@ class ValidHeader implements MAppViews {
         bootbox.confirm({
           className: 'dialogBox',
           title: 'Information',
-          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data load page.<br/>
-          <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
-          Be sure you don't lose anything important or save your progress before you proceed.`,
+          message: `${BACK_INFO}`,
           callback(result) {
             if (result) {
               SimpleLogging.log('reupload data confirmed', '');

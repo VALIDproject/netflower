@@ -26,6 +26,7 @@ import MediaEuroFilter from './filters/mediaEuroFilter';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
 import {type} from 'os';
+import {TIME_INFO, ATTR_INFO} from './language';
 
 class FilterData implements MAppViews {
 
@@ -75,41 +76,9 @@ class FilterData implements MAppViews {
    */
   private build() {
     this.$node.html(`
-      <!--<div class='container'>
-        <div class='row'>
-          <div class='col-sm-2'>
-            <small>Top Filter</small>
-          </div>
-          <div class='col-sm-2'>
-            <small id='attr1_label'>Paragraph Filter</small>
-          </div>
-          <div class='col-sm-2'>
-            <small>Time Slider</small>
-          </div>
-        </div>
-
-        <div class='row'>
-          <div class='col-sm-2'>
-            <select class='form-control input-sm' id='topFilter'>
-              <option value='-1' selected>disabled</option>
-              <option value='0'>Bottom 10</option>
-              <option value='1'>Top 10</option>
-            </select>
-          </div>
-          <div class='col-sm-2'>
-            <div id='paragraph'></div>
-          </div>
-        
-          <div class='col-sm-2'>
-             <!--<input id='timeSlider'/>
-          </div>
-      </div>-->
       <div id='timeForm' class='form-content popup'>
        <h2>Time Range Selection:</h2>
-       <p>Select here the time range of the visualization. You have various controls avaialbe for the selection.
-       The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
-       you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
-       to change the visualization.</p>
+       <p>${TIME_INFO}</p>
        <br/>
          <div class='form-group' style='display: flex;'>
             <ul class='list-group list-inline' id='selectable'></ul>
@@ -131,8 +100,7 @@ class FilterData implements MAppViews {
        
        <div id='attributeForm' class='form-content popup'>
         <h2>Connection Filter:</h2>
-        <p>Select here the attributes you want to filter for on the current visualization. The attributes
-        are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.</p>
+        <p>${ATTR_INFO}</p>
         <br/>
         <hr/>
           <div id='paragraph' class='form-check form-check-inline'></div>

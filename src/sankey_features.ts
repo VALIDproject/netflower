@@ -88,9 +88,7 @@ class SankeyFeatures implements MAppViews {
         <!--Export Settings-->
         <div class='col-md-2'>
           <h5>Export Settings</h5>
-          <button type='button' class= 'btn_design' class='btn btn-default' id='exportData'>
-            Export Data
-          </button>
+          <button type='button' class='btn btn-default btn_design' id='exportData'>Export Data</button>
         </div>
 
           <!--Notebook

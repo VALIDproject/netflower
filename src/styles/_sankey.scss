@@ -212,13 +212,10 @@ node text {
 
 #textBackBtn {
   cursor: pointer;
-  margin-top: 3px;
   position: absolute;
   margin-top: 6px;
   margin-left: 10px;
 }
-
-
 
 // Push source sparkline barcharts to right of parent element
 div.left_bars svg.barchart {
