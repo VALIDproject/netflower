@@ -10,6 +10,7 @@ import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 import {MAppViews} from './app';
 import SimpleLogging from './simpleLogging';
+import {d3TextEllipse} from './utilities';
 import {BACK_INFO} from './language';
 
 class ValidHeader implements MAppViews {
@@ -38,11 +39,16 @@ class ValidHeader implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
+    let fileName: any = localStorage.getItem('fileName');
+    if (fileName === '' || fileName === null) {
+      fileName = 'No File Name';
+    }
+
     this.$node.html(`
     <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
-     <span id='textBackBtn'>File Name Change Data</span>
+     <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
     </span>
     </div>
     <div class='valid_logo'></div>
@@ -91,7 +97,7 @@ class ValidHeader implements MAppViews {
       });
   }
 
-  private shrinkHeader () {
+  private shrinkHeader(): void {
     $(document).on('scroll', function(){
       if ($(document).scrollTop() > 100) {
         $('.logo').addClass('shrink');
@@ -100,7 +106,8 @@ class ValidHeader implements MAppViews {
         $('.valid_logo').addClass('shrink');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o fa-2x');
         $('.btn_preupload i').addClass('fa fa-folder-open-o');
-        $('#backBtn').attr('style', 'margin-top: -4px;');
+        $('.btn_preupload').attr('style', 'margin-top: 3px;');
+        $('#textBackBtn').attr('style', 'margin-top: 0px;');
       } else {
         $('.logo').removeClass('shrink');
         $('#validHeader').removeClass('shrink');
@@ -108,7 +115,8 @@ class ValidHeader implements MAppViews {
         $('.valid_logo').removeClass('shrink');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o');
         $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
-        $('#backBtn').attr('style', 'margin-top: -8px;');
+        $('.btn_preupload').attr('style', 'margin-top: 7px;');
+        $('#textBackBtn').attr('style', 'margin-top: 6px;');
       }
     });
   }

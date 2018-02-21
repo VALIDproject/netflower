@@ -26,7 +26,7 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   margin-bottom: 0;
   background-color:white;
   font-size: 13px;
-  font-weight: 400;  
+  font-weight: 400;
   line-height: 1.42857143;
   text-align: center;
   white-space: nowrap;
@@ -40,8 +40,8 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   border: 1.5px solid transparent;
   border-radius: 4px;
   padding: 5px 16px;
-  color: $valid-color3;  
-  border-color: $valid-color3;  
+  color: $valid-color3;
+  border-color: $valid-color3;
 }
 
 button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
@@ -105,7 +105,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   //background-size: 240px;
   //margin-top: 10px;
   //padding-left: 250px;
-  margin-right:20px;  
+  margin-right:20px;
   font-size: 200%;
   font-family: 'Oswald', sans-serif;
 }
@@ -113,15 +113,15 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 .valid_logo {
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
-  background-size: 200px;  
-  //padding-left: 20px;  
+  background-size: 200px;
+  //padding-left: 20px;
   //margin-left: 150px;
   //position: absolute;
   float:right;
   width: 15%;
-  height: 40px; 
+  height: 40px;
   margin-top:10px;
-  margin-right: 20px;  
+  margin-right: 20px;
 }
 
 .valid_logo.shrink {
@@ -136,11 +136,11 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   margin-left: auto;
   margin-right: 20px;
   //margin-top: 50px;
-  //width: 40%; 
+  //width: 40%;
   p {
     float: right;
-    padding: 15px; 
-    //margin-top:-40px;  
+    padding: 15px;
+    //margin-top:-40px;
   }
 }
 
@@ -149,11 +149,10 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 }
 
-
 .btn_preupload {
   float: left;
   width: 40%;
-  margin-top:7px;
+  margin-top: 7px;
 }
 
 .btn_preupload.shrink {
@@ -211,8 +210,8 @@ span.from {
   opacity: 0.8 !important;
 }
 
-.shrink {  
-  font-size: 100%;  
+.shrink {
+  font-size: 100%;
 }
 
 #sampleFile {

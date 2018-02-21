@@ -215,6 +215,15 @@ node text {
   position: absolute;
   margin-top: 6px;
   margin-left: 10px;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#textBackBtn:hover {
+  text-overflow: inherit;
+  overflow: visible;
 }
 
 // Push source sparkline barcharts to right of parent element

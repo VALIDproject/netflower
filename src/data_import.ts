@@ -274,9 +274,7 @@ class DataImport implements MAppViews {
 
         const msg = `<small>${new Date().toLocaleString()}</small>:
                      <br/>File: ${file.name}<br/><strong>Loaded successfully!</strong>`;
-        setTimeout(function(){
-          alertify.delay(5000).success(msg);
-        }, 1000);
+        alertify.delay(5000).success(msg);
         SimpleLogging.log('import upload complete', file.name);
 
         setTimeout(() => {
