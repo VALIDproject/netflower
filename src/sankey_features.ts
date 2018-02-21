@@ -52,7 +52,7 @@ class SankeyFeatures implements MAppViews {
               </div>
               <div class='col-md-4'>
                   <div class='btn-group'>
-                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Attribute</button>      						
+                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>      						
                   </div>
                 </div>
       			</div>
@@ -66,7 +66,7 @@ class SankeyFeatures implements MAppViews {
       		</div>
 
           <!--Global Filters-->
-          <div class='col-md-3'>
+          <!--<div class='col-md-3'>
             <div class='row'>
               <div class='col-md-12'>
                 <div class='row'>
@@ -83,23 +83,21 @@ class SankeyFeatures implements MAppViews {
                 </div>
               </div>
             </div>
-          </div>
+          </div>-->
 
         <!--Export Settings-->
         <div class='col-md-2'>
           <h5>Export Settings</h5>
-          <button type='button' class= 'btn_design' class='btn btn-default' id='exportData'>
-            Export Data
-          </button>
+          <button type='button' class='btn btn-default btn_design' id='exportData'>Export Data</button>
         </div>
 
-          <!--Notebook-->
+          <!--Notebook
       		<div class='col-md-2'>
       			<h5>Notebook</h5>
       			<button type='button' class= 'btn_design' class='btn btn-default'>
       				Notebook
       			</button>
-      		</div>
+      		</div>-->
       	</div>
       </div>
     `);

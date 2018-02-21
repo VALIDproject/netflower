@@ -31,9 +31,10 @@
 }
 
 .toggler:before {
-  //background-color: red;
+  //background-color: $valid-color3;
   font-family: FontAwesome;
-  content:'\f013';
+  content: '\f0c9';
+  //content:'\f013';
   position:absolute;
   top: 15px;
   left: 3px;

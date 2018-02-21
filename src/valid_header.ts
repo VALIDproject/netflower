@@ -10,6 +10,8 @@ import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 import {MAppViews} from './app';
 import SimpleLogging from './simpleLogging';
+import {d3TextEllipse} from './utilities';
+import {BACK_INFO} from './language';
 
 class ValidHeader implements MAppViews {
 
@@ -37,11 +39,17 @@ class ValidHeader implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
+    let fileName: any = localStorage.getItem('fileName');
+    if (fileName === '' || fileName === null) {
+      fileName = 'No File Name';
+    }
+
     this.$node.html(`
     <div class='logo'>NETFLOWER</div>   
     <div class='btn_preupload'>
-    <i class='fa fa-angle-left fa-4x' id='backBtn'></i>   
-      <!--<button type='button' id='backBtn' class='btn btn-sm btn-secondary'>Change DAta</button>-->
+    <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
+     <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
+    </span>
     </div>
     <div class='valid_logo'></div>
     <div id='socialMedia'>    
@@ -63,9 +71,7 @@ class ValidHeader implements MAppViews {
         bootbox.confirm({
           className: 'dialogBox',
           title: 'Information',
-          message: `Upon hitting the <strong>OK</strong> button, you will be redirected to the data load page.<br/>
-          <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
-          Be sure you don't lose anything important or save your progress before you proceed.`,
+          message: `${BACK_INFO}`,
           callback(result) {
             if (result) {
               SimpleLogging.log('reupload data confirmed', '');
@@ -91,24 +97,26 @@ class ValidHeader implements MAppViews {
       });
   }
 
-  private shrinkHeader () {
+  private shrinkHeader(): void {
     $(document).on('scroll', function(){
       if ($(document).scrollTop() > 100) {
         $('.logo').addClass('shrink');
         $('#validHeader').addClass('shrink');
         $('#socialMedia').addClass('shrink');
         $('.valid_logo').addClass('shrink');
-        $('.btn_preupload i').removeClass('fa fa-angle-left fa-4x');
-        $('.btn_preupload i').addClass('fa fa-angle-left fa-2x');
-        $('#backBtn').attr('style', 'margin-top: -4px;');
+        $('.btn_preupload i').removeClass('fa fa-folder-open-o fa-2x');
+        $('.btn_preupload i').addClass('fa fa-folder-open-o');
+        $('.btn_preupload').attr('style', 'margin-top: 3px;');
+        $('#textBackBtn').attr('style', 'margin-top: 0px;');
       } else {
         $('.logo').removeClass('shrink');
         $('#validHeader').removeClass('shrink');
         $('#socialMedia').removeClass('shrink');
         $('.valid_logo').removeClass('shrink');
-        $('.btn_preupload i').removeClass('fa fa-angle-left fa-2x');
-        $('.btn_preupload i').addClass('fa fa-angle-left fa-4x');
-        $('#backBtn').attr('style', 'margin-top: -8px;');
+        $('.btn_preupload i').removeClass('fa fa-folder-open-o');
+        $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
+        $('.btn_preupload').attr('style', 'margin-top: 7px;');
+        $('#textBackBtn').attr('style', 'margin-top: 6px;');
       }
     });
   }
