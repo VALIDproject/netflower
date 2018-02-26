@@ -28,6 +28,8 @@ export class AppConstants {
 
   static EVENT_CLEAR_FILTERS = 'eventClearFilters';
 
+  static EVENT_TIME_VALUES = 'eventTimeValues';
+
 
   //FILE DOWNLOADS
   static ASYLUM_FILE = 'https://dl.dropboxusercontent.com/s/cr3iu0adtb77de6/Asylum_Seekers_Data.csv?dl=0';
