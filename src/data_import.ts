@@ -73,11 +73,11 @@ class DataImport implements MAppViews {
     // Add the upload form and whole container
     this.$fileContainer = this.$node.html(`
     <div class='fileContainer'>
-    <button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>
-    <center><h2 id='informationText'>Load your data here!!</h2></center>
+    <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
+    <h3 id='informationText'>Load your data here:</h3>
       <form class='form-inline well'>
         <div class='form-group'>
-          <div class='input-group'>
+          <div class='input-group'>         
               <span class='input-group-btn' style='padding-right: 2px;'>
                 <span class='btn btn-default btn-file'>
                   Select CSV file... 
@@ -87,13 +87,14 @@ class DataImport implements MAppViews {
             <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
           </div>
         </div>
-        <div class='form-group'>
-          <button type='submit' id='submitFile' class='btn btn-primary'>
-            <i class='fa fa-upload'>&nbsp;</i>Load File</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info'>
-            <i class='fa fa-pencil-square-o'>&nbsp;</i>View Data</button>
+        <div class='form-group'>        
+          <button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>          
+          <button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>
+          <button type='button' id='sampleFile' class='btn btn-primary btn-large'>
+            <i class='fa fa-download'></i> Sample Files</button>
         </div>
-      </form>`);
+      </form>`
+    );
 
     // Add the display conatiner and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
@@ -111,12 +112,11 @@ class DataImport implements MAppViews {
           </div>
             <div id='valuesList'></div>
         </div>
-			</div>
     `);
 
     d3.select('.fileContainer').append('div').classed('helpInfo', true);
     this.$helpInfo = d3.select('.helpInfo').html(`
-      <p>${USAGE_INFO}</p>
+    <p>${USAGE_INFO}</p>
       <table class='demo'>
         <thead>
         <tr>
@@ -134,19 +134,13 @@ class DataImport implements MAppViews {
         </tr>
         </tbody>
       </table>
-      <br/>
-      <p>${DOWNLOAD_INFO}</p>
-      <!--<a href='http://flock-1140.students.fhstp.ac.at/Sample_Data.csv' download=''>-->
-      <button type='button' id='sampleFile' class='btn btn-primary btn-large' style='float: right'>
-        <i class='fa fa-download'></i> Sample Files</button>
-      <!--</a>-->
+      <br/>      
     `);
 
-    //Initialize for text transition
+    // Initialize for text transition
     this.$chaningHeading = d3.select('#informationText');
 
-    //Disable some buttons initially
-    d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
+    // Disable some buttons initially
     d3.select('#showMoreBtn').attr('disabled', true).style('opacity', 0);
     this.$btnNext = $('#seeNextRecords').hide();
     this.$btnPrev = $('#seePrevRecords').hide();
@@ -163,17 +157,14 @@ class DataImport implements MAppViews {
         alertify.delay(4000).log('Data import started.');
 
         // Disable the unwanted buttons
-        d3.select('#specialBtn').attr('disabled', true).style('opacity', 0);
         d3.select('#showMoreBtn').attr('disabled', true).style('opacity', 0);
         this.$btnNext = $('#seeNextRecords').hide();
         this.$btnPrev = $('#seePrevRecords').hide();
-
         // Clear the table if present
         d3.select('.ctrlContainer').classed('invisibleClass', true);
         d3.select('#valuesList').selectAll('*').remove();
-
         // Change information and reset edit mode
-        textTransition(this.$chaningHeading, 'View data, load new or proceed!!', 500);
+        textTransition(this.$chaningHeading, 'View data, load new or proceed', 500);
         this.editMode = false;
 
         // Start the uploading
@@ -240,35 +231,6 @@ class DataImport implements MAppViews {
         evt.stopPropagation();
       });
 
-    // Listener for the finished visualization Button
-    this.$node.select('#specialBtn')
-      .on('click', (e) => {
-        // Before rework the keys of the data
-        SimpleLogging.log('import special button','');
-        this.reworkKeys(this.parseResults);
-        this.makeNodesUnique();
-
-        if(this.editMode) {
-          d3.select('.dataLoadingView').classed('invisibleClass', true);
-          d3.select('.dataVizView').classed('invisibleClass', false);
-          d3.select('#valuesList').selectAll('*').remove();
-          this.storeData();
-          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
-
-          console.log('In edit mode');
-        } else {
-          d3.select('.dataLoadingView').classed('invisibleClass', true);
-          d3.select('.dataVizView').classed('invisibleClass', false);
-          this.storeData();
-          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
-
-          console.log('Not in edit mode');
-        }
-        const evt = <MouseEvent>d3.event;
-        evt.preventDefault();
-        evt.stopPropagation();
-      });
-
     // Listener for the download file button
     this.$node.select('#sampleFile').on('click', (e) => {
       bootbox.alert({
@@ -312,21 +274,30 @@ class DataImport implements MAppViews {
 
         const msg = `<small>${new Date().toLocaleString()}</small>:
                      <br/>File: ${file.name}<br/><strong>Loaded successfully!</strong>`;
-        setTimeout(function(){
-          alertify.delay(5000).success(msg);
-        }, 1000);
-        SimpleLogging.log('import upload complete',file.name);
+        alertify.delay(5000).success(msg);
+        SimpleLogging.log('import upload complete', file.name);
 
-        // Enable the detail button and the start visualization button
-        d3.select('#showMoreBtn').attr('disabled', null)
-          .transition()
-          .duration(1250)
-          .style('opacity', 1);
+        setTimeout(() => {
+          // Before rework the keys of the data
+          SimpleLogging.log('import special button','');
+          this.reworkKeys(this.parseResults);
+          this.makeNodesUnique();
 
-        d3.select('#specialBtn').attr('disabled', null)
-          .transition()
-          .duration(1250)
-          .style('opacity', 1);
+          if(this.editMode) {
+            const msg = `You have <strong>ERRORS</strong> in your Table. This would produce a strange behaving
+                visualization. You should check the other error messages and clean your data.`;
+            alertify.closeLogOnClick(true).delay(0).error(msg);
+            console.log('In edit mode');
+          } else {
+            d3.select('.dataLoadingView').classed('invisibleClass', true);
+            d3.select('.dataVizView').classed('invisibleClass', false);
+            this.storeData();
+            events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+
+            console.log('Not in edit mode');
+          }
+        }, 4000)
+
       }
     });
   }
@@ -345,6 +316,15 @@ class DataImport implements MAppViews {
 
     // Print out the parse errors in the file
     if (resultError.length > 0) {
+      // Enable the detail button and the start visualization button
+      d3.select('#showMoreBtn').attr('disabled', null)
+        .transition()
+        .duration(1250)
+        .style('opacity', 1);
+
+      // Don't go to the visualization page
+      this.editMode = true;
+
       for(const el of resultError) {
         const elem = el;
         const msg = `<small>${new Date().toLocaleString()}</small>:
@@ -368,15 +348,16 @@ class DataImport implements MAppViews {
    * Differneces are the asynchronus load of localforage and smaller size of localstorage.
    */
   private storeData() {
-    //Store the data
+    // Store the data
     localforage.setItem('data', this.parseResults.data).then(function (value) {
       console.log('Saved data');
     }).catch(function (err) {
       console.log('Error: ', err);
     });
 
-    //Local Storage for small variables
+    // Local Storage for small variables
     localStorage.setItem('dataLoaded', 'loaded');
+    localStorage.setItem('fileName', this.uploadedFileName);
     localStorage.setItem('columnLabels', JSON.stringify(this.reworkColumnLabels(this.parseResults.meta.fields)));
   }
 

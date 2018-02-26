@@ -37,7 +37,7 @@ export default class SimpleLogging implements MAppViews {
       .append('button')
       .attr('type', 'button')
       .attr('id', 'submitLog')
-      .attr('class', 'btn btn-primary btn-sm')
+      .attr('class', 'btn btn-default btn-sm')
       .style('margin-top', '10px')
       .style('display', 'block')
       .text('Submit Log');
