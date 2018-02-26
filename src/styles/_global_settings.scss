@@ -69,3 +69,21 @@
 #noteArea {
   resize: none;
 }
+
+/**
+Part of the valid header
+ */
+
+.timeInfoBox {
+  display: flex;
+  margin-top: 3px;
+  max-width: 600px;
+}
+
+#timeInfoHeader {
+  margin-left: 10px;
+
+  span.label {
+    background: #45B07C;
+  }
+}

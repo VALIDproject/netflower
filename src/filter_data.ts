@@ -125,13 +125,21 @@ class FilterData implements MAppViews {
 
     // Clears all filters and updates the appropriate sliders
     events.on(AppConstants.EVENT_CLEAR_FILTERS, (evt, data) => {
-      SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
+      // Reset the time filter first
+      const timePoints = d3.set(
+        json.map(function (d: any) { return d.timeNode; })
+      ).values().sort();
+      this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
+
       const filterTime = this.timeFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
 
+      // Reset all Labels afterwards
+      textTransition(d3.select('#currentTimeInfo'),
+        `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
+
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
-
       $('.paraFilter').each((index, element) => {
         const value = $(element).val() as string;
         if($(element).is(':checked'))
@@ -142,6 +150,8 @@ class FilterData implements MAppViews {
 
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
+      events.fire(AppConstants.EVENT_TIME_VALUES, [timePoints[timePoints.length - 1]]);
+      SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
     });
 
     // Listener for the change of the paragraph elements
@@ -235,6 +245,7 @@ class FilterData implements MAppViews {
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
     textTransition(d3.select('#currentTimeInfo'),
       `Between: ${timePoints[timePoints.length - 1]} - ${timePoints[timePoints.length - 1]}`, 200);
+    events.fire(AppConstants.EVENT_TIME_VALUES, [timePoints[timePoints.length - 1]]);
 
     ul.selectAll('li')
       .data(timePoints)
@@ -288,6 +299,7 @@ class FilterData implements MAppViews {
         const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
         events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
         events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
+        events.fire(AppConstants.EVENT_TIME_VALUES, selectedTime);
         textTransition(d3.select('#currentTimeInfo'),
           `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
       } else {

@@ -8,6 +8,8 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
+import {AppConstants} from './app_constants';
+import {splitAt} from './utilities';
 import {MAppViews} from './app';
 import SimpleLogging from './simpleLogging';
 import {d3TextEllipse} from './utilities';
@@ -50,6 +52,9 @@ class ValidHeader implements MAppViews {
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
     </span>
+    </div>
+    <div class='timeInfoBox'><div style='font-size: 0.9em;'>Viewing Timestamps: </div>
+      <div id='timeInfoHeader'></div>
     </div>
     <div class='valid_logo'></div>
     <div id='socialMedia'>    
@@ -95,6 +100,21 @@ class ValidHeader implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
+
+    events.on(AppConstants.EVENT_TIME_VALUES, (evt, data) => {
+      d3.select('#timeInfoHeader').selectAll('*').remove();
+
+      d3.select('#timeInfoHeader').selectAll('span')
+        .data(data)
+        .enter()
+        .append('span')
+        .text((txt) => {
+          const textParts = splitAt(4)(txt);
+          return textParts[0] + 'Q' + textParts[1];
+        })
+        .attr('class', 'label label-primary')
+        .attr('style', 'margin-left: 5px;');
+    });
   }
 
   private shrinkHeader(): void {
@@ -104,6 +124,7 @@ class ValidHeader implements MAppViews {
         $('#validHeader').addClass('shrink');
         $('#socialMedia').addClass('shrink');
         $('.valid_logo').addClass('shrink');
+        $('.timeInfoBox').removeClass('invisibleClass');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o fa-2x');
         $('.btn_preupload i').addClass('fa fa-folder-open-o');
         $('.btn_preupload').attr('style', 'margin-top: 3px;');
@@ -113,6 +134,7 @@ class ValidHeader implements MAppViews {
         $('#validHeader').removeClass('shrink');
         $('#socialMedia').removeClass('shrink');
         $('.valid_logo').removeClass('shrink');
+        $('.timeInfoBox').addClass('invisibleClass');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o');
         $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
         $('.btn_preupload').attr('style', 'margin-top: 7px;');
