@@ -116,13 +116,13 @@ class GlobalSettings implements MAppViews {
     // Watch for page pre reaload and store the notes
     window.onbeforeunload = function(event) {
       localStorage.setItem('noteAreaText', $('#noteArea').val());
-      event.returnValue = 'Set';
+      return;
     }
 
     // Retrieve the notes once page is loaded
     window.onload = function() {
       const text = localStorage.getItem('noteAreaText');
-      if (text !== null) {
+      if (text !== null && text !== undefined) {
         $('#noteArea').val(text)
       };
     }
