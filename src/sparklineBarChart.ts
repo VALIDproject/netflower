@@ -94,30 +94,32 @@ export default class SparklineBarChart implements MAppViews {
 
       node.each(function (d, i) {
         const nodeElem = d3.select(this);
-        const yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
 
         if (nodeElem.attr('class').includes('source')) {
-          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         } else {
-          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         }
       });
     });
   }
 
-  private build(data: any, nodeName: string, yMiddle: number, timePoints: string[]) {
+  private build(data: any, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
 
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     this.valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
-    if (this.necessaryHeight < yMiddle) {
-      this.necessaryHeight = yMiddle;
-      this.$node.attr('height', yMiddle + CHART_HEIGHT + 5);
+    const correctedTop = elemTop + AppConstants.SANKEY_TOP_MARGIN - AppConstants.SANKEY_NODE_PADDING / 3;
+    const correctedHeight =elemHeight + AppConstants.SANKEY_NODE_PADDING * 2 /3;
+
+    if (this.necessaryHeight < correctedTop + correctedHeight) {
+      this.necessaryHeight = correctedTop + correctedHeight;
+      this.$node.attr('height', correctedTop + correctedHeight);
     }
 
     const aggregatedData = _self.prepareData(data, nodeName);
-    _self.drawBarChart(aggregatedData, nodeName, yMiddle, timePoints);
+    _self.drawBarChart(aggregatedData, nodeName, correctedTop, correctedHeight, timePoints);
   }
 
   /**
@@ -166,16 +168,30 @@ export default class SparklineBarChart implements MAppViews {
    * @param nodeName name of the node for which the barchart is drawn
    * @param dy vertical offset from sankey diagram
    */
-  private drawBarChart(aggregatedData: IKeyValue[], nodeName: string, yMiddle: number, timePoints: string[]) {
+  private drawBarChart(aggregatedData: IKeyValue[], nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
 
     const x = d3.scale.ordinal().rangeRoundBands([0, this.chartWidth], .05);
     const y = d3.scale.linear().range([CHART_HEIGHT, 0]);
 
+    const yBaseline = elemTop + elemHeight / 2 - CHART_HEIGHT / 2;
+
     x.domain(timePoints);
     y.domain([0, d3.max(aggregatedData, function (d) { return d.values; })]);
 
     const group = this.$node.append('g');
+
+    group.append('rect')
+    .attr('x', 0)
+    .attr('y', elemTop)
+    .attr('width', this.chartWidth)
+    .attr('height', elemHeight)
+    .attr('fill', '#ddeeff')
+    .on('mouseover', (d) => {
+      console.log('hello world');
+      console.log(d);
+      console.log(_self);
+    });
 
     group.selectAll('bar')
       .data(aggregatedData)
@@ -184,7 +200,7 @@ export default class SparklineBarChart implements MAppViews {
       .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
       .attr('x', function (d, i) { return x(d.key); })
       .attr('width', x.rangeBand())
-      .attr('y', function (d) { return y(d.values) + yMiddle; })
+      .attr('y', function (d) { return y(d.values) + yBaseline; })
       .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
       //Add the link titles - Hover Path
       .on('mouseover', (d) => {
@@ -192,11 +208,6 @@ export default class SparklineBarChart implements MAppViews {
         Tooltip.mouseOver(d, text, 'T2');
       })
       .on('mouseout', Tooltip.mouseOut);
-
-    group.on('mouseover', (d) => {
-      console.log(d);
-      console.log(_self);
-    });
   }
 }
 

@@ -353,7 +353,7 @@ class SankeyDiagram implements MAppViews {
     const widthNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().width;
     const heightNode = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
 
-    const margin = {top: 10, right: 120, bottom: 10, left: 120};
+    const margin = {top: AppConstants.SANKEY_TOP_MARGIN, right: 120, bottom: 10, left: 120};
     const width = widthNode - margin.left - margin.right;
     const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
     const widthOffset = 80;
@@ -367,7 +367,7 @@ class SankeyDiagram implements MAppViews {
 
     // Set the diagram properties
     sankey.nodeWidth(35)
-      .nodePadding(20)
+      .nodePadding(AppConstants.SANKEY_NODE_PADDING)
       .size([width - widthOffset, height]);
 
     const path = sankey.link();
