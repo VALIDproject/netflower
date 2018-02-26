@@ -39,6 +39,10 @@ export const LOG_INFO = `Here you are able to export the logs of the whole syste
 purposes. However, the application tracks your actions and the state of the visualization the whole time. By clicking on the
 button a <strong>Log File</strong> will be created that is saved locally on your machine.`;
 
+export const NO_TIME_POINTS = `<span class='label label-warning' style='font-weight: normal;'>Warning</span> 
+You have no time points selected! <br/> In order to prevent the application from showing nothing or unwanted results, 
+the last defined time points were choosen.`;
+
 export const DOWNLOAD_INFO = `The <strong>button</strong> below let's you download a sample dataset for the application.
 It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`;
 

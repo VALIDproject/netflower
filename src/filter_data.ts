@@ -26,7 +26,8 @@ import MediaEuroFilter from './filters/mediaEuroFilter';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
 import {type} from 'os';
-import {TIME_INFO, ATTR_INFO} from './language';
+import {TIME_INFO, ATTR_INFO, NO_TIME_POINTS} from './language';
+import isEmpty = hbs.Utils.isEmpty;
 
 class FilterData implements MAppViews {
 
@@ -233,7 +234,7 @@ class FilterData implements MAppViews {
 
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
     textTransition(d3.select('#currentTimeInfo'),
-        `Between: ${timePoints[timePoints.length - 1]} - ${timePoints[timePoints.length - 1]}`, 200);
+      `Between: ${timePoints[timePoints.length - 1]} - ${timePoints[timePoints.length - 1]}`, 200);
 
     ul.selectAll('li')
       .data(timePoints)
@@ -280,14 +281,23 @@ class FilterData implements MAppViews {
         selectedTime.push(valueSelected.replace('Q', ''));
       });
 
-      this.timeFilter.changeTimePoints(selectedTime);
-      // Selection happened now update all other filters and the view
-      const filterTime = this.timeFilter.meetCriteria(json);
-      const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
-      events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
-      events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
-      textTransition(d3.select('#currentTimeInfo'),
-        `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
+      if (selectedTime.length > 0) {
+        this.timeFilter.changeTimePoints(selectedTime);
+        // Selection happened now update all other filters and the view
+        const filterTime = this.timeFilter.meetCriteria(json);
+        const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
+        events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+        events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
+        textTransition(d3.select('#currentTimeInfo'),
+          `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
+      } else {
+        bootbox.alert({
+          message: NO_TIME_POINTS,
+          backdrop: true,
+          className: 'dialogBox',
+          size: 'small'
+        });
+      }
 
       $('#timeForm').fadeOut(200, function() {});
     });

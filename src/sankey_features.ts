@@ -46,7 +46,7 @@ class SankeyFeatures implements MAppViews {
                 <h5>Filter</h5>
               </div>
               <div class='col-sm-4' style='margin-top: 7px;'>
-                <button id='clearAllBtn' class='badge'
+                <button id='clearAllBtn' class='label'
                   style='background: #45B07C; font-weight: normal;'><i class='fa fa-times'></i> Clear All</button>
               </div>
             </div>
