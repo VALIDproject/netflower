@@ -1,19 +1,15 @@
-.globalSettings {
-  //width: 1%;
-  //height: 810px;
-  //position: absolute;
-  //top: 200px;
-  //left: 10px;
-  //border: 1px solid black;
-}
-
 .dialogBox {
   margin-top: 20%;
   z-index: 100001;
 }
 
+.dialogBoxLeft {
+  margin-top: 20%;
+  margin-left: 8%;
+  z-index: 100001;
+}
 
-.list-group, .showChange  {
+.list-group  {
   padding: 15px;
 
   p {
@@ -23,21 +19,53 @@
 }
 
 .clearBox {
-  padding: 15px;
+  padding: 0 15px 15px 15px;
 }
 
-.showChange {
-  margin-top: 30px;
+.noteBox {
+  padding: 15px 15px 0 15px;
 }
 
 .toggler:before {
-  //background-color: $valid-color3;
   font-family: FontAwesome;
   content: '\f0c9';
-  //content:'\f013';
-  position:absolute;
+  position: absolute;
   top: 15px;
   left: 3px;
+}
 
+#sideMenu {
+  width: 25% !important;
+}
 
+#submitLog {
+  width: 100%;
+}
+
+.btn-file2 {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-file2 input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 999px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  background: red;
+  cursor: inherit;
+  display: block;
+}
+
+#globalSaveBtn {
+  width: 100%;
+}
+
+#noteArea {
+  resize: none;
 }

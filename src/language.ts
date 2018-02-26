@@ -35,6 +35,10 @@ to change the visualization.`
 export const ATTR_INFO = `Select here the attributes you want to filter for on the current visualization. The attributes
 are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.`
 
+export const LOG_INFO = `Here you are able to export the logs of the whole system. This is mainly for testing and evaluation
+purposes. However, the application tracks your actions and the state of the visualization the whole time. By clicking on the
+button a <strong>Log File</strong> will be created that is saved locally on your machine.`;
+
 export const DOWNLOAD_INFO = `The <strong>button</strong> below let's you download a sample dataset for the application.
 It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`;
 
