@@ -181,12 +181,13 @@ export default class SparklineBarChart implements MAppViews {
 
     const group = this.$node.append('g');
 
+    // add a white background rect that can catch mouseenter events
     group.append('rect')
     .attr('x', 0)
     .attr('y', elemTop)
     .attr('width', this.chartWidth)
     .attr('height', elemHeight)
-    .attr('fill', '#ddeeff');
+    .attr('fill', 'white');
 
     group.on('mouseenter', (d) => {
       // our version of d3.js TypeScript definitions lack currentTarget
@@ -197,9 +198,11 @@ export default class SparklineBarChart implements MAppViews {
         .classed('overlay', true);
 
       overlay.html(`
-      <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 14}' style='text-anchor: middle'>time</text>
-      <text x='${2}' y='${yBaseline + CHART_HEIGHT + 14}' style='text-anchor: start'>${TimeFormat.format(timePoints[0])}</text>
-      <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 14}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
+      <text id='flowtotals' x='${2}' y='${yBaseline - 4}' style='text-anchor: start'>${this.generateFlowTotalsText(aggregatedData, timePoints)}</text>
+
+      <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: middle'>time</text>
+      <text x='${2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: start'>${TimeFormat.format(timePoints[0])}</text>
+      <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
       `);
     })
     .on('mouseleave', (d) => {
@@ -216,12 +219,22 @@ export default class SparklineBarChart implements MAppViews {
       .attr('width', x.rangeBand())
       .attr('y', function (d) { return y(d.values) + yBaseline; })
       .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
-      //Add the link titles - Hover Path
+      // bar hover -- update text above barchart
       .on('mouseover', (d) => {
-        const text = nodeName + '<br/>Time: ' + TimeFormat.format(d.key) + '<br/>Flow: ' + dotFormat(d.values) + _self.valuePostFix;
-        Tooltip.mouseOver(d, text, 'T2');
+        d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
       })
-      .on('mouseout', Tooltip.mouseOut);
+      .on('mouseout', (d) => {
+        d3.select('text#flowtotals').text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+      });
+  }
+
+  private generateFlowTotalsText(aggregatedData: IKeyValue[], timePoints: string[]): string {
+    const activeSum = aggregatedData
+      .filter((d, i) => {return (this.activeQuarters.indexOf(d.key) >= 0);})
+      .map((d) => d.values)
+      .reduce((total, current) => total + current);
+
+    return 'Total flows in ' + TimeFormat.formatMultiple(this.activeQuarters, timePoints) + ': ' + dotFormat(activeSum) + this.valuePostFix;
   }
 }
 
