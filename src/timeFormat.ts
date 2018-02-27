@@ -41,6 +41,7 @@ export default class TimeFormat {
                     } else {
                         // single or start of interval
                         start = possible;
+                        end = possible;
                     }
                 } else {
                     if (start.length > 0) {
@@ -52,11 +53,23 @@ export default class TimeFormat {
                         if (start !== end) {
                             result += '-' + TimeFormat.format(end);
                         }
+                        start = '';
                     } else {
                         // middle of hole --> nothing to do
                     }
                 }
             }
+            if (start.length > 0) {
+                // after the end of interval
+                if (result.length > 0) {
+                    result += ', ';
+                }
+                result += TimeFormat.format(start);
+                if (start !== end) {
+                    result += '-' + TimeFormat.format(end);
+                }
+            }
+            console.log(result);
 
             return result;
         }

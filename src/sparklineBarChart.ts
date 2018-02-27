@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {dotFormat, Tooltip} from './utilities';
+import {dotFormat, d3TextWrap} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFormat from './timeFormat';
 
@@ -204,6 +204,7 @@ export default class SparklineBarChart implements MAppViews {
       <text x='${2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: start'>${TimeFormat.format(timePoints[0])}</text>
       <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
       `);
+      d3TextWrap(d3.select('text#flowtotals'), this.chartWidth, 2);
     })
     .on('mouseleave', (d) => {
       const overlays = d3.selectAll('svg.barchart g.overlay');
@@ -224,7 +225,9 @@ export default class SparklineBarChart implements MAppViews {
         d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
       })
       .on('mouseout', (d) => {
-        d3.select('text#flowtotals').text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+        const text = d3.select('text#flowtotals');
+        text.text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+        d3TextWrap(text , this.chartWidth, 2);
       });
   }
 
