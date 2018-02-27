@@ -41,7 +41,7 @@ export default class ManageFilterDialog {
     let placeholder = "Add a new tag...";
     let message = `
       <div class='input-group input-group-xs' style='margin: 10px 0px; width: 60%;'>
-        <input type='text' id='addTagFilter' class='form-control' placeholder='${placeholder}'/>
+        <input type='text' id='addTagInput' class='form-control' placeholder='${placeholder}'/>
         <span class='input-group-btn'>
           <button type='button' id='addTagButton' class='btn btn-primary'><i class='fa fa-plus'></i></button>
         </span>
@@ -68,7 +68,7 @@ export default class ManageFilterDialog {
         buttons: {
           confirm: {
             label: 'Yes',
-            className: 'btn-success'
+            className: 'btn-info'
           },
           cancel: {
             label: 'No',
@@ -86,12 +86,25 @@ export default class ManageFilterDialog {
     });
 
     const addTag = (d) => {
-      const value: string = $('#addTagFilter').val();
-      // add tag to tag list
-      that._tags.add(value.charAt(0).toUpperCase() + value.slice(1));
-      that.updateDialogMessage();
+      let value: string = $('#addTagInput').val();
+      value = value.charAt(0).toUpperCase() + value.slice(1);
+      // check if tag already exists in tag list
+      console.log(that._tags.values());
+      console.log(value + ": " + this._tags.has(value));
+      if(that._tags.has(value)) {
+        bootbox.alert({
+          className: 'dialogBox',
+          message: "Node already has provided tag!"
+        });
+        $('#addTagInput').val("");
+        $('#addTagInput').focus();
+      } else {
+        // add tag to tag list
+        that._tags.add(value);
+        that.updateDialogMessage();
+      }
     };
-    $('#addTagFilter').keypress((e) => {
+    $('#addTagInput').keypress((e) => {
       if (e.which === 13) {
         addTag(e);
       }
@@ -99,7 +112,7 @@ export default class ManageFilterDialog {
     $('#addTagButton').on('click', addTag);
 
     $('#clearTagSearch').on('click', (e) => {
-      $('#addTagFilter').val("");
+      $('#addTagInput').val("");
     });
   }
 
@@ -174,7 +187,7 @@ export default class ManageFilterDialog {
       if(a > b) return 1;
       return 0;
     });
-    return tags;
+    return tags.map(function(tag) { return tag.trim()});
   }
 
   private formatTagsForCSV(tags: d3.Set) {
