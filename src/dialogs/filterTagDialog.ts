@@ -169,7 +169,6 @@ export default class FilterTagDialog {
             callback: function(){
               that._activeTags = that.tagFilter.activeTags;
               that._availableTags = that.tagFilter.availableTags;
-              console.log('Custom cancel clicked');
             }
           },
           ok: {

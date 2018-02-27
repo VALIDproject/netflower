@@ -56,6 +56,24 @@ export default class MediaTagFilter extends TagFilter
     });
   }
 
+  public getTagsByName(data: any, val: string): d3.Set
+  {
+    let resultSet:d3.Set = d3.set([]);
+    for(let entry of data) {
+      if(entry.targetNode.indexOf(val) !== -1) {
+        const tagsAsText:string = entry.targetTag;
+        if (tagsAsText !== undefined) {
+          const values:Array<string> = tagsAsText.split("|");
+          values.forEach(function (value) {
+            if(value !== '' && !resultSet.has(value))
+              resultSet.add(value);
+          })
+        }
+      }
+    }
+    return resultSet;
+  }
+
   public printData(): void {
     console.log('Media Tag Filter: ' + this._activeTags.values());
   }

@@ -33,6 +33,7 @@ import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
 import FilterTagDialog from './dialogs/filterTagDialog';
+import ManageTagDialog from './dialogs/manageTagDialog';
 
 
 class SankeyDiagram implements MAppViews {
@@ -316,8 +317,6 @@ class SankeyDiagram implements MAppViews {
         setEntityFilterRange(this.entityEuroFilter, '#entityFilter', originalData);
         setMediaFilterRange(this.mediaEuroFilter, '#mediaFilter', originalData);
         setEuroFilterRange(this.euroFilter, '#valueSlider', originalData);
-        setEntityTagFilter(this.entityTagFilter, originalData);
-        setMediaTagFilter(this.mediaTagFilter, originalData);
 
         events.fire(AppConstants.EVENT_UI_COMPLETE, originalData);
 
@@ -334,6 +333,10 @@ class SankeyDiagram implements MAppViews {
 
         SimpleLogging.log('initialize sankey', JSON.parse(localStorage.getItem('columnLabels')));
       }
+
+      // Update the tags for the legal entities as well as the media institutions
+      setEntityTagFilter(this.entityTagFilter, originalData);
+      setMediaTagFilter(this.mediaTagFilter, originalData);
 
       //Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
@@ -619,6 +622,7 @@ class SankeyDiagram implements MAppViews {
         });
 
       //Add in the title for the nodes
+      //let tmp = node.append('g');
       const heading = node.append('g').append('text')
         .attr('x', 45)
         .attr('y', function (d) {
@@ -629,7 +633,7 @@ class SankeyDiagram implements MAppViews {
         .attr('class', 'rightText')
         .text(function (d) {
           if(that.pipeline.getTagFlowFilterStatus())
-            return `${d.name.replace(/\|/gi, ', ')}`
+            return `${d.name.replace(/\|/gi, ', ')}`;
           else
             return `${d.name}`;
         })
@@ -640,22 +644,76 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'end')
         .attr('class', 'leftText');
 
+      if(!that.pipeline.getTagFlowFilterStatus()) {
+        const managers = node.append('g');
 
-      const maxTextWidth = (margin.left + margin.right - 10) / 2;
-      const leftWrap = this.$node.selectAll('.leftText');
-      d3TextEllipse(leftWrap, maxTextWidth);
-      const rightWrap = this.$node.selectAll('.rightText');
-      d3TextEllipse(rightWrap, maxTextWidth);
+        const buttons = managers.append('rect')
+          .attr('x', 45)
+          .attr('y', function (d) {
+            return (d.dy / 2) + 7;
+          })
+          .attr('rx', 2)
+          .attr('ry', 2)
+          .attr('width', '76px')
+          .attr('height', '18px')
+          .attr('fill', '#DA5A6B')
+          .filter(function (d, i) {
+            return d.x < width / 2;
+          })
+          .attr('x', -121 + sankey.nodeWidth());
 
-      //On Hover titles for Sankey Diagram Text - after Text Elipsis
-      heading.on('mouseover', (d) => {
-        Tooltip.mouseOver(d, d.name, 'T2');
-      })
-        .on('mouseout', Tooltip.mouseOut);
-      rightWrap.on('mouseover', (d) => {
-        Tooltip.mouseOver(d, d.name, 'T2');
-      })
-        .on('mouseout', Tooltip.mouseOut);
+        const buttonLabels = managers.append('text')
+          .attr('x', 50)
+          .attr('y', function (d) {
+            return (d.dy / 2) + 12;
+          })
+          .attr('dy', '0.6em')
+          .attr('fill', 'white')
+          .attr('text-anchor', 'start')
+          .attr('cursor', 'pointer')
+          .attr('class', 'manageMediaTag')
+          .text('Manage Tags')
+          .filter(function (d, i) {
+            return d.x < width / 2;
+          })
+          .attr('x', -50 + sankey.nodeWidth())
+          .attr('text-anchor', 'end')
+          .attr('class', 'manageEntityTag');
+
+        const maxTextWidth = (margin.left + margin.right - 10) / 2;
+        const leftWrap = this.$node.selectAll('.leftText');
+        d3TextEllipse(leftWrap, maxTextWidth);
+        const rightWrap = this.$node.selectAll('.rightText');
+        d3TextEllipse(rightWrap, maxTextWidth);
+        const entityTagManager = this.$node.selectAll('.manageEntityTag');
+        const mediaTagManager = this.$node.selectAll('.manageMediaTag');
+
+        //On Hover titles for Sankey Diagram Text - after Text Elipsis
+        heading.on('mouseover', (d) => {
+          let tags: d3.Set = that.entityTagFilter.getTagsByName(json, d.name);
+          let tooltipText = '<br>(Tags: ' + (tags.size() == 0 ? 'None)' : tags.values() + ')');
+          Tooltip.mouseOver(d, d.name + tooltipText, 'T2');
+        })
+          .on('mouseout', Tooltip.mouseOut);
+        rightWrap.on('mouseover', (d) => {
+          let tags: d3.Set = that.mediaTagFilter.getTagsByName(json, d.name);
+          let tooltipText = '<br>(Tags: ' + (tags.size() == 0 ? 'None)' : tags.values() + ')');
+          Tooltip.mouseOver(d, d.name + tooltipText, 'T2');
+        })
+          .on('mouseout', Tooltip.mouseOut);
+
+        entityTagManager.on('click', (d) => {
+          let tags: d3.Set = that.entityTagFilter.getTagsByName(json, d.name);
+          //console.log("tags: " + tags.values());
+          let dialog = new ManageTagDialog(d, tags);
+        })
+
+        mediaTagManager.on('click', (d) => {
+          let tags: d3.Set = that.mediaTagFilter.getTagsByName(json, d.name);
+          //console.log("tags: " + tags.values());
+          let dialog = new ManageTagDialog(d, tags);
+        })
+      }
 
     } else {
       const svgPlain = d3.select('#sankeyDiagram svg');

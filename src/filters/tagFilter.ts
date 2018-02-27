@@ -74,6 +74,11 @@ export default class TagFilter implements Filter
     this._availableTags.add(val);
   }
 
+  public getTagsByName(data: any, val: string): d3.Set
+  {
+    return d3.set([]);
+  }
+
   public printData(): void
   {
   }

@@ -58,6 +58,24 @@ export default class EntityTagFilter extends TagFilter
     });
   }
 
+  public getTagsByName(data: any, val: string): d3.Set
+  {
+    let resultSet:d3.Set = d3.set([]);
+    for(let entry of data) {
+      if(entry.sourceNode.indexOf(val) !== -1) {
+        const tagsAsText:string = entry.sourceTag;
+        if (tagsAsText !== undefined) {
+          const values:Array<string> = tagsAsText.split("|");
+          values.forEach(function (value) {
+            if(value !== '' && !resultSet.has(value))
+              resultSet.add(value);
+          })
+        }
+      }
+    }
+    return resultSet;
+  }
+
   public printData(): void
   {
     console.log('Entity Tag Filter: ' + this._activeTags.values());
