@@ -13,7 +13,7 @@ import TimeFormat from './timeFormat';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
-const OFFSET = 20;                         //Offset for the chart in px
+const OFFSET = 20;                         // Offset for the chart in px
 
 interface IKeyValue {
   key: string;
@@ -21,7 +21,7 @@ interface IKeyValue {
 }
 
 export default class SparklineBarChart implements MAppViews {
-  //2 singletons for both views
+  // 2 singletons for both views
   private static sourceChart: SparklineBarChart;
   private static targetChart: SparklineBarChart;
 
@@ -29,7 +29,7 @@ export default class SparklineBarChart implements MAppViews {
   private parentDOM: string;
   private field: string;
   private necessaryHeight = INITIAL_SVG_HEIGHT;
-  private chartWidth: number = 120;        //Fallback if not calcualted dynamically
+  private chartWidth: number = 120;        // Fallback if not calcualted dynamically
 
   /** unit of flows (e.g., '€'). Extracted from CSV header. */
   private valuePostFix = '';
@@ -40,7 +40,7 @@ export default class SparklineBarChart implements MAppViews {
     this.field = options.field;
     this.parentDOM = options.parentDOM;
 
-    //Initialize Singletons aka the Objects for left or right view point
+    // Initialize Singletons aka the Objects for left or right view point
     if ('sourceNode' === options.field) {
       SparklineBarChart.sourceChart = this;
       this.chartWidth = (d3.select('.left_bars') as any).node().getBoundingClientRect().width - OFFSET;
@@ -60,7 +60,7 @@ export default class SparklineBarChart implements MAppViews {
 
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
-      //Prepare the svg here, apparently sankey.init() has already finished
+      // Prepare the svg here, apparently sankey.init() has already finished
       this.$node = d3.select(this.parentDOM)
         .append('svg')
         .classed('barchart', true)
@@ -68,7 +68,7 @@ export default class SparklineBarChart implements MAppViews {
         .attr('height', INITIAL_SVG_HEIGHT);
     }
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -78,13 +78,13 @@ export default class SparklineBarChart implements MAppViews {
    * @param node
    */
   public static createSparklines(node: d3.Selection<any>) {
-    //This is how we retrieve the data. As it's loaded async it is only available as promise.
-    //We can save the promise thoug in a global variable and get the data later if we need
+    // This is how we retrieve the data. As it's loaded async it is only available as promise.
+    // We can save the promise thoug in a global variable and get the data later if we need
     const promiseData = localforage.getItem('data').then((value) => {
       return value;
     });
 
-    //Within the {} the data is available for usage
+    // Within the {} the data is available for usage
     promiseData.then(function (data: any) {
       const timePoints = d3.set(
         data.map(function (d: any) { return d.timeNode; })
@@ -128,7 +128,7 @@ export default class SparklineBarChart implements MAppViews {
   private attachListener() {
     const _self = this;
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      //On filters discard everything to allow a clean redraw
+      // On filters discard everything to allow a clean redraw
       _self.$node.html('');
     });
 
@@ -138,7 +138,7 @@ export default class SparklineBarChart implements MAppViews {
       _self.$node.html('');
     });
 
-    // if filtered quarter changes -> keep track of active quarters based on filtered data
+    // If filtered quarter changes -> keep track of active quarters based on filtered data
     events.on(AppConstants.EVENT_SLIDER_CHANGE, (evt, filteredData) => {
       _self.activeQuarters = d3.set(
         filteredData.map(function (d: any) { return d.timeNode; })

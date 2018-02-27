@@ -41,12 +41,16 @@ class SankeyFeatures implements MAppViews {
       <div class='container-fluid'>
       	<div class='row'>
       		<div class='col-md-3'>
-      			<h5>Filter</h5>
+            <div class='row'>
+              <div class='col-sm-4'>
+                <h5>Filter</h5>
+              </div>
+              <div class='col-sm-4' style='margin-top: 7px;'>
+                <button id='clearAllBtn' class='label'
+                  style='background: #45B07C; font-weight: normal;'><i class='fa fa-times'></i> Clear All</button>
+              </div>
+            </div>
       			<div class='row'>
-              <!--<div class='col-md-3'>-->
-                <!--<button type='button' class= 'btn_design' id='clearAllFilters' class='btn btn-default'>Clear-->
-                <!--</button>-->
-              <!--</div>-->
               <div class='col-md-4'>
                 <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
               </div>
@@ -59,7 +63,7 @@ class SankeyFeatures implements MAppViews {
       			<div class='row'>
       			<p>
       				<div class='col-md-3'>
-      					 <span class='label label-default'>2016Q2 - 2017Q1</span>
+      					 <span id='currentTimeInfo' class='label label-default' style='background: #45B07C'>Nothing</span>
       				</div>
       			</p>
       			</div>
@@ -72,13 +76,13 @@ class SankeyFeatures implements MAppViews {
                 <div class='row'>
                   <div class='col-md-6' id = 'btn_above'>
                     <h5>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class ='btn_design' class='btn btn-default'>Absolute Value</button>                   
-                    <button type='button' class ='btn_design' class='btn btn-default'>Number of Links</button>
+                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>                   
+                    <button type='button' class='btn btn-default btn_design'>Number of Links</button>
                   </div>
                   <div class='col-md-6' id = 'btn_above'>
                     <h5>Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class ='btn_design' class='btn btn-default'>Absolute Value</button>
-                    <button type='button' class ='btn_design' class='btn btn-default'>Relative Value</button>
+                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>
+                    <button type='button' class='btn btn-default btn_design'>Relative Value</button>
                   </div>
                 </div>
               </div>
@@ -88,13 +92,15 @@ class SankeyFeatures implements MAppViews {
         <!--Export Settings-->
         <div class='col-md-2'>
           <h5>Export Settings</h5>
-          <button type='button' class='btn btn-default btn_design' id='exportData'>Export Data</button>
+          <button type='button' class='btn btn-default btn_design' id='exportData'>
+            Export Data
+          </button>
         </div>
 
           <!--Notebook
       		<div class='col-md-2'>
       			<h5>Notebook</h5>
-      			<button type='button' class= 'btn_design' class='btn btn-default'>
+      			<button type='button' class='btn btn-default btn_design'>
       				Notebook
       			</button>
       		</div>-->
@@ -107,7 +113,7 @@ class SankeyFeatures implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
-    this.$node.select('#clearAllFilters').on('click', (d) => {
+    this.$node.select('#clearAllBtn').on('click', (d) => {
       events.fire(AppConstants.EVENT_CLEAR_FILTERS, d, null);
     });
   }
