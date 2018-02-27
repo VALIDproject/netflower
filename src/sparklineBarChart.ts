@@ -186,11 +186,25 @@ export default class SparklineBarChart implements MAppViews {
     .attr('y', elemTop)
     .attr('width', this.chartWidth)
     .attr('height', elemHeight)
-    .attr('fill', '#ddeeff')
-    .on('mouseover', (d) => {
-      console.log('hello world');
-      console.log(d);
-      console.log(_self);
+    .attr('fill', '#ddeeff');
+
+    group.on('mouseenter', (d) => {
+      // our version of d3.js TypeScript definitions lack currentTarget
+      // cp. https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+      const g = d3.select((d3.event as any).currentTarget);
+
+      const overlay = g.append('g')
+        .classed('overlay', true);
+
+      overlay.html(`
+      <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 14}' style='text-anchor: middle'>time</text>
+      <text x='${2}' y='${yBaseline + CHART_HEIGHT + 14}' style='text-anchor: start'>${TimeFormat.format(timePoints[0])}</text>
+      <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 14}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
+      `);
+    })
+    .on('mouseleave', (d) => {
+      const overlays = d3.selectAll('svg.barchart g.overlay');
+      overlays.remove();
     });
 
     group.selectAll('bar')
