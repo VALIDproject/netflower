@@ -77,18 +77,18 @@ class DataImport implements MAppViews {
     <h3 id='informationText'>Load your data here:</h3>
       <form class='form-inline well'>
         <div class='form-group'>
-          <div class='input-group'>         
+          <div class='input-group'>
               <span class='input-group-btn' style='padding-right: 2px;'>
                 <span class='btn btn-default btn-file'>
-                  Select CSV file... 
+                  Select CSV file...
                   <input type='file' id='files' accept='.csv' required />
                 </span>
               </span>
             <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
           </div>
         </div>
-        <div class='form-group'>        
-          <button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>          
+        <div class='form-group'>
+          <button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>
           <button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>
           <button type='button' id='sampleFile' class='btn btn-primary btn-large'>
             <i class='fa fa-download'></i> Sample Files</button>
@@ -134,7 +134,7 @@ class DataImport implements MAppViews {
         </tr>
         </tbody>
       </table>
-      <br/>      
+      <br/>
     `);
 
     // Initialize for text transition
@@ -296,7 +296,7 @@ class DataImport implements MAppViews {
 
             console.log('Not in edit mode');
           }
-        }, 4000)
+        }, 4000);
 
       }
     });
@@ -329,7 +329,7 @@ class DataImport implements MAppViews {
         const elem = el;
         const msg = `<small>${new Date().toLocaleString()}</small>:
                      <br/><strong>Error:</strong>${elem.message}
-                     <br/><strong>Search in Row: </strong> ${elem.row}`
+                     <br/><strong>Search in Row: </strong> ${elem.row}`;
         alertify.closeLogOnClick(true).delay(0).error(msg);
       }
     }

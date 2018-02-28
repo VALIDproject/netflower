@@ -94,7 +94,7 @@ class FilterData implements MAppViews {
          </div>
          <div id='timeClose' class='close'><i class='fa fa-times-circle'></i></div>
        </div>
-       
+
        <div id='attributeForm' class='form-content popup'>
         <h2>Connection Filter:</h2>
         <p>${ATTR_INFO}</p>
@@ -176,13 +176,13 @@ class FilterData implements MAppViews {
     // Initializes the dialog for the time filter
     $('#btnTimeDialog').on('click', (e) => {
       // The Popup fades in just after
-      $('#timeForm').fadeIn(600, function() {});
+      $('#timeForm').fadeIn(600); //, function() {}
     });
 
     // Initializes the dialog for the attribute filter
     $('#btnAttributeDialog').on('click', (e) => {
       // The Popup fades in just after
-      $('#attributeForm').fadeIn(600, function() {});
+      $('#attributeForm').fadeIn(600);
     });
   }
 
@@ -231,7 +231,7 @@ class FilterData implements MAppViews {
     }
 
     $('#attributeClose').on('click', function() {
-      $('#attributeForm').fadeOut(200, function() {});
+      $('#attributeForm').fadeOut(200);
     });
   }
 
@@ -263,10 +263,10 @@ class FilterData implements MAppViews {
 
     let selectedTime = [];
     $('#selectable').selectable({
-      selected: function() {
+      selected: () => {
         result.empty();
         $('li.ui-selected').each(function(i, e) {
-          const valueSelected = e.innerHTML
+          const valueSelected = e.innerHTML;
           result.append(' ' + valueSelected + ' ');
         });
       }
@@ -311,11 +311,11 @@ class FilterData implements MAppViews {
         });
       }
 
-      $('#timeForm').fadeOut(200, function() {});
+      $('#timeForm').fadeOut(200);
     });
 
     $('#timeClose').on('click', () => {
-      $('#timeForm').fadeOut(200, function() {});
+      $('#timeForm').fadeOut(200);
     });
   }
 }

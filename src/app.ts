@@ -114,7 +114,7 @@ export class App implements MAppViews {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
-    }    
+    }
   ];
 
   constructor(parent:Element) {
@@ -123,7 +123,6 @@ export class App implements MAppViews {
 
     this.$node.append('div').classed('dataLoadingView', true);
     this.$node.append('div').classed('dataVizView', true);
-    
   }
 
   /**

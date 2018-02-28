@@ -47,10 +47,10 @@ class GlobalSettings implements MAppViews {
         <div class='form-group'>
           <h4>Notebook:</h4>
           <div class='col-auto'>
-             <div class='input-group'>         
+             <div class='input-group'>
                 <span class='input-group-btn' style='padding-right: 2px;'>
                   <span class='btn btn-default btn-file2'>
-                    Load Notes 
+                    Load Notes
                     <input type='file' id='globalFiles' accept='.txt' required />
                   </span>
                 </span>
@@ -65,7 +65,7 @@ class GlobalSettings implements MAppViews {
           <textarea class='form-control' id='noteArea' rows='16' cols='80' wrap='off'></textarea>
         </div>
       </form>
-    
+
       <div class='clearBox'>
         <hr/>
         <h4>Export Logs:</h4>
@@ -101,7 +101,7 @@ class GlobalSettings implements MAppViews {
           .attr('cols', '80')
           .attr('wrap', 'off')
           .text(text);
-      }
+      };
 
       // Read the file and display all
       fileReader.readAsText(file, 'UTF-8');
@@ -117,15 +117,15 @@ class GlobalSettings implements MAppViews {
     window.onbeforeunload = function(event) {
       localStorage.setItem('noteAreaText', $('#noteArea').val());
       return;
-    }
+    };
 
     // Retrieve the notes once page is loaded
-    window.onload = function() {
+    window.onload = () => {
       const text = localStorage.getItem('noteAreaText');
       if (text !== null && text !== undefined) {
-        $('#noteArea').val(text)
+        $('#noteArea').val(text);
       };
-    }
+    };
   }
 
   /**
@@ -136,7 +136,7 @@ class GlobalSettings implements MAppViews {
     const textBlob = new Blob([saveText], {type: 'text/plain'});
     let fileName: string;
 
-    var dialog = bootbox.dialog({
+    const dialog = bootbox.dialog({
       title: 'Enter a name for the file',
       className: 'dialogBoxLeft',
       message: `
@@ -151,7 +151,7 @@ class GlobalSettings implements MAppViews {
         cancel: {
           label: 'Cancel',
           className: 'btn-default',
-          callback: function () {
+          callback: () => {
             d3.select('#globalSaveBtn').attr('disabled', null);
             console.log('Cancel clicked.');
           }
@@ -159,7 +159,7 @@ class GlobalSettings implements MAppViews {
         ok: {
           label: 'Ok',
           className: 'btn-primary',
-          callback: function () {
+          callback: () => {
             fileName = $('#dialogFileName').val();
 
             if (fileName === '' || fileName === null) {
@@ -167,7 +167,7 @@ class GlobalSettings implements MAppViews {
             }
 
             // Create the download fake link
-            let link = document.createElement('a');
+            const link = document.createElement('a');
             link.download = fileName;
             link.innerHTML = 'Download File';
 
