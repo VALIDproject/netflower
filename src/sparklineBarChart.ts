@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {dotFormat, Tooltip} from './utilities';
+import {dotFormat, d3TextWrap} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFormat from './timeFormat';
 
@@ -94,30 +94,32 @@ export default class SparklineBarChart implements MAppViews {
 
       node.each(function (d, i) {
         const nodeElem = d3.select(this);
-        const yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
 
         if (nodeElem.attr('class').includes('source')) {
-          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         } else {
-          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         }
       });
     });
   }
 
-  private build(data: any, nodeName: string, yMiddle: number, timePoints: string[]) {
+  private build(data: any, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
 
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     this.valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
-    if (this.necessaryHeight < yMiddle) {
-      this.necessaryHeight = yMiddle;
-      this.$node.attr('height', yMiddle + CHART_HEIGHT + 5);
+    const correctedTop = elemTop + AppConstants.SANKEY_TOP_MARGIN - AppConstants.SANKEY_NODE_PADDING / 3;
+    const correctedHeight =elemHeight + AppConstants.SANKEY_NODE_PADDING * 2 /3;
+
+    if (this.necessaryHeight < correctedTop + correctedHeight) {
+      this.necessaryHeight = correctedTop + correctedHeight;
+      this.$node.attr('height', correctedTop + correctedHeight);
     }
 
     const aggregatedData = _self.prepareData(data, nodeName);
-    _self.drawBarChart(aggregatedData, nodeName, yMiddle, timePoints);
+    _self.drawBarChart(aggregatedData, nodeName, correctedTop, correctedHeight, timePoints);
   }
 
   /**
@@ -166,16 +168,48 @@ export default class SparklineBarChart implements MAppViews {
    * @param nodeName name of the node for which the barchart is drawn
    * @param dy vertical offset from sankey diagram
    */
-  private drawBarChart(aggregatedData: IKeyValue[], nodeName: string, yMiddle: number, timePoints: string[]) {
+  private drawBarChart(aggregatedData: IKeyValue[], nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
 
     const x = d3.scale.ordinal().rangeRoundBands([0, this.chartWidth], .05);
     const y = d3.scale.linear().range([CHART_HEIGHT, 0]);
 
+    const yBaseline = elemTop + elemHeight / 2 - CHART_HEIGHT / 2;
+
     x.domain(timePoints);
     y.domain([0, d3.max(aggregatedData, function (d) { return d.values; })]);
 
     const group = this.$node.append('g');
+
+    // add a white background rect that can catch mouseenter events
+    group.append('rect')
+    .attr('x', 0)
+    .attr('y', elemTop)
+    .attr('width', this.chartWidth)
+    .attr('height', elemHeight)
+    .attr('fill', 'white');
+
+    group.on('mouseenter', (d) => {
+      // our version of d3.js TypeScript definitions lack currentTarget
+      // cp. https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+      const g = d3.select((d3.event as any).currentTarget);
+
+      const overlay = g.append('g')
+        .classed('overlay', true);
+
+      overlay.html(`
+      <text id='flowtotals' x='${2}' y='${yBaseline - 4}' style='text-anchor: start'>${this.generateFlowTotalsText(aggregatedData, timePoints)}</text>
+
+      <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: middle'>time</text>
+      <text x='${2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: start'>${TimeFormat.format(timePoints[0])}</text>
+      <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
+      `);
+      d3TextWrap(d3.select('text#flowtotals'), this.chartWidth, 2);
+    })
+    .on('mouseleave', (d) => {
+      const overlays = d3.selectAll('svg.barchart g.overlay');
+      overlays.remove();
+    });
 
     group.selectAll('bar')
       .data(aggregatedData)
@@ -184,14 +218,26 @@ export default class SparklineBarChart implements MAppViews {
       .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
       .attr('x', function (d, i) { return x(d.key); })
       .attr('width', x.rangeBand())
-      .attr('y', function (d) { return y(d.values) + yMiddle; })
+      .attr('y', function (d) { return y(d.values) + yBaseline; })
       .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
-      //Add the link titles - Hover Path
+      // bar hover -- update text above barchart
       .on('mouseover', (d) => {
-        const text = nodeName + '<br/>Time: ' + TimeFormat.format(d.key) + '<br/>Flow: ' + dotFormat(d.values) + _self.valuePostFix;
-        Tooltip.mouseOver(d, text, 'T2');
+        d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
       })
-      .on('mouseout', Tooltip.mouseOut);
+      .on('mouseout', (d) => {
+        const text = d3.select('text#flowtotals');
+        text.text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+        d3TextWrap(text , this.chartWidth, 2);
+      });
+  }
+
+  private generateFlowTotalsText(aggregatedData: IKeyValue[], timePoints: string[]): string {
+    const activeSum = aggregatedData
+      .filter((d, i) => {return (this.activeQuarters.indexOf(d.key) >= 0);})
+      .map((d) => d.values)
+      .reduce((total, current) => total + current);
+
+    return 'Total flows in ' + TimeFormat.formatMultiple(this.activeQuarters, timePoints) + ': ' + dotFormat(activeSum) + this.valuePostFix;
   }
 }
 
