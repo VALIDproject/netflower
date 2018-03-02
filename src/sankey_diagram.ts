@@ -32,12 +32,13 @@ import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
 
 
+const FLOW_TO_SHOW_INC = 12;
+
 class SankeyDiagram implements MAppViews {
 
   private $node;
-  private nodesToShow: number = 25;
+  private nodesToShow: number = FLOW_TO_SHOW_INC; // actually flows
   private sankeyHeight: number = 0;
-  private maximumNodes: number = 0;
   private drawReally: boolean = true;
   private valuesSumSource: {key: string, values: number}[];
   private valuesSumTarget: {key: string, values: number}[];
@@ -176,7 +177,7 @@ class SankeyDiagram implements MAppViews {
       <span id='loadInfo' style='text-align: center;'>X/Y elements displayed</span>
       <div class='input-group input-group-xs'>
         <span class='input-group-btn'>
-          <button id='loadLessBtn' type='button' class='btn btn-secondary ' disabled='true'>
+          <button id='loadLessBtn' type='button' class='btn btn-secondary '>
           <span>Show Less</span></button>
         </span>
         <span class='input-group-btn'>
@@ -339,7 +340,6 @@ class SankeyDiagram implements MAppViews {
   private buildSankey(json, origJson) {
     const that = this;
     const sankey = (<any>d3).sankey();
-    const units = '€';
     const timePoints: any = d3.set(json.map(function (d: any) {return d.timeNode;})).values().sort();
     const selectedTimePointsAsString = (timePoints.length > 1)
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length - 1])
@@ -396,9 +396,15 @@ class SankeyDiagram implements MAppViews {
 
     // Create reduced graph with only number of nodes shown
     const graph = {'nodes': [], 'links': []};
-    console.log('changed', that.nodesToShow);
-    // Keep track of number of flows (distinct source target pairs)
-    that.maximumNodes = flatNest.length;
+
+    // ensure enough data for display (always before painting instead of event handler)
+    if (this.nodesToShow >= flatNest.length) {
+      this.nodesToShow = flatNest.length;
+    } else if (this.nodesToShow <= FLOW_TO_SHOW_INC) {
+      this.nodesToShow = FLOW_TO_SHOW_INC;
+    }
+
+  console.log('changed flows to show: ', that.nodesToShow);
 
     //============ CHECK IF SHOULD DRAW ============
     if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
@@ -410,16 +416,8 @@ class SankeyDiagram implements MAppViews {
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
-      let counter = 0;
-      for (const d of flatNest) {
-        counter++;
-        if (counter * 2 > that.nodesToShow) {
-          const textUp = `Flows below ${dotFormat(d.sum)}${valuePostFix} are not displayed.`;
-          textTransition(d3.select('#infoNodesLeft'), textUp, 350);
-          const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
-          textTransition(d3.select('#loadInfo'), textDown, 350);
-          break;
-        }
+      for (let counter = 0; counter < this.nodesToShow; counter++) {
+        const d = flatNest[counter];
         graph.nodes.push({'name': d.source});//all Nodes source
         graph.nodes.push({'name': d.target});//all Nodes target
         graph.links.push({
@@ -428,6 +426,17 @@ class SankeyDiagram implements MAppViews {
           'value': d.sum
         });
       }
+
+      // disable buttons at the limits (always b/c it might be small data)
+      d3.select('#loadLessBtn').attr('disabled', this.nodesToShow <= FLOW_TO_SHOW_INC ? 'disabled' : null);
+      d3.select('#loadMoreBtn').attr('disabled', this.nodesToShow >= flatNest.length ? 'disabled' : null);
+
+      const textUp = ( this.nodesToShow < flatNest.length)
+        ? `Flows at and below ${dotFormat(flatNest[this.nodesToShow].sum)}${valuePostFix} are not displayed.`
+        : 'All flows are displayed.';
+      textTransition(d3.select('#infoNodesLeft'), textUp, 350);
+      const textDown = `${this.nodesToShow}/${flatNest.length} flows displayed`;
+      textTransition(d3.select('#loadInfo'), textDown, 350);
 
       // d3.keys - returns array of keys from the nest function
       // d3.nest - groups the values of an array by the given key
@@ -553,7 +562,7 @@ class SankeyDiagram implements MAppViews {
 
       // This is how the overlays for the rects can be done after they have been added
       node.append('rect')
-        .filter((d) => {return d.overall > d.value; })
+        .filter((d) => {return d.overall - d.value > 0.00001; }) // compare to a small number to avoid floating point issues
         .attr('width', (d) =>  {
           return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
         })
@@ -668,14 +677,8 @@ class SankeyDiagram implements MAppViews {
 
     // Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
-      this.nodesToShow += 25;
+      this.nodesToShow += FLOW_TO_SHOW_INC;
       SimpleLogging.log('show more flows', this.nodesToShow);
-      if (this.nodesToShow > 25) {
-        d3.select('#loadLessBtn').attr('disabled', null);
-      }
-      if (this.nodesToShow > this.maximumNodes) {
-        this.nodesToShow = this.maximumNodes;
-      }
 
       // Increase the height of the svg to fit the data
       this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
@@ -701,12 +704,8 @@ class SankeyDiagram implements MAppViews {
       this.sankeyHeight -= (10 * this.nodesToShow);
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
-      this.nodesToShow -= 25;
+      this.nodesToShow -= FLOW_TO_SHOW_INC;
       SimpleLogging.log('show less flows', this.nodesToShow);
-      if (this.nodesToShow <= 25) {
-        d3.select('#loadLessBtn').attr('disabled', true);
-        this.nodesToShow = 25;
-      }
 
       d3.select('#sankeyDiagram').html('');
       d3.selectAll('.barchart').html('');
@@ -866,7 +865,8 @@ class SankeyDiagram implements MAppViews {
       </td><td> ${direction} displayed elements.</td></tr>
     `;
 
-    const hiddenFlows = (d.overall - d.value) > 0 ? `
+    // compare to a small number to avoid floating point issues
+    const hiddenFlows = (d.overall - d.value) > 0.00001 ? `
     <tr><td>
       <svg width='8' height='8'>
         <defs>
