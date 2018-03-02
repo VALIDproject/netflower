@@ -562,7 +562,7 @@ class SankeyDiagram implements MAppViews {
 
       // This is how the overlays for the rects can be done after they have been added
       node.append('rect')
-        .filter((d) => {return d.overall > d.value; })
+        .filter((d) => {return d.overall - d.value > 0.00001; }) // compare to a small number to avoid floating point issues
         .attr('width', (d) =>  {
           return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
         })
@@ -865,7 +865,8 @@ class SankeyDiagram implements MAppViews {
       </td><td> ${direction} displayed elements.</td></tr>
     `;
 
-    const hiddenFlows = (d.overall - d.value) > 0 ? `
+    // compare to a small number to avoid floating point issues
+    const hiddenFlows = (d.overall - d.value) > 0.00001 ? `
     <tr><td>
       <svg width='8' height='8'>
         <defs>
