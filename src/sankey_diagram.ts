@@ -382,7 +382,7 @@ class SankeyDiagram implements MAppViews {
         return {
           source: v[0].sourceNode,
           target: v[0].targetNode,
-          sum: d3.sum(v, function (d: any) {
+          value: d3.sum(v, function (d: any) {
             return d.valueNode;
           })
         };
@@ -390,16 +390,13 @@ class SankeyDiagram implements MAppViews {
       .entries(json)
       .map((o) => o.values) // Remove key/values
       .sort(function (a: any, b: any) { // Sort the array of objects by sum
-        return d3.descending(a.sum, b.sum);
+        return d3.descending(a.value, b.value);
       })
-      .filter((e) => {return e.sum > 0;}); // Remove entries whos sum is smaller than 0
-
-    const flowSorter = FlowSorter.getInstance();
-    flowSorter.topFlows(flatNest);
+      .filter((e) => {return e.value > 0;}); // Remove entries whos sum is smaller than 0
 
 
     // Create reduced graph with only number of nodes shown
-    const graph = {'nodes': [], 'links': []};
+    let graph = {'nodes': [], 'links': []};
 
     // ensure enough data for display (always before painting instead of event handler)
     if (this.nodesToShow >= flatNest.length) {
@@ -427,7 +424,7 @@ class SankeyDiagram implements MAppViews {
         graph.links.push({
           'source': d.source,
           'target': d.target,
-          'value': d.sum
+          'value': d.value
         });
       }
 
@@ -436,7 +433,7 @@ class SankeyDiagram implements MAppViews {
       d3.select('#loadMoreBtn').attr('disabled', this.nodesToShow >= flatNest.length ? 'disabled' : null);
 
       const textUp = ( this.nodesToShow < flatNest.length)
-        ? `Flows at and below ${dotFormat(flatNest[this.nodesToShow].sum)}${valuePostFix} are not displayed.`
+        ? `Flows at and below ${dotFormat(flatNest[this.nodesToShow].value)}${valuePostFix} are not displayed.`
         : 'All flows are displayed.';
       textTransition(d3.select('#infoNodesLeft'), textUp, 350);
       const textDown = `${this.nodesToShow}/${flatNest.length} flows displayed`;
@@ -480,6 +477,9 @@ class SankeyDiagram implements MAppViews {
 
         graph.nodes[i] = {'name': d, 'overall': overall, 'fraction': visible/overall};
       });
+
+      const flowSorter = FlowSorter.getInstance();
+      graph = flowSorter.topFlows(flatNest);
 
       this.minFraction = Math.min(...graph.nodes.map((d) => d.fraction));
 
@@ -682,6 +682,7 @@ class SankeyDiagram implements MAppViews {
     // Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
       this.nodesToShow += FLOW_TO_SHOW_INC;
+      FlowSorter.getInstance().showMore();
       SimpleLogging.log('show more flows', this.nodesToShow);
 
       // Increase the height of the svg to fit the data
@@ -709,6 +710,7 @@ class SankeyDiagram implements MAppViews {
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       this.nodesToShow -= FLOW_TO_SHOW_INC;
+      FlowSorter.getInstance().showLess();
       SimpleLogging.log('show less flows', this.nodesToShow);
 
       d3.select('#sankeyDiagram').html('');
