@@ -53,7 +53,7 @@ class ValidHeader implements MAppViews {
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
     </span>
     </div>
-    <div class='timeInfoBox'><div style='font-size: 0.9em;'>Viewing Timestamps: </div>
+    <div class='timeInfoBox invisibleClass'><div style='font-size: 0.9em;'>Viewing Timestamps: </div>
       <div id='timeInfoHeader'></div>
     </div>
     <div class='valid_logo'></div>
