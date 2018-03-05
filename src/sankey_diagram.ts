@@ -462,9 +462,23 @@ class SankeyDiagram implements MAppViews {
             return 'node target';
           }
         })
+        .on('mouseenter', (d) => {
+          this.assembleNodeTooltip(d, valuePostFix);
+        })
+        .on('mouseleave', Tooltip.mouseOut)
         .attr('transform', function (d) {
           return 'translate(' + d.x + ',' + d.y + ')';
         });
+
+      // white background rect so that tooltip is easier to reach
+      node.append('rect')
+        .attr('height', (d) => { return d.dy; })
+        .attr('width', (d) => { return 45 + (margin.left + margin.right) / 2; })
+        .style('fill', 'white')
+        .filter(function (d, i) {
+          return d.x < width / 2;
+        })
+        .attr('x', -45 + sankey.nodeWidth() - (margin.left + margin.right) / 2);
 
       // Add the rectangles for the nodes
       node.append('rect')
@@ -479,11 +493,7 @@ class SankeyDiagram implements MAppViews {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() / d.fraction, 1);
           }
         })
-        .style('fill', '#DA5A6B')
-        .on('mouseover', (d) => {
-          this.assembleNodeTooltip(d, valuePostFix);
-        })
-        .on('mouseout', Tooltip.mouseOut);
+        .style('fill', '#DA5A6B');
 
       // Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
@@ -502,10 +512,6 @@ class SankeyDiagram implements MAppViews {
           } else {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
           }
-        })
-        .on('mouseout', Tooltip.mouseOut)
-        .on('mouseover', (d) => {
-          this.assembleNodeTooltip(d, valuePostFix);
         });
 
       // Add in the title for the nodes
@@ -535,15 +541,6 @@ class SankeyDiagram implements MAppViews {
       d3TextEllipse(rightWrap, maxTextWidth);
 
       // On Hover titles for Sankey Diagram Text - after Text Elipsis
-      heading.on('mouseover', (d) => {
-        this.assembleNodeTooltip(d, valuePostFix);
-      })
-        .on('mouseout', Tooltip.mouseOut);
-      rightWrap.on('mouseover', (d) => {
-        this.assembleNodeTooltip(d, valuePostFix);
-      })
-        .on('mouseout', Tooltip.mouseOut);
-
     } else {
       const svgPlain = d3.select('#sankeyDiagram svg');
       svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right) / 2 + ')')
