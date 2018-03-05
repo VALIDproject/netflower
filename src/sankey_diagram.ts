@@ -36,7 +36,6 @@ import FlowSorter from './flowSorter';
 class SankeyDiagram implements MAppViews {
 
   private $node;
-  private lastShownFlowCount: number = 1; // replaces `nodesToShow` as proxy for increasing svg height
   private sankeyHeight: number = 0;
   private drawReally: boolean = true;
   private minFraction: number = 1;
@@ -398,7 +397,6 @@ class SankeyDiagram implements MAppViews {
 
       const flowSorter = FlowSorter.getInstance();
       graph = flowSorter.topFlows(flatNest, valuePostFix);
-      this.lastShownFlowCount = graph.links.length;
 
       textTransition(d3.select('#infoNodesLeft'), flowSorter.getMessage(0), 350);
       textTransition(d3.select('#loadInfo'), flowSorter.getMessage(1), 350);
@@ -611,7 +609,7 @@ class SankeyDiagram implements MAppViews {
 
       // Increase the height of the svg to fit the data
       this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      this.sankeyHeight += (10 * this.lastShownFlowCount);
+      this.sankeyHeight += (120 * FlowSorter.getInstance().getExtent());
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       d3.select('#sankeyDiagram').html('');
@@ -630,7 +628,7 @@ class SankeyDiagram implements MAppViews {
     // Functionality of show less button with dynamic increase of values.
     this.$node.select('#loadLessBtn').on('click', (e) => {
       this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      this.sankeyHeight -= (10 * this.lastShownFlowCount);
+      this.sankeyHeight -= (120 * FlowSorter.getInstance().getExtent());
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       FlowSorter.getInstance().showLess();

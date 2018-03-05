@@ -95,6 +95,10 @@ export default class FlowSorter implements MAppViews {
     return this.canShowMore;
   }
 
+  public getExtent(): number {
+    return this.showExtent;
+  }
+
   public getMessage(i: number) {
     return this.messages[i];
   }
