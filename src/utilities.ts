@@ -1,6 +1,7 @@
 /**
  * Created by Florian on 02.05.2017.
  */
+import text = d3.text;
 ;
 import * as d3 from 'd3';
 import * as events from 'phovea_core/src/event';
@@ -110,6 +111,17 @@ export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom =
  */
 export const splitAt = (index) => (it) =>
   [it.slice(0, index), it.slice(index)];
+
+/**
+ * This function takes a time point which consits basically of a year and a quarter. It places between the year and
+ * quarter a big "Q" in order to symbolize the quarter. So for example 20151 --> 2015Q1
+ * @param timePoint to be transformed
+ * @returns {string} transfomred time point
+ */
+export function splitQuarter(timePoint: string): string {
+  const textParts = splitAt(4)(timePoint);
+  return `${textParts[0]}Q${textParts[1]}`;
+}
 
 const formatNumber = d3.format(',.0f');    //Zero decimal places
 //  format = function(d) { return formatNumber(d); }, //Display number with unit sign

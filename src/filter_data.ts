@@ -17,7 +17,7 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {splitAt} from './utilities';
+import {splitAt, splitQuarter} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFilter from './filters/timeFilter';
 import ParagraphFilter from './filters/paragraphFilter';
@@ -136,7 +136,8 @@ class FilterData implements MAppViews {
 
       // Reset all Labels afterwards
       textTransition(d3.select('#currentTimeInfo'),
-        `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
+        `Between: ${splitQuarter(this.timeFilter.minValue + '')} - 
+          ${splitQuarter(this.timeFilter.maxValue + '')}`, 200);
 
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
@@ -244,7 +245,8 @@ class FilterData implements MAppViews {
 
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
     textTransition(d3.select('#currentTimeInfo'),
-      `Between: ${timePoints[timePoints.length - 1]} - ${timePoints[timePoints.length - 1]}`, 200);
+      `Between: ${splitQuarter(timePoints[timePoints.length - 1])} -
+        ${splitQuarter(timePoints[timePoints.length - 1])}`, 200);
     events.fire(AppConstants.EVENT_TIME_VALUES, [timePoints[timePoints.length - 1]]);
 
     ul.selectAll('li')
@@ -300,8 +302,10 @@ class FilterData implements MAppViews {
         events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
         events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
         events.fire(AppConstants.EVENT_TIME_VALUES, selectedTime);
+
         textTransition(d3.select('#currentTimeInfo'),
-          `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
+          `Between: ${splitQuarter(this.timeFilter.minValue + '')} - 
+          ${splitQuarter(this.timeFilter.maxValue + '')}`, 200);
       } else {
         bootbox.alert({
           message: NO_TIME_POINTS,
