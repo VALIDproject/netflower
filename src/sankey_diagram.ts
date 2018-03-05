@@ -20,7 +20,7 @@ import {
   getEntityRef, getMediaRef, getValueRef,
   setEntityTagFilter, setMediaTagFilter
 } from './filters/filterMethods';
-import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER} from './language';
+import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER, NOTAGS_INFO} from './language';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -156,7 +156,7 @@ class SankeyDiagram implements MAppViews {
           </span>
         </div>
         <div class='input-group input-group-xs' id='entityTagFilterGroup' style='width: 100%; margin: 10px auto;'>
-          <button type='button' class='tagFilterBtn form-control' id='entityTagFilterButton'>Set ${columnLabels.sourceNode} Tags</button>
+          <button type='button' class='tagFilterBtn form-control' id='entityTagFilterButton'>Filter by ${columnLabels.sourceNode} Tags</button>
           <div class="tagFilterBox"></div>
         </div>
       </div>
@@ -231,7 +231,7 @@ class SankeyDiagram implements MAppViews {
         </span>
       </div>
       <div class='input-group input-group-xs' id='mediaTagFilterGroup' style='width: 100%; margin: 10px auto;'>
-        <button type='button' class='tagFilterBtn form-control' id='mediaTagFilterButton'>Set ${columnLabels.targetNode} Tags</button>
+        <button type='button' class='tagFilterBtn form-control' id='mediaTagFilterButton'>Filter by ${columnLabels.targetNode} Tags</button>
         <div class="tagFilterBox"></div>
       </div>
     </div>
@@ -456,6 +456,15 @@ class SankeyDiagram implements MAppViews {
     if (json.length === 0) {                                  //ERROR: Too strong filtered
       that.drawReally = false;
       this.showErrorDialog(ERROR_TOOMANYFILTER);
+    } else if(that.pipeline.getTagFlowFilterStatus()) {
+      let sumOfEntityTags = that.entityTagFilter.activeTags.size() + that.entityTagFilter.availableTags.size();
+      let sumOfMediaTags = that.mediaTagFilter.activeTags.size() + that.mediaTagFilter.availableTags.size();
+      if(sumOfEntityTags == 0 || sumOfMediaTags == 0) {
+        that.drawReally = false;
+        this.showErrorDialog(NOTAGS_INFO);
+      } else {
+        that.drawReally = true;
+      }
     } else {
       that.drawReally = true;
     }
@@ -472,13 +481,15 @@ class SankeyDiagram implements MAppViews {
           textTransition(d3.select('#loadInfo'), textDown, 350);
           break;
         }
-        graph.nodes.push({'name': d.source});//all Nodes source
-        graph.nodes.push({'name': d.target});//all Nodes target
-        graph.links.push({
-          'source': d.source,
-          'target': d.target,
-          'value': d.sum
-        });
+        if(d.source && d.target) {
+          graph.nodes.push({'name': d.source});//all Nodes source
+          graph.nodes.push({'name': d.target});//all Nodes target
+          graph.links.push({
+            'source': d.source,
+            'target': d.target,
+            'value': d.sum
+          });
+        }
       }
 
       //d3.keys - returns array of keys from the nest function
@@ -622,7 +633,6 @@ class SankeyDiagram implements MAppViews {
         });
 
       //Add in the title for the nodes
-      //let tmp = node.append('g');
       const heading = node.append('g').append('text')
         .attr('x', 45)
         .attr('y', function (d) {
@@ -647,22 +657,22 @@ class SankeyDiagram implements MAppViews {
       if(!that.pipeline.getTagFlowFilterStatus()) {
         const managers = node.append('g');
 
-        const buttons = managers.append('rect')
+        const tagCountRect = managers.append('rect')
           .attr('x', 45)
           .attr('y', function (d) {
             return (d.dy / 2) + 7;
           })
           .attr('rx', 2)
           .attr('ry', 2)
-          .attr('width', '76px')
+          .attr('width', '50px')
           .attr('height', '18px')
-          .attr('fill', '#DA5A6B')
+          .attr('fill', 'rgba(0,0,0,0.3)')
           .filter(function (d, i) {
             return d.x < width / 2;
           })
-          .attr('x', -121 + sankey.nodeWidth());
+          .attr('x', -111 + sankey.nodeWidth());
 
-        const buttonLabels = managers.append('text')
+        const tagCountLabels = managers.append('text')
           .attr('x', 50)
           .attr('y', function (d) {
             return (d.dy / 2) + 12;
@@ -670,50 +680,68 @@ class SankeyDiagram implements MAppViews {
           .attr('dy', '0.6em')
           .attr('fill', 'white')
           .attr('text-anchor', 'start')
-          .attr('cursor', 'pointer')
-          .attr('class', 'manageMediaTag')
-          .text('Manage Tags')
+          .attr('cursor', 'default')
+          .text(function(d) {
+            return that.getNumOfTagsForMediaNode(json, d.name);
+          })
           .filter(function (d, i) {
             return d.x < width / 2;
           })
-          .attr('x', -50 + sankey.nodeWidth())
+          .attr('x', -65 + sankey.nodeWidth())
+          .attr('text-anchor', 'end')
+          .text(function(d) {
+            return that.getNumOfTagsForEntityNode(json, d.name);
+          });
+
+        const buttons = managers.append('text')
+          .attr('x', 100)
+          .attr('y', function (d) {
+            return (d.dy / 2) + 14;
+          })
+          .attr('dy', '0.6em')
+          .attr('font-family', 'FontAwesome')
+          .attr('font-size', '1.5em')
+          .attr('cursor', 'pointer')
+          .attr('class', 'manageMediaTag')
+          .text(function(d) {
+            return '\uf044';
+          })
+          .filter(function (d, i) {
+            return d.x < width / 2;
+          })
+          .attr('x', -45 + sankey.nodeWidth())
           .attr('text-anchor', 'end')
           .attr('class', 'manageEntityTag');
 
-        const maxTextWidth = (margin.left + margin.right - 10) / 2;
-        const leftWrap = this.$node.selectAll('.leftText');
-        d3TextEllipse(leftWrap, maxTextWidth);
-        const rightWrap = this.$node.selectAll('.rightText');
-        d3TextEllipse(rightWrap, maxTextWidth);
         const entityTagManager = this.$node.selectAll('.manageEntityTag');
         const mediaTagManager = this.$node.selectAll('.manageMediaTag');
 
-        //On Hover titles for Sankey Diagram Text - after Text Elipsis
-        heading.on('mouseover', (d) => {
-          let tags: d3.Set = that.entityTagFilter.getTagsByName(json, d.name);
-          let tooltipText = '<br>(Tags: ' + (tags.size() == 0 ? 'None)' : tags.values() + ')');
-          Tooltip.mouseOver(d, d.name + tooltipText, 'T2');
-        })
-          .on('mouseout', Tooltip.mouseOut);
-        rightWrap.on('mouseover', (d) => {
-          let tags: d3.Set = that.mediaTagFilter.getTagsByName(json, d.name);
-          let tooltipText = '<br>(Tags: ' + (tags.size() == 0 ? 'None)' : tags.values() + ')');
-          Tooltip.mouseOver(d, d.name + tooltipText, 'T2');
-        })
-          .on('mouseout', Tooltip.mouseOut);
-
         entityTagManager.on('click', (d) => {
           let tags: d3.Set = that.entityTagFilter.getTagsByName(json, d.name);
-          //console.log("tags: " + tags.values());
-          let dialog = new ManageTagDialog(d, tags);
+          let dialog = new ManageTagDialog(d, tags, that.entityTagFilter);
         })
 
         mediaTagManager.on('click', (d) => {
           let tags: d3.Set = that.mediaTagFilter.getTagsByName(json, d.name);
-          //console.log("tags: " + tags.values());
-          let dialog = new ManageTagDialog(d, tags);
+          let dialog = new ManageTagDialog(d, tags, that.mediaTagFilter);
         })
       }
+
+      const maxTextWidth = (margin.left + margin.right - 10) / 2;
+      const leftWrap = this.$node.selectAll('.leftText');
+      d3TextEllipse(leftWrap, maxTextWidth);
+      const rightWrap = this.$node.selectAll('.rightText');
+      d3TextEllipse(rightWrap, maxTextWidth);
+
+      //On Hover titles for Sankey Diagram Text - after Text Elipsis
+      heading.on('mouseover', (d) => {
+        Tooltip.mouseOver(d, d.name, 'T2');
+      })
+        .on('mouseout', Tooltip.mouseOut);
+      rightWrap.on('mouseover', (d) => {
+        Tooltip.mouseOver(d, d.name, 'T2');
+      })
+        .on('mouseout', Tooltip.mouseOut);
 
     } else {
       const svgPlain = d3.select('#sankeyDiagram svg');
@@ -965,6 +993,24 @@ class SankeyDiagram implements MAppViews {
       }
     });
 
+  }
+
+  private getNumOfTagsForMediaNode(json, name) {
+    let tags: d3.Set = this.mediaTagFilter.getTagsByName(json, name);
+    switch(tags.size()) {
+      case 0: { return 'No Tags'; }
+      case 1: { return tags.size() + ' Tag'; }
+      default: { return tags.size() + ' Tags'; }
+    }
+  }
+
+  private getNumOfTagsForEntityNode(json, name) {
+    let tags: d3.Set = this.entityTagFilter.getTagsByName(json, name);
+    switch(tags.size()) {
+      case 0: { return 'No Tags'; }
+      case 1: { return tags.size() + ' Tag'; }
+      default: { return tags.size() + ' Tags'; }
+    }
   }
 }
 

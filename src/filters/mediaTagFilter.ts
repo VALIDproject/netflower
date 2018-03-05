@@ -8,7 +8,8 @@ import Entity from '../datatypes/entity';
 export default class MediaTagFilter extends TagFilter
 {
   //Find all media institutions which are associated with the active tags
-  protected processData(data: any): void {
+  protected processData(data: any): void
+  {
     let that = this;
     let tags: d3.Set = d3.set([]);
     let map = new Map<string, d3.Set>();
@@ -18,7 +19,7 @@ export default class MediaTagFilter extends TagFilter
       let value: d3.Set = map.get(key);
 
       const tagsAsText: string = entry.targetTag;
-      const tagValues: Array<string> = tagsAsText.split("|");
+      const tagValues: Array<string> = tagsAsText.split(" | ");
       if (tagsAsText !== '') {
         if (value === null || value === undefined) {
           value = d3.set();

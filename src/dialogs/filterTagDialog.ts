@@ -16,10 +16,12 @@ export default class FilterTagDialog {
 
   private message: string;
   private dialog;
+  private columnLabels;
 
   constructor(private d, private tagFilter: TagFilter, private tagGroupHTMLElement) {
     this._activeTags = d3.set(tagFilter.activeTags.values());
     this._availableTags = d3.set(tagFilter.availableTags.values());
+    this.columnLabels = this.getColumnLabels();
     this.setAvailableTags();
     this.buildDialog();
   }
@@ -141,9 +143,9 @@ export default class FilterTagDialog {
 
   private getDialogTitle() {
     if(this.tagFilter instanceof EntityTagFilter)
-      return 'Filter Legal Entities By Tags';
+      return 'Filter ' + this.columnLabels.sourceNode + ' By Tags';
     else
-      return 'Filter Media Insitutions By Tags';
+      return 'Filter ' + this.columnLabels.targetNode + ' By Tags';
   }
 
   private buildDialog() {
@@ -188,9 +190,9 @@ export default class FilterTagDialog {
                   .style('color', '#FFF')
                   .style('border:', 'none');
                 if(that.tagFilter instanceof EntityTagFilter)
-                  $tagFilterBtn.html(`Change Legal Entity Tags`);
+                  $tagFilterBtn.html(`Change ${columnLabels.sourceNode} Tags`);
                 else
-                  $tagFilterBtn.html(`Change Media Institution Tags`);
+                  $tagFilterBtn.html(`Change ${columnLabels.targetNode} Tags`);
                 const $tagContainer = $tagFilterBox
                                         .append('div')
                                         .style('padding', '5px')
@@ -210,9 +212,9 @@ export default class FilterTagDialog {
                   .style('color', '#555')
                   .style('border:', '1px solid #CCC')
                 if(that.tagFilter instanceof EntityTagFilter)
-                  $tagFilterBtn.html(`Set Legal Entity Tags`);
+                  $tagFilterBtn.html(`Set ${columnLabels.sourceNode} Tags`);
                 else
-                  $tagFilterBtn.html(`Set Media Institution Tags`);
+                  $tagFilterBtn.html(`Set ${columnLabels.targetNode} Tags`);
               }
               events.fire(AppConstants.EVENT_FILTER_CHANGED, that.d, null);
             }
@@ -222,6 +224,17 @@ export default class FilterTagDialog {
       this.dialog.init(() => {
         this.updateDialogMessage();
       });
+  }
+
+  private getColumnLabels(): any {
+    let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+    if (columnLabels == null) {
+      columnLabels = {};
+      columnLabels.sourceNode = 'Source';
+      columnLabels.targetNode = 'Target';
+      columnLabels.valueNode = '';
+    }
+    return columnLabels;
   }
 
   private sortTagsByAlphabet(tagSet: d3.Set) {

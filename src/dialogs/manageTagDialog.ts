@@ -5,21 +5,26 @@ import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
 
+import TagFilter from '../filters/tagFilter';
+import EntityTagFilter from '../filters/entityTagFilter';
+
 export default class ManageFilterDialog {
 
   private _tags: d3.Set;
+  private _availableTags: d3.Set;
 
   private message: string;
   private dialog;
 
-  constructor(private d, private _originalTags: d3.Set) {
+  constructor(private d, private _originalTags: d3.Set, private tagFilter: TagFilter,) {
     this._tags = d3.set(this._originalTags.values());
+    this.createAvailableTagSet(tagFilter);
     this.buildDialog();
   }
 
   private updateDialogMessage() {
     this._tags = d3.set(this.sortTagsByAlphabet(this._tags));
-    this.message = this.buildActiveTagsHtml() + this.buildAddNewTagHtml();
+    this.message = this.buildActiveTagsHtml() + this.buildAddNewTagHtml() + this.buildSuggestedTagsHtml();
     $('.bootbox-body').html(this.message);
     this.initTagButtons();
   }
@@ -53,44 +58,62 @@ export default class ManageFilterDialog {
     return message;
   }
 
+  private buildSuggestedTagsHtml() {
+    let message = "<small>Suggested Tags:";
+    if(this._availableTags.empty()) {
+      return message += "<b>None</b></small>";
+    } else {
+      message += "</small><div style=\"margin: 10px 0px\">";
+      for (let value of this._availableTags.values()) {
+        if(!this._tags.has(value)) {
+          message += this.createButtonHtmlByValue(value, false)
+        }
+      }
+    }
+    return message + "</div>";
+  }
+
   private createButtonHtmlByValue(value: string, active: boolean) {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
           "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
   }
 
   private initTagButtons() {
-    var that = this;
+    const that = this;
     $('.tagBtn').click(function() {
-      const tagLabel = $(this).html();
-      bootbox.confirm({
-        className: 'dialogBox',
-        message: "This removes the tag " + tagLabel + ". Do you wish to proceed?",
-        buttons: {
-          confirm: {
-            label: 'Yes',
-            className: 'btn-info'
+      const tagBtnElem = this;
+      if($(tagBtnElem).hasClass('active')) {
+        const tagLabel = $(tagBtnElem).html();
+        bootbox.confirm({
+          className: 'dialogBox',
+          message: "This removes the tag " + tagLabel + ". Do you wish to proceed?",
+          buttons: {
+            confirm: {
+              label: 'Yes',
+              className: 'btn-info'
+            },
+            cancel: {
+              label: 'No',
+              className: 'btn-cancel'
+            }
           },
-          cancel: {
-            label: 'No',
-            className: 'btn-cancel'
+          callback: function (result) {
+            if (result) {
+              that._tags.remove(tagLabel);
+              that.updateDialogMessage();
+            }
           }
-        },
-        callback: function (result) {
-          if(result) {
-            console.log(tagLabel);
-            that._tags.remove(tagLabel);
-            that.updateDialogMessage();
-          }
-        }
-      });
+        });
+      } else {
+        that._tags.add($(this).html());
+        that.updateDialogMessage();
+      }
     });
 
     const addTag = (d) => {
       let value: string = $('#addTagInput').val();
       value = value.charAt(0).toUpperCase() + value.slice(1);
       // check if tag already exists in tag list
-      console.log(that._tags.values());
-      console.log(value + ": " + this._tags.has(value));
       if(that._tags.has(value)) {
         bootbox.alert({
           className: 'dialogBox',
@@ -166,10 +189,10 @@ export default class ManageFilterDialog {
       let term = this.d.name.toLowerCase();
       let sourceValue = entry.sourceNode.toLowerCase();
       let targetValue = entry.targetNode.toLowerCase();
-      if(sourceValue.indexOf(term) !== -1) {
+      if(sourceValue === term) {
         entry.sourceTag = this.formatTagsForCSV(this._tags);
       }
-      if (targetValue.indexOf(term) !== -1) {
+      if (targetValue === term) {
         entry.targetTag = this.formatTagsForCSV(this._tags);
       }
     }
@@ -178,6 +201,13 @@ export default class ManageFilterDialog {
       events.fire(AppConstants.EVENT_FILTER_CHANGED, that.d, null);
       return localforage.getItem('data');
     });
+  }
+
+  private createAvailableTagSet(tagFilter: TagFilter) {
+    this._availableTags = d3.set(tagFilter.availableTags.values());
+    for (let value of tagFilter.activeTags.values()) {
+      this._availableTags.add(value);
+    }
   }
 
   private sortTagsByAlphabet(tagSet: d3.Set) {
