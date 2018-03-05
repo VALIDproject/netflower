@@ -111,6 +111,12 @@ export class App implements MAppViews {
       options: {'parentDOM' : 'div.sankey_features div.col-md-4'},
     },
     {
+      view: 'FlowSorter',
+      parent: 'dataVizView',
+      // options: {'parentDOM' : 'div.clearBox'},
+      options: {'parentDOM' : 'div.sankey_features div.col-md-2'},
+    },
+    {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
