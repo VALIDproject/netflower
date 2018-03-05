@@ -43,6 +43,14 @@ export const NO_TIME_POINTS = `<span class='label label-warning' style='font-wei
 You have no time points selected! <br/> In order to prevent the application from showing nothing or unwanted results,
 the last defined time points were choosen.`;
 
+export const EXPORT_INFO = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span>
+You are going to download a file with the name: <strong>flows</strong> and the current time stamp which contains the exported flow data of the current
+view. Proceed with OK if you want to download the file.`;
+
+export const EXPORT_INFO2 = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span> 
+You are going to download a file with the name: <strong>timeseries</strong> and the current time stamp which contains the exported data of the current
+view. Proceed with OK if you want to download the file.`;
+
 export const DOWNLOAD_INFO = `The <strong>button</strong> below let's you download a sample dataset for the application.
 It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`;
 

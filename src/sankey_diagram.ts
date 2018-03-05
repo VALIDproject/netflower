@@ -900,7 +900,6 @@ class SankeyDiagram implements MAppViews {
         }
       }
     });
-
   }
 }
 
