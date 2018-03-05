@@ -30,18 +30,14 @@ import PaymentEuroFilter from './filters/paymentEuroFilter';
 import SparklineBarChart from './sparklineBarChart';
 import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
+import FlowSorter from './flowSorter';
 
-
-const FLOW_TO_SHOW_INC = 12;
 
 class SankeyDiagram implements MAppViews {
 
   private $node;
-  private nodesToShow: number = FLOW_TO_SHOW_INC; // actually flows
   private sankeyHeight: number = 0;
   private drawReally: boolean = true;
-  private valuesSumSource: {key: string, values: number}[];
-  private valuesSumTarget: {key: string, values: number}[];
   private minFraction: number = 1;
 
   // Filters
@@ -314,15 +310,6 @@ class SankeyDiagram implements MAppViews {
 
       // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
-      this.valuesSumSource = d3.nest()
-        .key((d: any) => { return d.sourceNode; })
-        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
-        .entries(filteredData);
-
-      this.valuesSumTarget = d3.nest()
-        .key((d: any) => { return d.targetNode; })
-        .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
-        .entries(filteredData);
 
       // console.log('----------- Original Data -----------');
       // console.log(originalData);
@@ -381,30 +368,21 @@ class SankeyDiagram implements MAppViews {
         return {
           source: v[0].sourceNode,
           target: v[0].targetNode,
-          time: v[0].timeNode,
-          sum: d3.sum(v, function (d: any) {
+          value: d3.sum(v, function (d: any) {
             return d.valueNode;
           })
         };
       })
       .entries(json)
       .map((o) => o.values) // Remove key/values
-      .sort(function (a: any, b: any) { // Sort the array of objects by sum
-        return d3.descending(a.sum, b.sum);
-      })
-      .filter((e) => {return e.sum > 0;}); // Remove entries whos sum is smaller than 0
+      .filter((e) => {return e.value > 0;}); // Remove entries whos sum is smaller than 0
+
 
     // Create reduced graph with only number of nodes shown
-    const graph = {'nodes': [], 'links': []};
+    // rationale: typescript complains less about dy etc. if we first define it like this
+    let graph = {'nodes': [], 'links': []};
 
-    // ensure enough data for display (always before painting instead of event handler)
-    if (this.nodesToShow >= flatNest.length) {
-      this.nodesToShow = flatNest.length;
-    } else if (this.nodesToShow <= FLOW_TO_SHOW_INC) {
-      this.nodesToShow = FLOW_TO_SHOW_INC;
-    }
-
-  console.log('changed flows to show: ', that.nodesToShow);
+  // console.log('changed flows to show: ', that.nodesToShow);
 
     //============ CHECK IF SHOULD DRAW ============
     if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
@@ -416,66 +394,16 @@ class SankeyDiagram implements MAppViews {
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
-      for (let counter = 0; counter < this.nodesToShow; counter++) {
-        const d = flatNest[counter];
-        graph.nodes.push({'name': d.source});//all Nodes source
-        graph.nodes.push({'name': d.target});//all Nodes target
-        graph.links.push({
-          'source': d.source,
-          'target': d.target,
-          'value': d.sum
-        });
-      }
+
+      const flowSorter = FlowSorter.getInstance();
+      graph = flowSorter.topFlows(flatNest, valuePostFix);
+
+      textTransition(d3.select('#infoNodesLeft'), flowSorter.getMessage(0), 350);
+      textTransition(d3.select('#loadInfo'), flowSorter.getMessage(1), 350);
 
       // disable buttons at the limits (always b/c it might be small data)
-      d3.select('#loadLessBtn').attr('disabled', this.nodesToShow <= FLOW_TO_SHOW_INC ? 'disabled' : null);
-      d3.select('#loadMoreBtn').attr('disabled', this.nodesToShow >= flatNest.length ? 'disabled' : null);
-
-      const textUp = ( this.nodesToShow < flatNest.length)
-        ? `Flows at and below ${dotFormat(flatNest[this.nodesToShow].sum)}${valuePostFix} are not displayed.`
-        : 'All flows are displayed.';
-      textTransition(d3.select('#infoNodesLeft'), textUp, 350);
-      const textDown = `${this.nodesToShow}/${flatNest.length} flows displayed`;
-      textTransition(d3.select('#loadInfo'), textDown, 350);
-
-      // d3.keys - returns array of keys from the nest function
-      // d3.nest - groups the values of an array by the given key
-      // d3.map - constructs a new map and copies all enumerable properties from the specified object into this map.
-      graph.nodes = (<any>d3).keys((<any>d3).nest().key((d) => {return d.name;}).map(graph.nodes));
-
-      graph.links.forEach(function (d, i) {
-        graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
-        graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
-      });
-
-      // This makes out of the array of strings a array of objects with the key 'name'
-      graph.nodes.forEach((d, i) => {
-        // Also store the overall sum of (filtered) flows for the node
-        let overall = 0;
-        let visible = -1;
-        for (const val of this.valuesSumSource) {
-          if (val.key === d) {
-            overall = val.values;
-
-            visible = graph.links
-              .filter((d) => { return d.source === i; })
-              .map((d) => d.value)
-              .reduce((total, current) => total + current);
-          }
-        }
-        for (const val of this.valuesSumTarget) {
-          if (val.key === d) {
-            overall = val.values;
-
-            visible = graph.links
-              .filter((d) => { return d.target === i; })
-              .map((d) => d.value)
-              .reduce((total, current) => total + current);
-          }
-        }
-
-        graph.nodes[i] = {'name': d, 'overall': overall, 'fraction': visible/overall};
-      });
+      d3.select('#loadLessBtn').attr('disabled', flowSorter.hasShowLess() ? null : 'disabled');
+      d3.select('#loadMoreBtn').attr('disabled', flowSorter.hasShowMore() ? null : 'disabled');
 
       this.minFraction = Math.min(...graph.nodes.map((d) => d.fraction));
 
@@ -677,12 +605,11 @@ class SankeyDiagram implements MAppViews {
 
     // Functionality of show more button with dynamic increase of values.
     this.$node.select('#loadMoreBtn').on('click', (e) => {
-      this.nodesToShow += FLOW_TO_SHOW_INC;
-      SimpleLogging.log('show more flows', this.nodesToShow);
+      FlowSorter.getInstance().showMore();
 
       // Increase the height of the svg to fit the data
       this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      this.sankeyHeight += (10 * this.nodesToShow);
+      this.sankeyHeight += (120 * FlowSorter.getInstance().getExtent());
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
       d3.select('#sankeyDiagram').html('');
@@ -701,11 +628,10 @@ class SankeyDiagram implements MAppViews {
     // Functionality of show less button with dynamic increase of values.
     this.$node.select('#loadLessBtn').on('click', (e) => {
       this.sankeyHeight = this.$node.select('.sankey_vis').node().getBoundingClientRect().height;
-      this.sankeyHeight -= (10 * this.nodesToShow);
+      this.sankeyHeight -= (120 * FlowSorter.getInstance().getExtent());
       this.$node.select('.sankey_vis').style('height', this.sankeyHeight + 'px');
 
-      this.nodesToShow -= FLOW_TO_SHOW_INC;
-      SimpleLogging.log('show less flows', this.nodesToShow);
+      FlowSorter.getInstance().showLess();
 
       d3.select('#sankeyDiagram').html('');
       d3.selectAll('.barchart').html('');
@@ -718,6 +644,12 @@ class SankeyDiagram implements MAppViews {
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
       evt.stopPropagation();
+    });
+
+    events.on(AppConstants.EVENT_SORT_CHANGE, (evt) => {
+      d3.select('#sankeyDiagram').html('');
+      d3.selectAll('.barchart').html('');
+      this.getStorageData(true);
     });
 
     // Change detection for the input FROM of the ENTITY slider.
