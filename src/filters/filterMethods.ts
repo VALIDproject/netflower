@@ -74,7 +74,9 @@ export function updateEntityRange(filter, data: any) {
 
   entityFilterRef.update({
     min: myMin,
-    max: myMax
+    max: myMax,
+    from: myMin,
+    to: myMax
   });
 }
 
@@ -138,7 +140,9 @@ export function updateMediaRange(filter, data: any) {
 
   mediaFilterRef.update({
     min: myMin,
-    max: myMax
+    max: myMax,
+    from: myMin,
+    to: myMax
   });
 }
 
@@ -211,7 +215,9 @@ export function updateEuroRange(filter, data: any) {
 
   valueFilterRef.update({
     min: min,
-    max: max
+    max: max,
+    from: min,
+    to: max
   });
 }
 

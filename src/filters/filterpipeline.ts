@@ -1,7 +1,6 @@
 import Filter from './filter';
 import EntitySearchFilter from './entitySearchFilter';
 import MediaSearchFilter from './mediaSearchFilter';
-import TopFilter from './topFilter';
 import TagFlowFilter from './tagFlowFilter';
 
 /**
@@ -14,7 +13,7 @@ export default class FilterPipeline
   private _attributeFilters = new Array<Filter>();
 
   // Top filter has to be the first filter of the pipeline and therefore is stored separately
-  private _topFilter: TopFilter;
+  // private _topFilter: TopFilter;
   // Search filters have to be right after the topFilter and therefore are also stored separately
   private _entitySearchFilter: EntitySearchFilter;
   private _mediaSearchFilter: MediaSearchFilter;
@@ -67,10 +66,10 @@ export default class FilterPipeline
    * This is used to change the stored topFilter.
    * @param newTop which will be used as filter.
    */
-  public changeTopFilter(newTop: TopFilter): void
-  {
-    this._topFilter = newTop;
-  }
+  // public changeTopFilter(newTop: TopFilter): void
+  // {
+  //   this._topFilter = newTop;
+  // }
 
   /**
    * Changes the stored entitySearchFilter.
@@ -101,7 +100,7 @@ export default class FilterPipeline
   }
 
   /**
-   * This method performs all filters in the pipeline and additionally the topFilter,
+   * This method performs all filters in the pipeline and additionally the time filter,
    * entitySearchFilter and mediaSearchFilter which are special ones.
    * @param data to perform the filter pipeline on.
    * @returns {any} the filtered data.
@@ -114,9 +113,6 @@ export default class FilterPipeline
         data = this._tagFlowFilter.meetCriteria(data);
       }
     } else {
-      if (this._topFilter !== null && this._topFilter !== undefined)
-        data = this._topFilter.meetCriteria(data);
-
       if (this._entitySearchFilter !== null && this._entitySearchFilter !== undefined)
         data = this._entitySearchFilter.meetCriteria(data);
 
@@ -139,7 +135,7 @@ export default class FilterPipeline
   {
     for (let filter of this._attributeFilters)
     {
-          data = filter.meetCriteria(data);
+      data = filter.meetCriteria(data);
     }
     return data;
   }
@@ -150,7 +146,6 @@ export default class FilterPipeline
   public printFilters(): void
   {
     console.log('Filter Count: ' + (this.filters.length+3));
-    this._topFilter.printData();
     this._entitySearchFilter.printData();
     this._mediaSearchFilter.printData();
     this._tagFlowFilter.printData();

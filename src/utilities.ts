@@ -10,7 +10,7 @@ import {AppConstants} from './app_constants';
 /**
  Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
  * Based on https://github.com/mbostock/d3/issues/1642
- * @exemple svg.append('g')
+ * @example svg.append('g')
  *      .attr('class', 'x axis')
  *      .attr('transform', 'translate(0,' + height + ')')
  *      .call(xAxis)
@@ -25,9 +25,9 @@ import {AppConstants} from './app_constants';
  *
  * @see: from https://github.com/d3/d3/issues/1642 AlexandreBonneau
  */
-export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
-  paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
-  paddingTopBottom = (paddingTopBottom || 5) - 2; //Default padding (5px), remove 2 pixels because of the borders
+export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom = 5) {
+  // paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
+  paddingTopBottom = paddingTopBottom - 2; //Default padding (5px), remove 2 pixels because of the borders
   const maxWidth = width; //I store the tooltip max width
   width = width - (paddingRightLeft * 2); //Take the padding into account
 
@@ -417,9 +417,16 @@ export class Tooltip {
         .style('left', ((<any>d3).event.pageX - 20) + 'px')
         .style('top', ((<any>d3).event.pageY - 140) + 'px');
     } else {
+      let left = (<any>d3).event.pageX;
+      const screenWidth = document.documentElement.clientWidth;
+      if ((left + 200) > screenWidth) {
+        left = screenWidth - 200; // Reduce by tooltip width = 200 and offset = 20
+      } else {
+        left = left - 20;
+      }
       Tooltip.tooltip2.transition().duration(200).style('opacity', .9);
       Tooltip.tooltip2.html(text)
-        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('left', left + 'px')
         .style('top', ((<any>d3).event.pageY) + 'px');
     }
   }
