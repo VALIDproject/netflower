@@ -190,14 +190,18 @@ export default class SparklineBarChart implements MAppViews {
     .attr('fill', 'white');
 
     group.on('mouseenter', (d) => {
-      // our version of d3.js TypeScript definitions lack currentTarget
-      // cp. https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-      const g = d3.select((d3.event as any).currentTarget);
+      const overlay = _self.$node.append('g')
+        .classed('overlay', true)
+        .on('mouseleave', (d) => {
+          const overlays = d3.selectAll('svg.barchart g.overlay');
+          overlays.remove();
+        });
 
-      const overlay = g.append('g')
-        .classed('overlay', true);
+      const y1 = Math.min(yBaseline - 4 - 13, elemTop);
+      const y2 = Math.max(yBaseline + CHART_HEIGHT + 13 + 3, elemTop + elemHeight);
 
       overlay.html(`
+      <rect x='0' y='${y1}' width='${_self.chartWidth}' height='${y2 -y1}' fill="white" />
       <text id='flowtotals' x='${2}' y='${yBaseline - 4}' style='text-anchor: start'>${this.generateFlowTotalsText(aggregatedData, timePoints)}</text>
 
       <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: middle'>time</text>
@@ -205,10 +209,25 @@ export default class SparklineBarChart implements MAppViews {
       <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
       `);
       d3TextWrap(d3.select('text#flowtotals'), this.chartWidth, 2);
-    })
-    .on('mouseleave', (d) => {
-      const overlays = d3.selectAll('svg.barchart g.overlay');
-      overlays.remove();
+
+      overlay.selectAll('bar')
+        .data(aggregatedData)
+        .enter().append('rect')
+        .classed('bar', true)
+        .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
+        .attr('x', function (d, i) { return x(d.key); })
+        .attr('width', x.rangeBand())
+        .attr('y', function (d) { return y(d.values) + yBaseline; })
+        .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
+        // bar hover -- update text above barchart
+        .on('mouseover', (d) => {
+          d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
+        })
+        .on('mouseout', (d) => {
+          const text = d3.select('text#flowtotals');
+          text.text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+          d3TextWrap(text, this.chartWidth, 2);
+        });
     });
 
     group.selectAll('bar')
@@ -219,16 +238,7 @@ export default class SparklineBarChart implements MAppViews {
       .attr('x', function (d, i) { return x(d.key); })
       .attr('width', x.rangeBand())
       .attr('y', function (d) { return y(d.values) + yBaseline; })
-      .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
-      // bar hover -- update text above barchart
-      .on('mouseover', (d) => {
-        d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
-      })
-      .on('mouseout', (d) => {
-        const text = d3.select('text#flowtotals');
-        text.text(_self.generateFlowTotalsText(aggregatedData, timePoints));
-        d3TextWrap(text , this.chartWidth, 2);
-      });
+      .attr('height', function (d) { return CHART_HEIGHT - y(d.values); });
   }
 
   private generateFlowTotalsText(aggregatedData: IKeyValue[], timePoints: string[]): string {
