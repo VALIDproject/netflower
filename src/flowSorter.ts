@@ -104,8 +104,6 @@ export default class FlowSorter implements MAppViews {
   }
 
   public topFlows(flatNest: Flow[], valuePostFix: string): any {
-    console.log('top flows');
-
     if (this.sortMode === SORT_MODES[0]) {
       return this.flowOrder(flatNest, valuePostFix);
     } else if (this.sortMode === SORT_MODES[1]) {

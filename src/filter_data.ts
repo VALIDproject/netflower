@@ -152,6 +152,13 @@ class FilterData implements MAppViews {
       textTransition(d3.select('#currentTimeInfo'),
         `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
         200);
+      // reset buttons in time filter dialog
+      d3.selectAll('#timeForm li')
+        .attr('class', 'list-group-item')
+        .filter(function(d, i) {
+          return i === (timePoints.length - 1);
+        })
+        .attr('class', 'list-group-item ui-selected');
 
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
