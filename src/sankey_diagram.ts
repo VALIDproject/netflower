@@ -382,7 +382,7 @@ class SankeyDiagram implements MAppViews {
     // rationale: typescript complains less about dy etc. if we first define it like this
     let graph = {'nodes': [], 'links': []};
 
-  // console.log('changed flows to show: ', that.nodesToShow);
+    // console.log('changed flows to show: ', that.nodesToShow);
 
     //============ CHECK IF SHOULD DRAW ============
     if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
@@ -394,17 +394,15 @@ class SankeyDiagram implements MAppViews {
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
-
       const flowSorter = FlowSorter.getInstance();
       graph = flowSorter.topFlows(flatNest, valuePostFix);
 
       textTransition(d3.select('#infoNodesLeft'), flowSorter.getMessage(0), 350);
       textTransition(d3.select('#loadInfo'), flowSorter.getMessage(1), 350);
 
-      // disable buttons at the limits (always b/c it might be small data)
+      // Disable buttons at the limits (always b/c it might be small data)
       d3.select('#loadLessBtn').attr('disabled', flowSorter.hasShowLess() ? null : 'disabled');
       d3.select('#loadMoreBtn').attr('disabled', flowSorter.hasShowMore() ? null : 'disabled');
-
       this.minFraction = Math.min(...graph.nodes.map((d) => d.fraction));
 
       // Basic parameters for the diagram

@@ -150,14 +150,14 @@ class FilterData implements MAppViews {
       textTransition(d3.select('#currentTimeInfo'),
         `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
         200);
-      // reset buttons in time filter dialog
+      // Reset buttons in time filter dialog
       d3.selectAll('#timeForm li')
         .attr('class', 'list-group-item')
         .filter(function(d, i) {
           return i === (timePoints.length - 1);
         })
         .attr('class', 'list-group-item ui-selected');
-
+      // Reset all checkboxes for connection filter
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
       $('.paraFilter').each((index, element) => {
@@ -253,8 +253,6 @@ class FilterData implements MAppViews {
     ).values().sort();
     const ul = d3.select('#selectable');
     const result = $('#result');
-
-    // console.log(TimeFormat.formatMultiple(this.activeQuarters, timePoints));
 
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
     textTransition(d3.select('#currentTimeInfo'),

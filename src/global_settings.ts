@@ -32,7 +32,7 @@ class GlobalSettings implements MAppViews {
     this.build();
     this.attachListener();
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
