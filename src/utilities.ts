@@ -401,10 +401,20 @@ export function d3TextEllipse(text, maxTextWidth) {
     const tspan = text.insert('tspan', ':first-child').text(words.join(' '));
 
     //While it's too long and we have words left we keep removing words
-    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length) {
+    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length > 1) {
       words.pop();
       tspan.text(words.join(' '));
     }
+
+    // only 1 word left & if too long, keep removing characters
+    if (words.length === 1) {
+      let length = words[0].length;
+      while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && length > 1) {
+        length--;
+        tspan.text(words[0].slice(0, length));
+      }
+    }
+
     if (words.length === numWords) {
       ellipsis.remove();
     }
