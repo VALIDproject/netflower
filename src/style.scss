@@ -223,3 +223,20 @@ span.from {
 #sampleFile {
   margin-left: 50px;
 }
+
+// Removes the number spinner from input elements of type number
+CSS
+
+/* Hide HTML5 Up and Down arrows. */
+CSS
+
+/* Hide HTML5 Up and Down arrows. */
+/* Hide HTML5 Up and Down arrows. */
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
