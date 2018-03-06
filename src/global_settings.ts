@@ -32,7 +32,7 @@ class GlobalSettings implements MAppViews {
     this.build();
     this.attachListener();
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -122,7 +122,7 @@ class GlobalSettings implements MAppViews {
     // Retrieve the notes once page is loaded
     window.onload = () => {
       const text = localStorage.getItem('noteAreaText');
-      if (text !== null && text !== undefined) {
+      if (text !== null && text !== undefined && text !== 'undefined') {
         $('#noteArea').val(text);
       };
     };

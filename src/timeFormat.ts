@@ -6,6 +6,7 @@ const outFormatMonth = d3.time.format('%b %Y');
 export default class TimeFormat {
 
     private static func: (raw: string) => string = passThrough;
+    private static revt: (raw: string) => string = passThrough;
 
     public static format(raw: string): string {
       if (raw === null || raw === undefined) {
@@ -14,7 +15,14 @@ export default class TimeFormat {
       return TimeFormat.func(raw);
     }
 
-    public static formatNumber(raw: number): string {
+    public static reverseFormat(raw: string): string {
+        if (raw === null || raw === undefined) {
+          return;
+        }
+        return TimeFormat.revt(raw);
+      }
+
+      public static formatNumber(raw: number): string {
         return TimeFormat.func(raw.toString());
     }
 
@@ -87,10 +95,17 @@ export default class TimeFormat {
             TimeFormat.func = function (raw: string): string {
                 return raw.substr(0, 4) + ' Q' + raw.substr(-1);
             };
+            TimeFormat.revt = function (formated: string): string {
+                return formated.replace(' Q', '');
+            };
         } else if (header.match(/month/i)) {
             TimeFormat.func = function (raw: string): string {
                 const date = inFormatMonth.parse(raw); // returns a Date
                 return outFormatMonth(date);
+            };
+            TimeFormat.revt = function (formated: string): string {
+                const date = outFormatMonth.parse(formated); // returns a Date
+                return inFormatMonth(date);
             };
         } else {
             TimeFormat.func = passThrough;

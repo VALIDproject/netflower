@@ -8,6 +8,7 @@ import * as d3 from 'd3';
 import { AppConstants } from './app_constants';
 import { MAppViews } from './app';
 import { downloadFile, randomString } from './utilities';
+import { EXPORT_INFO, EXPORT_INFO2 } from './language';
 import SimpleLogging from './simpleLogging';
 
 export default class Export implements MAppViews {
@@ -61,11 +62,22 @@ export default class Export implements MAppViews {
 
       // CSV export using D3.js
       const dataAsStr = d3.csv.format(dataAsArray);
-      const filename = 'flows.csv';
+      const filename = 'flows ' + new Date().toLocaleString() + '.csv';
       if (dataAsArray.length === 1) {
         bootbox.alert('No flows are visible.');
       } else {
-        downloadFile(dataAsStr, filename, 'text/csv');
+        bootbox.confirm({
+          className: 'dialogBox',
+          title: 'Information',
+          message: EXPORT_INFO,
+          callback(result) {
+            if (result) {
+              downloadFile(dataAsStr, filename, 'text/csv');
+            } else {
+              return;
+            }
+          }
+        });
       }
     });
   }
@@ -94,11 +106,22 @@ export default class Export implements MAppViews {
     if (comment.length > 0) {
       dataAsStr = '# ' + comment + '\n' + dataAsStr;
     }
-    const filename = 'timeseries.csv';
+    const filename = 'timeseries ' + new Date().toLocaleString() + '.csv';
     if (dataAsArray.length === 1) {
       bootbox.alert('No time steps are visible.');
     } else {
-      downloadFile(dataAsStr, filename, 'text/csv');
+      bootbox.confirm({
+        className: 'dialogBox',
+        title: 'Information',
+        message: EXPORT_INFO2,
+        callback(result) {
+          if (result) {
+            downloadFile(dataAsStr, filename, 'text/csv');
+          } else {
+            return;
+          }
+        }
+      });
     }
   }
 }

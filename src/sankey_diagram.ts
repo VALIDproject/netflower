@@ -382,7 +382,7 @@ class SankeyDiagram implements MAppViews {
     // rationale: typescript complains less about dy etc. if we first define it like this
     let graph = {'nodes': [], 'links': []};
 
-  // console.log('changed flows to show: ', that.nodesToShow);
+    // console.log('changed flows to show: ', that.nodesToShow);
 
     //============ CHECK IF SHOULD DRAW ============
     if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
@@ -394,17 +394,15 @@ class SankeyDiagram implements MAppViews {
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
-
       const flowSorter = FlowSorter.getInstance();
       graph = flowSorter.topFlows(flatNest, valuePostFix);
 
       textTransition(d3.select('#infoNodesLeft'), flowSorter.getMessage(0), 350);
       textTransition(d3.select('#loadInfo'), flowSorter.getMessage(1), 350);
 
-      // disable buttons at the limits (always b/c it might be small data)
+      // Disable buttons at the limits (always b/c it might be small data)
       d3.select('#loadLessBtn').attr('disabled', flowSorter.hasShowLess() ? null : 'disabled');
       d3.select('#loadMoreBtn').attr('disabled', flowSorter.hasShowMore() ? null : 'disabled');
-
       this.minFraction = Math.min(...graph.nodes.map((d) => d.fraction));
 
       // Basic parameters for the diagram
@@ -462,9 +460,23 @@ class SankeyDiagram implements MAppViews {
             return 'node target';
           }
         })
+        .on('mouseenter', (d) => {
+          this.assembleNodeTooltip(d, valuePostFix);
+        })
+        .on('mouseleave', Tooltip.mouseOut)
         .attr('transform', function (d) {
           return 'translate(' + d.x + ',' + d.y + ')';
         });
+
+      // white background rect so that tooltip is easier to reach
+      node.append('rect')
+        .attr('height', (d) => { return d.dy; })
+        .attr('width', (d) => { return 45 + (margin.left + margin.right) / 2; })
+        .style('fill', 'white')
+        .filter(function (d, i) {
+          return d.x < width / 2;
+        })
+        .attr('x', -45 + sankey.nodeWidth() - (margin.left + margin.right) / 2);
 
       // Add the rectangles for the nodes
       node.append('rect')
@@ -479,11 +491,7 @@ class SankeyDiagram implements MAppViews {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() / d.fraction, 1);
           }
         })
-        .style('fill', '#DA5A6B')
-        .on('mouseover', (d) => {
-          this.assembleNodeTooltip(d, valuePostFix);
-        })
-        .on('mouseout', Tooltip.mouseOut);
+        .style('fill', '#DA5A6B');
 
       // Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
@@ -502,10 +510,6 @@ class SankeyDiagram implements MAppViews {
           } else {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
           }
-        })
-        .on('mouseout', Tooltip.mouseOut)
-        .on('mouseover', (d) => {
-          this.assembleNodeTooltip(d, valuePostFix);
         });
 
       // Add in the title for the nodes
@@ -535,15 +539,6 @@ class SankeyDiagram implements MAppViews {
       d3TextEllipse(rightWrap, maxTextWidth);
 
       // On Hover titles for Sankey Diagram Text - after Text Elipsis
-      heading.on('mouseover', (d) => {
-        this.assembleNodeTooltip(d, valuePostFix);
-      })
-        .on('mouseout', Tooltip.mouseOut);
-      rightWrap.on('mouseover', (d) => {
-        this.assembleNodeTooltip(d, valuePostFix);
-      })
-        .on('mouseout', Tooltip.mouseOut);
-
     } else {
       const svgPlain = d3.select('#sankeyDiagram svg');
       svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right) / 2 + ')')
@@ -832,7 +827,6 @@ class SankeyDiagram implements MAppViews {
         }
       }
     });
-
   }
 }
 

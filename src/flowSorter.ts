@@ -10,9 +10,9 @@ import { dotFormat } from './utilities';
 import SimpleLogging from './simpleLogging';
 
 interface Flow {
-    source:string;
-    target:string;
-    value:number;
+  source:string;
+  target:string;
+  value:number;
 }
 
 interface Link {
@@ -22,9 +22,9 @@ interface Link {
 }
 
 interface SNode {
-    name: string;
-    overall: number;
-    fraction: number;
+  name: string;
+  overall: number;
+  fraction: number;
 }
 
 const FLOWS_INCREMENT = 12;
@@ -32,8 +32,6 @@ const NODES_INCREMENT = 8;
 const SORT_MODES = ['flow', 'source', 'target'];
 
 export default class FlowSorter implements MAppViews {
-
-
 
   private sortMode: string = SORT_MODES[0];
   private showExtent: number = 1;
@@ -64,11 +62,11 @@ export default class FlowSorter implements MAppViews {
       .style('margin-top', '10px')
       .style('display', 'block');
 
-    for(const mode of SORT_MODES) {
+    for (const mode of SORT_MODES) {
       this.$node.append('option')
-      .attr('value', mode)
-      .attr('selected', this.sortMode === mode ? 'selected' : null)
-      .text('Sort by ' + mode);
+        .attr('value', mode)
+        .attr('selected', this.sortMode === mode ? 'selected' : null)
+        .text('Sort by ' + mode);
     }
 
     this.attachListener();
@@ -104,8 +102,6 @@ export default class FlowSorter implements MAppViews {
   }
 
   public topFlows(flatNest: Flow[], valuePostFix: string): any {
-    console.log('top flows');
-
     if (this.sortMode === SORT_MODES[0]) {
       return this.flowOrder(flatNest, valuePostFix);
     } else if (this.sortMode === SORT_MODES[1]) {
@@ -218,9 +214,9 @@ export default class FlowSorter implements MAppViews {
 
   private sumValues(flows: Flow[], node: string, nodeIsSource: boolean) {
     return flows
-    .filter((d) => { return node === (nodeIsSource ? d.source : d.target); })
-    .map((d) => d.value)
-    .reduce((total, current) => total + current);
+      .filter((d) => { return node === (nodeIsSource ? d.source : d.target); })
+      .map((d) => d.value)
+      .reduce((total, current) => total + current);
   }
 
   private graphFromNodeFlows(nodes: SNode[], flows: Flow[]): any {
@@ -253,8 +249,8 @@ export default class FlowSorter implements MAppViews {
   // Class is a singleton an therefore only one object can exist => get object with this method
   public static getInstance(parent?: Element, options?: any): FlowSorter {
     if (FlowSorter.instance === null || FlowSorter.instance === undefined) {
-        console.log('flowsorter created with parent ' + parent);
-        FlowSorter.instance = new FlowSorter(parent, options);
+      console.log('flowsorter created with parent ' + parent);
+      FlowSorter.instance = new FlowSorter(parent, options);
     }
 
     return FlowSorter.instance;
@@ -268,5 +264,5 @@ export default class FlowSorter implements MAppViews {
  * @returns {FlowSorter}
  */
 export function create(parent: Element, options: any) {
-    return FlowSorter.getInstance(parent, options);
+  return FlowSorter.getInstance(parent, options);
 }

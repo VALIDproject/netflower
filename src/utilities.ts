@@ -1,8 +1,8 @@
 /**
  * Created by Florian on 02.05.2017.
  */
-;
 import * as d3 from 'd3';
+import text = d3.text;
 import * as events from 'phovea_core/src/event';
 import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
@@ -110,6 +110,17 @@ export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom =
  */
 export const splitAt = (index) => (it) =>
   [it.slice(0, index), it.slice(index)];
+
+/**
+ * This function takes a time point which consits basically of a year and a quarter. It places between the year and
+ * quarter a big "Q" in order to symbolize the quarter. So for example 20151 --> 2015Q1
+ * @param timePoint to be transformed
+ * @returns {string} transfomred time point
+ */
+export function splitQuarter(timePoint: string): string {
+  const textParts = splitAt(4)(timePoint);
+  return `${textParts[0]}Q${textParts[1]}`;
+}
 
 const formatNumber = d3.format(',.0f');    //Zero decimal places
 //  format = function(d) { return formatNumber(d); }, //Display number with unit sign
@@ -389,10 +400,20 @@ export function d3TextEllipse(text, maxTextWidth) {
     const tspan = text.insert('tspan', ':first-child').text(words.join(' '));
 
     //While it's too long and we have words left we keep removing words
-    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length) {
+    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length > 1) {
       words.pop();
       tspan.text(words.join(' '));
     }
+
+    // only 1 word left & if too long, keep removing characters
+    if (words.length === 1) {
+      let length = words[0].length;
+      while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && length > 1) {
+        length--;
+        tspan.text(words[0].slice(0, length));
+      }
+    }
+
     if (words.length === numWords) {
       ellipsis.remove();
     }

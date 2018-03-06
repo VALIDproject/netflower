@@ -256,6 +256,10 @@ svg text.yaxisunit {
   font: 10px sans-serif;
 }
 
+.barchart {
+  overflow: visible !important;
+}
+
 // REMOVE LATER
 //.quarterSlider {
 //  width: 250px;
@@ -280,7 +284,7 @@ Section for the input fields of the sliders.
 
 .sliderInput {
     font-size: 11px;
-    width: 50px;
+    width: 64px;
     text-align: center;
 }
 .sliderInput + .sliderInput {

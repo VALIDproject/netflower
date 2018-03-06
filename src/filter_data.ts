@@ -17,7 +17,7 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {splitAt} from './utilities';
+import {splitAt, splitQuarter} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFilter from './filters/timeFilter';
 import ParagraphFilter from './filters/paragraphFilter';
@@ -27,7 +27,6 @@ import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
 import {type} from 'os';
 import {TIME_INFO, ATTR_INFO, NO_TIME_POINTS} from './language';
-import isEmpty = hbs.Utils.isEmpty;
 
 class FilterData implements MAppViews {
 
@@ -100,7 +99,9 @@ class FilterData implements MAppViews {
         <p>${ATTR_INFO}</p>
         <br/>
         <hr/>
-          <div id='paragraph' class='form-check form-check-inline'></div>
+          <div id='attribute1' class='form-check form-check-inline'>
+            <span class='colLabel'> </span>
+          </div>
           <div id='attributeClose' class='close'><i class='fa fa-times-circle'></i></div>
        </div>
     `);
@@ -111,10 +112,21 @@ class FilterData implements MAppViews {
    */
   private attachListener(json) {
     // Set the filters only if data is available
+    let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+    if (columnLabels == null) {
+      columnLabels = {};
+      columnLabels.sourceNode = 'Source';
+      columnLabels.targetNode = 'Target';
+      columnLabels.attribute1 = 'Attribute 1';
+      columnLabels.valueNode = '';
+    } else {
+      TimeFormat.setFormat(columnLabels.timeNode);
+    }
+
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
       this.initializeTimeFilter(json);
-      this.setParagraphFilterElements(json);
+      this.setParagraphFilterElements(json, columnLabels);
     }
 
     events.on(AppConstants.EVENT_UI_COMPLETE, (evt, data) => {
@@ -136,8 +148,16 @@ class FilterData implements MAppViews {
 
       // Reset all Labels afterwards
       textTransition(d3.select('#currentTimeInfo'),
-        `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
-
+        `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
+        200);
+      // Reset buttons in time filter dialog
+      d3.selectAll('#timeForm li')
+        .attr('class', 'list-group-item')
+        .filter(function(d, i) {
+          return i === (timePoints.length - 1);
+        })
+        .attr('class', 'list-group-item ui-selected');
+      // Reset all checkboxes for connection filter
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
       $('.paraFilter').each((index, element) => {
@@ -190,7 +210,7 @@ class FilterData implements MAppViews {
    * This method adds all the elements and options for the paragraph filter.
    * @param json with the data to be added.
    */
-  private setParagraphFilterElements(json)
+  private setParagraphFilterElements(json, columnLabels)
   {
     const paragraphs: Array<string> = [];
     for(const entry of json)
@@ -200,12 +220,12 @@ class FilterData implements MAppViews {
       if (val !== undefined) {
         if(paragraphs.indexOf(val) === -1) {
           paragraphs.push(val);
-          this.$node.select('#paragraph').append('input').attr('value',val).attr('type', 'checkbox')
+          this.$node.select('#attribute1').append('input').attr('value',val).attr('type', 'checkbox')
             .attr('class','paraFilter form-check-input').attr('checked', true);
-          this.$node.select('#paragraph').append('span')
+          this.$node.select('#attribute1').append('span')
             .attr('class', 'form-check-label')
             .attr('style', 'font-size: 1.0em; margin-left: 5px;').text(val);
-          this.$node.select('#paragraph').append('span').attr('style', 'margin-left: 10px;');
+          this.$node.select('#attribute1').append('span').attr('style', 'margin-left: 10px;');
         }
       }
     }
@@ -218,16 +238,8 @@ class FilterData implements MAppViews {
     }
 
     // Set UI label dynamically based on CSV header
-    const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
-    if (columnLabels != null) {
-      if (columnLabels.attribute1 !== undefined) {
-        this.$node.select('#attr1_label').html(columnLabels.attribute1 + ' Filter');
-      } else {
-        //Attribute1 column not present in header --> empty UI label
-        this.$node.select('#attr1_label').html('');
-      }
-    } else {
-      this.$node.select('#attr1_label').html('Attribute Filter');
+    if (paragraphs.length > 0) {
+      this.$node.select('#attribute1 .colLabel').html(columnLabels.attribute1);
     }
 
     $('#attributeClose').on('click', function() {
@@ -244,7 +256,8 @@ class FilterData implements MAppViews {
 
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
     textTransition(d3.select('#currentTimeInfo'),
-      `Between: ${timePoints[timePoints.length - 1]} - ${timePoints[timePoints.length - 1]}`, 200);
+      `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
+      200);
     events.fire(AppConstants.EVENT_TIME_VALUES, [timePoints[timePoints.length - 1]]);
 
     ul.selectAll('li')
@@ -252,8 +265,7 @@ class FilterData implements MAppViews {
       .enter()
       .append('li')
       .text((txt) => {
-        const textParts = splitAt(4)(txt);
-        return textParts[0] + 'Q' + textParts[1];
+        return TimeFormat.format(txt);
       })
       .attr('class', 'list-group-item')
       .filter(function(d, i) {
@@ -289,7 +301,7 @@ class FilterData implements MAppViews {
 
       $('li.ui-selected').each(function(i, e) {
         const valueSelected = e.innerHTML;
-        selectedTime.push(valueSelected.replace('Q', ''));
+        selectedTime.push(TimeFormat.reverseFormat(valueSelected));
       });
 
       if (selectedTime.length > 0) {
@@ -300,8 +312,10 @@ class FilterData implements MAppViews {
         events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
         events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
         events.fire(AppConstants.EVENT_TIME_VALUES, selectedTime);
+
         textTransition(d3.select('#currentTimeInfo'),
-          `Between: ${this.timeFilter.minValue} - ${this.timeFilter.maxValue}`, 200);
+          'Selected: ' + TimeFormat.formatMultiple(selectedTime, timePoints),
+          200);
       } else {
         bootbox.alert({
           message: NO_TIME_POINTS,
