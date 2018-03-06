@@ -27,7 +27,6 @@ import TimeFormat from './timeFormat';
 import SimpleLogging from './simpleLogging';
 import {type} from 'os';
 import {TIME_INFO, ATTR_INFO, NO_TIME_POINTS} from './language';
-import isEmpty = hbs.Utils.isEmpty;
 
 class FilterData implements MAppViews {
 
@@ -113,7 +112,6 @@ class FilterData implements MAppViews {
    */
   private attachListener(json) {
     // Set the filters only if data is available
-
     let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     if (columnLabels == null) {
       columnLabels = {};

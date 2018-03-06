@@ -122,7 +122,7 @@ class GlobalSettings implements MAppViews {
     // Retrieve the notes once page is loaded
     window.onload = () => {
       const text = localStorage.getItem('noteAreaText');
-      if (text !== null && text !== undefined) {
+      if (text !== null && text !== undefined && text !== 'undefined') {
         $('#noteArea').val(text);
       };
     };
