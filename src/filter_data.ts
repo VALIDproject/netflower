@@ -150,8 +150,8 @@ class FilterData implements MAppViews {
 
       // Reset all Labels afterwards
       textTransition(d3.select('#currentTimeInfo'),
-        `Between: ${splitQuarter(this.timeFilter.minValue + '')} - 
-          ${splitQuarter(this.timeFilter.maxValue + '')}`, 200);
+        `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
+        200);
 
       d3.selectAll('input').property('checked', true);
       this.paragraphFilter.resetValues();
@@ -249,10 +249,12 @@ class FilterData implements MAppViews {
     const ul = d3.select('#selectable');
     const result = $('#result');
 
+    // console.log(TimeFormat.formatMultiple(this.activeQuarters, timePoints));
+
     this.timeFilter.timePoints = [timePoints[timePoints.length - 1]];
     textTransition(d3.select('#currentTimeInfo'),
-      `Between: ${splitQuarter(timePoints[timePoints.length - 1])} -
-        ${splitQuarter(timePoints[timePoints.length - 1])}`, 200);
+      `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
+      200);
     events.fire(AppConstants.EVENT_TIME_VALUES, [timePoints[timePoints.length - 1]]);
 
     ul.selectAll('li')
@@ -260,8 +262,7 @@ class FilterData implements MAppViews {
       .enter()
       .append('li')
       .text((txt) => {
-        const textParts = splitAt(4)(txt);
-        return textParts[0] + 'Q' + textParts[1];
+        return TimeFormat.format(txt);
       })
       .attr('class', 'list-group-item')
       .filter(function(d, i) {
@@ -297,7 +298,7 @@ class FilterData implements MAppViews {
 
       $('li.ui-selected').each(function(i, e) {
         const valueSelected = e.innerHTML;
-        selectedTime.push(valueSelected.replace('Q', ''));
+        selectedTime.push(TimeFormat.reverseFormat(valueSelected));
       });
 
       if (selectedTime.length > 0) {
@@ -310,8 +311,8 @@ class FilterData implements MAppViews {
         events.fire(AppConstants.EVENT_TIME_VALUES, selectedTime);
 
         textTransition(d3.select('#currentTimeInfo'),
-          `Between: ${splitQuarter(this.timeFilter.minValue + '')} - 
-          ${splitQuarter(this.timeFilter.maxValue + '')}`, 200);
+          'Selected: ' + TimeFormat.formatMultiple(selectedTime, timePoints),
+          200);
       } else {
         bootbox.alert({
           message: NO_TIME_POINTS,

@@ -13,6 +13,7 @@ import {splitAt} from './utilities';
 import {MAppViews} from './app';
 import SimpleLogging from './simpleLogging';
 import {d3TextEllipse} from './utilities';
+import TimeFormat from './timeFormat';
 import {BACK_INFO} from './language';
 
 class ValidHeader implements MAppViews {
@@ -47,7 +48,7 @@ class ValidHeader implements MAppViews {
     }
 
     this.$node.html(`
-    <div class='logo'>NETFLOWER</div>   
+    <div class='logo'>NETFLOWER</div>
     <div class='btn_preupload'>
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
@@ -57,7 +58,7 @@ class ValidHeader implements MAppViews {
       <div id='timeInfoHeader'></div>
     </div>
     <div class='valid_logo'></div>
-    <div id='socialMedia'>    
+    <div id='socialMedia'>
         <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
         <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
         <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x' id='web'></i></a></p>
@@ -108,9 +109,8 @@ class ValidHeader implements MAppViews {
         .data(data)
         .enter()
         .append('span')
-        .text((txt) => {
-          const textParts = splitAt(4)(txt);
-          return textParts[0] + 'Q' + textParts[1];
+        .text((txt: string) => {
+          return TimeFormat.format(txt);
         })
         .attr('class', 'label label-primary')
         .attr('style', 'margin-left: 5px;');
