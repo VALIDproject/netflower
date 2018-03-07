@@ -158,7 +158,13 @@ class FilterData implements MAppViews {
         })
         .attr('class', 'list-group-item ui-selected');
       // Reset all checkboxes for connection filter
-      d3.selectAll('input').property('checked', true);
+      d3.selectAll('.paraFilter').property('checked', true);
+      // Edge case for the paragraph 31 of media transperancy dataset
+      if(!d3.select('input[value = \'31\']').empty()) {
+        d3.select('input[value = \'31\']').property('checked', false);
+      }
+
+      // d3.select('input[value = \'31\']').attr('checked', null);
       this.paragraphFilter.resetValues();
       $('.paraFilter').each((index, element) => {
         const value = $(element).val() as string;
