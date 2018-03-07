@@ -52,8 +52,8 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 #loadLessBtn[disabled], #loadMoreBtn[disabled] {
   cursor: default;
-  color: black;
-  border-color: black;
+  color: $valid-color3;
+  border-color: $valid-color3;
 }
 
 #btn_above button{
