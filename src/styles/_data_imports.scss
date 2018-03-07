@@ -134,21 +134,25 @@
 .btn-file {
   position: relative;
   overflow: hidden;
-  background:
+ // background: $valid-color3;
+
+  /*background:*/
     /* On "top" */
-    repeating-linear-gradient(
+    /*repeating-linear-gradient(
         45deg,
         transparent,
         transparent 10px,
         #fbfbfb 10px,
         #fbfbfb 20px
-    ),
+    ),*/
       /* on "bottom" */
-    linear-gradient(
+    /*linear-gradient(
         to bottom,
         #fbfbfb,
         #dfdfdf
-    );
+    );*/
+
+
 }
 
 .btn-file input[type=file] {
