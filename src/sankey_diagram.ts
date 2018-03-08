@@ -335,29 +335,6 @@ class SankeyDiagram implements MAppViews {
 
       // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
-      /*
-      * if(this.pipeline.getTagFlowFilterStatus()) {
-        this.valuesSumSource = (<any>d3).nest()
-        .key((d) => { return d.sourceTag; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
-        .entries(filteredData);
-
-        this.valuesSumTarget = (<any>d3).nest()
-        .key((d) => { return d.targetTag; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
-        .entries(filteredData);
-      } else {
-        this.valuesSumSource = (<any>d3).nest()
-        .key((d) => { return d.sourceNode; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
-        .entries(filteredData);
-
-      this.valuesSumTarget = (<any>d3).nest()
-        .key((d) => { return d.targetNode; })
-        .rollup(function (v) { return [d3.sum(v, function (d: any) { return d.valueNode; })]; })
-        .entries(filteredData);
-      }
-      */
 
       // console.log('----------- Original Data -----------');
       // console.log(originalData);
@@ -411,10 +388,12 @@ class SankeyDiagram implements MAppViews {
     let flatNest = d3.nest()
       .key((d: any) => {
         // First define keys
-        if(that.pipeline.getTagFlowFilterStatus())
+        if(that.pipeline.getTagFlowFilterStatus()) {
           return d.sourceTag + '|$|' + d.targetTag;
-        else
+        } else {
           return d.sourceNode + '|$|' + d.targetNode;
+        }
+
       })
       .rollup(function (v: any[]) { // construct object
         return {
@@ -429,9 +408,11 @@ class SankeyDiagram implements MAppViews {
       .map((o) => o.values) // Remove key/values
       .filter((e) => {return e.value > 0;}); // Remove entries whos sum is smaller than 0
 
-    if(that.pipeline.getTagFlowFilterStatus())
-      flatNest = flatNest.filter(function (d) { return (d.source != "") && (d.target != "") });
-
+    if(that.pipeline.getTagFlowFilterStatus()) {
+      flatNest = flatNest.filter(function (d) {
+        return (d.source !== '') && (d.target !== '');
+      });
+    }
 
     // Create reduced graph with only number of nodes shown
     // rationale: typescript complains less about dy etc. if we first define it like this
@@ -444,9 +425,9 @@ class SankeyDiagram implements MAppViews {
       that.drawReally = false;
       this.showErrorDialog(ERROR_TOOMANYFILTER);
     } else if(that.pipeline.getTagFlowFilterStatus()) {
-      let sumOfEntityTags = that.entityTagFilter.activeTags.size() + that.entityTagFilter.availableTags.size();
-      let sumOfMediaTags = that.mediaTagFilter.activeTags.size() + that.mediaTagFilter.availableTags.size();
-      if(sumOfEntityTags == 0 || sumOfMediaTags == 0) {
+      const sumOfEntityTags = that.entityTagFilter.activeTags.size() + that.entityTagFilter.availableTags.size();
+      const sumOfMediaTags = that.mediaTagFilter.activeTags.size() + that.mediaTagFilter.availableTags.size();
+      if((sumOfEntityTags === 0) || (sumOfMediaTags === 0)) {
         that.drawReally = false;
         this.showErrorDialog(NOTAGS_INFO);
       } else {
@@ -458,27 +439,6 @@ class SankeyDiagram implements MAppViews {
 
     //============ REALLY DRAW ===============
     if (that.drawReally) {
-      /*let counter = 0;
-      for (const d of flatNest) {
-        counter++;
-        if (counter * 2 > that.nodesToShow) {
-          const textUp = `Flows below ${dotFormat(d.sum)}${valuePostFix} are not displayed.`;
-          textTransition(d3.select('#infoNodesLeft'), textUp, 350);
-          const textDown = `${counter}/${this.valuesSumSource.length + this.valuesSumTarget.length} elements displayed`;
-          textTransition(d3.select('#loadInfo'), textDown, 350);
-          break;
-        }
-        if(d.source && d.target) {
-          graph.nodes.push({'name': d.source});//all Nodes source
-          graph.nodes.push({'name': d.target});//all Nodes target
-          graph.links.push({
-            'source': d.source,
-            'target': d.target,
-            'value': d.sum
-          });
-        }
-      }*/
-
       const flowSorter = FlowSorter.getInstance();
       graph = flowSorter.topFlows(flatNest, valuePostFix);
 
@@ -608,10 +568,11 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'start')
         .attr('class', 'rightText')
         .text(function (d) {
-          if(that.pipeline.getTagFlowFilterStatus())
+          if(that.pipeline.getTagFlowFilterStatus()) {
             return `${d.name.replace(/\|/gi, ', ')}`;
-          else
+          } else {
             return `${d.name}`;
+          }
         })
         .filter(function (d, i) {
           return d.x < width / 2;
@@ -651,7 +612,7 @@ class SankeyDiagram implements MAppViews {
             return that.getNumOfTagsForMediaNode(json, d.name);
           })
           .filter(function (d, i) {
-            return d.x < width / 2;
+            return d.x < (width / 2);
           })
           .attr('x', -65 + sankey.nodeWidth())
           .attr('text-anchor', 'end')
@@ -683,14 +644,14 @@ class SankeyDiagram implements MAppViews {
         const mediaTagManager = this.$node.selectAll('.manageMediaTag');
 
         entityTagManager.on('click', (d) => {
-          let tags: d3.Set = that.entityTagFilter.getTagsByName(json, d.name);
-          let dialog = new ManageTagDialog(d, tags, that.entityTagFilter);
-        })
+          const tags: d3.Set = that.entityTagFilter.getTagsByName(json, d.name);
+          const dialog = new ManageTagDialog(d, tags, that.entityTagFilter);
+        });
 
         mediaTagManager.on('click', (d) => {
-          let tags: d3.Set = that.mediaTagFilter.getTagsByName(json, d.name);
-          let dialog = new ManageTagDialog(d, tags, that.mediaTagFilter);
-        })
+          const tags: d3.Set = that.mediaTagFilter.getTagsByName(json, d.name);
+          const dialog = new ManageTagDialog(d, tags, that.mediaTagFilter);
+        });
       }
 
       // Here the textwrapping happens of the nodes
@@ -771,13 +732,13 @@ class SankeyDiagram implements MAppViews {
 
     // Functionality to open the tag filter window for legal entites
     const entityFilterTags = (d) => {
-      let dialog = new FilterTagDialog(d, this.entityTagFilter, this.$node.select('#entityTagFilterGroup'));
+      const dialog = new FilterTagDialog(d, this.entityTagFilter, this.$node.select('#entityTagFilterGroup'));
     };
     this.$node.select('#entityTagFilterButton').on('click', entityFilterTags);
 
     // Functionality to open the tag filter window for media institutes
     const mediaFilterTags = (d) => {
-      let dialog = new FilterTagDialog(d, this.mediaTagFilter, this.$node.select('#mediaTagFilterGroup'));
+      const dialog = new FilterTagDialog(d, this.mediaTagFilter, this.$node.select('#mediaTagFilterGroup'));
     };
     this.$node.select('#mediaTagFilterButton').on('click', mediaFilterTags);
 
@@ -1014,21 +975,37 @@ class SankeyDiagram implements MAppViews {
   }
 
   private getNumOfTagsForMediaNode(json, name) {
-    let tags: d3.Set = this.mediaTagFilter.getTagsByName(json, name);
+    const tags: d3.Set = this.mediaTagFilter.getTagsByName(json, name);
+    let numberOfTags = '';
     switch(tags.size()) {
-      case 0: { return 'No Tags'; }
-      case 1: { return tags.size() + ' Tag'; }
-      default: { return tags.size() + ' Tags'; }
+      case 0: {
+        numberOfTags = 'No Tags';
+      } break;
+      case 1: {
+        numberOfTags =  tags.size() + ' Tag';
+      } break;
+      default: {
+        numberOfTags = tags.size() + ' Tags';
+      } break;
     }
+    return numberOfTags;
   }
 
   private getNumOfTagsForEntityNode(json, name) {
-    let tags: d3.Set = this.entityTagFilter.getTagsByName(json, name);
+    const tags: d3.Set = this.entityTagFilter.getTagsByName(json, name);
+    let numberOfTags = '';
     switch(tags.size()) {
-      case 0: { return 'No Tags'; }
-      case 1: { return tags.size() + ' Tag'; }
-      default: { return tags.size() + ' Tags'; }
+      case 0: {
+        numberOfTags = 'No Tags';
+      } break;
+      case 1: {
+        numberOfTags = tags.size() + ' Tag';
+      } break;
+      default: {
+        numberOfTags = tags.size() + ' Tags';
+      } break;
     }
+    return numberOfTags;
   }
 }
 

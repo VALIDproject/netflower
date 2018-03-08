@@ -186,7 +186,7 @@ export default class FilterTagDialog {
               let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
               if(that.tagFilter.active) {
                 $tagFilterBtn
-                  .style('background-color', '#DA5A6B')
+                  .style('background-color', '#45B07C')
                   .style('color', '#FFF')
                   .style('border:', 'none');
                 if(that.tagFilter instanceof EntityTagFilter)

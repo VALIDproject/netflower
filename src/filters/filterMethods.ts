@@ -236,7 +236,7 @@ export function setEntityTagFilter(filter, data: any)
   for(let entry of data) {
     const tagsAsText:string = entry.sourceTag;
     if (tagsAsText !== undefined) {
-      const values:Array<string> = tagsAsText.split(" | ");
+      const values:Array<string> = tagsAsText.split("|");
       values.forEach(function (value) {
         if(value !== '') {
           let val = value.trim();
@@ -257,7 +257,7 @@ export function setMediaTagFilter(filter, data: any)
   for(let entry of data) {
     const tagsAsText:string = entry.targetTag;
     if (tagsAsText !== undefined) {
-      const values:Array<string> = tagsAsText.split(" | ");
+      const values:Array<string> = tagsAsText.split("|");
       values.forEach(function (value) {
         if(value !== '') {
           let val = value.trim();

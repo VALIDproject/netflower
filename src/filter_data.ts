@@ -107,13 +107,6 @@ class FilterData implements MAppViews {
           <div id='paragraph' class='form-check form-check-inline'></div>
           <div id='attributeClose' class='close'><i class='fa fa-times-circle'></i></div>
        </div>
-       
-       <div class='form-group' style='display: flex;'>
-          <select class='form-control input-sm' id='tagFlowFilter'>
-             <option value='-1' selected>disabled</option>
-             <option value='1'>enabled</option>
-          </select>
-       </div>
     `);
   }
 
@@ -148,22 +141,7 @@ class FilterData implements MAppViews {
       events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TAG_FLOW_FILTER, (evt, data) => {
         this.tagFlowFilter.active = false;
         $('#tagFlowFilter').val(-1);
-      })
-
-      // Listener for the change of the tag flow filter
-      this.$node.select('#tagFlowFilter').on('change', (d) => {
-        const value:string = $('#tagFlowFilter').val().toString();
-
-        if(value === '1')
-        {
-          this.tagFlowFilter.active = true;
-          SimpleLogging.log('tag flow filter', 'activated');
-        } else {
-          this.tagFlowFilter.active = false;
-          SimpleLogging.log('tag flow filter', ' disabled');
-        }
-        events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
-      })
+      });
 
       // Reset all Labels afterwards
       textTransition(d3.select('#currentTimeInfo'),
@@ -202,6 +180,21 @@ class FilterData implements MAppViews {
       const filterTime = this.timeFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    });
+
+    // Listener for the change of the tag flow filter
+    $('#tagFlowFilter').on('change', (d) => {
+      const value:string = $('#tagFlowFilter').val().toString();
+
+      if(value === '1')
+      {
+        this.tagFlowFilter.active = true;
+        SimpleLogging.log('tag flow filter', 'activated');
+      } else {
+        this.tagFlowFilter.active = false;
+        SimpleLogging.log('tag flow filter', ' disabled');
+      }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
