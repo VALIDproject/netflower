@@ -131,10 +131,10 @@ export default class FlowSorter implements MAppViews {
 
     // prepare infos for user interface
     this.canShowMore = flowsToShow < flatNest.length;
-    /*this.messages[0] = (flowsToShow < flatNest.length)
+    this.messages[0] = (flowsToShow < flatNest.length)
       ? `Flows at and below ${dotFormat(flatNest[flowsToShow].value)}${valuePostFix} are not displayed.`
       : 'All flows are displayed.';
-    this.messages[1] = `${flowsToShow}/${flatNest.length} flows displayed`;*/
+    this.messages[1] = `${flowsToShow}/${flatNest.length} flows displayed`;
 
     return this.graphFromNodeFlows(nodes, flows);
   }
