@@ -27,10 +27,15 @@ export const BACK_INFO = `Upon hitting the <strong>OK</strong> button, you will 
 <strong>NOTE:</strong> This will reload the page and the previous data will be lost!!<br/><br/>
 Be sure you don't lose anything important or save your progress before you proceed.`;
 
-export const TIME_INFO = `Select here the time range of the visualization. You have various controls avaialbe for the selection.
+/*export const TIME_INFO = `Select here the time range of the visualization. You have various controls avaialbe for the selection.
 The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
 you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
-to change the visualization.`;
+to change the visualization.`;*/
+
+export const TIME_INFO = `Select here the time range of the visualization.<br/> 
+1) Click & Drag mouse for rectangle selection.<br/>
+2) Click one elment to make a single selection.<br/>
+3) CTRL + Click to make a multi selection.`;
 
 export const ATTR_INFO = `Select here the attributes you want to filter for on the current visualization. The attributes
 are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.`;
