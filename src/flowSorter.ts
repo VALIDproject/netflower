@@ -142,7 +142,7 @@ export default class FlowSorter implements MAppViews {
     // prepare infos for user interface
     this.canShowMore = flowsToShow < flatNest.length;
     this.messages[0] = (flowsToShow < flatNest.length)
-      ? `Flows at and below ${dotFormat(flatNest[flowsToShow].value)}${valuePostFix} are not displayed.`
+      ? `Flows ${descending ? '≤' : '≥'} ${dotFormat(flatNest[flowsToShow].value)}${valuePostFix} are not displayed.`
       : 'All flows are displayed.';
     this.messages[1] = `${flowsToShow}/${flatNest.length} flows displayed`;
 
@@ -221,7 +221,7 @@ export default class FlowSorter implements MAppViews {
     // prepare infos for user interface
     this.canShowMore = sourcesToShow < valuesSumSource.length;
     this.messages[0] = (sourcesToShow < valuesSumSource.length)
-      ? `${typeOfNode} nodes of total flow at and below ${dotFormat(valuesSumSource[sourcesToShow].values)}${valuePostFix} are not displayed.`
+      ? `${typeOfNode} nodes of total flow ${descending ? '≤' : '≥'} ${dotFormat(valuesSumSource[sourcesToShow].values)}${valuePostFix} are not displayed.`
       : `All ${typeOfNode} nodes are displayed.`;
     this.messages[1] = `${sourcesToShow}/${valuesSumSource.length} ${typeOfNode} nodes displayed`;
 
