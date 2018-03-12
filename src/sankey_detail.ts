@@ -44,7 +44,7 @@ class SankeyDetail implements MAppViews {
         d3.select(this).attr('transform', function(d,i){
           return 'translate(' + (this.getBoundingClientRect().x + (<any>d3).event.dx) + ',' +
             (this.getBoundingClientRect().y + (<any>d3).event.dy) + ')';
-        })
+        });
       });
 
     // TODO: Remove later as it's just a current workaround as second window is always 200 offset...
@@ -53,7 +53,7 @@ class SankeyDetail implements MAppViews {
         d3.select(this).attr('transform', function(d,i){
           return 'translate(' + (this.getBoundingClientRect().x + (<any>d3).event.dx) + ',' +
             (this.getBoundingClientRect().y + (<any>d3).event.dy - 200) + ')';
-        })
+        });
       });
 
     // Return the promise directly as long there is no dynamical data to update
