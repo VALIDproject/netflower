@@ -805,6 +805,7 @@ class SankeyDiagram implements MAppViews {
       <rect width='8' height='8' fill='url(#diagonalHatch2)' />
       </svg>
     ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
+    <tr><td>${dotFormat(d.overall) + valuePostFix}</td><td>in total.</td></tr>
     ` : '';
 
     Tooltip.mouseOver(d, text + hiddenFlows + '</table>', 'T2');
