@@ -22,8 +22,10 @@ class SankeyDetail implements MAppViews {
   private drawSvg: number = 0;
   // Look if the bar chart is drawn
   private drawBarChart: number = 0;
-  private toolbox;
-  private toolbox2;
+  private toolbox: d3.Selection<any>;
+  private toolbox2: d3.Selection<any>;
+  private drag;
+  private drag2;
 
   constructor(parent: Element, private options: any) {
     this.$node = d3.select(parent);
@@ -37,6 +39,22 @@ class SankeyDetail implements MAppViews {
   init() {
     // this.build();
     this.attachListener();
+    this.drag = d3.behavior.drag()
+      .on('drag', function(d,i) {
+        d3.select(this).attr('transform', function(d,i){
+          return 'translate(' + (this.getBoundingClientRect().x + (<any>d3).event.dx) + ',' +
+            (this.getBoundingClientRect().y + (<any>d3).event.dy) + ')';
+        })
+      });
+
+    // TODO: Remove later as it's just a current workaround as second window is always 200 offset...
+    this.drag2 = d3.behavior.drag()
+      .on('drag', function(d,i) {
+        d3.select(this).attr('transform', function(d,i){
+          return 'translate(' + (this.getBoundingClientRect().x + (<any>d3).event.dx) + ',' +
+            (this.getBoundingClientRect().y + (<any>d3).event.dy - 200) + ')';
+        })
+      });
 
     // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
@@ -119,7 +137,7 @@ class SankeyDetail implements MAppViews {
 
     if (this.drawSvg === 0) {
       this.$node.append('svg')
-        .attr('class', 'sankey_details')
+        .attr('class', 'sankey_details draggable')
         .attr('transform', 'translate(' + xpositionSvg + ',' + newYPositionSvg + ')')
         .attr('width', w + margin.left + margin.right + 'px')
         .attr('height', h + margin.top + margin.bottom + 'px')
@@ -193,12 +211,12 @@ class SankeyDetail implements MAppViews {
           evt.stopPropagation();
           // Export.exportSingleFlowOverTime('svg.sankey_details2 rect.bar');
         });
-
+      d3.select('.sankey_details').call(this.drag);
       ++this.drawSvg;
 
     } else {
       this.$node.append('svg')
-        .attr('class', 'sankey_details2')
+        .attr('class', 'sankey_details2 draggable')
         .attr('transform', 'translate(' + xpositionSvg + ',' + (h + newYPositionSvg) + ')')
         .attr('width', w + margin.left + margin.right + 'px')
         .attr('height', h + margin.top + margin.bottom + 'px')
@@ -269,6 +287,7 @@ class SankeyDetail implements MAppViews {
           Export.exportSingleFlowOverTime('svg.sankey_details2 rect.bar', sourceAndTarget);
         });
 
+      d3.select('.sankey_details2').call(this.drag2);
       this.drawSvg = 0;
     }
 
