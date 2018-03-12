@@ -29,7 +29,7 @@ interface SNode {
 
 const FLOWS_INCREMENT = 12;
 const NODES_INCREMENT = 8;
-const SORT_MODES = ['flow', 'source', 'target'];
+const SORT_MODES = ['flow (descending)', 'source (descending)', 'target (descending)', 'flow (ascending)', 'source (ascending)', 'target (ascending)'];
 
 export default class FlowSorter implements MAppViews {
 
@@ -103,18 +103,28 @@ export default class FlowSorter implements MAppViews {
 
   public topFlows(flatNest: Flow[], valuePostFix: string): any {
     if (this.sortMode === SORT_MODES[0]) {
-      return this.flowOrder(flatNest, valuePostFix);
+      return this.flowOrder(flatNest, valuePostFix, true);
     } else if (this.sortMode === SORT_MODES[1]) {
-      return this.nodeOrder(flatNest, valuePostFix, true);
+      return this.nodeOrder(flatNest, valuePostFix, true, true);
     } else if (this.sortMode === SORT_MODES[2]) {
-      return this.nodeOrder(flatNest, valuePostFix, false);
+      return this.nodeOrder(flatNest, valuePostFix, false, true);
+    } else if (this.sortMode === SORT_MODES[3]) {
+      return this.flowOrder(flatNest, valuePostFix, false);
+    } else if (this.sortMode === SORT_MODES[4]) {
+      return this.nodeOrder(flatNest, valuePostFix, true, false);
+    } else if (this.sortMode === SORT_MODES[5]) {
+      return this.nodeOrder(flatNest, valuePostFix, false, false);
     }
   }
 
-  private flowOrder(flatNest: Flow[], valuePostFix: string): any {
+  private flowOrder(flatNest: Flow[], valuePostFix: string, descending: boolean): any {
     const flowsToShow = Math.min(flatNest.length, this.showExtent * FLOWS_INCREMENT);
     const flows = flatNest.sort((a, b) => {
-      return d3.descending(a.value, b.value);
+      if (descending) {
+        return d3.descending(a.value, b.value);
+      } else {
+        return d3.ascending(a.value, b.value);
+      }
     }).slice(0, flowsToShow);
 
     const nodes: SNode[] = [];
@@ -145,12 +155,18 @@ export default class FlowSorter implements MAppViews {
    * @param valuePostFix
    * @param bySource switch whether to sort by source or target
    */
-  private nodeOrder(flatNest: Flow[], valuePostFix: string, bySource: boolean): any {
+  private nodeOrder(flatNest: Flow[], valuePostFix: string, bySource: boolean, descending: boolean): any {
     const valuesSumSource = d3.nest()
       .key((d: Flow) => { return bySource ? d.source : d.target; }) // XXX
       .rollup((v) => { return d3.sum(v, (d: Flow) => { return d.value; }); })
       .entries(flatNest)
-      .sort((a, b) => { return d3.descending(a.values, b.values); });
+      .sort((a, b) => {
+        if (descending) {
+          return d3.descending(a.values, b.values);
+        } else {
+          return d3.ascending(a.values, b.values);
+        }
+      });
 
     const targetCount = d3.set(flatNest.map((d) => {return (bySource ? d.target : d.source); })).size(); // XXX
 
