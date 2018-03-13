@@ -48,6 +48,14 @@ module.exports = function(registry) {
     'name': 'SparklineBarChartTarget',
   });
 
+  registry.push('validView', 'Export', function() { return System.import('./src/export'); }, {
+    'name': 'Export',
+  });
+
+  registry.push('validView', 'FlowSorter', function() { return System.import('./src/flowSorter'); }, {
+    'name': 'FlowSorter',
+  });
+
   registry.push('validView', 'SimpleLogging', function() { return System.import('./src/simpleLogging'); }, {
     'name': 'SimpleLogging',
   });

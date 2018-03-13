@@ -7,13 +7,13 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {dotFormat, Tooltip} from './utilities';
+import {dotFormat, d3TextWrap} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFormat from './timeFormat';
 
 const CHART_HEIGHT: number = 18;
 const INITIAL_SVG_HEIGHT: number = 100;
-const OFFSET = 20;                         //Offset for the chart in px
+const OFFSET = 20;                         // Offset for the chart in px
 
 interface IKeyValue {
   key: string;
@@ -21,7 +21,7 @@ interface IKeyValue {
 }
 
 export default class SparklineBarChart implements MAppViews {
-  //2 singletons for both views
+  // 2 singletons for both views
   private static sourceChart: SparklineBarChart;
   private static targetChart: SparklineBarChart;
 
@@ -29,7 +29,7 @@ export default class SparklineBarChart implements MAppViews {
   private parentDOM: string;
   private field: string;
   private necessaryHeight = INITIAL_SVG_HEIGHT;
-  private chartWidth: number = 120;        //Fallback if not calcualted dynamically
+  private chartWidth: number = 120;        // Fallback if not calcualted dynamically
 
   /** unit of flows (e.g., '€'). Extracted from CSV header. */
   private valuePostFix = '';
@@ -40,7 +40,7 @@ export default class SparklineBarChart implements MAppViews {
     this.field = options.field;
     this.parentDOM = options.parentDOM;
 
-    //Initialize Singletons aka the Objects for left or right view point
+    // Initialize Singletons aka the Objects for left or right view point
     if ('sourceNode' === options.field) {
       SparklineBarChart.sourceChart = this;
       this.chartWidth = (d3.select('.left_bars') as any).node().getBoundingClientRect().width - OFFSET;
@@ -60,7 +60,7 @@ export default class SparklineBarChart implements MAppViews {
 
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
     if(dataAvailable) {
-      //Prepare the svg here, apparently sankey.init() has already finished
+      // Prepare the svg here, apparently sankey.init() has already finished
       this.$node = d3.select(this.parentDOM)
         .append('svg')
         .classed('barchart', true)
@@ -68,7 +68,7 @@ export default class SparklineBarChart implements MAppViews {
         .attr('height', INITIAL_SVG_HEIGHT);
     }
 
-    //Return the promise directly as long there is no dynamical data to update
+    // Return the promise directly as long there is no dynamical data to update
     return Promise.resolve(this);
   }
 
@@ -78,13 +78,13 @@ export default class SparklineBarChart implements MAppViews {
    * @param node
    */
   public static createSparklines(node: d3.Selection<any>) {
-    //This is how we retrieve the data. As it's loaded async it is only available as promise.
-    //We can save the promise thoug in a global variable and get the data later if we need
+    // This is how we retrieve the data. As it's loaded async it is only available as promise.
+    // We can save the promise thoug in a global variable and get the data later if we need
     const promiseData = localforage.getItem('data').then((value) => {
       return value;
     });
 
-    //Within the {} the data is available for usage
+    // Within the {} the data is available for usage
     promiseData.then(function (data: any) {
       const timePoints = d3.set(
         data.map(function (d: any) { return d.timeNode; })
@@ -94,30 +94,32 @@ export default class SparklineBarChart implements MAppViews {
 
       node.each(function (d, i) {
         const nodeElem = d3.select(this);
-        const yMiddle = nodeElem.datum().y + nodeElem.datum().dy / 2;
 
         if (nodeElem.attr('class').includes('source')) {
-          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         } else {
-          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, yMiddle, timePoints);
+          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         }
       });
     });
   }
 
-  private build(data: any, nodeName: string, yMiddle: number, timePoints: string[]) {
+  private build(data: any, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
 
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     this.valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
 
-    if (this.necessaryHeight < yMiddle) {
-      this.necessaryHeight = yMiddle;
-      this.$node.attr('height', yMiddle + CHART_HEIGHT + 5);
+    const correctedTop = elemTop + AppConstants.SANKEY_TOP_MARGIN - AppConstants.SANKEY_NODE_PADDING / 3;
+    const correctedHeight =elemHeight + AppConstants.SANKEY_NODE_PADDING * 2 /3;
+
+    if (this.necessaryHeight < correctedTop + correctedHeight) {
+      this.necessaryHeight = correctedTop + correctedHeight;
+      this.$node.attr('height', correctedTop + correctedHeight);
     }
 
     const aggregatedData = _self.prepareData(data, nodeName);
-    _self.drawBarChart(aggregatedData, nodeName, yMiddle, timePoints);
+    _self.drawBarChart(aggregatedData, nodeName, correctedTop, correctedHeight, timePoints);
   }
 
   /**
@@ -126,7 +128,7 @@ export default class SparklineBarChart implements MAppViews {
   private attachListener() {
     const _self = this;
     events.on(AppConstants.EVENT_FILTER_CHANGED, (evt, data) => {
-      //On filters discard everything to allow a clean redraw
+      // On filters discard everything to allow a clean redraw
       _self.$node.html('');
     });
 
@@ -136,7 +138,7 @@ export default class SparklineBarChart implements MAppViews {
       _self.$node.html('');
     });
 
-    // if filtered quarter changes -> keep track of active quarters based on filtered data
+    // If filtered quarter changes -> keep track of active quarters based on filtered data
     events.on(AppConstants.EVENT_SLIDER_CHANGE, (evt, filteredData) => {
       _self.activeQuarters = d3.set(
         filteredData.map(function (d: any) { return d.timeNode; })
@@ -166,16 +168,67 @@ export default class SparklineBarChart implements MAppViews {
    * @param nodeName name of the node for which the barchart is drawn
    * @param dy vertical offset from sankey diagram
    */
-  private drawBarChart(aggregatedData: IKeyValue[], nodeName: string, yMiddle: number, timePoints: string[]) {
+  private drawBarChart(aggregatedData: IKeyValue[], nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
 
     const x = d3.scale.ordinal().rangeRoundBands([0, this.chartWidth], .05);
     const y = d3.scale.linear().range([CHART_HEIGHT, 0]);
 
+    const yBaseline = elemTop + elemHeight / 2 - CHART_HEIGHT / 2;
+
     x.domain(timePoints);
     y.domain([0, d3.max(aggregatedData, function (d) { return d.values; })]);
 
     const group = this.$node.append('g');
+
+    // add a white background rect that can catch mouseenter events
+    group.append('rect')
+    .attr('x', 0)
+    .attr('y', elemTop)
+    .attr('width', this.chartWidth)
+    .attr('height', elemHeight)
+    .attr('fill', 'white');
+
+    group.on('mouseenter', (d) => {
+      const overlay = _self.$node.append('g')
+        .classed('overlay', true)
+        .on('mouseleave', (d) => {
+          const overlays = d3.selectAll('svg.barchart g.overlay');
+          overlays.remove();
+        });
+
+      const y1 = Math.min(yBaseline - 4 - 13, elemTop);
+      const y2 = Math.max(yBaseline + CHART_HEIGHT + 13 + 3, elemTop + elemHeight);
+
+      overlay.html(`
+      <rect x='0' y='${y1}' width='${_self.chartWidth}' height='${y2 -y1}' fill="white" />
+      <text id='flowtotals' x='${2}' y='${yBaseline - 4}' style='text-anchor: start'>${this.generateFlowTotalsText(aggregatedData, timePoints)}</text>
+
+      <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: middle'>time</text>
+      <text x='${2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: start'>${TimeFormat.format(timePoints[0])}</text>
+      <text x='${this.chartWidth - 2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: end'>${TimeFormat.format(timePoints[timePoints.length-1])}</text>
+      `);
+      d3TextWrap(d3.select('text#flowtotals'), this.chartWidth, 2);
+
+      overlay.selectAll('bar')
+        .data(aggregatedData)
+        .enter().append('rect')
+        .classed('bar', true)
+        .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
+        .attr('x', function (d, i) { return x(d.key); })
+        .attr('width', x.rangeBand())
+        .attr('y', function (d) { return y(d.values) + yBaseline; })
+        .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
+        // bar hover -- update text above barchart
+        .on('mouseover', (d) => {
+          d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
+        })
+        .on('mouseout', (d) => {
+          const text = d3.select('text#flowtotals');
+          text.text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+          d3TextWrap(text, this.chartWidth, 2);
+        });
+    });
 
     group.selectAll('bar')
       .data(aggregatedData)
@@ -184,15 +237,17 @@ export default class SparklineBarChart implements MAppViews {
       .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
       .attr('x', function (d, i) { return x(d.key); })
       .attr('width', x.rangeBand())
-      .attr('y', function (d) { return y(d.values) + yMiddle; })
-      .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
-      //Add the link titles - Hover Path
-      .on('mouseover', (d) => {
-        const text = nodeName + '<br/>Time: ' + TimeFormat.format(d.key) + '<br/>Flow: ' + dotFormat(d.values) + _self.valuePostFix;
-        console.log(text);
-        Tooltip.mouseOver(d, text, 'T2');
-      })
-      .on('mouseout', Tooltip.mouseOut);
+      .attr('y', function (d) { return y(d.values) + yBaseline; })
+      .attr('height', function (d) { return CHART_HEIGHT - y(d.values); });
+  }
+
+  private generateFlowTotalsText(aggregatedData: IKeyValue[], timePoints: string[]): string {
+    const activeSum = aggregatedData
+      .filter((d, i) => {return (this.activeQuarters.indexOf(d.key) >= 0);})
+      .map((d) => d.values)
+      .reduce((total, current) => total + current);
+
+    return 'Total flows in ' + TimeFormat.formatMultiple(this.activeQuarters, timePoints) + ': ' + dotFormat(activeSum) + this.valuePostFix;
   }
 }
 

@@ -105,6 +105,18 @@ export class App implements MAppViews {
       options: {'parentDOM' : 'div.right_bars', 'field': 'targetNode'},
     },
     {
+      view: 'Export',
+      parent: 'dataVizView',
+      // options: {'parentDOM' : 'div.clearBox'},
+      options: {'parentDOM' : 'div.sankey_features div.col-md-4'},
+    },
+    {
+      view: 'FlowSorter',
+      parent: 'dataVizView',
+      // options: {'parentDOM' : 'div.clearBox'},
+      options: {'parentDOM' : 'div.sankey_features div.col-md-2'},
+    },
+    {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
@@ -143,7 +155,9 @@ export class App implements MAppViews {
     $(window).resize(function () {
       clearTimeout(id);
       id = setTimeout(function () {
-        events.fire(AppConstants.EVENT_RESIZE_WINDOW);
+        if(!$('.dataVizView').hasClass('invisibleClass')) {
+          events.fire(AppConstants.EVENT_RESIZE_WINDOW);
+        }
       }, 300);
     });
   }

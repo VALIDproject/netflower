@@ -45,17 +45,22 @@ export default class MediaEuroFilter implements Filter
     this.maxValue = maxValue;
   }
 
-  //all entries which targetNode is one of the before processed media entities will be added to the resultData
+  /**
+   * Filters all entries which targetNode is one of the before processed media entities. Then it will be added
+   * to the resultsData.
+   * @param data to perform the filter on.
+   * @returns {Array<any>} the filtered data afterwards.
+   */
   public meetCriteria(data: any): any
   {
     this._resultData = new Array<any>();
     this.processData(data);
 
-    for(let entry of data)
+    for (let entry of data)
     {
-      for(let entity of this._container.entities)
+      for (let entity of this._container.entities)
       {
-        if(entry.targetNode === entity.identifier)
+        if (entry.targetNode === entity.identifier)
           this._resultData.push(entry);
       }
     }
@@ -63,43 +68,50 @@ export default class MediaEuroFilter implements Filter
     return this._resultData;
   }
 
-  //Find all media entities which totalAmount is between the min and max values
+  /**
+   * Finds all media entities which totalAmount is between the min and max values.
+   * @param data where the operations are performed on.
+   */
   private processData(data: any): void
   {
     this.generateDataStructure(data);
-
-    //Filter DataStructure
-    for(let entity of this._container.entities)
+    let toRemove: number[] = [];
+    // Filter DataStructure
+    for (let entity in this._container.entities)
     {
-      let totalAmount = entity.totalAmount;
-
-      if(totalAmount < this._minValue || totalAmount > this._maxValue)
+      let totalAmount = this._container.entities[entity].totalAmount;
+      if (totalAmount < this._minValue || totalAmount > this._maxValue)
       {
-        this._container.removeEntity(entity);
+        toRemove.push(parseInt(entity, 0));
       }
     }
+
+    this._container.filterEntityContainer(toRemove);
   }
 
-  //this method generates a datastructure where all media entities and their totalAmount (total of all payments corresponding to this media company) are stored
+  /**
+   * This method generates a datastructure where all media entities and their totalAmount
+   * (total of all payments corresponding to this media company) are stored.
+   * @param data to generate the data structure from.
+   */
   private generateDataStructure(data: any): void
   {
     this._container.clearEntities();
 
-    if(data === null || data === undefined)
+    if (data === null || data === undefined)
       return;
 
-    //generating DataStructure
-    for(let entry of data)
+    // Generating DataStructure
+    for (let entry of data)
     {
       let ent = this._container.findEntity(entry.targetNode);
 
-      if(ent === null)
+      if (ent === null)
       {
         ent = new Entity(entry.targetNode);
         ent.addPayment(entry.valueNode);
         this._container.addEntity(ent);
       }
-
       else
       {
         ent.addPayment(entry.valueNode);
@@ -107,7 +119,11 @@ export default class MediaEuroFilter implements Filter
     }
   }
 
-  //calculating the min and max value of the media entities totalAmounts (total of all payments corresponding to this media company)
+  /**
+   * Is used for calculating the min and max value of the media entities totalAmounts
+   * (total of all payments corresponding to this media company).
+   * @param data to calculate the min and max values from.
+   */
   public calculateMinMaxValues(data: any): void
   {
     this.generateDataStructure(data);
@@ -116,21 +132,21 @@ export default class MediaEuroFilter implements Filter
     let maxValue:number = 0;
     let first:boolean = true;
 
-    for(let entity of this._container.entities)
+    for (let entity of this._container.entities)
     {
       let totalAmount = entity.totalAmount;
 
-      if(first)
+      if (first)
       {
         minValue = totalAmount;
         maxValue = totalAmount;
         first = false;
       }
 
-      if(totalAmount < minValue)
+      if (totalAmount < minValue)
         minValue = totalAmount;
 
-      if(totalAmount > maxValue)
+      if (totalAmount > maxValue)
       {
         maxValue = totalAmount;
       }

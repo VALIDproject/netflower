@@ -1,4 +1,5 @@
 /.tscache
+/.vscode
 /.idea
 /build/
 /dist/

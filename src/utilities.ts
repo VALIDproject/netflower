@@ -1,8 +1,8 @@
 /**
  * Created by Florian on 02.05.2017.
  */
-;
 import * as d3 from 'd3';
+import text = d3.text;
 import * as events from 'phovea_core/src/event';
 import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
@@ -10,7 +10,7 @@ import {AppConstants} from './app_constants';
 /**
  Function allowing to 'wrap' the text from an SVG <text> element with <tspan>.
  * Based on https://github.com/mbostock/d3/issues/1642
- * @exemple svg.append('g')
+ * @example svg.append('g')
  *      .attr('class', 'x axis')
  *      .attr('transform', 'translate(0,' + height + ')')
  *      .call(xAxis)
@@ -25,9 +25,9 @@ import {AppConstants} from './app_constants';
  *
  * @see: from https://github.com/d3/d3/issues/1642 AlexandreBonneau
  */
-export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
-  paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
-  paddingTopBottom = (paddingTopBottom || 5) - 2; //Default padding (5px), remove 2 pixels because of the borders
+export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom = 5) {
+  // paddingRightLeft = paddingRightLeft || 5; //Default padding (5px)
+  paddingTopBottom = paddingTopBottom - 2; //Default padding (5px), remove 2 pixels because of the borders
   const maxWidth = width; //I store the tooltip max width
   width = width - (paddingRightLeft * 2); //Take the padding into account
 
@@ -110,6 +110,17 @@ export function d3TextWrap(text, width, paddingRightLeft?, paddingTopBottom?) {
  */
 export const splitAt = (index) => (it) =>
   [it.slice(0, index), it.slice(index)];
+
+/**
+ * This function takes a time point which consits basically of a year and a quarter. It places between the year and
+ * quarter a big "Q" in order to symbolize the quarter. So for example 20151 --> 2015Q1
+ * @param timePoint to be transformed
+ * @returns {string} transfomred time point
+ */
+export function splitQuarter(timePoint: string): string {
+  const textParts = splitAt(4)(timePoint);
+  return `${textParts[0]}Q${textParts[1]}`;
+}
 
 const formatNumber = d3.format(',.0f');    //Zero decimal places
 //  format = function(d) { return formatNumber(d); }, //Display number with unit sign
@@ -389,10 +400,20 @@ export function d3TextEllipse(text, maxTextWidth) {
     const tspan = text.insert('tspan', ':first-child').text(words.join(' '));
 
     //While it's too long and we have words left we keep removing words
-    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length) {
+    while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && words.length > 1) {
       words.pop();
       tspan.text(words.join(' '));
     }
+
+    // only 1 word left & if too long, keep removing characters
+    if (words.length === 1) {
+      let length = words[0].length;
+      while ((tspan.node() as any).getComputedTextLength() > maxTextWidth && length > 1) {
+        length--;
+        tspan.text(words[0].slice(0, length));
+      }
+    }
+
     if (words.length === numWords) {
       ellipsis.remove();
     }
@@ -417,9 +438,16 @@ export class Tooltip {
         .style('left', ((<any>d3).event.pageX - 20) + 'px')
         .style('top', ((<any>d3).event.pageY - 140) + 'px');
     } else {
+      let left = (<any>d3).event.pageX;
+      const screenWidth = document.documentElement.clientWidth;
+      if ((left + 200) > screenWidth) {
+        left = screenWidth - 200; // Reduce by tooltip width = 200 and offset = 20
+      } else {
+        left = left - 20;
+      }
       Tooltip.tooltip2.transition().duration(200).style('opacity', .9);
       Tooltip.tooltip2.html(text)
-        .style('left', ((<any>d3).event.pageX - 20) + 'px')
+        .style('left', left + 'px')
         .style('top', ((<any>d3).event.pageY) + 'px');
     }
   }
@@ -429,3 +457,9 @@ export class Tooltip {
       Tooltip.tooltip2.transition().duration(500).style('opacity', 0);
   }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+/*
+* Create a copy of an object to log it out:
+* Object.assign({},this._container)
+*/

@@ -7,7 +7,6 @@ import * as d3 from 'd3';
 export default class ParagraphFilter implements Filter
 {
   private resultData: Array<any>;
-
   private queriedValues: d3.Set;
 
   constructor()
@@ -25,21 +24,32 @@ export default class ParagraphFilter implements Filter
     this.queriedValues = d3.set(val);
   }
 
-  //check if the value meets the entries paragraph value
+  /**
+   * This checks if the value meets the entries paragraph value.
+   * @param data to search the paragraphs in.
+   * @returns {Array<any>} the result of the search.
+   */
   public meetCriteria(data: any): any
   {
     this.resultData = data.filter((d) => {
-      // attribute1 column not present in row --> it meets the criteria (typically a dataset without an attribute column)
+      // Attribute1 column not present in row --> it meets the criteria (typically a dataset without an attribute column)
       return (d.attribute1 === undefined) || this.queriedValues.has(d.attribute1);
     });
 
     return this.resultData;
   }
 
+  /**
+   * Resets the paragraph filter or attributes.
+   */
   public resetValues(): void {
     this.queriedValues = d3.set([]);
   }
 
+  /**
+   * Adds a new attribute to the query.
+   * @param val
+   */
   public addValue(val: string): void {
     this.queriedValues.add(val);
   }

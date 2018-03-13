@@ -75,6 +75,7 @@
     "@types/localforage": "0.0.34",
     "@types/papaparse": "^4.1.28",
     "BootSideMenu": "0.0.1",
+    "alertify.js": "^1.0.12",
     "bootbox": "^4.4.0",
     "bootstrap-sass": "3.3.7",
     "bootstrap-slider": "^9.8.0",
