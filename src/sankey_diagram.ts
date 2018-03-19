@@ -508,7 +508,7 @@ class SankeyDiagram implements MAppViews {
           // Save type of node in DOM
           let classAttr;
           if (d.sourceLinks.length > 0) {
-            classAttr = 'node source'
+            classAttr = 'node source';
           } else {
             classAttr = 'node target';
           }
