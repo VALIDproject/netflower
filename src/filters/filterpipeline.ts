@@ -89,11 +89,19 @@ export default class FilterPipeline
     this._mediaSearchFilter = newMedSearch;
   }
 
+  /**
+   * Changes the stored tagFlowFilter.
+   * @param {TagFlowFilter} newTagFlow tags to filter.
+   */
   public changeTagFlowFilter(newTagFlow: TagFlowFilter): void
   {
     this._tagFlowFilter = newTagFlow;
   }
 
+  /**
+   * Checks if the aggregated sankey view is active.
+   * @returns {boolean} whether the aggregated sankey view is active or not.
+   */
   public getTagFlowFilterStatus(): boolean
   {
     return this._tagFlowFilter.active;

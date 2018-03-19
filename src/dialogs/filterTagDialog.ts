@@ -7,6 +7,11 @@ import * as bootbox from 'bootbox';
 import TagFilter from '../filters/tagFilter';
 import EntityTagFilter from '../filters/entityTagFilter';
 
+/**
+ * This class is used to describe a dialog to filter nodes by tags.
+ * Filtering performed by this filter is either for source or target nodes,
+ * depending on the provided TagFilter instance.
+ */
 export default class FilterTagDialog {
 
   private _activeTags: d3.Set;
@@ -30,6 +35,9 @@ export default class FilterTagDialog {
     this.activeTags.forEach((tag:string) => this._availableTags.remove(tag));
   }
 
+  /**
+   * Updates the content of the dialog window
+   */
   private updateDialogMessage() {
     this._activeTags = d3.set(this.sortTagsByAlphabet(this._activeTags));
     this._availableTags = d3.set(this.sortTagsByAlphabet(this._availableTags));
@@ -42,6 +50,9 @@ export default class FilterTagDialog {
     }
   }
 
+  /**
+   * Builds the html code for tags currently selected for filtering.
+   */
   private buildActiveTagsHtml() {
     let message = "<small>Tags selected:";
     if(this._activeTags.empty()) {
@@ -55,6 +66,9 @@ export default class FilterTagDialog {
     }
   }
 
+  /**
+   * Builds the html code for a search input to look for a specific tag.
+   */
   private buildSearchTagsHtml() {
     let placeholder = "Search for tag...";
     let message = `
@@ -71,6 +85,9 @@ export default class FilterTagDialog {
     return message;
   }
 
+  /**
+   * Builds the html code for tags currently not selected, but available for filtering.
+   */
   private buildAvailableTagsHtml() {
     let message = "<small>Tags available:";
     if(this._availableTags.empty()) {
@@ -91,11 +108,19 @@ export default class FilterTagDialog {
     return message + "</div>";
   }
 
-  private createButtonHtmlByValue(value: string, active: boolean) {
+  /**
+   * Get the html code for a new tag button.
+   * @param value of button label, active whether the tag is currently selected
+   * @returns {string} of the html code creating a new tag button.
+   */
+  private createButtonHtmlByValue(value: string, active: boolean): string {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
           "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
   }
 
+  /**
+   * Defines the activities that follow when clicking on the tag buttons or using the search input.
+   */
   private initTagButtons() {
     var that = this;
     $('.tagBtn').click(function() {
@@ -148,6 +173,9 @@ export default class FilterTagDialog {
       return 'Filter ' + this.columnLabels.targetNode + ' By Tags';
   }
 
+  /**
+   * Creates and opens the dialog window for filtering tags.
+   */
   private buildDialog() {
     let that = this;
     this.dialog = bootbox.dialog({
@@ -226,6 +254,10 @@ export default class FilterTagDialog {
       });
   }
 
+  /**
+   * Get all column names for the data
+   * @returns {any} object which contains the column names saved in the local storage.
+   */
   private getColumnLabels(): any {
     let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
     if (columnLabels == null) {
@@ -237,7 +269,12 @@ export default class FilterTagDialog {
     return columnLabels;
   }
 
-  private sortTagsByAlphabet(tagSet: d3.Set) {
+  /**
+   * Sorts a set of tags in alphabetical order
+   * @param tagSet the set of tags to apply the sorting on.
+   * @returns {Array<any>} of alphabetically sorted tags.
+   */
+  private sortTagsByAlphabet(tagSet: d3.Set):any {
     let tags = tagSet.values();
     tags.sort(function(a, b) {
       if(a < b) return -1;

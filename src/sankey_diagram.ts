@@ -506,11 +506,13 @@ class SankeyDiagram implements MAppViews {
         .enter().append('g')
         .attr('class', function (d: any, i: number) {
           // Save type of node in DOM
+          let classAttr;
           if (d.sourceLinks.length > 0) {
-            return 'node source';
+            classAttr = 'node source'
           } else {
-            return 'node target';
+            classAttr = 'node target';
           }
+          return (that.pipeline.getTagFlowFilterStatus()) ? classAttr + ' tag' : classAttr;
         })
         .attr('transform', function (d) {
           return 'translate(' + d.x + ',' + d.y + ')';
@@ -581,6 +583,7 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'end')
         .attr('class', 'leftText');
 
+      // Add tag managing buttons if the aggregated sankey view shall be displayed
       if(!that.pipeline.getTagFlowFilterStatus()) {
         const managers = node.append('g');
 
@@ -974,6 +977,12 @@ class SankeyDiagram implements MAppViews {
 
   }
 
+  /**
+   * This method returns the number of tags associated with a specific media institution
+   * @param json data to look for tags
+   * @param name of the specific media institution
+   * @returns {string} number of the tags associated with the media institution
+   */
   private getNumOfTagsForMediaNode(json, name) {
     const tags: d3.Set = this.mediaTagFilter.getTagsByName(json, name);
     let numberOfTags = '';
@@ -991,6 +1000,12 @@ class SankeyDiagram implements MAppViews {
     return numberOfTags;
   }
 
+  /**
+   * This method returns the number of tags associated with a specific legal entity
+   * @param json data to look for tags
+   * @param name of the specific legal entity
+   * @returns {string} number of the tags associated with the legal entity
+   */
   private getNumOfTagsForEntityNode(json, name) {
     const tags: d3.Set = this.entityTagFilter.getTagsByName(json, name);
     let numberOfTags = '';

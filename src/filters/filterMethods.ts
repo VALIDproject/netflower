@@ -229,6 +229,11 @@ export function getValueRef() {
   return valueFilterRef;
 }
 
+/**
+ * This method creates a set containing all the legal entity tags
+ * @param filter the filter data
+ * @param data the data to create the tag set with
+ */
 export function setEntityTagFilter(filter, data: any)
 {
   let tags:d3.Set = d3.set([]);
@@ -250,6 +255,11 @@ export function setEntityTagFilter(filter, data: any)
   filter.availableTags = tags;
 }
 
+/**
+ * This method creates a set containing all the media entity tags
+ * @param filter the filter data
+ * @param data the data to create the tag set with
+ */
 export function setMediaTagFilter(filter, data: any)
 {
   let tags:d3.Set = d3.set([]);

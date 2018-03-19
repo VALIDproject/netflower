@@ -3,7 +3,7 @@ import Filter from './filter';
 import EntityContainer from '../datatypes/entityContainer';
 
 /**
- * This class is used to describe a value filter or filtering by value of the data set.
+ * This class is used to describe a tag filter or filtering by tags of the data set.
  */
 export default class TagFilter implements Filter
 {
@@ -50,7 +50,11 @@ export default class TagFilter implements Filter
     this._activeTags = tags;
   }
 
-  //check if the value meets the entries tag value
+  /**
+   * This checks wether the data contains the filter options or not or the necessary information.
+   * @param data to perfrom the filter on.
+   * @returns {any} the resulting array of data.
+   */
   public meetCriteria(data: any): any
   {
     if(this._active) {
@@ -60,7 +64,10 @@ export default class TagFilter implements Filter
     return data;
   }
 
-  // Find all legal or media entities which are tagged by one of the selected tags
+  /**
+   * Find all legal or media entities which are tagged by one of the selected tags
+   * @param data to apply the search on
+   */
   protected processData(data: any): void
   {
   }

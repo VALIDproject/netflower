@@ -7,7 +7,10 @@ import Entity from '../datatypes/entity';
  */
 export default class EntityTagFilter extends TagFilter
 {
-  //Find all legal entities which are associated with the active tags
+  /**
+   * Find all legal entities which are associated with the active tags
+   * @param data to apply the search on
+   */
   protected processData(data: any): void
   {
     let that = this;
@@ -58,6 +61,12 @@ export default class EntityTagFilter extends TagFilter
     });
   }
 
+  /**
+   * Finds all legal entity tags for a specific legal entity.
+   * @param data with tags associated to its entries
+   * @param {string} val name of the legal entity
+   * @returns {d3.Set} of tags associated to the specified legal entity
+   */
   public getTagsByName(data: any, val: string): d3.Set
   {
     let resultSet:d3.Set = d3.set([]);

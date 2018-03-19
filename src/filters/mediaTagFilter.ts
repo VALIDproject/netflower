@@ -7,7 +7,10 @@ import Entity from '../datatypes/entity';
  */
 export default class MediaTagFilter extends TagFilter
 {
-  //Find all media institutions which are associated with the active tags
+  /**
+   * Find all media institutions which are associated with the active tags
+   * @param data to apply the search on
+   */
   protected processData(data: any): void
   {
     let that = this;
@@ -57,6 +60,12 @@ export default class MediaTagFilter extends TagFilter
     });
   }
 
+  /**
+   * Finds all media institution tags for a specific media institution.
+   * @param data with tags associated to its entries
+   * @param {string} val name of the media institution
+   * @returns {d3.Set} of tags associated to the specified media institution
+   */
   public getTagsByName(data: any, val: string): d3.Set
   {
     let resultSet:d3.Set = d3.set([]);

@@ -8,6 +8,11 @@ import * as bootbox from 'bootbox';
 import TagFilter from '../filters/tagFilter';
 import EntityTagFilter from '../filters/entityTagFilter';
 
+/**
+ * This class is used to describe a dialog to manage the tags of a node.
+ * Changes performed by this dialog is either applied to a source or a target node,
+ * depending on the provided TagFilter instance.
+ */
 export default class ManageFilterDialog {
 
   private _tags: d3.Set;
@@ -22,6 +27,9 @@ export default class ManageFilterDialog {
     this.buildDialog();
   }
 
+  /**
+   * Updates the content of the dialog window
+   */
   private updateDialogMessage() {
     this._tags = d3.set(this.sortTagsByAlphabet(this._tags));
     this.message = this.buildActiveTagsHtml() + this.buildAddNewTagHtml() + this.buildSuggestedTagsHtml();
@@ -29,6 +37,9 @@ export default class ManageFilterDialog {
     this.initTagButtons();
   }
 
+  /**
+   * Builds the html code for tags currently active for the node.
+   */
   private buildActiveTagsHtml() {
     let message = "<small>Tags:";
     if(this._tags.empty()) {
@@ -42,6 +53,9 @@ export default class ManageFilterDialog {
     }
   }
 
+  /**
+   * Builds the html code for an input to add a new tag to the list of active tags.
+   */
   private buildAddNewTagHtml() {
     let placeholder = "Add a new tag...";
     let message = `
@@ -58,6 +72,9 @@ export default class ManageFilterDialog {
     return message;
   }
 
+  /**
+   * Builds the html code for tags currently not active for the tag, but overall available to add to the list.
+   */
   private buildSuggestedTagsHtml() {
     let message = "<small>Suggested Tags:";
     if(this._availableTags.empty()) {
@@ -73,11 +90,19 @@ export default class ManageFilterDialog {
     return message + "</div>";
   }
 
+  /**
+   * Get the html code for a new tag button.
+   * @param value of button label, active whether the tag is currently active
+   * @returns {string} of the html code creating a new tag button.
+   */
   private createButtonHtmlByValue(value: string, active: boolean) {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
           "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
   }
 
+  /**
+   * Defines the activities that follow when clicking on the tag buttons or using the input field.
+   */
   private initTagButtons() {
     const that = this;
     $('.tagBtn').click(function() {
@@ -143,6 +168,9 @@ export default class ManageFilterDialog {
     return 'Manage Tags for ' + this.d.name;
   }
 
+  /**
+   * Creates and opens the dialog window for filtering tags.
+   */
   private buildDialog() {
     let that = this;
     this.dialog = bootbox.dialog({
@@ -210,6 +238,11 @@ export default class ManageFilterDialog {
     }
   }
 
+  /**
+   * Sorts a set of tags in alphabetical order
+   * @param tagSet the set of tags to apply the sorting on.
+   * @returns {Array<any>} of alphabetically sorted tags.
+   */
   private sortTagsByAlphabet(tagSet: d3.Set) {
     let tags = tagSet.values();
     tags.sort(function(a, b) {
@@ -220,7 +253,12 @@ export default class ManageFilterDialog {
     return tags.map(function(tag) { return tag.trim()});
   }
 
-  private formatTagsForCSV(tags: d3.Set) {
+  /**
+   * Format tags such that they have a consistent formatting in the CSV file.
+   * @param {d3.Set} tags to format
+   * @returns {string} the formatted tags as text
+   */
+  private formatTagsForCSV(tags: d3.Set): string {
     return tags.values().join(" | ")
   }
 }

@@ -1,7 +1,7 @@
 import Filter from './filter';
 
 /**
- * This class is used to filter the data by either the upper best or the lowest ones.
+ * This class is used to filter the data by tag flows.
  * Either by value or time or other criteria.
  */
 export default class TagFlowFilter implements Filter
@@ -28,13 +28,20 @@ export default class TagFlowFilter implements Filter
     this._active = act;
   }
 
-  //determine if the filter should filter the top or bottom 10
-  public changeFilterTagFlow(top: boolean)
+  /**
+   * Determines if the aggregated sankey view should be displayed
+   * @param {boolean} top
+   */
+  public changeFilterTagFlow(flow: boolean)
   {
-    this._active = top;
+    this._active = flow;
   }
 
-  //method to find the nodes that are tagged and their respective monetary flow
+  /**
+   * Method to find the nodes that are tagged and their respective monetary flow
+   * @param data containing the nodes
+   * @returns {any} set of nodes that are grouped by tag label and aggregated by their monetary flow
+   */
   public findTagFlows(data: any): any
   {
     //creating an empty map an fill group all entities and and calulcate the total of all payments
@@ -77,6 +84,11 @@ export default class TagFlowFilter implements Filter
     }
   }
 
+  /**
+   * This checks wether the data contains the filter options or not or the necessary information.
+   * @param data to perfrom the filter on.
+   * @returns {any} the resulting array of data.
+   */
   public meetCriteria(data: any): any
   {
     this.resultData = new Array<any>();
