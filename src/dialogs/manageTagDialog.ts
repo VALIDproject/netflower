@@ -159,7 +159,7 @@ export default class ManageFilterDialog {
     });
     $('#addTagButton').on('click', addTag);
 
-    $('#clearTagSearch').on('click', (e) => {
+    $('#clearAddTag').on('click', (e) => {
       $('#addTagInput').val("");
     });
   }
