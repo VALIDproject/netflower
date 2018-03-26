@@ -238,30 +238,32 @@ export function setEntityTagFilter(filter, data: any)
 {
   let tags:d3.Set = d3.set([]);
 
-  let dataWithTags: any = data.filter((entry) => entry.sourceTag !== '');
-  dataWithTags = d3.nest<any>()
-    .key(function(d) { return d.sourceNode; })
-    .rollup(function(leaves) {
-      let nodeTags = d3.set([]);
-      for(const leaf of leaves) {
-        var values = leaf.sourceTag.split("|");
-        values.forEach(function(value) {
-          var val = value.trim();
-          nodeTags.add(val);
-          if(!tags.has(val))
-            tags.add(val);
-        })
-      }
-      return nodeTags.values().join(" | ");
-    })
-    .entries(dataWithTags);
+  let dataWithTags: any = data.filter((entry) => (entry.sourceTag !== '')  && (entry.sourceTag !== undefined));
 
-  console.log('legal:');
-  console.log(dataWithTags);
+  if (dataWithTags.length > 0) {
+    dataWithTags = d3.nest<any>()
+      .key(function (d) {
+        return d.sourceNode;
+      })
+      .rollup(function (leaves) {
+        let nodeTags = d3.set([]);
+        for (const leaf of leaves) {
+          var values = leaf.sourceTag.split("|");
+          values.forEach(function (value) {
+            var val = value.trim();
+            nodeTags.add(val);
+            if (!tags.has(val))
+              tags.add(val);
+          })
+        }
+        return nodeTags.values().join(" | ");
+      })
+      .entries(dataWithTags);
 
-  localforage.getItem('data').then((value) => {
-    return applyTagChangesToNode(value, dataWithTags);
-  });
+    localforage.getItem('data').then((value) => {
+      return applyTagChangesToNode(value, dataWithTags);
+    });
+  }
 
   filter.availableTags = tags;
 }
@@ -275,30 +277,32 @@ export function setMediaTagFilter(filter, data: any)
 {
   let tags:d3.Set = d3.set([]);
 
-  let dataWithTags: any = data.filter((entry) => entry.targetTag !== '');
-  dataWithTags = d3.nest<any>()
-    .key(function(d) { return d.targetNode; })
-    .rollup(function(leaves) {
-      let nodeTags = d3.set([]);
-      for(const leaf of leaves) {
-        var values = leaf.targetTag.split("|");
-        values.forEach(function(value) {
-          var val = value.trim();
-          nodeTags.add(val);
-          if(!tags.has(val))
-            tags.add(val);
-        })
-      }
-      return nodeTags.values().join(" | ");
-    })
-    .entries(dataWithTags);
+  let dataWithTags: any = data.filter((entry) => (entry.targetTag !== '')  && (entry.targetTag !== undefined));
 
-  console.log('media:');
-  console.log(dataWithTags);
+  if (dataWithTags.length > 0) {
+    dataWithTags = d3.nest<any>()
+      .key(function (d) {
+        return d.targetNode;
+      })
+      .rollup(function (leaves) {
+        let nodeTags = d3.set([]);
+        for (const leaf of leaves) {
+          var values = leaf.targetTag.split("|");
+          values.forEach(function (value) {
+            var val = value.trim();
+            nodeTags.add(val);
+            if (!tags.has(val))
+              tags.add(val);
+          })
+        }
+        return nodeTags.values().join(" | ");
+      })
+      .entries(dataWithTags);
 
-  localforage.getItem('data').then((value) => {
-    return applyTagChangesToNode(value, dataWithTags);
-  });
+    localforage.getItem('data').then((value) => {
+      return applyTagChangesToNode(value, dataWithTags);
+    });
+  }
 
   filter.availableTags = tags;
 }

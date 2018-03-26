@@ -22,12 +22,12 @@ export default class EntityTagFilter extends TagFilter
       let value: d3.Set = map.get(key);
 
       const tagsAsText:string = entry.sourceTag;
-      const tagValues:Array<string> = tagsAsText.split("|");
-      if (tagsAsText !== '') {
+      if (tagsAsText !== '' && tagsAsText !== undefined) {
+        const tagValues:Array<string> = tagsAsText.split("|");
         if(value === null || value === undefined) {
           value = d3.set();
           tagValues.forEach(function (tag) {
-            value.add(tag);
+            value.add(tag.trim());
           })
         } else {
           tagValues.forEach(function (tag) {
