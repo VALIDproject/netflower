@@ -163,11 +163,15 @@ export default class SparklineBarChart implements MAppViews {
     if(_self.aggregatedSankeyActive) {
       if(_self.field.includes('source')) {
         filteredData = data.filter(function (d) {
-          return d.sourceTag.includes(nodeName);
+          if(d.sourceTag !== undefined) {
+            return d.sourceTag.includes(nodeName);
+          }
         });
       } else {
         filteredData = data.filter(function (d) {
-          return d.targetTag.includes(nodeName);
+          if(d.targetTag !== undefined) {
+            return d.targetTag.includes(nodeName);
+          }
         });
       }
     } else {

@@ -52,7 +52,7 @@ export default class TagFlowFilter implements Filter
     {
       let key = entry.sourceTag;
       let relatedTag = entry.targetTag;
-      if (key != '' && relatedTag != '') {
+      if ((key !== '') && (key !== undefined) && (relatedTag !== '') && (relatedTag !== undefined)) {
         let value: number = map.get(key);
 
         if (value === null || value === undefined) {
@@ -108,7 +108,6 @@ export default class TagFlowFilter implements Filter
         }
       }
     }
-   // console.log(this.resultData);
     return this.resultData;
   }
 

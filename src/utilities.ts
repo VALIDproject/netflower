@@ -400,6 +400,11 @@ export function d3TextEllipse(text, maxTextWidth) {
   });
 }
 
+/**
+ * Sanitized the data in a way such that all the nodes with the same name have the same tags
+ * @param data to sanitize
+ * @param filteredData data with the correct tags and their respective nodes
+ */
 export function applyTagChangesToNode(data: any, filteredData: any): any {
   let newData = data;
   for (let entry of newData) {

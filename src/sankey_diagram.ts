@@ -410,7 +410,7 @@ class SankeyDiagram implements MAppViews {
 
     if(that.pipeline.getTagFlowFilterStatus()) {
       flatNest = flatNest.filter(function (d) {
-        return (d.source !== '') && (d.target !== '');
+        return (d.source !== '' && d.source !== undefined) && (d.target !== '' && d.target !== undefined);
       });
     }
 
