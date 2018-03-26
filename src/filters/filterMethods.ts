@@ -9,7 +9,7 @@ import 'ion-rangeslider';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.css';
 import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css';
 import {AppConstants} from '../app_constants';
-import {roundToFull} from '../utilities';
+import {roundToFull, applyTagChangesToNode} from '../utilities';
 import FilterPipeline from './filterpipeline';
 import EntityEuroFilter from './entityEuroFilter';
 import MediaEuroFilter from './mediaEuroFilter';
@@ -238,20 +238,31 @@ export function setEntityTagFilter(filter, data: any)
 {
   let tags:d3.Set = d3.set([]);
 
-  for(let entry of data) {
-    const tagsAsText:string = entry.sourceTag;
-    if (tagsAsText !== undefined) {
-      const values:Array<string> = tagsAsText.split("|");
-      values.forEach(function (value) {
-        if(value !== '') {
-          let val = value.trim();
+  let dataWithTags: any = data.filter((entry) => entry.sourceTag !== '');
+  dataWithTags = d3.nest<any>()
+    .key(function(d) { return d.sourceNode; })
+    .rollup(function(leaves) {
+      let nodeTags = d3.set([]);
+      for(const leaf of leaves) {
+        var values = leaf.sourceTag.split("|");
+        values.forEach(function(value) {
+          var val = value.trim();
+          nodeTags.add(val);
           if(!tags.has(val))
             tags.add(val);
-        }
-      })
+        })
+      }
+      return nodeTags.values().join(" | ");
+    })
+    .entries(dataWithTags);
 
-    }
-  }
+  console.log('legal:');
+  console.log(dataWithTags);
+
+  localforage.getItem('data').then((value) => {
+    return applyTagChangesToNode(value, dataWithTags);
+  });
+
   filter.availableTags = tags;
 }
 
@@ -264,19 +275,30 @@ export function setMediaTagFilter(filter, data: any)
 {
   let tags:d3.Set = d3.set([]);
 
-  for(let entry of data) {
-    const tagsAsText:string = entry.targetTag;
-    if (tagsAsText !== undefined) {
-      const values:Array<string> = tagsAsText.split("|");
-      values.forEach(function (value) {
-        if(value !== '') {
-          let val = value.trim();
+  let dataWithTags: any = data.filter((entry) => entry.targetTag !== '');
+  dataWithTags = d3.nest<any>()
+    .key(function(d) { return d.targetNode; })
+    .rollup(function(leaves) {
+      let nodeTags = d3.set([]);
+      for(const leaf of leaves) {
+        var values = leaf.targetTag.split("|");
+        values.forEach(function(value) {
+          var val = value.trim();
+          nodeTags.add(val);
           if(!tags.has(val))
             tags.add(val);
-        }
-      })
+        })
+      }
+      return nodeTags.values().join(" | ");
+    })
+    .entries(dataWithTags);
 
-    }
-  }
+  console.log('media:');
+  console.log(dataWithTags);
+
+  localforage.getItem('data').then((value) => {
+    return applyTagChangesToNode(value, dataWithTags);
+  });
+
   filter.availableTags = tags;
 }
