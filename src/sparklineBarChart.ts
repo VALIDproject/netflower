@@ -201,7 +201,7 @@ export default class SparklineBarChart implements MAppViews {
       const y2 = Math.max(yBaseline + CHART_HEIGHT + 13 + 3, elemTop + elemHeight);
 
       overlay.html(`
-      <rect x='0' y='${y1}' width='${_self.chartWidth}' height='${y2 -y1}' fill="white" />
+      <rect x='0' y='${y1}' width='${_self.chartWidth}' height='${y2 -y1}' fill="#ffffff01" />
       <text id='flowtotals' x='${2}' y='${yBaseline - 4}' style='text-anchor: start'>${this.generateFlowTotalsText(aggregatedData, timePoints)}</text>
 
       <text x='${this.chartWidth/2}' y='${yBaseline + CHART_HEIGHT + 13}' style='text-anchor: middle'>time</text>
@@ -210,18 +210,19 @@ export default class SparklineBarChart implements MAppViews {
       `);
       d3TextWrap(d3.select('text#flowtotals'), this.chartWidth, 2);
 
-      overlay.selectAll('bar')
-        .data(aggregatedData)
+      overlay.selectAll('.barbg')
+        .data(timePoints)
         .enter().append('rect')
-        .classed('bar', true)
-        .classed('active', function (d, i) { return (_self.activeQuarters.indexOf(d.key) >= 0); })
-        .attr('x', function (d, i) { return x(d.key); })
+        .classed('barbg', true)
+        .attr('x', function (d, i) { return x(d); })
         .attr('width', x.rangeBand())
-        .attr('y', function (d) { return y(d.values) + yBaseline; })
-        .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
+        .attr('y', function (d) { return yBaseline; })
+        .attr('height', function (d) { return CHART_HEIGHT; })
         // bar hover -- update text above barchart
-        .on('mouseover', (d) => {
-          d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
+        .on('mouseover', (t : string) => {
+          const aggD : IKeyValue = aggregatedData.find((aggD, i) => {return aggD.key === t; });
+          const value = aggD ? aggD.values : 0;
+          d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(t)}: ${dotFormat(value) + _self.valuePostFix}`);
         })
         .on('mouseout', (d) => {
           const text = d3.select('text#flowtotals');
