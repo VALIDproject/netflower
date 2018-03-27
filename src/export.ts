@@ -61,8 +61,8 @@ export default class Export implements MAppViews {
       });
 
       // CSV export using D3.js
-      const dataAsStr = d3.csv.format(dataAsArray);
-      const filename = 'flows ' + new Date().toLocaleString() + '.csv';
+      const dataAsStr = d3.tsv.format(dataAsArray);
+      const filename = 'flows ' + new Date().toLocaleString() + '.tsv';
       if (dataAsArray.length === 1) {
         bootbox.alert('No flows are visible.');
       } else {
@@ -102,11 +102,11 @@ export default class Export implements MAppViews {
     });
 
     // CSV export using D3.js
-    let dataAsStr = d3.csv.format(dataAsArray);
+    let dataAsStr = d3.tsv.format(dataAsArray);
     if (comment.length > 0) {
       dataAsStr = '# ' + comment + '\n' + dataAsStr;
     }
-    const filename = 'timeseries ' + new Date().toLocaleString() + '.csv';
+    const filename = 'timeseries ' + new Date().toLocaleString() + '.tsv';
     if (dataAsArray.length === 1) {
       bootbox.alert('No time steps are visible.');
     } else {
