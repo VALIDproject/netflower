@@ -250,12 +250,6 @@ svg.barchart rect.bar:hover {
 
 svg.barchart rect.barbg {
   fill: white;
-  fill-opacity: 0.01;
-}
-
-svg.barchart rect.barbg:hover {
-  fill: black;
-  fill-opacity: 0.1;
 }
 
 svg.barchart text {
