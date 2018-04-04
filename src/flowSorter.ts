@@ -29,6 +29,7 @@ interface SNode {
 
 const FLOWS_INCREMENT = 12;
 const NODES_INCREMENT = 8;
+const NODES_INCR_OTHER = 10;
 const SORT_MODES = ['flow (descending)', 'source (descending)', 'target (descending)', 'flow (ascending)', 'source (ascending)', 'target (ascending)'];
 
 export default class FlowSorter implements MAppViews {
@@ -174,7 +175,7 @@ export default class FlowSorter implements MAppViews {
     console.log(`node count ${typeOfNode}: ${valuesSumSource.length} other: ${targetCount}`);
 
     const sourcesToShow = Math.min(valuesSumSource.length, this.showExtent * NODES_INCREMENT );
-    const targetsToShow = Math.min(targetCount, sourcesToShow / valuesSumSource.length * targetCount );
+    const targetsToShow = Math.min(targetCount, sourcesToShow * targetCount / valuesSumSource.length, this.showExtent * NODES_INCR_OTHER );
 
     console.log(`node show ${typeOfNode}: ${sourcesToShow} other: ${targetsToShow}`);
 
@@ -219,11 +220,15 @@ export default class FlowSorter implements MAppViews {
     });
 
     // prepare infos for user interface
-    this.canShowMore = sourcesToShow < valuesSumSource.length;
+    this.canShowMore = sourcesToShow < valuesSumSource.length || targetsToShow < targetCount;
     this.messages[0] = (sourcesToShow < valuesSumSource.length)
       ? `${typeOfNode} nodes of total flow ${descending ? '≤' : '≥'} ${dotFormat(valuesSumSource[sourcesToShow].values)}${valuePostFix} are not displayed.`
       : `All ${typeOfNode} nodes are displayed.`;
-    this.messages[1] = `${sourcesToShow}/${valuesSumSource.length} ${typeOfNode} nodes displayed`;
+    this.messages[1] = `${sourcesToShow}/${valuesSumSource.length} ${typeOfNode} nodes shown`;
+    if (sourcesToShow === valuesSumSource.length && targetsToShow < targetCount) {
+      const otherTypeOfNode = bySource ? 'target' : 'source';
+      this.messages[1] += ` (${targetsToShow}/${targetCount} ${otherTypeOfNode} nodes shown)`;
+    }
 
     return this.graphFromNodeFlows(nodes, flows);
   }
