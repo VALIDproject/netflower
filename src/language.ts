@@ -40,9 +40,8 @@ export const TIME_INFO = `Select here the time range of the visualization.<br/>
 export const ATTR_INFO = `Select here the attributes you want to filter for on the current visualization. The attributes
 are read from your imported .csv file. If you see no checkboxes here, you probably have no attributes defined.`;
 
-export const LOG_INFO = `Here you are able to export the logs of the whole system. This is mainly for testing and evaluation
-purposes. However, the application tracks your actions and the state of the visualization the whole time. By clicking on the
-button a <strong>Log File</strong> will be created that is saved locally on your machine.`;
+export const LOG_INFO = `Export logs for evaluation and testing purpose. The application tracks your actions and the state of the visualization the whole time. By clicking on the
+button a <strong>Log File</strong> will be created and saved locally on your machine.`;
 
 export const NO_TIME_POINTS = `<span class='label label-warning' style='font-weight: normal;'>Warning</span>
 You have no time points selected! <br/> In order to prevent the application from showing nothing or unwanted results,

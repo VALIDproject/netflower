@@ -39,6 +39,7 @@ class SankeyDiagram implements MAppViews {
   private sankeyHeight: number = 0;
   private drawReally: boolean = true;
   private minFraction: number = 1;
+  private sankeyOptimization: boolean = true;
 
   // Filters
   private pipeline: FilterPipeline;
@@ -254,6 +255,13 @@ class SankeyDiagram implements MAppViews {
       this.resize();
     });
 
+    // Listen for the check if the sankey should be drawn with space optimization or not and use resize
+    // in order to draw the sankey diagaram again
+    events.on(AppConstants.EVENT_SANKEY_SORT_BEHAVIOR, (evt, automaticCheck) => {
+      this.sankeyOptimization = automaticCheck;
+      this.resize();
+    });
+
     // Listen for the change of the quarter slider and update others
     events.on(AppConstants.EVENT_SLIDER_CHANGE, (e, d) => {
       updateEntityRange(this.entityEuroFilter, d);
@@ -355,7 +363,8 @@ class SankeyDiagram implements MAppViews {
     // Set the diagram properties
     sankey.nodeWidth(35)
       .nodePadding(AppConstants.SANKEY_NODE_PADDING)
-      .size([width - widthOffset, height]);
+      .size([width - widthOffset, height])
+      .changeOptimization(this.sankeyOptimization);
 
     const path = sankey.link();
 

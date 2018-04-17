@@ -32,6 +32,8 @@ export class AppConstants {
 
   static EVENT_SORT_CHANGE = 'eventSortChange';
 
+  static EVENT_SANKEY_SORT_BEHAVIOR = 'eventSankeySortBehavior';
+
   static SANKEY_TOP_MARGIN = 10;
   static SANKEY_NODE_PADDING = 20;
 
