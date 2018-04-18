@@ -477,7 +477,7 @@ class SankeyDiagram implements MAppViews {
           return 'translate(' + d.x + ',' + d.y + ')';
         });
 
-      // white background rect so that tooltip is easier to reach
+      // White background rect so that tooltip is easier to reach
       node.append('rect')
         .attr('height', (d) => { return d.dy; })
         .attr('width', (d) => { return 45 + (margin.left + margin.right) / 2; })
@@ -533,12 +533,20 @@ class SankeyDiagram implements MAppViews {
         .text(function (d) {
           return `${d.name}`;
         })
+        .on('click', function(d: any) {
+          $('#mediaSearchFilter').val(d.name);
+          $('#mediaSearchButton').trigger('click');
+        })
         .filter(function (d, i) {
           return d.x < width / 2;
         })
         .attr('x', -45 + sankey.nodeWidth())
         .attr('text-anchor', 'end')
-        .attr('class', 'leftText');
+        .attr('class', 'leftText')
+        .on('click', function(d: any) {  // Click and add it to the search box for source
+          $('#entitySearchFilter').val(d.name);
+          $('#entitySearchButton').trigger('click');
+        });
 
       // Here the textwrapping happens of the nodes
       const maxTextWidth = (margin.left + margin.right - 10) / 2;
