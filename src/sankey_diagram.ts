@@ -534,7 +534,8 @@ class SankeyDiagram implements MAppViews {
           return `${d.name}`;
         })
         .on('click', function(d: any) {
-          $('#mediaSearchFilter').val(d.name);
+          const txt = '"' + d.name + '"';
+          $('#mediaSearchFilter').val(txt);
           $('#mediaSearchButton').trigger('click');
         })
         .filter(function (d, i) {
@@ -544,7 +545,8 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'end')
         .attr('class', 'leftText')
         .on('click', function(d: any) {  // Click and add it to the search box for source
-          $('#entitySearchFilter').val(d.name);
+          const txt = '"' + d.name + '"';
+          $('#entitySearchFilter').val(txt);
           $('#entitySearchButton').trigger('click');
         });
 
