@@ -33,9 +33,9 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   vertical-align: middle;
   cursor: pointer;
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   background-image: none;
   border: 1.5px solid transparent;
   border-radius: 4px;
@@ -45,7 +45,7 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
 }
 
 button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
-	color: $valid-color2;
+  color: $valid-color2;
   border-color: $valid-color2;
   background-color:white;
 }
@@ -173,7 +173,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 }
 
 .toolbox {
-    z-index: 50000000;
+  z-index: 50000000;
 }
 
 .button_bar {
@@ -190,7 +190,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 }
 
 span.to {
-    cursor: pointer !important;
+  cursor: pointer !important;
 }
 
 span.from {
@@ -201,10 +201,10 @@ span.from {
 .input-group-xs>.form-control,
 .input-group-xs>.input-group-addon,
 .input-group-xs>.input-group-btn>.btn {
-    height: 22px;
-    padding: 1px 5px;
-    font-size: 12px;
-    line-height: 1.5;
+  height: 22px;
+  padding: 1px 5px;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 // Brings down the bootbox dialog a bit.
@@ -225,18 +225,12 @@ span.from {
 }
 
 // Removes the number spinner from input elements of type number
-CSS
-
-/* Hide HTML5 Up and Down arrows. */
-CSS
-
-/* Hide HTML5 Up and Down arrows. */
 /* Hide HTML5 Up and Down arrows. */
 input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type="number"] {
-    -moz-appearance: textfield;
+  -moz-appearance: textfield;
 }

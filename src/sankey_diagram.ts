@@ -537,6 +537,7 @@ class SankeyDiagram implements MAppViews {
           const txt = '"' + d.name + '"';
           $('#mediaSearchFilter').val(txt);
           $('#mediaSearchButton').trigger('click');
+          $('#mediaSearchFilter').addClass('flash');
         })
         .filter(function (d, i) {
           return d.x < width / 2;
@@ -548,6 +549,7 @@ class SankeyDiagram implements MAppViews {
           const txt = '"' + d.name + '"';
           $('#entitySearchFilter').val(txt);
           $('#entitySearchButton').trigger('click');
+          $('#entitySearchFilter').addClass('flash');
         });
 
       // Here the textwrapping happens of the nodes
@@ -593,6 +595,7 @@ class SankeyDiagram implements MAppViews {
       this.entitySearchFilter.term = '';
       SimpleLogging.log('source name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+      $('#entitySearchFilter').removeClass('flash');
     });
 
     // Full-text search in target node names
@@ -615,6 +618,7 @@ class SankeyDiagram implements MAppViews {
       this.mediaSearchFilter.term = '';
       SimpleLogging.log('target name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+      $('#mediaSearchFilter').removeClass('flash');
     });
 
     // Functionality of show more button with dynamic increase of values.
