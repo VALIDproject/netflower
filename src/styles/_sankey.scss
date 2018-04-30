@@ -36,6 +36,9 @@ Sankey diagram part.
   height: 100%;
 }
 
+.leftText {
+  cursor: url( '#{$imagesDirectory}/searchIcon.svg' ) 30 1, pointer;
+}
 
 .sankey_vis {
   float: right;
@@ -49,6 +52,10 @@ Sankey diagram part.
   height: 100%;
   //border: 1px solid grey;
   width: 18%;
+}
+
+.rightText {
+  cursor: url( '#{$imagesDirectory}/searchIcon.svg' ) 1 30, pointer;
 }
 
 .axis text {
@@ -316,4 +323,30 @@ Section for the input fields of the sliders.
 
 .tooltip2 .node td:last-child {
   text-align: left;
+}
+
+.flash {
+  -moz-animation: flash 2s ease-out;
+  -moz-animation-iteration-count: 2;
+
+  -webkit-animation: flash 2s ease-out;
+  -webkit-animation-iteration-count: 2;
+}
+
+@keyframes flash {
+    0% { border-color: transparent; }
+    50% { border-color: $valid-color; border-radius: 4px; box-shadow: 0 0 10px $valid-color; }
+    100% { border-color: transparent; }
+}
+
+@-webkit-keyframes flash {
+    0% { border-color: transparent; }
+    50% { border-color: $valid-color; }
+    100% { border-color: transparent; }
+}
+
+@-moz-keyframes flash {
+    0% { border-color: transparent; }
+    50% { border-color: $valid-color; }
+    100% { border-color: transparent; }
 }

@@ -39,7 +39,7 @@ class SankeyDiagram implements MAppViews {
   private sankeyHeight: number = 0;
   private drawReally: boolean = true;
   private minFraction: number = 1;
-  private sankeyOptimization: boolean = true;
+  private sankeyOptimization: boolean = false;
 
   // Filters
   private pipeline: FilterPipeline;
@@ -477,7 +477,7 @@ class SankeyDiagram implements MAppViews {
           return 'translate(' + d.x + ',' + d.y + ')';
         });
 
-      // white background rect so that tooltip is easier to reach
+      // White background rect so that tooltip is easier to reach
       node.append('rect')
         .attr('height', (d) => { return d.dy; })
         .attr('width', (d) => { return 45 + (margin.left + margin.right) / 2; })
@@ -533,12 +533,24 @@ class SankeyDiagram implements MAppViews {
         .text(function (d) {
           return `${d.name}`;
         })
+        .on('click', function(d: any) {
+          const txt = '"' + d.name + '"';
+          $('#mediaSearchFilter').val(txt);
+          $('#mediaSearchButton').trigger('click');
+          $('#mediaSearchFilter').addClass('flash');
+        })
         .filter(function (d, i) {
           return d.x < width / 2;
         })
         .attr('x', -45 + sankey.nodeWidth())
         .attr('text-anchor', 'end')
-        .attr('class', 'leftText');
+        .attr('class', 'leftText')
+        .on('click', function(d: any) {  // Click and add it to the search box for source
+          const txt = '"' + d.name + '"';
+          $('#entitySearchFilter').val(txt);
+          $('#entitySearchButton').trigger('click');
+          $('#entitySearchFilter').addClass('flash');
+        });
 
       // Here the textwrapping happens of the nodes
       const maxTextWidth = (margin.left + margin.right - 10) / 2;
@@ -583,6 +595,7 @@ class SankeyDiagram implements MAppViews {
       this.entitySearchFilter.term = '';
       SimpleLogging.log('source name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+      $('#entitySearchFilter').removeClass('flash');
     });
 
     // Full-text search in target node names
@@ -605,6 +618,7 @@ class SankeyDiagram implements MAppViews {
       this.mediaSearchFilter.term = '';
       SimpleLogging.log('target name filter cleared', '');
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, null);
+      $('#mediaSearchFilter').removeClass('flash');
     });
 
     // Functionality of show more button with dynamic increase of values.
