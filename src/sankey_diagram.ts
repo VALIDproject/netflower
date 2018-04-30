@@ -39,7 +39,7 @@ class SankeyDiagram implements MAppViews {
   private sankeyHeight: number = 0;
   private drawReally: boolean = true;
   private minFraction: number = 1;
-  private sankeyOptimization: boolean = true;
+  private sankeyOptimization: boolean = false;
 
   // Filters
   private pipeline: FilterPipeline;
