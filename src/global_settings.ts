@@ -121,7 +121,7 @@ class GlobalSettings implements MAppViews {
 
     // React to the toggle switch in order to change the sankey order behavior
     this.$node.select('#myonoffswitch').on('change', function() {
-      if (d3.select('#myonoffswitch').property('checked')){
+      if (d3.select('#myonoffswitch').property('checked')) {
         events.fire(AppConstants.EVENT_SANKEY_SORT_BEHAVIOR, true);
       } else {
         events.fire(AppConstants.EVENT_SANKEY_SORT_BEHAVIOR, false);
