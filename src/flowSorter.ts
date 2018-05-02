@@ -30,11 +30,18 @@ interface SNode {
 const FLOWS_INCREMENT = 12;
 const NODES_INCREMENT = 8;
 const NODES_INCR_OTHER = 10;
+// TODO: AR remove the old array here later
 const SORT_MODES = ['flow (descending)', 'source (descending)', 'target (descending)', 'flow (ascending)', 'source (ascending)', 'target (ascending)'];
+const SORT_TYPES = ['flow', 'source', 'target'];
+const ORDER_TYPES = ['descending', 'ascending'];
 
 export default class FlowSorter implements MAppViews {
 
+  // TODO: AR also remove this if function is working
   private sortMode: string = SORT_MODES[0];
+
+  private sortType: string = SORT_TYPES[0];
+  private orderType: string = ORDER_TYPES[0];
   private showExtent: number = 1;
 
   private canShowMore: boolean = true;
@@ -42,14 +49,22 @@ export default class FlowSorter implements MAppViews {
 
   private static instance: FlowSorter;
 
-  // for the UI (= button)
+  // For the SORT BY option
   private $node: d3.Selection<any>;
   private parentDOM: string;
+  // For the ORDER BY option
+  private $node2: d3.Selection<any>;
+  private parentDOM2: string;
+
 
   private constructor(parent: Element, private options: any) {
-    this.parentDOM = options.parentDOM;
+    this.parentDOM = options.sortBySelector;
+    this.parentDOM2 = options.orderBySelector;
+    console.log(this.parentDOM, this.parentDOM2, '.... blalbalallbalb');
   }
 
+  // TODO: AR renmae all occurence of sortMode with sortType or order Type where it's necessary.
+  // TODO: AR the other boilerplate is ready and set up for the stlye and so.
   /**
    * Initialize the view and return a promise
    * that is resolved as soon the view is completely initialized.
@@ -60,14 +75,26 @@ export default class FlowSorter implements MAppViews {
       .append('select')
       .attr('class', 'form-control input-sm')
       .attr('id', 'sortDropdown')
-      .style('margin-top', '10px')
       .style('display', 'block');
 
-    for (const mode of SORT_MODES) {
+    this.$node2 = d3.select(this.parentDOM2)
+      .append('select')
+      .attr('class', 'form-control input-sm')
+      .attr('id', 'orderDropdown')
+      .style('display', 'block');
+
+    for (const sortType of SORT_TYPES) {
       this.$node.append('option')
-        .attr('value', mode)
-        .attr('selected', this.sortMode === mode ? 'selected' : null)
-        .text('Sort by ' + mode);
+        .attr('value', sortType)
+        .attr('selected', this.sortType === sortType ? 'selected' : null)
+        .text(sortType);
+    }
+
+    for (const orderType of ORDER_TYPES) {
+      this.$node2.append('option')
+        .attr('value', orderType)
+        .attr('selected', this.orderType === orderType ? 'selected' : null)
+        .text(orderType);
     }
 
     this.attachListener();
@@ -265,6 +292,14 @@ export default class FlowSorter implements MAppViews {
       SimpleLogging.log('set sort flows by', that.sortMode);
       events.fire(AppConstants.EVENT_SORT_CHANGE, d);
     });
+
+    // TODO: AR adept for the order type
+    // this.$node2.on('change', function(d) {
+    //   const sel :any = this;
+    //   that.sortMode = sel.options[sel.selectedIndex].value;
+    //   SimpleLogging.log('set sort flows by', that.sortMode);
+    //   events.fire(AppConstants.EVENT_SORT_CHANGE, d);
+    // });
   }
 
   // Class is a singleton an therefore only one object can exist => get object with this method
