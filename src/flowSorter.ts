@@ -30,15 +30,10 @@ interface SNode {
 const FLOWS_INCREMENT = 12;
 const NODES_INCREMENT = 8;
 const NODES_INCR_OTHER = 10;
-// TODO: AR remove the old array here later
-const SORT_MODES = ['flow (descending)', 'source (descending)', 'target (descending)', 'flow (ascending)', 'source (ascending)', 'target (ascending)'];
 const SORT_TYPES = ['flow', 'source', 'target'];
 const ORDER_TYPES = ['descending', 'ascending'];
 
 export default class FlowSorter implements MAppViews {
-
-  // TODO: AR also remove this if function is working
-  private sortMode: string = SORT_MODES[0];
 
   private sortType: string = SORT_TYPES[0];
   private orderType: string = ORDER_TYPES[0];
@@ -105,12 +100,12 @@ export default class FlowSorter implements MAppViews {
 
   public showMore() {
     this.showExtent++;
-    SimpleLogging.log('show more; '+ this.sortMode + '; ', this.showExtent);
+    SimpleLogging.log('show more; '+ this.sortType + '; ' + this.orderType + '; ', this.showExtent);
   }
 
   public showLess() {
     this.showExtent = Math.max(1, this.showExtent - 1);
-    SimpleLogging.log('show less; '+ this.sortMode + ';', this.showExtent);
+    SimpleLogging.log('show less; '+ this.sortType + '; ' + this.orderType + ';', this.showExtent);
   }
 
   public hasShowLess() {
@@ -130,18 +125,14 @@ export default class FlowSorter implements MAppViews {
   }
 
   public topFlows(flatNest: Flow[], valuePostFix: string): any {
-    if (this.sortMode === SORT_MODES[0]) {
-      return this.flowOrder(flatNest, valuePostFix, true);
-    } else if (this.sortMode === SORT_MODES[1]) {
-      return this.nodeOrder(flatNest, valuePostFix, true, true);
-    } else if (this.sortMode === SORT_MODES[2]) {
-      return this.nodeOrder(flatNest, valuePostFix, false, true);
-    } else if (this.sortMode === SORT_MODES[3]) {
-      return this.flowOrder(flatNest, valuePostFix, false);
-    } else if (this.sortMode === SORT_MODES[4]) {
-      return this.nodeOrder(flatNest, valuePostFix, true, false);
-    } else if (this.sortMode === SORT_MODES[5]) {
-      return this.nodeOrder(flatNest, valuePostFix, false, false);
+    const descending: boolean = (this.orderType === ORDER_TYPES[0]);
+
+    if (this.sortType === SORT_TYPES[0]) {
+      return this.flowOrder(flatNest, valuePostFix, descending);
+    } else if (this.sortType === SORT_TYPES[1]) {
+      return this.nodeOrder(flatNest, valuePostFix, true, descending);
+    } else if (this.sortType === SORT_TYPES[2]) {
+      return this.nodeOrder(flatNest, valuePostFix, false, descending);
     }
   }
 
@@ -288,18 +279,17 @@ export default class FlowSorter implements MAppViews {
     const that = this;
     this.$node.on('change', function(d) {
       const sel :any = this;
-      that.sortMode = sel.options[sel.selectedIndex].value;
-      SimpleLogging.log('set sort flows by', that.sortMode);
+      that.sortType = sel.options[sel.selectedIndex].value;
+      SimpleLogging.log('set sort flows by', that.sortType);
       events.fire(AppConstants.EVENT_SORT_CHANGE, d);
     });
 
-    // TODO: AR adept for the order type
-    // this.$node2.on('change', function(d) {
-    //   const sel :any = this;
-    //   that.sortMode = sel.options[sel.selectedIndex].value;
-    //   SimpleLogging.log('set sort flows by', that.sortMode);
-    //   events.fire(AppConstants.EVENT_SORT_CHANGE, d);
-    // });
+    this.$node2.on('change', function(d) {
+      const sel :any = this;
+      that.orderType = sel.options[sel.selectedIndex].value;
+      SimpleLogging.log('set sort order ', that.orderType);
+      events.fire(AppConstants.EVENT_SORT_CHANGE, d);
+    });
   }
 
   // Class is a singleton an therefore only one object can exist => get object with this method
