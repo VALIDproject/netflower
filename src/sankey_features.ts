@@ -40,6 +40,7 @@ class SankeyFeatures implements MAppViews {
      this.$node.html(`
       <div class='container-fluid'>
       	<div class='row'>
+      	  <!--First section on the left with filters-->
       		<div class='col-md-3'>
             <div class='row'>
               <div class='col-sm-4'>
@@ -68,7 +69,36 @@ class SankeyFeatures implements MAppViews {
       			</p>
       			</div>
       		</div>
+      		
+      		<!--Second section with the sort options in hte middle-->
+      		<div class='col-md-3'>
+      		  <div class='row'>
+      		    <div class='col-sm-5'>
+      		      <h5>Sort & Order</h5>
+              </div>
+            </div>
+      		  <div class='row' style='margin-bottom: 5px;'>
+      		    <div class='col-sm-3'>
+      		      <label style='margin-top: 5px;'>Sort by:</label>
+      		    </div>
+      		    <div class='col-sm-6' id='sortBySelector'></div>
+            </div>
+            <div class='row'>
+              <div class='col-sm-3'>
+      		      <label style='margin-top: 5px;'>Order:</label>
+      		    </div>
+      		    <div class='col-sm-6' id='orderBySelector'></div>
+            </div>
+          </div>
 
+          <!--Export Settings-->
+          <div class='col-md-2'>
+            <h5>Miscellaneous</h5>
+            <button type='button' class='btn btn-default btn_design' id='exportData'>
+              Export Data
+            </button>
+          </div>
+          
           <!--Global Filters-->
           <!--<div class='col-md-3'>
             <div class='row'>
@@ -88,22 +118,6 @@ class SankeyFeatures implements MAppViews {
               </div>
             </div>
           </div>-->
-
-        <!--Export Settings-->
-        <div class='col-md-2'>
-          <h5>Export Settings</h5>
-          <button type='button' class='btn btn-default btn_design' id='exportData'>
-            Export Data
-          </button>
-        </div>
-
-          <!--Notebook
-      		<div class='col-md-2'>
-      			<h5>Notebook</h5>
-      			<button type='button' class='btn btn-default btn_design'>
-      				Notebook
-      			</button>
-      		</div>-->
       	</div>
       </div>
     `);

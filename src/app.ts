@@ -114,7 +114,8 @@ export class App implements MAppViews {
       view: 'FlowSorter',
       parent: 'dataVizView',
       // options: {'parentDOM' : 'div.clearBox'},
-      options: {'parentDOM' : 'div.sankey_features div.col-md-2'},
+      options: {'sortBySelector' : 'div.sankey_features div#sortBySelector',
+                'orderBySelector' : 'div.sankey_features div#orderBySelector'},
     },
     {
       view: 'SimpleLogging',

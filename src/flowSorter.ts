@@ -30,11 +30,13 @@ interface SNode {
 const FLOWS_INCREMENT = 12;
 const NODES_INCREMENT = 8;
 const NODES_INCR_OTHER = 10;
-const SORT_MODES = ['flow (descending)', 'source (descending)', 'target (descending)', 'flow (ascending)', 'source (ascending)', 'target (ascending)'];
+const SORT_TYPES = ['flow', 'source', 'target'];
+const ORDER_TYPES = ['descending', 'ascending'];
 
 export default class FlowSorter implements MAppViews {
 
-  private sortMode: string = SORT_MODES[0];
+  private sortType: string = SORT_TYPES[0];
+  private orderType: string = ORDER_TYPES[0];
   private showExtent: number = 1;
 
   private canShowMore: boolean = true;
@@ -42,14 +44,22 @@ export default class FlowSorter implements MAppViews {
 
   private static instance: FlowSorter;
 
-  // for the UI (= button)
+  // For the SORT BY option
   private $node: d3.Selection<any>;
   private parentDOM: string;
+  // For the ORDER BY option
+  private $node2: d3.Selection<any>;
+  private parentDOM2: string;
+
 
   private constructor(parent: Element, private options: any) {
-    this.parentDOM = options.parentDOM;
+    this.parentDOM = options.sortBySelector;
+    this.parentDOM2 = options.orderBySelector;
+    console.log(this.parentDOM, this.parentDOM2, '.... blalbalallbalb');
   }
 
+  // TODO: AR renmae all occurence of sortMode with sortType or order Type where it's necessary.
+  // TODO: AR the other boilerplate is ready and set up for the stlye and so.
   /**
    * Initialize the view and return a promise
    * that is resolved as soon the view is completely initialized.
@@ -60,14 +70,26 @@ export default class FlowSorter implements MAppViews {
       .append('select')
       .attr('class', 'form-control input-sm')
       .attr('id', 'sortDropdown')
-      .style('margin-top', '10px')
       .style('display', 'block');
 
-    for (const mode of SORT_MODES) {
+    this.$node2 = d3.select(this.parentDOM2)
+      .append('select')
+      .attr('class', 'form-control input-sm')
+      .attr('id', 'orderDropdown')
+      .style('display', 'block');
+
+    for (const sortType of SORT_TYPES) {
       this.$node.append('option')
-        .attr('value', mode)
-        .attr('selected', this.sortMode === mode ? 'selected' : null)
-        .text('Sort by ' + mode);
+        .attr('value', sortType)
+        .attr('selected', this.sortType === sortType ? 'selected' : null)
+        .text(sortType);
+    }
+
+    for (const orderType of ORDER_TYPES) {
+      this.$node2.append('option')
+        .attr('value', orderType)
+        .attr('selected', this.orderType === orderType ? 'selected' : null)
+        .text(orderType);
     }
 
     this.attachListener();
@@ -78,12 +100,12 @@ export default class FlowSorter implements MAppViews {
 
   public showMore() {
     this.showExtent++;
-    SimpleLogging.log('show more; '+ this.sortMode + '; ', this.showExtent);
+    SimpleLogging.log('show more; '+ this.sortType + '; ' + this.orderType + '; ', this.showExtent);
   }
 
   public showLess() {
     this.showExtent = Math.max(1, this.showExtent - 1);
-    SimpleLogging.log('show less; '+ this.sortMode + ';', this.showExtent);
+    SimpleLogging.log('show less; '+ this.sortType + '; ' + this.orderType + ';', this.showExtent);
   }
 
   public hasShowLess() {
@@ -103,18 +125,14 @@ export default class FlowSorter implements MAppViews {
   }
 
   public topFlows(flatNest: Flow[], valuePostFix: string): any {
-    if (this.sortMode === SORT_MODES[0]) {
-      return this.flowOrder(flatNest, valuePostFix, true);
-    } else if (this.sortMode === SORT_MODES[1]) {
-      return this.nodeOrder(flatNest, valuePostFix, true, true);
-    } else if (this.sortMode === SORT_MODES[2]) {
-      return this.nodeOrder(flatNest, valuePostFix, false, true);
-    } else if (this.sortMode === SORT_MODES[3]) {
-      return this.flowOrder(flatNest, valuePostFix, false);
-    } else if (this.sortMode === SORT_MODES[4]) {
-      return this.nodeOrder(flatNest, valuePostFix, true, false);
-    } else if (this.sortMode === SORT_MODES[5]) {
-      return this.nodeOrder(flatNest, valuePostFix, false, false);
+    const descending: boolean = (this.orderType === ORDER_TYPES[0]);
+
+    if (this.sortType === SORT_TYPES[0]) {
+      return this.flowOrder(flatNest, valuePostFix, descending);
+    } else if (this.sortType === SORT_TYPES[1]) {
+      return this.nodeOrder(flatNest, valuePostFix, true, descending);
+    } else if (this.sortType === SORT_TYPES[2]) {
+      return this.nodeOrder(flatNest, valuePostFix, false, descending);
     }
   }
 
@@ -261,8 +279,15 @@ export default class FlowSorter implements MAppViews {
     const that = this;
     this.$node.on('change', function(d) {
       const sel :any = this;
-      that.sortMode = sel.options[sel.selectedIndex].value;
-      SimpleLogging.log('set sort flows by', that.sortMode);
+      that.sortType = sel.options[sel.selectedIndex].value;
+      SimpleLogging.log('set sort flows by', that.sortType);
+      events.fire(AppConstants.EVENT_SORT_CHANGE, d);
+    });
+
+    this.$node2.on('change', function(d) {
+      const sel :any = this;
+      that.orderType = sel.options[sel.selectedIndex].value;
+      SimpleLogging.log('set sort order ', that.orderType);
       events.fire(AppConstants.EVENT_SORT_CHANGE, d);
     });
   }
