@@ -458,6 +458,44 @@ export class Tooltip {
   }
 }
 
+  /**
+   * Displays a tooltip about a node.
+   * @param d data of a node as received from D3
+   * @param valuePostFix either "to" or "from"
+   */
+  export function assembleNodeTooltip(d: any, valuePostFix: string) {
+    const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
+    // Table because of aligned decimal numbers
+    const text = `${d.name}
+    <br />
+    <table class='node'>
+      <tr><td>
+        <svg width='8' height='8'>
+          <rect width='8' height='8' fill='#DA5A6B' />
+        </svg>
+        ${dotFormat(d.value) + valuePostFix}
+      </td><td> ${direction} displayed elements.</td></tr>
+    `;
+
+    // compare to a small number to avoid floating point issues
+    const hiddenFlows = (d.overall - d.value) > 0.00001 ? `
+    <tr><td>
+      <svg width='8' height='8'>
+        <defs>
+          <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
+            <rect width='4' height='4' fill='#DA5A6B' />
+            <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
+          </pattern>
+        </defs>
+      <rect width='8' height='8' fill='url(#diagonalHatch2)' />
+      </svg>
+    ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
+    <tr><td>${dotFormat(d.overall) + valuePostFix}</td><td>in total.</td></tr>
+    ` : '';
+
+    Tooltip.mouseOver(d, text + hiddenFlows + '</table>', 'T2');
+  }
+
 // ---------------------------------------------------------------------------------------------------------------------
 /*
 * Create a copy of an object to log it out:

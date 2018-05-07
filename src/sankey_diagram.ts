@@ -14,7 +14,8 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {roundToFull, dotFormat, textTransition, d3TextEllipse, Tooltip} from './utilities';
+import {roundToFull, dotFormat, textTransition, d3TextEllipse,
+  Tooltip, assembleNodeTooltip} from './utilities';
 import {
   setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange,
@@ -470,7 +471,7 @@ class SankeyDiagram implements MAppViews {
           }
         })
         .on('mouseenter', (d) => {
-          this.assembleNodeTooltip(d, valuePostFix);
+          assembleNodeTooltip(d, valuePostFix);
         })
         .on('mouseleave', Tooltip.mouseOut)
         .attr('transform', function (d) {
@@ -500,7 +501,20 @@ class SankeyDiagram implements MAppViews {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() / d.fraction, 1);
           }
         })
-        .style('fill', '#DA5A6B');
+        .style('fill', '#DA5A6B')
+        .on('click', function(d: any) {
+          if (d.sourceLinks.length > 0) {
+            const txtSource = '"' + d.name + '"';
+            $('#entitySearchFilter').val(txtSource);
+            $('#entitySearchButton').trigger('click');
+            $('#entitySearchFilter').addClass('flash');
+          } else {
+            const txtTarget = '"' + d.name + '"';
+            $('#mediaSearchFilter').val(txtTarget);
+            $('#mediaSearchButton').trigger('click');
+            $('#mediaSearchFilter').addClass('flash');
+          }
+        });
 
       // Create sparkline barcharts for newly enter-ing g.node elements
       node.call(SparklineBarChart.createSparklines);
@@ -794,44 +808,6 @@ class SankeyDiagram implements MAppViews {
       this.mediaEuroFilter.minValue = fromNumber;
       this.mediaEuroFilter.maxValue = toNumber;
     }
-  }
-
-  /**
-   * Displays a tooltip about a node.
-   * @param d data of a node as received from D3
-   * @param valuePostFix either "to" or "from"
-   */
-  private assembleNodeTooltip(d: any, valuePostFix: string) {
-    const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
-    // Table because of aligned decimal numbers
-    const text = `${d.name}
-    <br />
-    <table class='node'>
-      <tr><td>
-        <svg width='8' height='8'>
-          <rect width='8' height='8' fill='#DA5A6B' />
-        </svg>
-        ${dotFormat(d.value) + valuePostFix}
-      </td><td> ${direction} displayed elements.</td></tr>
-    `;
-
-    // compare to a small number to avoid floating point issues
-    const hiddenFlows = (d.overall - d.value) > 0.00001 ? `
-    <tr><td>
-      <svg width='8' height='8'>
-        <defs>
-          <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
-            <rect width='4' height='4' fill='#DA5A6B' />
-            <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
-          </pattern>
-        </defs>
-      <rect width='8' height='8' fill='url(#diagonalHatch2)' />
-      </svg>
-    ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
-    <tr><td>${dotFormat(d.overall) + valuePostFix}</td><td>in total.</td></tr>
-    ` : '';
-
-    Tooltip.mouseOver(d, text + hiddenFlows + '</table>', 'T2');
   }
 
   /**
