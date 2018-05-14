@@ -59,5 +59,9 @@ module.exports = function(registry) {
   registry.push('validView', 'SimpleLogging', function() { return System.import('./src/simpleLogging'); }, {
     'name': 'SimpleLogging',
   });
+
+  registry.push('validView', 'HelpWindow', function() { return System.import('./src/helpWindow'); }, {
+    'name': 'HelpWindow',
+  });
   // generator-phovea:end
 };
