@@ -81,6 +81,7 @@ export default class HelpWindow implements MAppViews {
     body {
       font-family: Yantramanav, 'Helvetica Neue', Helvetica, sans-serif;
       font-weight: 400;
+      padding:10px;
     }
 
     .logo {
@@ -105,6 +106,10 @@ export default class HelpWindow implements MAppViews {
         border: 1px solid grey;
         
       }
+
+      #content {
+        display:none;
+      }
     `;
   }
 
@@ -118,9 +123,23 @@ export default class HelpWindow implements MAppViews {
       <div id='validHeader'>
       <div class='logo'>NETFLOWER - Introductional Material & Tutorials</div>           
       </div>
+      <p>Dear user, this is the help site of netflower. You find tutorial videos and help materials in the form of screenshots and textual descriptions here.
+      Please select first if you like to watch videos or use screenshots and textual elements to get help.</p>
+      <button type="button">Screens & Text</button>
+      <button type="button">Videos</button>
 
+      <div>
+      <h2>Table of Content:</h2>
+      <p><a href="#loaddata">How to load data:</a></p>
+      <p><a href="#readviz">How to read the visulization:</a></p>
+      <p><a href="#filter">How to filter, sort and order:</a></p>
+      <p><a href="#notebook">How to use the notebook:</a></p>
+      </div>
+      </br>
+
+      <!--Content-->
       <div id ='content'>
-      <h3>How to load data:</h3>   
+      <h3 id="loaddata">How to load data:</h3>   
       <div class="container-fluid">
     	<div class="row">
 	  	<div class="col-md-12">
@@ -133,17 +152,17 @@ export default class HelpWindow implements MAppViews {
 				<div class="col-md-4">
 					<p>
           This tool requires a specific format for the tables in order to visualize them appropriate. 
-          Also .CSV are only accepted. If the required format isn't met, it will result in erros or no displayed data. 
+          Also <strong>.CSV</strong> are only accepted. If the required format isn't met, it will result in erros or no displayed data. 
           The format of the table headings defines all further views but needs to be in a specific order.</p>
-          <p> 1) prepare your data file as a .csv file with the structure shown in the table </br>
-          2) Load you data here and click "Load & Show" </br>
-          3) Here you can download some sample files. </p>					
+          <p> (1) prepare your data file as a .csv file with the structure shown in the table </br>
+          (2) Load you data here and click "Load & Show" </br>
+          (3) Here you can download some sample files. </p>					
 				</div>
 			</div>
 		</div>
   </div>
   
-  <h3>How to read the visulization:</h3>  
+  <h3 id="readviz">How to read the visulization:</h3>  
 
   <div class="container-fluid">
     	<div class="row">
@@ -151,48 +170,55 @@ export default class HelpWindow implements MAppViews {
 			<div class="row">
         <div class="col-md-8">
         <span class = 'screen'>
-        <img src = 'https://www.dropbox.com/s/z26ahjx9g6nqsmu/vis_marks.png?raw=1'/>
+        <img src = 'https://www.dropbox.com/s/z26ahjx9g6nqsmu/vis_marks.png?raw=1'/>              
         </span>
+      
 				</div>
 				<div class="col-md-4">
 					<p>
-        1) The main visualization is a sankey diagram. You read the sankey diagram from left to right. 
+        (1) The main visualization is a sankey diagram. You read the sankey diagram from left to right. 
          In this example you see the number of Asylm seekers which make an application. The left side are the original countries
-         and on the right there are the destination countries.</p>
+         and on the right there are the destination countries.</p>  
+        <img style='width: 400px' src = 'https://www.dropbox.com/s/gwnl46zrjllrpob/encoding.png?raw=1'/>
+        <p>The screen above shows the visual encoding. There is this example table of asylmn data. The lines from the table to the sankey diagram
+        shows the encoding from the data to the visual element - in this case a sankey diagram. </p>
          
-        <p>2)The small bar charts left and right show the amount of asylum applications from the original country and destination country point of 
+        <p>(2) The small bar charts left and right show the amount of asylum applications from the original country and destination country point of 
         view. </p>
 
         <img style='width: 400px'src = 'https://www.dropbox.com/s/gnn8vd483z6iyi8/detailview.png?raw=1'/>
         <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylm applications between 
-        two nodes (origin countries and destination countries).</p>
+        the two nodes (origin countries and destination countries).</p>
 				</div>
 			</div>
 		</div>
   </div>
 
-  <h3>How to filter, sort and order:</h3>  
+  <h3 id="filter">How to filter, sort and order:</h3>  
     <div class="container-fluid">
     	<div class="row">
 	  	<div class="col-md-12">
 			<div class="row">
         <div class="col-md-8">
         <span class = 'screen'>
-        <img src = 'https://www.dropbox.com/s/nm158h8p71jnxao/filter.png?raw=1'/>
+        <img src = 'https://www.dropbox.com/s/pgpvtm7n6icel59/filter_marks2.png?raw=1'/>
         </span>
 				</div>
 				<div class="col-md-4">
-        <p>You can filter, sort and order data influencing the whole Visulaization View. 
-        1) You can filter the data in time and connection. 
-        2) You can sort the data by source, target and flow and order it ascending and decending. 
-        3) Export the data. You get a .csv file with the data of the current visualization.</p>
+        <p>You can filter, sort and order the data, which influences the visualization view. </br>
+        1) You can filter the data in time and connection. </br>
+        2) You can sort the data by source, target and flow and order it ascending and decending. </br>
+        3) Export the data from the current view. You get a .csv file with the data of the current visualization, including all sorting and
+        filtering operations.</br>
+        4) You can limit the number of aslymn applications by using the slider on both sides. </br>
+        5) Search for a particular country in the origin and also in the destination countries using the seach box. </p>
 				</div>
 			</div>
 		</div>
   </div>
 
 
-  <h3>How to use the notebook:</h3>  
+  <h3 id="notebook">How to use the notebook:</h3>  
     <div class="container-fluid">
     	<div class="row">
 	  	<div class="col-md-12">
@@ -210,15 +236,12 @@ export default class HelpWindow implements MAppViews {
 			</div>
 		</div>
   </div>
-
-
-
-
   </div>    
 </div>
 
     `;
   }
+
 }
 
 /**
