@@ -60,7 +60,10 @@ export default class HelpWindow implements MAppViews {
       this.htmlString += this.customHtml();
 
       // Close the HTML tags again
-      this.htmlString += `</body></html>`;
+      this.htmlString += `
+      <script>${this.customJs()}</script>
+      </body></html>
+      `;
 
       console.log('string: ', this.htmlString);
 
@@ -110,6 +113,13 @@ export default class HelpWindow implements MAppViews {
       #content {
         display:none;
       }
+    `;
+  }
+
+  private customJs(): string {
+    return `
+      const i = 2;
+      console.log('Wert von i: ', i);
     `;
   }
 
