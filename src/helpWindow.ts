@@ -109,17 +109,30 @@ export default class HelpWindow implements MAppViews {
         border: 1px solid grey;
         
       }
-
       #content {
-        display:none;
+        display: none;
+      }
+
+      #video {
+        display: block;
       }
     `;
   }
 
   private customJs(): string {
     return `
-      const i = 2;
-      console.log('Wert von i: ', i);
+       function showScreenshots() {       
+       let x = document.getElementById('content');     
+
+       if (x.style.display === 'none') {
+         console.log('HALLO');
+         x.style.display = 'none';        
+        } else {
+          console.log('HALLO else');
+        
+        x.style.display = 'block';
+       }       
+      }
     `;
   }
 
@@ -135,7 +148,7 @@ export default class HelpWindow implements MAppViews {
       </div>
       <p>Dear user, this is the help site of netflower. You find tutorial videos and help materials in the form of screenshots and textual descriptions here.
       Please select first if you like to watch videos or use screenshots and textual elements to get help.</p>
-      <button type="button">Screens & Text</button>
+      <button onclick="showScreenshots()" type="button">Screens & Text</button>
       <button type="button">Videos</button>
 
       <div>
@@ -147,7 +160,63 @@ export default class HelpWindow implements MAppViews {
       </div>
       </br>
 
-      <!--Content-->
+
+      </br>
+
+      <!--Videos-->
+      <div id='videos'>
+      <h3 id="loaddata">How to load data:</h3>
+      <video controls>
+      <source src="https://www.dropbox.com/s/e6vlt8n3s8l84wi/loadData_video.mov?raw=1" type="video/mp4">
+      </video>
+      <p>
+      This tool requires a specific format for the tables in order to visualize them appropriate. 
+      Also <strong>.CSV</strong> are only accepted. If the required format isn't met, it will result in erros or no displayed data. 
+      The format of the table headings defines all further views but needs to be in a specific order.</p>
+      <p> (1) prepare your data file as a .csv file with the structure shown in the table </br>
+      (2) Load you data here and click "Load & Show" </br>
+      (3) Here you can download some sample files. </p>	
+      </br>
+      
+      <h3 id="readviz">How to read the visulization:</h3>  
+      <video controls>
+      <source src="https://www.dropbox.com/s/gvl1f664wk01wkg/vis_video.mov?raw=1" type="video/mp4">
+      </video>
+
+      <p>
+        (1) The main visualization is a sankey diagram. You read the sankey diagram from left to right. 
+         In this example you see the number of Asylm seekers which make an application. The left side are the original countries
+         and on the right there are the destination countries.</p>  
+        <p>The screen above shows the visual encoding. There is this example table of asylmn data. The lines from the table to the sankey diagram
+        shows the encoding from the data to the visual element - in this case a sankey diagram. </p>
+         
+        <p>(2) The small bar charts left and right show the amount of asylum applications from the original country and destination country point of view. </p>
+     
+        <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylm applications between 
+        the two nodes (origin countries and destination countries).</p>
+
+        <p>On the end of the site, you find two buttons 'Show Less' and 'Show more'. Here you can load more nodes or show less nodes. When you hover over
+        the nodes (Rects) in the visualization you get the information of how many asylmn applications were made from the selected country (node). You also 
+        see that maybe not all destination and origin countries are visible by the hatching rect. Here you can use the buttons below to load more origin and destination countries.</p>
+
+
+        <h3 id="filter">How to filter, sort and order:</h3>  
+        <video controls>
+        <!--<source src="https://www.dropbox.com/s/e6vlt8n3s8l84wi/loadData_video.mov?raw=1" type="video/mp4">-->
+        </video>
+        <p>You can filter, sort and order the data, which influences the visualization view. </br>
+        1) You can filter the data in time and connection. </br>
+        2) You can sort the data by source, target and flow and order it ascending and decending. </br>
+        3) Export the data from the current view. You get a .csv file with the data of the current visualization, including all sorting and
+        filtering operations.</br>
+        4) You can limit the number of aslymn applications by using the slider on both sides. </br>
+        5) Search for a particular country in the origin and also in the destination countries using the seach box. </p>
+
+
+      </div>
+
+
+      <!--Content Screenshot-->
       <div id ='content'>
       <h3 id="loaddata">How to load data:</h3>   
       <div class="container-fluid">
@@ -199,6 +268,10 @@ export default class HelpWindow implements MAppViews {
         <img style='width: 400px'src = 'https://www.dropbox.com/s/gnn8vd483z6iyi8/detailview.png?raw=1'/>
         <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylm applications between 
         the two nodes (origin countries and destination countries).</p>
+
+        <p>On the end of the site, you find two buttons 'Show Less' and 'Show more'. Here you can load more nodes or show less nodes. When you hover over
+        the nodes (Rects) in the visualization you get the information of how many asylmn applications were made from the selected country (node). You also 
+        see that maybe not all destination and origin countries are visible by the hatching rect. Here you can use the buttons below to load more origin and destination countries.</p>
 				</div>
 			</div>
 		</div>
@@ -247,7 +320,10 @@ export default class HelpWindow implements MAppViews {
 		</div>
   </div>
   </div>    
+</div> 
 </div>
+<!--End Screenshots-->
+
 
     `;
   }
