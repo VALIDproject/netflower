@@ -35,13 +35,12 @@ export default class HelpWindow implements MAppViews {
 
   /**
    * Build the basic DOM elements
-   * a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a>
    */
   private build() {
     this.$node.append('a')
       .attr('id', 'helpTextBtn')
       .append('i')
-      .attr('class','fa fa-question fa-2x')
+      .attr('class','fa fa-question fa-2x web')
       .attr('style', 'cursor: pointer;');
 
   }
@@ -65,11 +64,9 @@ export default class HelpWindow implements MAppViews {
       </body></html>
       `;
 
-      console.log('string: ', this.htmlString);
-
       // Open the new Tab with the page we generated
-      let newwindow = window.open();
-      let newdocument = newwindow.document;
+      const newwindow = window.open();
+      const newdocument = newwindow.document;
       newdocument.write(this.htmlString);
       newdocument.close();
     });
@@ -116,32 +113,36 @@ export default class HelpWindow implements MAppViews {
       #videos {
         display: none;
       }
-.btn_design {
-      display: inline-block;
-      margin-bottom: 0;
-      background-color:white;
-      font-size: 13px;
-      font-weight: 400;
-      line-height: 1.42857143;
-      text-align: center;
-      white-space: nowrap;
-      vertical-align: middle;
-      cursor: pointer;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      background-image: none;
-      border: 1.5px solid transparent;
-      border-radius: 4px;
-      padding: 5px 16px;
-      color: #45B07C;
-      border-color: #45B07C;
-}
-
+      
+      .btn_design {
+        display: inline-block;
+        margin-bottom: 0;
+        background-color:white;
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1.5px solid transparent;
+        border-radius: 4px;
+        padding: 5px 16px;
+        color: #45B07C;
+        border-color: #45B07C;
+      }
     `;
   }
 
+  /**
+   * This function is used to create the script of the custom site.
+   * @returns {string} the whole script elements of the site.
+   */
   private customJs(): string {
     return `
     let x = document.getElementById('content');
@@ -149,24 +150,14 @@ export default class HelpWindow implements MAppViews {
     let y = document.getElementById('videos');
     y.style.display = 'none'; 
 
-    function showScreenshots() {       
-
-       if (x.style.display === 'none') {
-        console.log(' if CONTENT', x);
-        x.style.display = 'block';             
+    function showScreenshots(mediaType) {       
+        if (mediaType === 'content') {
+          x.style.display = 'block';
+          y.style.display = 'none';
         } else {
-          console.log(' else CONTENT', x);        
-          x.style.display = 'none';        
-       }         
-
-      if (y.style.display === 'none') {
-        console.log(' if Video');
-        y.style.display = 'block';             
-       } else {
-         console.log(' else Video');      
-        y.style.display = 'none';       
-      }    
-
+          y.style.display = 'block';
+          x.style.display = 'none';
+        }
       }
     `;
   }
@@ -177,81 +168,82 @@ export default class HelpWindow implements MAppViews {
    */
   private customHtml(): string {
     return `
-  
       <div id='validHeader'>
-      <div class='logo'>NETFLOWER - Introductional Material & Tutorials</div>           
+        <div class='logo'>NETFLOWER - Introductional Material & Tutorials</div>           
       </div>
-      <p>Dear user, this is the help site of netflower. You find tutorial videos and help materials in the form of screenshots and textual descriptions here.
-      Please select first if you like to watch videos or use screenshots and textual elements to get help.</p>
-      <button class='btn_design' onclick='showScreenshots()' type='button'>Screens & Text</button>
-      <button class='btn_design' onclick='showScreenshots()' type='button'>Videos</button>
+      <p>Dear user, this is the help site of netflower. You will find tutorial videos and help materials in form of screenshots and textual descriptions here.
+      Please select first, if you like to watch videos or use screenshots & textual elements to get help.</p>
+      <button class='btn_design' onclick='showScreenshots("content")' type='button'>Screens & Text</button>
+      <button class='btn_design' onclick='showScreenshots("video")' type='button'>Videos</button>
 
       <div>
-      <h2>Table of Content:</h2>
-      <p><a href='#loaddata'>How to load data:</a></p>
-      <p><a href='#readviz'>How to read the visulization:</a></p>
-      <p><a href='#filter'>How to filter, sort and order:</a></p>
-      <p><a href='#notebook'>How to use the notebook:</a></p>
+        <h2>Table of Content:</h2>
+        <p><a href='#loaddata'>How to load data:</a></p>
+        <p><a href='#readviz'>How to read the visulization:</a></p>
+        <p><a href='#filter'>How to filter, sort and order:</a></p>
+        <p><a href='#notebook'>How to use the notebook:</a></p>
       </div>
+      <hr />
       <br />
 
       <!--Videos-->
       <div id='videos'>
       <h3 id='loaddata'>How to load data:</h3>
       <video controls>
-      <source src='https://www.dropbox.com/s/e6vlt8n3s8l84wi/loadData_video.mov?raw=1' type='video/mp4'>
+        <source src='https://www.dropbox.com/s/e6vlt8n3s8l84wi/loadData_video.mov?raw=1' type='video/mp4'>
       </video>
       <p>
-      This tool requires a specific format for the tables in order to visualize them appropriate. 
-      Also <strong>.CSV</strong> are only accepted. If the required format isn't met, it will result in erros or no displayed data. 
+      This tool requires a specific format for the tables in order to visualize them appropriately. 
+      Also only the <strong>.CSV</strong> format is accepted. If the required format isn't met, it will result in erros or no displayed data. 
       The format of the table headings defines all further views but needs to be in a specific order.</p>
-      <p> (1) prepare your data file as a .csv file with the structure shown in the table<br />
+      <p> (1) Prepare your data file as a .csv file with the structure shown in the table<br />
       (2) Load you data here and click 'Load & Show' <br />
       (3) Here you can download some sample files. </p>	
       <br />
       
       <h3 id='readviz'>How to read the visulization:</h3>  
       <video controls>
-      <source src='https://www.dropbox.com/s/gvl1f664wk01wkg/vis_video.mov?raw=1' type='video/mp4'>
+        <source src='https://www.dropbox.com/s/gvl1f664wk01wkg/vis_video.mov?raw=1' type='video/mp4'>
       </video>
-
       <p>
-        (1) The main visualization is a sankey diagram. You read the sankey diagram from left to right. 
-         In this example you see the number of Asylm seekers which make an application. The left side are the original countries
-         and on the right there are the destination countries.</p>  
-        <p>The screen above shows the visual encoding. There is this example table of asylmn data. The lines from the table to the sankey diagram
-        shows the encoding from the data to the visual element - in this case a sankey diagram. </p>
-         
-        <p>(2) The small bar charts left and right show the amount of asylum applications from the original country and destination country point of view. </p>
-     
-        <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylm applications between 
+      (1) The main visualization form is a sankey diagram. You read the sankey diagram from left to right. 
+      In this example you see the number of Asylum seekers which make an application. The left side represent the origin countries
+      and on the right side are the destination countries.</p>  
+      <p>The screen above shows the visual encoding. There is this example table of asylum data. The lines from the table to the sankey diagram
+      show the encoding from the data to the visual element - in this case a sankey diagram.</p> 
+      <p>(2) The small bar charts left and right show the amount of asylum applications from the origin country and destination country point of view.</p>
+        <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylum applications between 
         the two nodes (origin countries and destination countries).</p>
 
-        <p>On the end of the site, you find two buttons 'Show Less' and 'Show more'. Here you can load more nodes or show less nodes. When you hover over
-        the nodes (Rects) in the visualization you get the information of how many asylmn applications were made from the selected country (node). You also 
+        <p>On the end of the site, you find two buttons <strong>'Show Less'</strong> and <strong>'Show more'</strong>. Here you can load more nodes or show less nodes. When you hover over
+        the nodes (Rects) in the visualization you get the information of how many asylum applications were made from the selected country (node). You also 
         see that maybe not all destination and origin countries are visible by the hatching rect. Here you can use the buttons below to load more origin and destination countries.</p>
 
 
-        <h3 id='filter'>How to filter, sort and order:</h3>  
-        <video controls>
+      <h3 id='filter'>How to filter, sort and order:</h3>  
+      <video controls>
         <source src='https://www.dropbox.com/s/rgrnpcl4lll57ds/filter_sorting_ordering_video.mov?raw=1' type='video/mp4'>
-        </video>
-        <p>You can filter, sort and order the data, which influences the visualization view. <br />
+      </video>
+      <p>You can filter, sort and order the data, which influences the visualization view. <br />
         1) You can filter the data in time and connection. <br />
-        2) You can sort the data by source, target and flow and order it ascending and decending. <br />
-        3) Export the data from the current view. You get a .csv file with the data of the current visualization, including all sorting and
+        2) You can sort the data by source, target and flow and order it, ascending and decending. <br />
+        3) Exporting the data from the current view. You get a .csv file with the data of the current visualization, including all sorting and
         filtering operations.<br />
-        4) You can limit the number of aslymn applications by using the slider on both sides. <br />
+        4) You can limit the number of asylum applications by using the slider on both sides. <br />
         5) Search for a particular country in the origin and also in the destination countries using the seach box. </p>
 
-        <h3 id='notebook'>How to use the notebook:</h3>  
-        <video controls>
+      <h3 id='notebook'>How to use the notebook:</h3>  
+      <video controls>
         <source src='https://www.dropbox.com/s/00rjwwl6gj84alp/notebook_video.mov?raw=1' type='video/mp4'>
-        </video>
+      </video>
         <p>You can use a notebook, which opens when clicking the handler on the left side of the screen. 
         You can add some notes and also export it as a .txt. file. This file can be loaded in the notebook sidebar, when starting
-        for example a new session analysing data with netflower. Please notice, that if you close your browser and shut down your device, the 
-        data get lost.</p>
+        for example a new session analysing data with netflower. 
+          <p style='border:2px; border-style:solid; border-color:#DA5A6B; padding: 1em;'>
+          <i>Please notice, that if you clean your browser forcefully shut down your device, the data gets lost. However, if
+          you referesh the page or go back to it if you closed the browser normally it will still be there!</i> 
+          </p>
+        </p>
       </div>
 
 
@@ -263,16 +255,16 @@ export default class HelpWindow implements MAppViews {
 	  	<div class='col-md-12'>
 			<div class='row'>
         <div class='col-md-8'>
-        <span class = 'screen'>
-        <img src = 'https://www.dropbox.com/s/kqw2z6ndh7uw2gl/load_data_marks.png?raw=1'/>
+        <span class='screen'>
+          <img src='https://www.dropbox.com/s/kqw2z6ndh7uw2gl/load_data_marks.png?raw=1'/>
         </span>
 				</div>
 				<div class='col-md-4'>
 					<p>
-          This tool requires a specific format for the tables in order to visualize them appropriate. 
-          Also <strong>.CSV</strong> are only accepted. If the required format isn't met, it will result in erros or no displayed data. 
+          This tool requires a specific format for the tables in order to visualize them appropriately. 
+          Also only <strong>.CSV</strong> files are accepted. If the required format isn't met, it will result in erros or no displayed data. 
           The format of the table headings defines all further views but needs to be in a specific order.</p>
-          <p> (1) prepare your data file as a .csv file with the structure shown in the table <br />
+          <p> (1) Prepare your data file as a .csv file with the structure shown in the table <br />
           (2) Load you data here and click 'Load & Show' <br />
           (3) Here you can download some sample files. </p>					
 				</div>
@@ -281,35 +273,31 @@ export default class HelpWindow implements MAppViews {
   </div>
   
   <h3 id='readviz'>How to read the visulization:</h3>  
-
   <div class='container-fluid'>
     	<div class='row'>
 	  	<div class='col-md-12'>
 			<div class='row'>
         <div class='col-md-8'>
         <span class = 'screen'>
-        <img src = 'https://www.dropbox.com/s/z26ahjx9g6nqsmu/vis_marks.png?raw=1'/>              
+          <img src='https://www.dropbox.com/s/z26ahjx9g6nqsmu/vis_marks.png?raw=1'/>              
         </span>
       
 				</div>
 				<div class='col-md-4'>
 					<p>
-        (1) The main visualization is a sankey diagram. You read the sankey diagram from left to right. 
-         In this example you see the number of Asylm seekers which make an application. The left side are the original countries
-         and on the right there are the destination countries.</p>  
+          (1) The main visualization is a sankey diagram. You read the sankey diagram from left to right. 
+          In this example you see the number of Asylum seekers which make an application. The left side show the origin countries
+         and on the right are the destination countries.</p>  
         <img style='width: 400px' src = 'https://www.dropbox.com/s/gwnl46zrjllrpob/encoding.png?raw=1'/>
-        <p>The screen above shows the visual encoding. There is this example table of asylmn data. The lines from the table to the sankey diagram
-        shows the encoding from the data to the visual element - in this case a sankey diagram. </p>
-         
+        <p>The screen above shows the visual encoding. There is this example table of asylum data. The lines from the table to the sankey diagram
+        show the encoding from the data to the visual element - in this case a sankey diagram. </p>
         <p>(2) The small bar charts left and right show the amount of asylum applications from the original country and destination country point of 
         view. </p>
-
         <img style='width: 400px'src = 'https://www.dropbox.com/s/gnn8vd483z6iyi8/detailview.png?raw=1'/>
-        <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylm applications between 
+        <p>By clicking on one connection line in the sankey diagram, you get a detail view showing the amount of asylum applications between 
         the two nodes (origin countries and destination countries).</p>
-
-        <p>On the end of the site, you find two buttons 'Show Less' and 'Show more'. Here you can load more nodes or show less nodes. When you hover over
-        the nodes (Rects) in the visualization you get the information of how many asylmn applications were made from the selected country (node). You also 
+        <p>On the end of the site, you find two buttons <strong>'Show Less'</strong> and <strong>'Show more'</strong>. Here you can load more nodes or show less nodes. When you hover over
+        the nodes (Rects) in the visualization you get the information of how many asylum applications were made from the selected country (node). You also 
         see that maybe not all destination and origin countries are visible by the hatching rect. Here you can use the buttons below to load more origin and destination countries.</p>
 				</div>
 			</div>
@@ -329,10 +317,10 @@ export default class HelpWindow implements MAppViews {
 				<div class='col-md-4'>
         <p>You can filter, sort and order the data, which influences the visualization view. <br />
         1) You can filter the data in time and connection. <br />
-        2) You can sort the data by source, target and flow and order it ascending and decending. <br />
-        3) Export the data from the current view. You get a .csv file with the data of the current visualization, including all sorting and
+        2) You can sort the data by source, target and flow and order it, ascending and decending. <br />
+        3) Exporting the data from the current view. You get a .csv file with the data of the current visualization, including all sorting and
         filtering operations.<br />
-        4) You can limit the number of aslymn applications by using the slider on both sides. <br />
+        4) You can limit the number of asylum applications by using the slider on both sides. <br />
         5) Search for a particular country in the origin and also in the destination countries using the seach box. </p>
 				</div>
 			</div>
@@ -347,26 +335,27 @@ export default class HelpWindow implements MAppViews {
 			<div class='row'>
         <div class='col-md-8'>
         <span class = 'screen'>
-        <img src = 'https://www.dropbox.com/s/ejf85l057deiw30/notebook.png?raw=1'/>
+          <img src = 'https://www.dropbox.com/s/ejf85l057deiw30/notebook.png?raw=1'/>
         </span>
 				</div>
 				<div class='col-md-4'>
         <p>You can use a notebook, which opens when clicking the handler on the left side of the screen. 
         You can add some notes and also export it as a .txt. file. This file can be loaded in the notebook sidebar, when starting
-        for example a new session analysing data with netflower. Please notice, that if you close your browser and shut down your device, the 
-        data get lost.</p>
+        for example a new session analysing data with netflower. 
+          <p style='border:2px; border-style:solid; border-color:#DA5A6B; padding: 1em;'>
+          <i>Please notice, that if you clean your browser forcefully shut down your device, the data gets lost. However, if
+          you referesh the page or go back to it if you closed the browser normally it will still be there!</i> 
+          </p>
+        </p>
 				</div>
-			</div>
-		</div>
-  </div>
-  </div>    
-</div> 
-<!--End Screenshots-->
-
-
+        </div>
+      </div>
+    </div>
+    </div>    
+  </div> 
+  <!--End Screenshots-->
     `;
   }
-
 }
 
 /**

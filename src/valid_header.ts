@@ -59,9 +59,9 @@ class ValidHeader implements MAppViews {
     </div>
     <div class='valid_logo'></div>
     <div id='socialMedia'>
-        <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
-        <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
-        <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x' id='web'></i></a></p>
+        <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x web' ></i></a> </p>
+        <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x web'></i></a> </p>
+        <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x web'></i></a></p>
     </div>
     `);
   }
