@@ -190,7 +190,7 @@ export default class HelpWindow implements MAppViews {
       <div id='videos'>
       <h3 id='loaddata'>How to load data:</h3>
       <video controls>
-        <source src='https://www.dropbox.com/s/e6vlt8n3s8l84wi/loadData_video.mov?raw=1' type='video/mp4'>
+        <source src='https://www.dropbox.com/s/oaqfe5d9vd2tjk1/Loading_Voiceover.mp4?raw=1' type='video/mp4'>
       </video>
       <p>
       This tool requires a specific format for the tables in order to visualize them appropriately. 
@@ -203,7 +203,7 @@ export default class HelpWindow implements MAppViews {
       
       <h3 id='readviz'>How to read the visulization:</h3>  
       <video controls>
-        <source src='https://www.dropbox.com/s/gvl1f664wk01wkg/vis_video.mov?raw=1' type='video/mp4'>
+        <source src='https://www.dropbox.com/s/9j5vfifm38jcn9t/Visual_Voiceover.mp4?raw=1' type='video/mp4'>
       </video>
       <p>
       (1) The main visualization form is a sankey diagram. You read the sankey diagram from left to right. 
@@ -222,7 +222,7 @@ export default class HelpWindow implements MAppViews {
 
       <h3 id='filter'>How to filter, sort and order:</h3>  
       <video controls>
-        <source src='https://www.dropbox.com/s/rgrnpcl4lll57ds/filter_sorting_ordering_video.mov?raw=1' type='video/mp4'>
+        <source src='https://www.dropbox.com/s/3c2r9g0boplw3xw/Filter_Voiceover.mp4?raw=1' type='video/mp4'>
       </video>
       <p>You can filter, sort and order the data, which influences the visualization view. <br />
         1) You can filter the data in time and connection. <br />
@@ -234,7 +234,7 @@ export default class HelpWindow implements MAppViews {
 
       <h3 id='notebook'>How to use the notebook:</h3>  
       <video controls>
-        <source src='https://www.dropbox.com/s/00rjwwl6gj84alp/notebook_video.mov?raw=1' type='video/mp4'>
+        <source src='https://www.dropbox.com/s/eojnigrttqxftm3/Notes_Voiceover.mp4?raw=1' type='video/mp4'>
       </video>
         <p>You can use a notebook, which opens when clicking the handler on the left side of the screen. 
         You can add some notes and also export it as a .txt. file. This file can be loaded in the notebook sidebar, when starting
