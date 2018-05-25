@@ -283,12 +283,8 @@ class DataImport implements MAppViews {
           SimpleLogging.log('import special button','');
 
           this.reworkKeys(this.parseResults);
-          this.makeNodesUnique();
           this.reworkNegativeValues(this.parseResults);
-
-          console.log('results:', this.parseResults.data.filter((o) => {
-            return o.valueNode > 1000;
-          }));
+          this.makeNodesUnique();
 
           if(this.editMode) {
             const msg = `You have <strong>ERRORS</strong> in your Table. This would produce a strange behaving
@@ -299,9 +295,9 @@ class DataImport implements MAppViews {
             console.log('Not in edit mode');
             Promise.resolve(this.storeData()).then(res => {
               console.log('res: ', res);
-              // events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
-              // d3.select('.dataLoadingView').classed('invisibleClass', true);
-              // d3.select('.dataVizView').classed('invisibleClass', false);
+              events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+              d3.select('.dataLoadingView').classed('invisibleClass', true);
+              d3.select('.dataVizView').classed('invisibleClass', false);
             });
           }
         }, 4000);

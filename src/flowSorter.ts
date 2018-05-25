@@ -55,11 +55,8 @@ export default class FlowSorter implements MAppViews {
   private constructor(parent: Element, private options: any) {
     this.parentDOM = options.sortBySelector;
     this.parentDOM2 = options.orderBySelector;
-    console.log(this.parentDOM, this.parentDOM2, '.... blalbalallbalb');
   }
 
-  // TODO: AR renmae all occurence of sortMode with sortType or order Type where it's necessary.
-  // TODO: AR the other boilerplate is ready and set up for the stlye and so.
   /**
    * Initialize the view and return a promise
    * that is resolved as soon the view is completely initialized.
@@ -295,7 +292,7 @@ export default class FlowSorter implements MAppViews {
   // Class is a singleton an therefore only one object can exist => get object with this method
   public static getInstance(parent?: Element, options?: any): FlowSorter {
     if (FlowSorter.instance === null || FlowSorter.instance === undefined) {
-      console.log('flowsorter created with parent ' + parent);
+      // console.log('flowsorter created with parent ' + parent);
       FlowSorter.instance = new FlowSorter(parent, options);
     }
 
