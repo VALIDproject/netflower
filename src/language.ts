@@ -92,5 +92,12 @@ export const DOWNLOAD_DIALOG = `You can download the following sample files by k
     </td>
 		<td class='rightTD'><a href=${AppConstants.FARM_FILE}>Download Data (.csv)</a></td>
 	</tr>
+	<tr>
+		<td class='leftTD'><strong>Aid payments OECD</strong><br/>
+       Aid payments from EU countries to developing countries in the last 10 years.
+       <a target='_blank' href='http://dx.doi.org/10.1787/data-00072-en'>Source</a>
+    </td>
+		<td class='rightTD'><a href=${AppConstants.OECD_FILE}>Download Data (.csv)</a></td>
+	</tr>
 	</tbody>
 </table>`;

@@ -14,6 +14,7 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
 import SimpleLogging from './simpleLogging';
+import time = d3.time;
 
 const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
 
@@ -280,7 +281,9 @@ class DataImport implements MAppViews {
         setTimeout(() => {
           // Before rework the keys of the data
           SimpleLogging.log('import special button','');
+
           this.reworkKeys(this.parseResults);
+          this.reworkNegativeValues(this.parseResults);
           this.makeNodesUnique();
 
           if(this.editMode) {
@@ -289,15 +292,15 @@ class DataImport implements MAppViews {
             alertify.closeLogOnClick(true).delay(0).error(msg);
             console.log('In edit mode');
           } else {
-            d3.select('.dataLoadingView').classed('invisibleClass', true);
-            d3.select('.dataVizView').classed('invisibleClass', false);
-            this.storeData();
-            events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
-
             console.log('Not in edit mode');
+            Promise.resolve(this.storeData()).then(res => {
+              console.log('res: ', res);
+              events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+              d3.select('.dataLoadingView').classed('invisibleClass', true);
+              d3.select('.dataVizView').classed('invisibleClass', false);
+            });
           }
         }, 4000);
-
       }
     });
   }
@@ -359,6 +362,10 @@ class DataImport implements MAppViews {
     localStorage.setItem('dataLoaded', 'loaded');
     localStorage.setItem('fileName', this.uploadedFileName);
     localStorage.setItem('columnLabels', JSON.stringify(this.reworkColumnLabels(this.parseResults.meta.fields)));
+
+    return new Promise((resolve) => {
+      resolve('Data storage finished.');
+    });
   }
 
   /**
@@ -388,7 +395,6 @@ class DataImport implements MAppViews {
         delete e[keys[i]];
       }
     });
-
     this.parseResults.data = data;
   }
 
@@ -408,6 +414,22 @@ class DataImport implements MAppViews {
     flowsToChange.forEach((d) => {
       d.targetNode = d.targetNode + ' ';
     });
+  }
+
+  /**
+   * This function is used to remove negative values if there are some in order to display the data
+   * appropriately. Furthermore the source and target are flipped in order to represen the change.
+   * @param json with the original data
+   */
+  private reworkNegativeValues(json) {
+    const data = json.data;
+    data.forEach(o => {
+      if (o.valueNode < 0) {
+        [o.sourceNode, o.targetNode] = [o.targetNode, o.sourceNode];
+        o.valueNode = (o.valueNode * -1) + '';
+      }
+    });
+    this.parseResults.data = data;
   }
 
   /**

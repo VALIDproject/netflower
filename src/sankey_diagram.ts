@@ -533,6 +533,19 @@ class SankeyDiagram implements MAppViews {
           } else {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
           }
+        })
+        .on('click', function(d: any) {
+          if (d.sourceLinks.length > 0) {
+            const txtSource = '"' + d.name + '"';
+            $('#entitySearchFilter').val(txtSource);
+            $('#entitySearchButton').trigger('click');
+            $('#entitySearchFilter').addClass('flash');
+          } else {
+            const txtTarget = '"' + d.name + '"';
+            $('#mediaSearchFilter').val(txtTarget);
+            $('#mediaSearchButton').trigger('click');
+            $('#mediaSearchFilter').addClass('flash');
+          }
         });
 
       // Add in the title for the nodes
