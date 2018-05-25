@@ -293,7 +293,7 @@ class DataImport implements MAppViews {
             console.log('In edit mode');
           } else {
             console.log('Not in edit mode');
-            Promise.resolve(this.storeData()).then(res => {
+            Promise.resolve(this.storeData()).then((res) => {
               console.log('res: ', res);
               events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
               d3.select('.dataLoadingView').classed('invisibleClass', true);
@@ -423,7 +423,7 @@ class DataImport implements MAppViews {
    */
   private reworkNegativeValues(json) {
     const data = json.data;
-    data.forEach(o => {
+    data.forEach((o) => {
       if (o.valueNode < 0) {
         [o.sourceNode, o.targetNode] = [o.targetNode, o.sourceNode];
         o.valueNode = (o.valueNode * -1) + '';
