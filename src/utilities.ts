@@ -4,6 +4,7 @@
 import * as d3 from 'd3';
 import text = d3.text;
 import * as events from 'phovea_core/src/event';
+import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
 
@@ -417,6 +418,32 @@ export function d3TextEllipse(text, maxTextWidth) {
     if (words.length === numWords) {
       ellipsis.remove();
     }
+  });
+}
+
+/**
+ * Sanitized the data in a way such that all the nodes with the same name have the same tags
+ * @param data to sanitize
+ * @param filteredData data with the correct tags and their respective nodes
+ */
+export function applyTagChangesToNode(data: any, filteredData: any): any {
+  let newData = data;
+  for (let entry of newData) {
+    const sourceValue = entry.sourceNode.toLowerCase();
+    const targetValue = entry.targetNode.toLowerCase();
+
+    filteredData.forEach(function(d) {
+      const term = d.key.toLowerCase();
+      if (sourceValue === term) {
+        entry.sourceTag = d.values;
+      }
+      if (targetValue === term) {
+        entry.targetTag = d.values;
+      }
+    })
+  }
+  localforage.setItem('data', newData).then(function(value) {
+    return localforage.getItem('data');
   });
 }
 

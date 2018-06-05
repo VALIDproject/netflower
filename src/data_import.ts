@@ -16,7 +16,7 @@ import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
 import SimpleLogging from './simpleLogging';
 import time = d3.time;
 
-const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2'];
+const keyRep: Array<string> = ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'attribute1', 'attribute2', 'sourceTag', 'targetTag'];
 
 class DataImport implements MAppViews {
 
