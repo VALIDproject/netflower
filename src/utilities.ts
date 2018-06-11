@@ -387,6 +387,19 @@ export function textTransition(element: d3.Selection<any>, newText: string, dura
 }
 
 /**
+ * This function can be used in order to compute the dimensions of a string, that is going to be drawn
+ * but without drawing it.
+ * @param text that should be drawn
+ * @returns {{width: number, height: number}} the dimensions of the drawn text
+ */
+export function textSize(text): {width: number, height: number} {
+    let container = d3.select('body').append('svg');
+    container.append('text').attr({ x: -99999, y: -99999 }).text(text);
+    const size = (container.node() as any).getBBox();
+    container.remove();
+    return { width: size.width, height: size.height };
+}
+/**
  * This function can be used to add text ellipses to overvlowing text. It will add dots to all text
  * that is above the given width.
  * @param text element in d3 which contains the text e.g. d3.selectAll('text');

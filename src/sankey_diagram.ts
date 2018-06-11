@@ -377,7 +377,7 @@ class SankeyDiagram implements MAppViews {
     const margin = {top: AppConstants.SANKEY_TOP_MARGIN, right: 120, bottom: 10, left: 120};
     const width = widthNode - margin.left - margin.right;
     const height = heightNode - margin.top - margin.bottom - headingOffset - footerOffset;
-    const widthOffset = 80;
+    const widthOffset = 200;
 
     // Append the svg canvas to the page
     const svg = d3.select('#sankeyDiagram').append('svg')
@@ -639,62 +639,37 @@ class SankeyDiagram implements MAppViews {
       // Add tag managing buttons if the aggregated sankey view shall be displayed
       if(!that.pipeline.getTagFlowFilterStatus()) {
         const managers = node.append('g');
-
-        const tagCountRect = managers.append('rect')
-          .attr('x', 45)
-          .attr('y', function (d) {
-            return (d.dy / 2) + 7;
-          })
-          .attr('rx', 2)
-          .attr('ry', 2)
-          .attr('width', '50px')
-          .attr('height', '18px')
-          .attr('fill', 'rgba(0,0,0,0.3)')
-          .filter(function (d, i) {
-            return d.x < width / 2;
-          })
-          .attr('x', -111 + sankey.nodeWidth());
-
-        const tagCountLabels = managers.append('text')
-          .attr('x', 50)
-          .attr('y', function (d) {
-            return (d.dy / 2) + 12;
-          })
-          .attr('dy', '0.6em')
-          .attr('fill', 'white')
-          .attr('text-anchor', 'start')
-          .attr('cursor', 'default')
-          .text(function(d) {
-            return that.getNumOfTagsForMediaNode(json, d.name);
-          })
-          .filter(function (d, i) {
-            return d.x < (width / 2);
-          })
-          .attr('x', -65 + sankey.nodeWidth())
-          .attr('text-anchor', 'end')
-          .text(function(d) {
-            return that.getNumOfTagsForEntityNode(json, d.name);
-          });
-
         const buttons = managers.append('text')
-          .attr('x', 100)
+          .attr('x', 150)
           .attr('y', function (d) {
-            return (d.dy / 2) + 14;
+            return (d.dy / 2) - 7;
           })
           .attr('dy', '0.6em')
           .attr('font-family', 'FontAwesome')
           .attr('font-size', '1.5em')
           .attr('cursor', 'pointer')
-          .attr('class', 'manageMediaTag')
           .text(function(d) {
-            return '\uf044';
+            return '\uf02c';
+          })
+          .attr('class', function (d) {
+            if (that.getNumOfTagsForMediaNode(json, d.name) === 'No Tags') {
+              return 'manageMediaTag noFill';
+            } else {
+              return 'manageMediaTag fullFill';
+            }
           })
           .filter(function (d, i) {
             return d.x < width / 2;
           })
-          .attr('x', -45 + sankey.nodeWidth())
+          .attr('x', -150 + (sankey.nodeWidth() - 20))
           .attr('text-anchor', 'end')
-          .attr('class', 'manageEntityTag');
+          .attr('class', function (d) {
+            if (that.getNumOfTagsForEntityNode(json, d.name) === 'No Tags') {
+              return 'manageEntityTag noFill';
+            } else {
+              return 'manageEntityTag fullFill';
+            }
+          });
 
         const entityTagManager = this.$node.selectAll('.manageEntityTag');
         const mediaTagManager = this.$node.selectAll('.manageMediaTag');
