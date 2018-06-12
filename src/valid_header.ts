@@ -48,7 +48,8 @@ class ValidHeader implements MAppViews {
     }
 
     this.$node.html(`
-    <div class='logo'>NETFLOWER</div>
+    <!--<div class='logo'>NETFLOWER</div>-->
+    <div class='netflowerLogo'></div>
     <div class='btn_preupload'>
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
@@ -120,7 +121,7 @@ class ValidHeader implements MAppViews {
   private shrinkHeader(): void {
     $(document).on('scroll', function(){
       if ($(document).scrollTop() > 100) {
-        $('.logo').addClass('shrink');
+        $('.netflowerLogo').addClass('shrink');
         $('#validHeader').addClass('shrink');
         $('#socialMedia').addClass('shrink');
         $('.valid_logo').addClass('shrink');
@@ -130,7 +131,7 @@ class ValidHeader implements MAppViews {
         $('.btn_preupload').attr('style', 'margin-top: 3px;');
         $('#textBackBtn').attr('style', 'margin-top: 0px;');
       } else {
-        $('.logo').removeClass('shrink');
+        $('.netflowerLogo').removeClass('shrink');
         $('#validHeader').removeClass('shrink');
         $('#socialMedia').removeClass('shrink');
         $('.valid_logo').removeClass('shrink');
