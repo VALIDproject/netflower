@@ -39,6 +39,7 @@ export default class HelpWindow implements MAppViews {
   private build() {
     this.$node.append('a')
       .attr('id', 'helpTextBtn')
+      .attr('title', 'Help Site')
       .append('i')
       .attr('class','fa fa-question fa-2x web')
       .attr('style', 'cursor: pointer;');

@@ -3,7 +3,8 @@
  */
 
 import 'file-loader?name=index.html!extract-loader!html-loader!./index.html';
-import 'file-loader?name=404.html-loader!./404.html';
+import 'file-loader?name=404.html!./404.html';
+import 'file-loader?name=impressum.html!./impressum.html';
 import 'file-loader?name=robots.txt!./robots.txt';
 import 'file-loader?name=favicon.ico!./favicon.ico';
 import 'file-loader?name=favicon.png!./favicon.png';
