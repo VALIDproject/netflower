@@ -640,16 +640,20 @@ class SankeyDiagram implements MAppViews {
       if(!that.pipeline.getTagFlowFilterStatus()) {
         const managers = node.append('g');
         const buttons = managers.append('text')
-          .attr('x', 150)
+          .attr('x', 170)
           .attr('y', function (d) {
             return (d.dy / 2) - 7;
           })
           .attr('dy', '0.6em')
           .attr('font-family', 'FontAwesome')
-          .attr('font-size', '1.5em')
+          .attr('font-size', '1.0em')
           .attr('cursor', 'pointer')
           .text(function(d) {
-            return '\uf02c';
+            if (that.getNumOfTagsForMediaNode(json, d.name) === 'No Tags') {
+              return '\uf02c';
+            } else {
+              return '\uf02c ' + that.getNumOfTagsForMediaNode(json, d.name);
+            }
           })
           .attr('class', function (d) {
             if (that.getNumOfTagsForMediaNode(json, d.name) === 'No Tags') {
@@ -661,8 +665,15 @@ class SankeyDiagram implements MAppViews {
           .filter(function (d, i) {
             return d.x < width / 2;
           })
-          .attr('x', -150 + (sankey.nodeWidth() - 20))
+          .attr('x', -170 + (sankey.nodeWidth() - 20))
           .attr('text-anchor', 'end')
+          .text(function (d) {
+            if (that.getNumOfTagsForEntityNode(json, d.name) === 'No Tags') {
+              return '\uf02c';
+            } else {
+              return that.getNumOfTagsForEntityNode(json, d.name) + ' \uf02c';
+            }
+          })
           .attr('class', function (d) {
             if (that.getNumOfTagsForEntityNode(json, d.name) === 'No Tags') {
               return 'manageEntityTag noFill';
@@ -973,11 +984,8 @@ class SankeyDiagram implements MAppViews {
       case 0: {
         numberOfTags = 'No Tags';
       } break;
-      case 1: {
-        numberOfTags =  tags.size() + ' Tag';
-      } break;
       default: {
-        numberOfTags = tags.size() + ' Tags';
+        numberOfTags = tags.size() + '';
       } break;
     }
     return numberOfTags;
@@ -996,11 +1004,8 @@ class SankeyDiagram implements MAppViews {
       case 0: {
         numberOfTags = 'No Tags';
       } break;
-      case 1: {
-        numberOfTags = tags.size() + ' Tag';
-      } break;
       default: {
-        numberOfTags = tags.size() + ' Tags';
+        numberOfTags = tags.size() + '';
       } break;
     }
     return numberOfTags;
