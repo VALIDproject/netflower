@@ -115,7 +115,7 @@ export default class FilterTagDialog {
    */
   private createButtonHtmlByValue(value: string, active: boolean): string {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-          "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
+      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
   }
 
   /**
@@ -179,79 +179,89 @@ export default class FilterTagDialog {
   private buildDialog() {
     let that = this;
     this.dialog = bootbox.dialog({
-        className: 'dialogBox',
-        title: that.getDialogTitle(),
-        message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>',
-        buttons: {
-          clear: {
-            label: "Clear tags",
-            className: "btn-warning pull-left",
-            callback: function() {
-              that._activeTags.forEach((value:string) => that._availableTags.add(value));
-              that._activeTags = d3.set([]);
-              that.updateDialogMessage();
-              return false;
-            }
-          },
-          cancel: {
-            label: "Cancel",
-            className: 'btn-cancel',
-            callback: function(){
-              that._activeTags = that.tagFilter.activeTags;
-              that._availableTags = that.tagFilter.availableTags;
-            }
-          },
-          ok: {
-            label: "Apply",
-            className: 'btn-info',
-            callback: function(){
-              that.tagFilter.activeTags = that._activeTags;
-              that.tagFilter.availableTags = that._availableTags;
-              that.tagFilter.active = that._activeTags.empty() ? false : true;
-              const $tagFilterBox = that.tagGroupHTMLElement.select('.tagFilterBox');
-              const $tagFilterBtn = that.tagGroupHTMLElement.select('.tagFilterBtn');
-              $tagFilterBox.html('');
-              let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
-              if(that.tagFilter.active) {
-                $tagFilterBtn
-                  .style('background-color', '#45B07C')
-                  .style('color', '#FFF')
-                  .style('border:', 'none');
-                if(that.tagFilter instanceof EntityTagFilter)
-                  $tagFilterBtn.html(`Change ${columnLabels.sourceNode} Tags`);
-                else
-                  $tagFilterBtn.html(`Change ${columnLabels.targetNode} Tags`);
-                const $tagContainer = $tagFilterBox
-                                        .append('div')
-                                        .style('padding', '5px')
-                                        .style('border', '1px solid #ddd')
-                                        .style('border-radius', '4px');
-                that._activeTags.forEach((value:string) =>
+      className: 'dialogBox',
+      title: that.getDialogTitle(),
+      message: '<p><i class="fa fa-spin fa-spinner"></i> Loading...</p>',
+      buttons: {
+        clear: {
+          label: "Clear tags",
+          className: "btn-warning pull-left",
+          callback: function() {
+            that._activeTags.forEach((value:string) => that._availableTags.add(value));
+            that._activeTags = d3.set([]);
+            that.updateDialogMessage();
+            return false;
+          }
+        },
+        cancel: {
+          label: "Cancel",
+          className: 'btn-cancel',
+          callback: function(){
+            that._activeTags = that.tagFilter.activeTags;
+            that._availableTags = that.tagFilter.availableTags;
+          }
+        },
+        ok: {
+          label: "Apply",
+          className: 'btn-info',
+          callback: function(){
+            that.tagFilter.activeTags = that._activeTags;
+            that.tagFilter.availableTags = that._availableTags;
+            that.tagFilter.active = that._activeTags.empty() ? false : true;
+            const $tagFilterBox = that.tagGroupHTMLElement.select('.tagFilterBox');
+            const $tagFilterBtn = that.tagGroupHTMLElement.select('.tagFilterBtn');
+            $tagFilterBox.html('');
+            let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+            if(that.tagFilter.active) {
+              $tagFilterBtn
+                .style('background-color', '#45B07C')
+                .style('color', '#FFF')
+                .style('border:', 'none');
+              if(that.tagFilter instanceof EntityTagFilter)
+                $tagFilterBtn.html(`Change ${columnLabels.sourceNode} Tags`);
+              else
+                $tagFilterBtn.html(`Change ${columnLabels.targetNode} Tags`);
+              const $tagContainer = $tagFilterBox
+                  .append('div')
+                  .style('width', function() {
+                    const w = (d3.select('#entityTagFilterGroup') as any)
+                      .node().getBoundingClientRect().width;
+                    return w + 'px';
+                  })
+                  .attr('class', 'tagFilterBoxWrapper')
+                ;
+              for(let i = 0; i < that._activeTags.size(); i++) {
+                let value = that._activeTags.values()[i];
+                if (i === that._activeTags.size() -1) {
                   $tagContainer
-                    .append('button')
-                    .attr('type', 'button')
-                    .attr('class', 'btn-primary btn-xs waves-light')
-                    .attr('style', 'margin: 5px 5px 0px 0px;')
-                    .html(value)
-                );
-              } else {
-                $tagFilterBtn
-                  .style('background-color', '#FFF')
-                  .style('color', '#555')
-                  .style('border:', '1px solid #CCC')
-                if(that.tagFilter instanceof EntityTagFilter)
-                  $tagFilterBtn.html(`Set ${columnLabels.sourceNode} Tags`);
-                else
-                  $tagFilterBtn.html(`Set ${columnLabels.targetNode} Tags`);
+                    .append('p')
+                    .attr('class', 'tagFilterBoxElems')
+                    .text(value);
+                } else {
+                  $tagContainer
+                    .append('p')
+                    .attr('class', 'tagFilterBoxElems')
+                    .text(value + ', ');
+                }
               }
-              events.fire(AppConstants.EVENT_FILTER_CHANGED, that.d, null);
+            } else {
+              $tagFilterBtn
+                .style('background-color', '#FFF')
+                .style('color', '#555')
+                .style('border:', '1px solid #CCC')
+              if(that.tagFilter instanceof EntityTagFilter)
+                $tagFilterBtn.html(`Set ${columnLabels.sourceNode} Tags`);
+              else
+                $tagFilterBtn.html(`Set ${columnLabels.targetNode} Tags`);
             }
+            events.fire(AppConstants.EVENT_FILTER_CHANGED, that.d, null);
           }
         }
-      });
-      this.dialog.init(() => {
-        this.updateDialogMessage();
-      });
+      }
+    });
+    this.dialog.init(() => {
+      this.updateDialogMessage();
+    });
   }
 
   /**

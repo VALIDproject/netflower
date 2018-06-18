@@ -1,0 +1,19 @@
+/**
+PART FOR THE TAG FILTERS
+*/
+
+.tagFilterBoxWrapper {
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.tagFilterBoxElems {
+  font-size: 10px;
+  display: inline-block;
+  margin: 5px 5px 0 0;
+}

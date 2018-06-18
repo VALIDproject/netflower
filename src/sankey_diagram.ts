@@ -158,7 +158,7 @@ class SankeyDiagram implements MAppViews {
         </div>
         <div class='input-group input-group-xs' id='entityTagFilterGroup' style='width: 100%; margin: 10px auto;'>
           <button type='button' class='tagFilterBtn form-control' id='entityTagFilterButton'>Filter by ${columnLabels.sourceNode} Tags</button>
-          <div class="tagFilterBox"></div>
+          <div class='tagFilterBox'></div>
         </div>
       </div>
     `);
@@ -232,7 +232,7 @@ class SankeyDiagram implements MAppViews {
       </div>
       <div class='input-group input-group-xs' id='mediaTagFilterGroup' style='width: 100%; margin: 10px auto;'>
         <button type='button' class='tagFilterBtn form-control' id='mediaTagFilterButton'>Filter by ${columnLabels.targetNode} Tags</button>
-        <div class="tagFilterBox"></div>
+        <div class='tagFilterBox'></div>
       </div>
     </div>
     `);
