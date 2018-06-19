@@ -309,6 +309,11 @@ class SankeyDiagram implements MAppViews {
    */
   private resize() {
     d3.select('#sankeyDiagram').html('');
+
+    // Resize the box for the Tags
+    d3.selectAll('.tagFilterBox').style('width', function() {
+      return (d3.select('.controlBox') as any).node().getBoundingClientRect().width + 'px';
+    });
     this.getStorageData(true);
   }
 

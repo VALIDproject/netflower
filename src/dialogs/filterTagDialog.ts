@@ -223,26 +223,28 @@ export default class FilterTagDialog {
                 $tagFilterBtn.html(`Change ${columnLabels.targetNode} Tags`);
               const $tagContainer = $tagFilterBox
                   .append('div')
-                  .style('width', function() {
-                    const w = (d3.select('#entityTagFilterGroup') as any)
-                      .node().getBoundingClientRect().width;
-                    return w + 'px';
-                  })
                   .attr('class', 'tagFilterBoxWrapper');
+
+              // Build the Tag filter text
+              let tagFilterText = '';
               for(let i = 0; i < that._activeTags.size(); i++) {
                 let value = that._activeTags.values()[i];
                 if (i === that._activeTags.size() -1) {
-                  $tagContainer
-                    .append('p')
-                    .attr('class', 'tagFilterBoxElems')
-                    .text(value);
+                  tagFilterText += value;
                 } else {
-                  $tagContainer
-                    .append('p')
-                    .attr('class', 'tagFilterBoxElems')
-                    .text(value + ', ');
+                  tagFilterText += (value + ', ');
                 }
               }
+              // Append the text elements
+              $tagContainer
+                    .append('p')
+                    .attr('class', 'tagFilterBoxElems')
+                    .text(tagFilterText);
+
+              // Resize the box...
+              $tagFilterBox.style('width', function() {
+                  return (d3.select('.controlBox') as any).node().getBoundingClientRect().width + 'px';
+              });
             } else {
               $tagFilterBtn
                 .style('background-color', '#FFF')
