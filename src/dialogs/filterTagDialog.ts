@@ -228,8 +228,7 @@ export default class FilterTagDialog {
                       .node().getBoundingClientRect().width;
                     return w + 'px';
                   })
-                  .attr('class', 'tagFilterBoxWrapper')
-                ;
+                  .attr('class', 'tagFilterBoxWrapper');
               for(let i = 0; i < that._activeTags.size(); i++) {
                 let value = that._activeTags.values()[i];
                 if (i === that._activeTags.size() -1) {

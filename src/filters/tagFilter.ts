@@ -65,7 +65,8 @@ export default class TagFilter implements Filter
   }
 
   /**
-   * Find all legal or media entities which are tagged by one of the selected tags
+   * Find all legal or media entities which are tagged by one of the selected tags.
+   * Overridden in Subclasses that implement this Class.
    * @param data to apply the search on
    */
   protected processData(data: any): void
@@ -86,6 +87,9 @@ export default class TagFilter implements Filter
     return d3.set([]);
   }
 
+  /**
+   * Just for printing out the information if necessary. Overridden also in the Subclasses.
+   */
   public printData(): void
   {
   }

@@ -300,6 +300,7 @@ class SankeyDiagram implements MAppViews {
       this.mediaSearchFilter.term = '';
       this.entityTagFilter.resetTags();
       this.mediaTagFilter.resetTags();
+      location.reload(true);
     });
   }
 
@@ -649,11 +650,7 @@ class SankeyDiagram implements MAppViews {
           .attr('font-size', '1.0em')
           .attr('cursor', 'pointer')
           .text(function(d) {
-            if (that.getNumOfTagsForMediaNode(json, d.name) === 'No Tags') {
               return '\uf02c';
-            } else {
-              return '\uf02c ' + that.getNumOfTagsForMediaNode(json, d.name);
-            }
           })
           .attr('class', function (d) {
             if (that.getNumOfTagsForMediaNode(json, d.name) === 'No Tags') {
@@ -667,13 +664,6 @@ class SankeyDiagram implements MAppViews {
           })
           .attr('x', -170 + (sankey.nodeWidth() - 20))
           .attr('text-anchor', 'end')
-          .text(function (d) {
-            if (that.getNumOfTagsForEntityNode(json, d.name) === 'No Tags') {
-              return '\uf02c';
-            } else {
-              return that.getNumOfTagsForEntityNode(json, d.name) + ' \uf02c';
-            }
-          })
           .attr('class', function (d) {
             if (that.getNumOfTagsForEntityNode(json, d.name) === 'No Tags') {
               return 'manageEntityTag noFill';

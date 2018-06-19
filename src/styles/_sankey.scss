@@ -166,13 +166,13 @@ Sankey features part.
 }
 
 .noFill {
-  fill: transparent !important;
-  stroke: #696969 !important;
+  fill: #CDCDCD !important;
+  //stroke: #F0F0F0 !important;
   font-size: 1.2em !important;
 }
 
 .fullFill {
-  fill: #696969 !important;
+  fill: $valid-color !important;
   font-size: 1.2em !important;
 }
 
