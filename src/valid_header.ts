@@ -60,8 +60,10 @@ class ValidHeader implements MAppViews {
     </div>
     <div class='valid_logo'></div>
     <div id='socialMedia'>
-        <p><a href='impressum.html' 
+        <p><a href='imprint.html' 
           target='blank' title='Legal Disclosure'><i class='fa fa-info fa-2x web'></i></a></p>
+        <p><a href='help.html' 
+          target='blank' title='Help Site'><i class='fa fa-question fa-2x web'></i></a></p>
         <p><a href='https://twitter.com/valid_at' 
           target='blank' title='Twitter'><i class='fa fa-twitter-square fa-2x web'></i></a> </p>
         <p><a href='https://github.com/VALIDproject' 
@@ -124,7 +126,7 @@ class ValidHeader implements MAppViews {
   }
 
   private shrinkHeader(): void {
-    $(document).on('scroll', function(){
+    $(document).on('scroll', function () {
       if ($(document).scrollTop() > 100) {
         $('.netflowerLogo').addClass('shrink');
         $('#validHeader').addClass('shrink');

@@ -4,8 +4,8 @@
 
 import * as events from 'phovea_core/src/event';
 import * as d3 from 'd3';
-import { AppConstants } from './app_constants';
-import { MAppViews } from './app';
+import {AppConstants} from './app_constants';
+import {MAppViews} from './app';
 
 export default class HelpWindow implements MAppViews {
 
@@ -41,10 +41,11 @@ export default class HelpWindow implements MAppViews {
       .attr('id', 'helpTextBtn')
       .attr('title', 'Help Site')
       .append('i')
-      .attr('class','fa fa-question fa-2x web')
+      .attr('class', 'fa fa-question fa-2x web')
       .attr('style', 'cursor: pointer;');
 
   }
+
   /**
    * Attach the event listeners
    */
@@ -53,6 +54,7 @@ export default class HelpWindow implements MAppViews {
       // Open the HTML tags first and the basic stuff;
       this.htmlString = `<html><head>
                             <title>Help Site</title>
+                            <link href='https://fonts.googleapis.com/css?family=Yantramanav' rel='stylesheet'>
                             <style>${this.customStyle()}</style>
                          </head><body>`;
 
@@ -94,13 +96,9 @@ export default class HelpWindow implements MAppViews {
       }         
       
       #validHeader {
-        //position: fixed;      
+        float: left;
+        display: inline-block;
         width: 100%;
-        height: 35px;
-        background-color: #f0f0f0;
-        padding: 10px;
-        display: block;
-        border-bottom: 2px solid #dddddd;
       }
       .screen img{
         width: 800px; 
@@ -170,7 +168,8 @@ export default class HelpWindow implements MAppViews {
   private customHtml(): string {
     return `
       <div id='validHeader'>
-        <div class='logo'>NETFLOWER - Introductional Material & Tutorials</div>           
+        <img src='https://www.dropbox.com/s/2lpi4sb9b2oxd0u/netflowerlogoN.png?raw=1'
+         type='text/html' alt='Netflower Logo' class='responsive' width='200' height='100'/>    
       </div>
       <p>Dear user, this is the help site of netflower. You will find tutorial videos and help materials in form of screenshots and textual descriptions here.
       Please select first, if you like to watch videos or use screenshots & textual elements to get help.</p>

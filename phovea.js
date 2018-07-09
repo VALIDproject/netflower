@@ -60,8 +60,8 @@ module.exports = function(registry) {
     'name': 'SimpleLogging',
   });
 
-  registry.push('validView', 'HelpWindow', function() { return System.import('./src/helpWindow'); }, {
-    'name': 'HelpWindow',
-  });
+  // registry.push('validView', 'HelpWindow', function() { return System.import('./src/helpWindow'); }, {
+  //   'name': 'HelpWindow',
+  // });
   // generator-phovea:end
 };
