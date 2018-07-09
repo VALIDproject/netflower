@@ -49,7 +49,7 @@ class ValidHeader implements MAppViews {
 
     this.$node.html(`
     <!--<div class='logo'>NETFLOWER</div>-->
-    <div class='netflowerLogo'></div>
+    <div class='netflowerLogo img-responsive center-block'></div>
     <div class='btn_preupload'>
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
@@ -60,9 +60,16 @@ class ValidHeader implements MAppViews {
     </div>
     <div class='valid_logo'></div>
     <div id='socialMedia'>
-        <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x web' ></i></a> </p>
-        <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x web'></i></a> </p>
-        <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x web'></i></a></p>
+        <p><a href='imprint.html' 
+          target='blank' title='Legal Disclosure'><i class='fa fa-info fa-2x web'></i></a></p>
+        <p><a href='help.html' 
+          target='blank' title='Help Site'><i class='fa fa-question fa-2x web'></i></a></p>
+        <p><a href='https://twitter.com/valid_at' 
+          target='blank' title='Twitter'><i class='fa fa-twitter-square fa-2x web'></i></a> </p>
+        <p><a href='https://github.com/VALIDproject' 
+          target='blank' title='Github Code'> <i class='fa fa-github fa-2x web'></i></a> </p>
+        <p><a href='http://www.validproject.at/' 
+          target='blank' title='Project Website'><i class='fa fa-globe fa-2x web'></i></a></p>
     </div>
     `);
   }
@@ -119,7 +126,7 @@ class ValidHeader implements MAppViews {
   }
 
   private shrinkHeader(): void {
-    $(document).on('scroll', function(){
+    $(document).on('scroll', function () {
       if ($(document).scrollTop() > 100) {
         $('.netflowerLogo').addClass('shrink');
         $('#validHeader').addClass('shrink');
