@@ -49,7 +49,7 @@ class ValidHeader implements MAppViews {
 
     this.$node.html(`
     <!--<div class='logo'>NETFLOWER</div>-->
-    <div class='netflowerLogo img-responsive center-block'></div>
+    <div class='netflowerLogo'></div>
     <div class='btn_preupload'>
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
@@ -58,8 +58,7 @@ class ValidHeader implements MAppViews {
     <div class='timeInfoBox invisibleClass'><div style='font-size: 0.9em;'>Viewing Timestamps: </div>
       <div id='timeInfoHeader'></div>
     </div>
-    <div class='valid_logo'></div>
-    <div id='socialMedia'>
+        <div id='socialMedia'>
         <p><a href='imprint.html' 
           target='blank' title='Legal Disclosure'><i class='fa fa-info fa-2x web'></i></a></p>
         <p><a href='help.html' 
@@ -71,6 +70,7 @@ class ValidHeader implements MAppViews {
         <p><a href='http://www.validproject.at/' 
           target='blank' title='Project Website'><i class='fa fa-globe fa-2x web'></i></a></p>
     </div>
+    <div class='valid_logo'></div>
     `);
   }
 
@@ -145,7 +145,6 @@ class ValidHeader implements MAppViews {
         $('.timeInfoBox').addClass('invisibleClass');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o');
         $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
-        $('.btn_preupload').attr('style', 'margin-top: 7px;');
         $('#textBackBtn').attr('style', 'margin-top: 6px;');
       }
     });
