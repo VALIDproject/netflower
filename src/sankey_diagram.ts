@@ -122,7 +122,7 @@ class SankeyDiagram implements MAppViews {
             <div class='col-sm-10'>
               <input id='entityFilter'/>
             </div>
-            <div class='col-sm-1' style='margin-top: 24px;'>
+            <div class='col-sm-1 sliderIcon' style='margin-top: 24px;'>
               <a data-toggle='collapse' href='#collapseContentEntity' aria-expanded='true' class='collapsed'>
               <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
             </div>
@@ -155,7 +155,7 @@ class SankeyDiagram implements MAppViews {
           <div class='col-sm-11'>
             <input id='valueSlider'/>
           </div>
-          <div class='col-sm-1' style='margin-top: 24px;'>
+          <div class='col-sm-1 sliderIcon' style='margin-top: 24px;'>
             <a data-toggle='collapse' href='#collapseContentEntity3' aria-expanded='true' class='collapsed'>
             <i class='fa fa-pencil-square-o pull-right specialIcon'></i></a>
           </div>

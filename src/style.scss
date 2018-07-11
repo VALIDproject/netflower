@@ -75,6 +75,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 #validHeader {
   position: fixed;
   z-index: 100000;
+  margin: 0 auto;
   width: 100%;
   height: 67px;
   background-color: $background-color;
@@ -120,10 +121,12 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   float: left;
   background-image: url('media/netflowerlogoN.svg');
   background-repeat: no-repeat;
-  margin-right: 20px;
-  margin-top: 0.3%;
+  //margin-right: 20px;
+  //margin-top: 0.3%;
   height: 100%;
-  width: 12%;
+  width: 15.8%;
+  margin-right: .5%;
+  margin-left: .5%;
 }
 
 .netflowerLogo.shrink {
@@ -139,11 +142,12 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   //padding-left: 20px;
   //margin-left: 150px;
   //position: absolute;
-  float:right;
-  width: 18%;
+  float:left;
+  width: 16.8%;
   height: 40px;
-  margin-top: 1%;
-  margin-right: 20px;
+  margin-right: .5%;
+  margin-left: .5%;
+  margin-top: 12px;
 }
 
 .valid_logo.shrink {
@@ -152,16 +156,14 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 
 #socialMedia {
-  float: right;
-  z-index: 1000000;
-  margin-left: auto;
-  margin-right: 20px;
-  //margin-top: 50px;
-  //width: 40%;
+  width: 21.8%;
+  float: left;
+  margin-right: .5%;
+  margin-left: .5%;
+  margin-top: 12px;
   p {
     float: right;
-    padding: 15px;
-    //margin-top:-40px;
+    padding: 0 15px 0 15px;
   }
 }
 
@@ -171,8 +173,10 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 .btn_preupload {
   float: left;
-  width: 40%;
-  margin-top: 1%;
+  width: 40.8%;
+  margin-right: .5%;
+  margin-left: .5%;
+  margin-top: 12px;
 }
 
 .btn_preupload.shrink {

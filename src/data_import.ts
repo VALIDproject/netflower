@@ -75,6 +75,14 @@ class DataImport implements MAppViews {
     this.$fileContainer = this.$node.html(`
     <div class='fileContainer'>
     <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
+    <div class='informationBoxes'>
+      <div class='netflowerFeature'><h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data. 
+      The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data 
+      based on your explorations state. </div>
+      <div class='disclaimer'><h4>Important Information:</h4>The data you upload will only be stored locally on your computer. 
+      When you close the browser, the data is retained. When the computer is restarted or you upload new data, 
+      the data and exploration steps are lost.</div> 
+    </div>
     <h3 id='informationText'>Load your data here:</h3>
       <form class='form-inline well'>
         <div class='form-group'>
@@ -121,17 +129,18 @@ class DataImport implements MAppViews {
       <table class='demo'>
         <thead>
         <tr>
-          <th>Source</th><th>Target</th><th>Time</th><th>Value</th><th>Attribute 1</th><th>Attribute...</th>
+          <th>Source</th><th>Target</th><th>Time</th><th>Value</th><th>SourceTag</th><th>TargetTag</th><th>Attribute...</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-          <td>Assign an appropriate name for the source nodes of your visualization</td>
-          <td>Assign an appropriate name for the target nodes of your visualization</td>
+          <td>Assign an appropriate name for the source nodes of your visualization.</td>
+          <td>Assign an appropriate name for the target nodes of your visualization.</td>
           <td>Assign the time column name here.</td>
           <td>Assign the value column name here. Best to uses is a currency sign.</td>
-          <td>Add any attribute name here.</td>
-          <td>Further attributes...</td>
+          <td>Assign the tag name referring to the source nodes.</td>
+          <td>Assign the tag name referring to the target nodes.</td>
+          <td>Add attributes here (one attriubte per column).</td>          
         </tr>
         </tbody>
       </table>

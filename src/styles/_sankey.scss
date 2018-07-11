@@ -350,3 +350,13 @@ Section for the input fields of the sliders.
     50% { border-color: $valid-color; }
     100% { border-color: transparent; }
 }
+
+.col-sm-10 {
+  width: 90.33333% !important;
+}
+
+.sliderIcon {
+  @media (max-width: 1200px) {
+    margin-top: 0 !important;
+  }
+}
