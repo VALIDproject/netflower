@@ -147,7 +147,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   height: 40px;
   margin-right: .5%;
   margin-left: .5%;
-  margin-top: .5%; 
+  margin-top: 12px;
 }
 
 .valid_logo.shrink {
@@ -156,14 +156,14 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 
 #socialMedia {
-  width: 16.8%;
-  float: left; 
+  width: 21.8%;
+  float: left;
   margin-right: .5%;
   margin-left: .5%;
-  margin-top: .5%; 
+  margin-top: 12px;
   p {
     float: right;
-    padding: 0 15px 0 15px;    
+    padding: 0 15px 0 15px;
   }
 }
 
@@ -173,11 +173,10 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 .btn_preupload {
   float: left;
-  width: 45.8%; 
+  width: 40.8%;
   margin-right: .5%;
   margin-left: .5%;
-  margin-top: .5%; 
-  //margin-top: 1%;
+  margin-top: 12px;
 }
 
 .btn_preupload.shrink {
