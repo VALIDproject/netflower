@@ -50,6 +50,14 @@ export default class FilterTagDialog {
     }
   }
 
+  private createCloseButton (): string {
+    return "<i id=\"closeIcon\" class=\"fa fa-times\" aria-hidden=\"true\"></i>"
+    //return "<button type=\"button\" class=\"vclose\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>"
+    
+
+  }
+  
+
   /**
    * Builds the html code for tags currently selected for filtering.
    */
@@ -60,7 +68,7 @@ export default class FilterTagDialog {
     } else {
       message += "</small><div style=\"margin: 10px 0px 20px 0px;\">";
       this._activeTags.forEach((value:string) =>
-        message += this.createButtonHtmlByValue(value, true)
+      message += (this.createButtonHtmlByValue(value, true) + this.createCloseButton())        
       );
       return message + "</div>";
     }
@@ -115,7 +123,8 @@ export default class FilterTagDialog {
    */
   private createButtonHtmlByValue(value: string, active: boolean): string {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
+      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>" ;
+      
   }
 
   /**
@@ -185,7 +194,7 @@ export default class FilterTagDialog {
       buttons: {
         clear: {
           label: "Clear tags",
-          className: "btn-warning pull-left",
+          className: "btn-warning pull-left btn_design",
           callback: function() {
             that._activeTags.forEach((value:string) => that._availableTags.add(value));
             that._activeTags = d3.set([]);
@@ -195,7 +204,7 @@ export default class FilterTagDialog {
         },
         cancel: {
           label: "Cancel",
-          className: 'btn-cancel',
+          className: 'btn-cancel btn_design',
           callback: function(){
             that._activeTags = that.tagFilter.activeTags;
             that._availableTags = that.tagFilter.availableTags;
@@ -203,7 +212,7 @@ export default class FilterTagDialog {
         },
         ok: {
           label: "Apply",
-          className: 'btn-info',
+          className: 'btn-info btn_design',
           callback: function(){
             that.tagFilter.activeTags = that._activeTags;
             that.tagFilter.availableTags = that._availableTags;

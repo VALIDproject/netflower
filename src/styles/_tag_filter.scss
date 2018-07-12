@@ -7,7 +7,7 @@ PART FOR THE TAG FILTERS
 }
 
 .tagFilterBtn {
-  border-radius: 4px;
+  border-radius: 4px;  
 }
 
 .tagFilterBoxWrapper {
@@ -24,3 +24,25 @@ PART FOR THE TAG FILTERS
   white-space:nowrap;
   text-overflow:ellipsis;
 }
+
+#clearAddTag, #clearTagSearch {
+  background: #f0f0f0;
+  border-radius: 0;
+}
+#addTagInput, #tagSearchButton, #addTagButton {
+  border-radius: 0;
+}
+
+#closeIcon {
+  background-color: #45B07C;
+  color: white;
+  padding:7px;
+  border-top-right-radius: 4px;  
+  border-bottom-right-radius: 4px;
+  //margin-bottom:100px;
+  position: absolute;
+  //margin-top: 2px;
+  margin-left: -13px;  
+}
+
+

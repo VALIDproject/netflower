@@ -180,7 +180,7 @@ export default class ManageFilterDialog {
       buttons: {
         clear: {
           label: "Clear tags",
-          className: "btn-warning pull-left",
+          className: "btn-warning pull-left btn_design",
           callback: function() {
             that._tags = d3.set([]);
             that.updateDialogMessage();
@@ -189,14 +189,14 @@ export default class ManageFilterDialog {
         },
         cancel: {
           label: "Cancel",
-          className: 'btn-cancel',
+          className: 'btn-cancel btn_design',
           callback: function(){
             that._tags = that._originalTags;
           }
         },
         ok: {
           label: "Apply",
-          className: 'btn-info',
+          className: 'btn-info btn_design',
           callback: function(){
             localforage.getItem('data').then((value) => {
               return that.applyTagChangesToNode(value);
