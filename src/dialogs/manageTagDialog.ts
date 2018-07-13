@@ -17,15 +17,23 @@ export default class ManageFilterDialog {
 
   private _tags: d3.Set;
   private _availableTags: d3.Set;
+  private _activeTags: d3.Set;
+  private _term: string = "";
+  private _searchResult: d3.Set;
 
   private message: string;
   private dialog;
 
+  
   constructor(private d, private _originalTags: d3.Set, private tagFilter: TagFilter,) {
     this._tags = d3.set(this._originalTags.values());
+    this._activeTags = d3.set(tagFilter.activeTags.values());
+    this._availableTags = d3.set(tagFilter.availableTags.values());
     this.createAvailableTagSet(tagFilter);
     this.buildDialog();
   }
+
+
 
   /**
    * Updates the content of the dialog window
@@ -95,9 +103,14 @@ export default class ManageFilterDialog {
    * @param value of button label, active whether the tag is currently active
    * @returns {string} of the html code creating a new tag button.
    */
-  private createButtonHtmlByValue(value: string, active: boolean) {
+  private createButtonHtmlByValue(value: string, active: boolean): string {
+    if (active) {
+      return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
+      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + ' X' + "</button>" ;
+    } else {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-          "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>";
+      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>" ;
+    }
   }
 
   /**
@@ -105,35 +118,72 @@ export default class ManageFilterDialog {
    */
   private initTagButtons() {
     const that = this;
+
     $('.tagBtn').click(function() {
-      const tagBtnElem = this;
-      if($(tagBtnElem).hasClass('active')) {
-        const tagLabel = $(tagBtnElem).html();
-        bootbox.confirm({
-          className: 'dialogBox',
-          message: "This removes the tag " + tagLabel + ". Do you wish to proceed?",
-          buttons: {
-            confirm: {
-              label: 'Yes',
-              className: 'btn-info'
-            },
-            cancel: {
-              label: 'No',
-              className: 'btn-cancel'
-            }
-          },
-          callback: function (result) {
-            if (result) {
-              that._tags.remove(tagLabel);
-              that.updateDialogMessage();
-            }
-          }
-        });
+      const tagBtnElem = this; 
+      const tagLabel = $(tagBtnElem).html(); 
+      //console.log('this', this);  
+      const trimmed = $(this).html().slice(0, -2); 
+      
+      if($(this).hasClass('active')) {
+        that._tags.remove(trimmed);
+        that._availableTags.add(trimmed);
       } else {
+        that._availableTags.remove($(this).html());
         that._tags.add($(this).html());
-        that.updateDialogMessage();
-      }
+      }   
+     
+      that.updateDialogMessage();
     });
+
+
+    // $('.tagBtn').click(function() {
+    //   const tagBtnElem = this;      
+    //   const trimmed = $(this).html().slice(0, -2);
+    //   console.log('tagBtnElement ' + tagBtnElem, 'activeTags', that._activeTags, 'availableTags', that._availableTags, '_tags',that._tags);
+
+    //   if($(this).hasClass('active')) {
+    //     if($(this).hasClass('active')) {          
+    //       that._tags.add(trimmed);          
+    //       that._activeTags.remove(trimmed);
+    //       if(that._term != "")
+    //         if($(this).html().toLowerCase().startsWith(that._term))
+    //           that._searchResult.add($(this).html());
+    //     } else {
+    //       that._activeTags.add($(this).html());
+    //       that._tags.remove($(this).html());
+    //       if(that._term != "")
+    //         that._searchResult.remove($(this).html());
+    //     }
+    //     that.updateDialogMessage();    
+    //   });
+     //const tagLabel = $(tagBtnElem).html();
+     //console.log(tagLabel);
+        // bootbox.confirm({
+        //   className: 'dialogBox',
+        //   message: "This removes the tag " + tagLabel + ". Do you wish to proceed?",
+        //   buttons: {
+        //     confirm: {
+        //       label: 'Yes',
+        //       className: 'btn-info'
+        //     },
+        //     cancel: {
+        //       label: 'No',
+        //       className: 'btn-cancel'
+        //     }
+        //   },
+        //   callback: function (result) {
+        //     if (result) {
+        //       that._tags.remove(tagLabel);
+        //       that.updateDialogMessage();
+        //     }
+        //   }
+        // });
+      // } else {
+      //   that._tags.add($(this).html());
+      //   that.updateDialogMessage();
+      // }
+    //});
 
     const addTag = (d) => {
       let value: string = $('#addTagInput').val();

@@ -31,7 +31,7 @@ export default class FilterTagDialog {
     this.buildDialog();
   }
 
-  private setAvailableTags() {
+  private setAvailableTags() {    
     this.activeTags.forEach((tag:string) => this._availableTags.remove(tag));
   }
 
@@ -48,15 +48,7 @@ export default class FilterTagDialog {
       $('#tagSearchFilter').val(this._term);
       $('#tagSearchFilter').focus();
     }
-  }
-
-  private createCloseButton (): string {
-    return "<i id=\"closeIcon\" class=\"fa fa-times\" aria-hidden=\"true\"></i>"
-    //return "<button type=\"button\" class=\"vclose\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>"
-    
-
-  }
-  
+  } 
 
   /**
    * Builds the html code for tags currently selected for filtering.
@@ -68,7 +60,7 @@ export default class FilterTagDialog {
     } else {
       message += "</small><div style=\"margin: 10px 0px 20px 0px;\">";
       this._activeTags.forEach((value:string) =>
-      message += (this.createButtonHtmlByValue(value, true) + this.createCloseButton())        
+      message += (this.createButtonHtmlByValue(value, true))        
       );
       return message + "</div>";
     }
@@ -122,20 +114,26 @@ export default class FilterTagDialog {
    * @returns {string} of the html code creating a new tag button.
    */
   private createButtonHtmlByValue(value: string, active: boolean): string {
+    if (active) {
+      return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
+      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + ' X' + "</button>" ;
+    } else {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
       "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>" ;
-      
+    }
   }
-
   /**
    * Defines the activities that follow when clicking on the tag buttons or using the search input.
    */
   private initTagButtons() {
     var that = this;
     $('.tagBtn').click(function() {
+      const trimmed = $(this).html().slice(0, -2);
       if($(this).hasClass('active')) {
-        that._availableTags.add($(this).html());
-        that._activeTags.remove($(this).html());
+        console.log('availableTags',that._availableTags);
+        console.log('activeTags', that._activeTags);
+        that._availableTags.add(trimmed);
+        that._activeTags.remove(trimmed);        
         if(that._term != "")
           if($(this).html().toLowerCase().startsWith(that._term))
             that._searchResult.add($(this).html());
