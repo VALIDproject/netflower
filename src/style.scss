@@ -46,6 +46,11 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   border-color: $valid-color3;
 }
 
+.btn_original_design {
+  background-color: $valid-color3 !important;
+  color: white !important;
+}
+
 button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
   color: $valid-color2;
   border-color: $valid-color2;

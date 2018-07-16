@@ -31,7 +31,7 @@ export default class FilterTagDialog {
     this.buildDialog();
   }
 
-  private setAvailableTags() {    
+  private setAvailableTags() {
     this.activeTags.forEach((tag:string) => this._availableTags.remove(tag));
   }
 
@@ -48,7 +48,7 @@ export default class FilterTagDialog {
       $('#tagSearchFilter').val(this._term);
       $('#tagSearchFilter').focus();
     }
-  } 
+  }
 
   /**
    * Builds the html code for tags currently selected for filtering.
@@ -56,11 +56,11 @@ export default class FilterTagDialog {
   private buildActiveTagsHtml() {
     let message = "<small>Tags selected:";
     if(this._activeTags.empty()) {
-      return message + "<b>None</b></small>";
+      return message + "<b> None</b></small>";
     } else {
       message += "</small><div style=\"margin: 10px 0px 20px 0px;\">";
       this._activeTags.forEach((value:string) =>
-      message += (this.createButtonHtmlByValue(value, true))        
+      message += (this.createButtonHtmlByValue(value, true))
       );
       return message + "</div>";
     }
@@ -91,7 +91,7 @@ export default class FilterTagDialog {
   private buildAvailableTagsHtml() {
     let message = "<small>Tags available:";
     if(this._availableTags.empty()) {
-      return message += "<b>None</b></small>";
+      return message += "<b> None</b></small>";
     } else {
       message += "</small><div style=\"margin: 10px 0px\">";
       if(this._term == "") {
@@ -116,7 +116,8 @@ export default class FilterTagDialog {
   private createButtonHtmlByValue(value: string, active: boolean): string {
     if (active) {
       return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + ' X' + "</button>" ;
+      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value +
+        " <i class='fa fa-times'></i>" + "</button>" ;
     } else {
     return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
       "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>" ;
@@ -128,12 +129,10 @@ export default class FilterTagDialog {
   private initTagButtons() {
     var that = this;
     $('.tagBtn').click(function() {
-      const trimmed = $(this).html().slice(0, -2);
+      const trimmed = $(this).html().slice(0, -28);
       if($(this).hasClass('active')) {
-        console.log('availableTags',that._availableTags);
-        console.log('activeTags', that._activeTags);
         that._availableTags.add(trimmed);
-        that._activeTags.remove(trimmed);        
+        that._activeTags.remove(trimmed);
         if(that._term != "")
           if($(this).html().toLowerCase().startsWith(that._term))
             that._searchResult.add($(this).html());
@@ -210,7 +209,7 @@ export default class FilterTagDialog {
         },
         ok: {
           label: "Apply",
-          className: 'btn-info btn_design',
+          className: 'btn-info btn_design btn_original_design',
           callback: function(){
             that.tagFilter.activeTags = that._activeTags;
             that.tagFilter.availableTags = that._availableTags;

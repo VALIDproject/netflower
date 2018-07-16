@@ -24,7 +24,7 @@ export default class ManageFilterDialog {
   private message: string;
   private dialog;
 
-  
+
   constructor(private d, private _originalTags: d3.Set, private tagFilter: TagFilter,) {
     this._tags = d3.set(this._originalTags.values());
     this._activeTags = d3.set(tagFilter.activeTags.values());
@@ -51,7 +51,7 @@ export default class ManageFilterDialog {
   private buildActiveTagsHtml() {
     let message = "<small>Tags:";
     if(this._tags.empty()) {
-      return message + "<b>None</b></small>";
+      return message + "<b> None</b></small>";
     } else {
       message += "</small><div style=\"margin: 10px 0px 20px 0px;\">";
       this._tags.forEach((value:string) =>
@@ -86,7 +86,7 @@ export default class ManageFilterDialog {
   private buildSuggestedTagsHtml() {
     let message = "<small>Suggested Tags:";
     if(this._availableTags.empty()) {
-      return message += "<b>None</b></small>";
+      return message += "<b> None</b></small>";
     } else {
       message += "</small><div style=\"margin: 10px 0px\">";
       for (let value of this._availableTags.values()) {
@@ -106,10 +106,11 @@ export default class ManageFilterDialog {
   private createButtonHtmlByValue(value: string, active: boolean): string {
     if (active) {
       return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + ' X' + "</button>" ;
+        "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value +
+        " <i class='fa fa-times'></i>" + "</button>" ;
     } else {
-    return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
-      "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>" ;
+      return "<button type=\"button\" class=\"tagBtn" + (active ? " active " : " ") +
+        "btn btn-primary btn-sm waves-light\" style=\"margin-right: 10px; margin-bottom: 10px;\">" + value + "</button>" ;
     }
   }
 
@@ -120,70 +121,20 @@ export default class ManageFilterDialog {
     const that = this;
 
     $('.tagBtn').click(function() {
-      const tagBtnElem = this; 
-      const tagLabel = $(tagBtnElem).html(); 
-      //console.log('this', this);  
-      const trimmed = $(this).html().slice(0, -2); 
-      
+      const tagBtnElem = this;
+      const tagLabel = $(tagBtnElem).html();
+      const trimmed = $(this).html().slice(0, -28);
+
       if($(this).hasClass('active')) {
         that._tags.remove(trimmed);
         that._availableTags.add(trimmed);
       } else {
         that._availableTags.remove($(this).html());
         that._tags.add($(this).html());
-      }   
-     
+      }
+
       that.updateDialogMessage();
     });
-
-
-    // $('.tagBtn').click(function() {
-    //   const tagBtnElem = this;      
-    //   const trimmed = $(this).html().slice(0, -2);
-    //   console.log('tagBtnElement ' + tagBtnElem, 'activeTags', that._activeTags, 'availableTags', that._availableTags, '_tags',that._tags);
-
-    //   if($(this).hasClass('active')) {
-    //     if($(this).hasClass('active')) {          
-    //       that._tags.add(trimmed);          
-    //       that._activeTags.remove(trimmed);
-    //       if(that._term != "")
-    //         if($(this).html().toLowerCase().startsWith(that._term))
-    //           that._searchResult.add($(this).html());
-    //     } else {
-    //       that._activeTags.add($(this).html());
-    //       that._tags.remove($(this).html());
-    //       if(that._term != "")
-    //         that._searchResult.remove($(this).html());
-    //     }
-    //     that.updateDialogMessage();    
-    //   });
-     //const tagLabel = $(tagBtnElem).html();
-     //console.log(tagLabel);
-        // bootbox.confirm({
-        //   className: 'dialogBox',
-        //   message: "This removes the tag " + tagLabel + ". Do you wish to proceed?",
-        //   buttons: {
-        //     confirm: {
-        //       label: 'Yes',
-        //       className: 'btn-info'
-        //     },
-        //     cancel: {
-        //       label: 'No',
-        //       className: 'btn-cancel'
-        //     }
-        //   },
-        //   callback: function (result) {
-        //     if (result) {
-        //       that._tags.remove(tagLabel);
-        //       that.updateDialogMessage();
-        //     }
-        //   }
-        // });
-      // } else {
-      //   that._tags.add($(this).html());
-      //   that.updateDialogMessage();
-      // }
-    //});
 
     const addTag = (d) => {
       let value: string = $('#addTagInput').val();
@@ -246,7 +197,7 @@ export default class ManageFilterDialog {
         },
         ok: {
           label: "Apply",
-          className: 'btn-info btn_design',
+          className: 'btn-info btn_design btn_original_design',
           callback: function(){
             localforage.getItem('data').then((value) => {
               return that.applyTagChangesToNode(value);
