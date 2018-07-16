@@ -31,6 +31,8 @@ export default class SparklineBarChart implements MAppViews {
   private necessaryHeight = INITIAL_SVG_HEIGHT;
   private chartWidth: number = 120;        // Fallback if not calcualted dynamically
 
+  private aggregatedSankeyActive;
+
   /** unit of flows (e.g., '€'). Extracted from CSV header. */
   private valuePostFix = '';
 
@@ -95,17 +97,21 @@ export default class SparklineBarChart implements MAppViews {
       node.each(function (d, i) {
         const nodeElem = d3.select(this);
 
+        const aggregatedSankeyActive = (nodeElem.attr('class').includes('tag'));
+
         if (nodeElem.attr('class').includes('source')) {
-          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
+          SparklineBarChart.sourceChart.build(attFiltData, aggregatedSankeyActive, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         } else {
-          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
+          SparklineBarChart.targetChart.build(attFiltData, aggregatedSankeyActive, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         }
       });
     });
   }
 
-  private build(data: any, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
+  private build(data: any, aggregatedSankeyActive: boolean, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
+
+    _self.aggregatedSankeyActive = aggregatedSankeyActive;
 
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     this.valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
@@ -153,10 +159,30 @@ export default class SparklineBarChart implements MAppViews {
    */
   private prepareData(data: any, nodeName: string): IKeyValue[] {
     const _self = this;
-    const filteredData = data.filter(function (d) { return d[_self.field] === nodeName; });
+    let filteredData;
+    if(_self.aggregatedSankeyActive) {
+      if(_self.field.includes('source')) {
+        filteredData = data.filter(function (d) {
+          if(d.sourceTag !== undefined) {
+            return d.sourceTag.includes(nodeName);
+          }
+        });
+      } else {
+        filteredData = data.filter(function (d) {
+          if(d.targetTag !== undefined) {
+            return d.targetTag.includes(nodeName);
+          }
+        });
+      }
+    } else {
+      filteredData = data.filter(function (d) {
+        return d[_self.field] === nodeName;
+      });
+    }
+
     const aggregatedData = d3.nest()
       .key(function (d: any) { return d.timeNode; })
-      .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
+      .rollup(function (v) {return d3.sum(v, function (d: any) { return d.valueNode; }); })
       .entries(filteredData);
 
     return aggregatedData;

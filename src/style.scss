@@ -8,14 +8,16 @@
 /**
 The other styles of the page.
  */
-//Part of the data loading view.
+// Part of the data loading view.
 @import 'styles/data_imports';
-//Part of the filter data view.
+// Part of the filter data view.
 @import 'styles/filter_data';
-//Part of all sankey related visualization stuff.
+// Part of all sankey related visualization stuff.
 @import 'styles/sankey';
-//Part of the global settings view.
+// Part of the global settings view.
 @import 'styles/global_settings';
+// Part of the tag filter view.
+@import 'styles/tag_filter';
 
 
 //Button Design Filter Area
@@ -42,6 +44,11 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   padding: 5px 16px;
   color: $valid-color3;
   border-color: $valid-color3;
+}
+
+.btn_original_design {
+  background-color: $valid-color3 !important;
+  color: white !important;
 }
 
 button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {

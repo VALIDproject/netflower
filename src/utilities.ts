@@ -4,6 +4,7 @@
 import * as d3 from 'd3';
 import text = d3.text;
 import * as events from 'phovea_core/src/event';
+import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
 
@@ -386,6 +387,19 @@ export function textTransition(element: d3.Selection<any>, newText: string, dura
 }
 
 /**
+ * This function can be used in order to compute the dimensions of a string, that is going to be drawn
+ * but without drawing it.
+ * @param text that should be drawn
+ * @returns {{width: number, height: number}} the dimensions of the drawn text
+ */
+export function textSize(text): {width: number, height: number} {
+    let container = d3.select('body').append('svg');
+    container.append('text').attr({ x: -99999, y: -99999 }).text(text);
+    const size = (container.node() as any).getBBox();
+    container.remove();
+    return { width: size.width, height: size.height };
+}
+/**
  * This function can be used to add text ellipses to overvlowing text. It will add dots to all text
  * that is above the given width.
  * @param text element in d3 which contains the text e.g. d3.selectAll('text');
@@ -417,6 +431,32 @@ export function d3TextEllipse(text, maxTextWidth) {
     if (words.length === numWords) {
       ellipsis.remove();
     }
+  });
+}
+
+/**
+ * Sanitized the data in a way such that all the nodes with the same name have the same tags
+ * @param data to sanitize
+ * @param filteredData data with the correct tags and their respective nodes
+ */
+export function applyTagChangesToNode(data: any, filteredData: any): any {
+  let newData = data;
+  for (let entry of newData) {
+    const sourceValue = entry.sourceNode.toLowerCase();
+    const targetValue = entry.targetNode.toLowerCase();
+
+    filteredData.forEach(function(d) {
+      const term = d.key.toLowerCase();
+      if (sourceValue === term) {
+        entry.sourceTag = d.values;
+      }
+      if (targetValue === term) {
+        entry.targetTag = d.values;
+      }
+    })
+  }
+  localforage.setItem('data', newData).then(function(value) {
+    return localforage.getItem('data');
   });
 }
 

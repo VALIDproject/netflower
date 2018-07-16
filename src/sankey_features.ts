@@ -41,24 +41,33 @@ class SankeyFeatures implements MAppViews {
       <div class='container-fluid'>
       	<div class='row'>
       	  <!--First section on the left with filters-->
-      		<div class='col-md-3'>
+      		<div class='col-md-4'>
             <div class='row'>
-              <div class='col-sm-4'>
+              <div class='col-sm-3'>
                 <h5>Filter</h5>
               </div>
               <div class='col-sm-4' style='margin-top: 7px;'>
                 <button id='clearAllBtn' class='label'
                   style='background: #45B07C; font-weight: normal;'><i class='fa fa-times'></i> Clear All</button>
               </div>
+              <div class='col-sm-4'>
+                <h5>View Flow between:</h5>
+              </div>
             </div>
       			<div class='row'>
-              <div class='col-md-4'>
+              <div class='col-md-3'>
                 <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
               </div>
               <div class='col-md-4'>
                   <div class='btn-group'>
                     <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>      						
                   </div>
+                </div>
+                <div class='col-md-4'>
+                  <select class='form-control input-sm' id='tagFlowFilter'>
+                     <option value='-1' selected>nodes</option>
+                     <option value='1'>tags</option>
+                  </select>
                 </div>
       			</div>
       			<div class='row'>
