@@ -393,7 +393,7 @@ export function textTransition(element: d3.Selection<any>, newText: string, dura
  * @returns {{width: number, height: number}} the dimensions of the drawn text
  */
 export function textSize(text): {width: number, height: number} {
-    let container = d3.select('body').append('svg');
+    const container = d3.select('body').append('svg');
     container.append('text').attr({ x: -99999, y: -99999 }).text(text);
     const size = (container.node() as any).getBBox();
     container.remove();
@@ -440,8 +440,8 @@ export function d3TextEllipse(text, maxTextWidth) {
  * @param filteredData data with the correct tags and their respective nodes
  */
 export function applyTagChangesToNode(data: any, filteredData: any): any {
-  let newData = data;
-  for (let entry of newData) {
+  const newData = data;
+  for (const entry of newData) {
     const sourceValue = entry.sourceNode.toLowerCase();
     const targetValue = entry.targetNode.toLowerCase();
 
@@ -453,7 +453,7 @@ export function applyTagChangesToNode(data: any, filteredData: any): any {
       if (targetValue === term) {
         entry.targetTag = d.values;
       }
-    })
+    });
   }
   localforage.setItem('data', newData).then(function(value) {
     return localforage.getItem('data');
