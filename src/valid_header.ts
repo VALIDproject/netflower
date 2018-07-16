@@ -145,6 +145,7 @@ class ValidHeader implements MAppViews {
         $('.timeInfoBox').addClass('invisibleClass');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o');
         $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
+        $('.btn_preupload').attr('style', 'margin-top: 12px;');
         $('#textBackBtn').attr('style', 'margin-top: 6px;');
       }
     });
