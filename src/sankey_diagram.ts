@@ -23,6 +23,7 @@ import {
   setEntityTagFilter, setMediaTagFilter
 } from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER, NOTAGS_INFO} from './language';
+import { setTagFilterRefs } from './export';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -350,6 +351,9 @@ class SankeyDiagram implements MAppViews {
 
       // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
+
+      // Set the refs for the tag filters in order to use it in the export
+      setTagFilterRefs(this.entityTagFilter, this.mediaTagFilter, originalData);
 
       // console.log('----------- Original Data -----------');
       // console.log(originalData);

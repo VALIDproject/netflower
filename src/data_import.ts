@@ -303,7 +303,6 @@ class DataImport implements MAppViews {
           } else {
             console.log('Not in edit mode');
             Promise.resolve(this.storeData()).then((res) => {
-              console.log('res: ', res);
               events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
               d3.select('.dataLoadingView').classed('invisibleClass', true);
               d3.select('.dataVizView').classed('invisibleClass', false);
