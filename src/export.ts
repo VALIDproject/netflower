@@ -61,10 +61,10 @@ export default class Export implements MAppViews {
 
       // Flows extracted from data properties of the sankey links
       d3.selectAll('#sankeyDiagram path.link').each((d, i) => {
-        // console.log('TAGS - left: ', Export.entityTagFilterRef.getTagsByName(Export.currentData, d.source.name));
-        // console.log('TAGS - right: ', Export.mediaTagFilterRef.getTagsByName(Export.currentData, d.target.name));
-        console.log('d:', d);
-        dataAsArray.push([d.source.name, d.target.name, d.value]);
+        const sourceHash = Export.entityTagFilterRef.getTagsByName(Export.currentData, d.source.name);
+        const targetHash = Export.mediaTagFilterRef.getTagsByName(Export.currentData, d.target.name);
+        console.log('sourceHash', sourceHash.values());
+        dataAsArray.push([d.source.name, d.target.name, d.time, d.value]);
       });
       console.log('dataAsArray: ', dataAsArray);
 
