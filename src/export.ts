@@ -18,9 +18,11 @@ export default class Export implements MAppViews {
   private $node: d3.Selection<any>;
   private parentDOM: string;
   private btnExportFlowData: d3.Selection<any>;
+  private checkBoxExport: d3.Selection<any>;
+  private exportAll: boolean = true;
   public static entityTagFilterRef: EntityTagFilter;
   public static mediaTagFilterRef: MediaTagFilter;
-  public static currentData;
+  public static currentData: any;
 
   constructor(parent: Element, private options: any) {
     this.parentDOM = options.parentDOM;
@@ -33,7 +35,8 @@ export default class Export implements MAppViews {
    */
   init(): Promise<MAppViews> {
     this.btnExportFlowData = d3.select('#exportData');
-    this.$node = this.btnExportFlowData;
+    this.checkBoxExport = d3.select('#exportCheckbox');
+    // this.$node = this.btnExportFlowData;
 
     this.attachListener();
 
@@ -48,26 +51,53 @@ export default class Export implements MAppViews {
     // Retrieve the log file
     this.btnExportFlowData.on('click', (d) => {
       SimpleLogging.log('export flows clicked', '');
+      let dataAsArray = [[]];
 
-      // Column headers (based on input metadata if available)
-      let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
-      if (columnLabels == null) {
-       columnLabels = initDefaultColumnLabels(columnLabels);
+      // Check if we should save whole data or only the small sample before we proceed
+      this.exportAll = !this.checkBoxExport.property('checked') ? true : false;
+
+      if (this.exportAll) {
+        console.log('we export all');
+      } else {
+        // Column headers (based on input metadata if available)
+        let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+        if (columnLabels == null) {
+          columnLabels = initDefaultColumnLabels(columnLabels);
+        }
+        dataAsArray = [[columnLabels.sourceNode, columnLabels.sourceTag,
+          columnLabels.targetNode, columnLabels.targetTag, columnLabels.valueNode]];
+
+        // Flows extracted from data properties of the sankey links
+        d3.selectAll('#sankeyDiagram path.link').each((d, i) => {
+          const sourceHash = Export.entityTagFilterRef
+            .getTagsByName(Export.currentData, d.source.name)
+            .values().join('|');
+          const targetHash = Export.mediaTagFilterRef
+            .getTagsByName(Export.currentData, d.target.name)
+            .values().join('|');
+          dataAsArray.push([d.source.name, sourceHash, d.target.name, targetHash, d.value]);
+        });
+
+        // META DATA:
+        //----------------------------------------------------------
+        // Time points we have available:
+        const currentTime = [];
+        d3.select('#timeInfoHeader').selectAll('span').each(function (d, i) {
+          currentTime.push(d3.select(this).text());
+        })
+        // Attributes that are set at the moment
+        let currentAttrs = [];
+        d3.select('#attribute1').selectAll('span').each(function (d, i) {
+          currentAttrs.push(d3.select(this).text());
+        })
+        currentAttrs = currentAttrs.filter(Boolean); // Needed to remove empty strings
+
+        // Add the meta data as the first line of the csv
+        dataAsArray.unshift(['Timerange: ' + currentTime.join('|'),
+          'Attribute: ' + currentAttrs.join('|')]);
       }
-      const dataAsArray = [[columnLabels.sourceNode, columnLabels.targetNode,
-                            columnLabels.timeNode, columnLabels.valueNode,
-                            columnLabels.sourceTag, columnLabels.targetTag,
-                            columnLabels.attribute1, columnLabels.attribute2]];
 
-      // Flows extracted from data properties of the sankey links
-      d3.selectAll('#sankeyDiagram path.link').each((d, i) => {
-        const sourceHash = Export.entityTagFilterRef.getTagsByName(Export.currentData, d.source.name);
-        const targetHash = Export.mediaTagFilterRef.getTagsByName(Export.currentData, d.target.name);
-        console.log('sourceHash', sourceHash.values());
-        dataAsArray.push([d.source.name, d.target.name, d.time, d.value]);
-      });
-      console.log('dataAsArray: ', dataAsArray);
-
+      console.log('data: ', dataAsArray);
       // CSV export using D3.js
       const dataAsStr = d3.csv.format(dataAsArray);
       const filename = 'flows ' + new Date().toLocaleString() + '.csv';

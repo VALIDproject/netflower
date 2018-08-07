@@ -556,7 +556,7 @@ export function initDefaultColumnLabels(columnLabels: any) {
   columnLabels.sourceTag = 'sourceHash';
   columnLabels.targetTag = 'targetHash';
   columnLabels.attribute1 = 'attribute 1';
-  columnLabels.attribute2 = 'attribute 2';
+  // columnLabels.attribute2 = 'attribute 2';
 
   return columnLabels;
 }

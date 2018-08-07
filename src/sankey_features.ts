@@ -106,6 +106,10 @@ class SankeyFeatures implements MAppViews {
             <button type='button' class='btn btn-default btn_design' id='exportData'>
               Export Data
             </button>
+            <div class='custom-control custom-checkbox' style='margin-top: 4px;'>
+              <input type='checkbox' class='custom-control-input' id='exportCheckbox'>
+              <label class='custom-control-label' for='exportCheckbox'>Only visible elemments</label>
+            </div>
           </div>
           
           <!--Global Filters-->
