@@ -180,11 +180,11 @@ input[readonly] {
 }
 
 .disclaimer{
-  background-color: #f5f5f5;  
+  background-color: #f5f5f5;
   border-radius: 5px;
   padding:20px;
   float: left;
-  width: 49%;  
+  width: 49%;
   margin-right: .5%;
   margin-left: .5%;
   height: 140px;
@@ -192,7 +192,7 @@ input[readonly] {
 }
 
 .netflowerFeature {
-  background-color: #f5f5f5;  
+  background-color: #f5f5f5;
   border-radius: 5px;
   padding:20px;
   float: left;
@@ -210,4 +210,21 @@ input[readonly] {
   margin-bottom: 5%;
 }
 
-
+// Custom Divider format for separating with additional text
+.hr-sect {
+	display: flex;
+	flex-basis: 100%;
+	align-items: center;
+	color: rgba(0, 0, 0, 0.35);
+	margin: 8px 0px;
+}
+.hr-sect::before,
+.hr-sect::after {
+	content: "";
+	flex-grow: 1;
+	background: rgba(0, 0, 0, 0.35);
+	height: 1px;
+	font-size: 0px;
+	line-height: 0px;
+	margin: 0px 8px;
+}
