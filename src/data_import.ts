@@ -12,7 +12,8 @@ import * as alertify from 'alertify.js';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
+import {IMPORT_FEATURES, IMPORT_DISCLAIMER,
+  USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
 import SimpleLogging from './simpleLogging';
 import time = d3.time;
 
@@ -50,7 +51,7 @@ class DataImport implements MAppViews {
   init() {
     const dataAvailable = localStorage.getItem('dataLoaded') === 'loaded' ? true : false;
 
-    if(!dataAvailable) {
+    if (!dataAvailable) {
       d3.select('.dataVizView').classed('invisibleClass', true);
       d3.select('#backBtn').classed('invisibleClass', true);
     } else {
@@ -76,33 +77,56 @@ class DataImport implements MAppViews {
     <div class='fileContainer'>
     <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
     <div class='informationBoxes'>
-      <div class='netflowerFeature'><h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data. 
-      The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data 
-      based on your explorations state. </div>
-      <div class='disclaimer'><h4>Important Information:</h4>The data you upload will only be stored locally on your computer. 
-      When you close the browser, the data is retained. When the computer is restarted or you upload new data, 
-      the data and exploration steps are lost.</div> 
+      <div class='netflowerFeature'>${IMPORT_FEATURES}</div>
+      <div class='disclaimer'>${IMPORT_DISCLAIMER}</div> 
     </div>
     <h3 id='informationText'>Load your data here:</h3>
-      <form class='form-inline well'>
-        <div class='form-group'>
-          <div class='input-group'>
-              <span class='input-group-btn' style='padding-right: 2px;'>
-                <span class='btn btn-default btn-file'>
-                  Select CSV file...
-                  <input type='file' id='files' accept='.csv' required />
-                </span>
-              </span>
-            <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
+    <div style='width: 100%;'>
+    <div class='row'>
+      <div class='col-md-12'>
+              <div class='panel panel-primary'>
+                  <div class='panel-heading'>
+                      <h3 class='panel-title'>Choose between</h3>
+                      <span class='pull-right'>
+                          <ul class='nav panel-tabs'>
+                              <li class='active'><a href='#tab1' data-toggle='tab'><i class='fa fa-link'></i> URL</a></li>
+                              <li><a href='#tab2' data-toggle='tab'><i class='fa fa-file-excel-o'></i> File</a></li>
+                              <li><a href='#tab3' data-toggle='tab'><i class='fa fa-download'></i> Sample Data</a></li>
+                          </ul>
+                      </span>
+                  </div>
+                  <div class='panel-body'>
+                      <div class='tab-content'>
+                          <div class='tab-pane active' id='tab1'>
+                            <label for='fileByUrl'>Paste your URL (needs to be .csv):</label>
+                            <input type='text' class='form-control' id='fileByUrl'>
+                          </div>
+                          <div class='tab-pane' id='tab2'>
+                            <label for='filename'>Upload your FILE (needs to be .csv):</label>
+                            <div class='input-group'>
+                              <span class='input-group-btn' style='padding-right: 2px;'>
+                              <span class='btn btn-default btn-file'>
+                                Select CSV file...
+                                <input type='file' id='files' accept='.csv' required />
+                              </span>
+                              </span>
+                              <input readonly='readonly' placeholder='CSV file' 
+                                class='form-control' id='filename' type='text' />
+                            </div>
+                          </div>
+                          <div class='tab-pane' id='tab3'>${DOWNLOAD_DIALOG}</div>
+                  </div>
+              </div>
           </div>
-        </div>
-        <div class='form-group'>
-          <button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>
-          <button type='button' id='sampleFile' class='btn btn-primary btn-large'>
-            <i class='fa fa-download'></i> Sample Files</button>
-        </div>
-      </form>`
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-12'>
+          <button type='submit' id='submitFile' class='btn btn-primary btn-lg pull-right'>Load & Show</button>
+          <button type='button' id='showMoreBtn' class='btn btn-info pull-right'>View Data</button>
+      </div>
+    </div>
+    `
     );
 
     // Add the display conatiner and the logs
@@ -163,7 +187,7 @@ class DataImport implements MAppViews {
     // Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {
-        SimpleLogging.log('import submit button','');
+        SimpleLogging.log('import submit button', '');
         alertify.delay(4000).log('Data import started.');
 
         // Disable the unwanted buttons
@@ -177,9 +201,32 @@ class DataImport implements MAppViews {
         textTransition(this.$chaningHeading, 'View data, load new or proceed', 500);
         this.editMode = false;
 
-        // Start the uploading
+        // -----------------------------------------------------------------------
+        // Decide whether we got an URL or a FILE
+        const urlInput = $('#fileByUrl').val();
         const filesInput = <HTMLInputElement>d3.select('#files').node();
-        this.handleFileUpload(filesInput);
+
+        if (urlInput !== '' && filesInput.files[0] !== undefined) {       // A: Take file over url
+          this.handleFileUpload(filesInput);
+          // console.log('We have url but also file --> so we take file');
+        } else if (urlInput !== '') {                                     // B: Just a url
+          if (urlInput.substr(-4) === '.csv') {   // Check for a .csv
+            this.handleFileUrl(urlInput);
+            // console.log('We have only a url where we load from --> so we take url');
+          } else {
+            const msg = 'Only files with a .csv ending can be loaded by url!';
+            alertify.closeLogOnClick(true).delay(0).error(msg);
+          }
+        } else {                                                          // C: Just a file
+          if (filesInput.files[0] === undefined) {
+            const msg = 'Please select a file or paste a url in order to proceed!';
+            alertify.closeLogOnClick(true).delay(0).error(msg);
+          } else {
+            // Start the uploading
+            this.handleFileUpload(filesInput);
+            // console.log('We have only afile --> we take file then');
+          }
+        }
 
         // Necessary in order to prevent the reload of the page.
         const evt = <MouseEvent>d3.event;
@@ -190,7 +237,7 @@ class DataImport implements MAppViews {
     // Listener for the Edit Button
     this.$node.select('#showMoreBtn')
       .on('click', (e) => {
-        SimpleLogging.log('import preview show button','');
+        SimpleLogging.log('import preview show button', '');
         alertify.delay(4000).log('Viewing the detail table.');
         // Plot the data in the table and enable edit mode
         const resultData = this.parseResults.data;
@@ -212,7 +259,7 @@ class DataImport implements MAppViews {
     // Listener for the 'Next' Button in the visual browser
     this.$node.select('#seeNextRecords')
       .on('click', (e) => {
-        SimpleLogging.log('import preview next button','');
+        SimpleLogging.log('import preview next button', '');
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.$tableRows.slice(this.rowsToShow, this.rowsToShow + 10).show();
         this.rowsToShow += 10;
@@ -228,7 +275,7 @@ class DataImport implements MAppViews {
     // Listener for the 'Prev' Button in the visual browser
     this.$node.select('#seePrevRecords')
       .on('click', (e) => {
-        SimpleLogging.log('import preview prev button','');
+        SimpleLogging.log('import preview prev button', '');
         this.$tableRows.slice(this.rowsToShow - 10, this.rowsToShow).hide();
         this.rowsToShow -= 10;
         d3.select('#valueListMeta').html('Viewing page: ' + this.rowsToShow / 10
@@ -253,11 +300,44 @@ class DataImport implements MAppViews {
       evt.stopPropagation();
     });
 
-    d3.selectAll('a').on('click', (e) => {console.log('testaaaaaaa'); e.preventDefault();});
+    d3.selectAll('a').on('click', (e) => {
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
+      console.log('testaaaaaaa');
+    });
 
     // This little trick removes the fakepath form the filepath in the input field.
-    $('#files').change(function(){
+    $('#files').change(function () {
       $('#filename').val($(this).val().replace('C:\\fakepath\\', ''));
+    });
+  }
+
+  /**
+   * The function is called upon the upload button is clickedn and it parses the file by url.
+   * @param urlToLoad The url string to load from
+   */
+  private handleFileUrl(urlToLoad: string) {
+    papaparse.parse(urlToLoad, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (results, fileUrl) => {
+        this.parseResults = results;
+        this.uploadedFileName = fileUrl.toString()    // 1: Convert file name to string
+            .replace(/^.*[\\\/]/, '')                 // 2: Remove everyhting before last slash or backslash
+            .split('.')                               // 3: Split it at the dot which is the extension afterwards
+            .slice(0, -1)                             // 4: Remove the rest
+            .join('.') || this + '';                  // 5: Join the rest
+
+        this.displayData(this.parseResults);
+        const msg = `<small>${new Date().toLocaleString()}</small>:
+                     <br/>File: ${this.uploadedFileName}<br/><strong>Loaded successfully!</strong>`;
+        alertify.delay(5000).success(msg);
+        SimpleLogging.log('import from url complete', this.uploadedFileName);
+
+        // Start the visualization with a file from url
+        this.startVisualization();
+      }
     });
   }
 
@@ -285,33 +365,41 @@ class DataImport implements MAppViews {
         const msg = `<small>${new Date().toLocaleString()}</small>:
                      <br/>File: ${file.name}<br/><strong>Loaded successfully!</strong>`;
         alertify.delay(5000).success(msg);
-        SimpleLogging.log('import upload complete', file.name);
+        SimpleLogging.log('import file upload complete', file.name);
 
-        setTimeout(() => {
-          // Before rework the keys of the data
-          SimpleLogging.log('import special button','');
-
-          this.reworkKeys(this.parseResults);
-          this.reworkNegativeValues(this.parseResults);
-          this.makeNodesUnique();
-
-          if(this.editMode) {
-            const msg = `You have <strong>ERRORS</strong> in your Table. This would produce a strange behaving
-                visualization. You should check the other error messages and clean your data.`;
-            alertify.closeLogOnClick(true).delay(0).error(msg);
-            console.log('In edit mode');
-          } else {
-            console.log('Not in edit mode');
-            Promise.resolve(this.storeData()).then((res) => {
-              console.log('res: ', res);
-              events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
-              d3.select('.dataLoadingView').classed('invisibleClass', true);
-              d3.select('.dataVizView').classed('invisibleClass', false);
-            });
-          }
-        }, 4000);
+        // Start the visualization with a uploaded file
+        this.startVisualization();
       }
     });
+  }
+
+  /**
+   * This function is used in order to start the visualization once the upload of data is finished.
+   */
+  private startVisualization() {
+    setTimeout(() => {
+      SimpleLogging.log('start visualization as data loaded', '');
+      // Before rework the keys of the data
+      this.reworkKeys(this.parseResults);
+      // Remove negative values
+      this.reworkNegativeValues(this.parseResults);
+      // Make the nodes unique
+      this.makeNodesUnique();
+
+      if (this.editMode) {
+        const msg = `You have <strong>ERRORS</strong> in your Table. This would produce a strange behaving
+                visualization. You should check the other error messages and clean your data.`;
+        alertify.closeLogOnClick(true).delay(0).error(msg);
+        console.log('In edit mode');
+      } else {
+        console.log('Not in edit mode');
+        Promise.resolve(this.storeData()).then((res) => {
+          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+          d3.select('.dataLoadingView').classed('invisibleClass', true);
+          d3.select('.dataVizView').classed('invisibleClass', false);
+        });
+      }
+    }, 4000);
   }
 
   /**
@@ -337,7 +425,7 @@ class DataImport implements MAppViews {
       // Don't go to the visualization page
       this.editMode = true;
 
-      for(const el of resultError) {
+      for (const el of resultError) {
         const elem = el;
         const msg = `<small>${new Date().toLocaleString()}</small>:
                      <br/><strong>Error:</strong>${elem.message}
@@ -350,7 +438,7 @@ class DataImport implements MAppViews {
     const msg = `<strong>Success!!</strong> Data is loaded.
                  <br/>Rows-preview: ${this.rowsToShow}
                  <br/>Rows-total: ${this.parseResults.data.length}`;
-    setTimeout(function(){
+    setTimeout(function () {
       alertify.delay(5000).log(msg);
     }, 1500);
   }
@@ -383,7 +471,7 @@ class DataImport implements MAppViews {
    * @returns {any} object which  contains the saved column names and new names.
    */
   private reworkColumnLabels(keys: string[]): any {
-    const result : any = {};
+    const result: any = {};
     for (let i = 0; i < keys.length; i++) {
       result[keyRep[i]] = keys[i];
     }
@@ -398,8 +486,8 @@ class DataImport implements MAppViews {
     const data = json.data;
     const keys = Object.keys(data[0]);
 
-    data.forEach(function(e) {
-      for(let i = 0; i < keys.length; i++) {
+    data.forEach(function (e) {
+      for (let i = 0; i < keys.length; i++) {
         e[keyRep[i]] = e[keys[i]];
         delete e[keys[i]];
       }
@@ -415,10 +503,14 @@ class DataImport implements MAppViews {
     const json = this.parseResults.data;
     //All source nodes
     const sources = d3.set(
-      json.map(function (d: any) { return d.sourceNode; })
+      json.map(function (d: any) {
+        return d.sourceNode;
+      })
     );
     //All rows of orig data that have a known source node as target node
-    const flowsToChange = json.filter((d) => {return sources.has(d.targetNode); });
+    const flowsToChange = json.filter((d) => {
+      return sources.has(d.targetNode);
+    });
     //Transform these rows
     flowsToChange.forEach((d) => {
       d.targetNode = d.targetNode + ' ';
@@ -456,18 +548,18 @@ class DataImport implements MAppViews {
     let table = `<table class='table valueTable' >`;
     //Create the header of the table
     table += '<thead>';
-    for (const k in resultData[0] ) {
-      if(resultData[0].hasOwnProperty(k)) {
+    for (const k in resultData[0]) {
+      if (resultData[0].hasOwnProperty(k)) {
         table += '<th>' + k + '</th>';
       }
     }
     table += '</thead>';
 
-    for(const el of resultData) {
+    for (const el of resultData) {
       const row = el;
       table += '<tr>';
       for (const key in row) {
-        if(row.hasOwnProperty(key)) {
+        if (row.hasOwnProperty(key)) {
           table += '<td> ' + row[key] + '</td>';
         }
       }
@@ -493,7 +585,7 @@ class DataImport implements MAppViews {
       this.$btnPrev.hide();
     }
 
-    if(this.rowsToShow === 10) {
+    if (this.rowsToShow === 10) {
       this.$btnNext.show();
       this.$btnPrev.hide();
     }
@@ -509,3 +601,35 @@ class DataImport implements MAppViews {
 export function create(parent: Element, options: any) {
   return new DataImport(parent, options);
 }
+
+
+/** REMOVE LATER
+
+      <!--<form class='well' style='padding-bottom: 0 !important;'>-->
+        <!--<div class='form-group'>-->
+              <!--<label for='fileByUrl'>Paste your URL (needs to be .csv):</label>-->
+              <!--<input type='text' class='form-control' id='fileByUrl'>-->
+        <!--</div>-->
+        <!--<div class='form-group'>-->
+          <!--<div class='hr-sect'>OR</div>-->
+        <!--</div>-->
+        <!--<div class='form-group'>-->
+          <!--<div class='input-group'>-->
+              <!--<span class='input-group-btn' style='padding-right: 2px;'>-->
+                <!--<span class='btn btn-default btn-file'>-->
+                  <!--Select CSV file...-->
+                  <!--<input type='file' id='files' accept='.csv' required />-->
+                <!--</span>-->
+              <!--</span>-->
+            <!--<input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>-->
+          <!--</div>-->
+        <!--</div>-->
+        <!--<div class='form-group' style='margin-top: 40px;'>-->
+          <!--<button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>-->
+          <!--<button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>-->
+          <!--<button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>-->
+            <!--<i class='fa fa-download'></i> Sample Files</button>-->
+        <!--</div>-->
+      <!--</form>-->
+
+ **/

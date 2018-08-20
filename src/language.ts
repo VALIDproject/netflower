@@ -9,6 +9,14 @@ import {AppConstants} from './app_constants';
 export const APP_NAME = 'Valid';
 export const HELLO_WORLD = 'Hello World this is VALID... or will be...';
 
+export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data. 
+The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data 
+based on your explorations state.`;
+
+export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you upload will only be stored locally on your computer. 
+When you close the browser, the data is retained. When the computer is restarted or you upload new data, 
+the data and exploration steps are lost.`;
+
 export const ERROR_TOOMANYNODES = `Your current <font color='#DA5A6B'><strong>FILTER</strong></font>
 has too many nodes to display for the visual space. <br/> Please press the <strong>Show More</strong>
 utton at the end of the sankey diagram.<br/>This will create more visual space for the nodes in order to be loaded.
@@ -30,9 +38,9 @@ export const BACK_INFO = `Upon hitting the <strong>OK</strong> button, you will 
 Be sure you don't lose anything important or save your progress before you proceed.`;
 
 /*export const TIME_INFO = `Select here the time range of the visualization. You have various controls avaialbe for the selection.
-The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
-you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
-to change the visualization.`;*/
+ The controls are listed on the right near the box. Inide the box are Quarters which you can choose. Below
+ you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
+ to change the visualization.`;*/
 
 export const TIME_INFO = `Select here the time range of the visualization.<br/> 
 1) Click & Drag mouse for rectangle selection.<br/>
