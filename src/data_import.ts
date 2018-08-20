@@ -12,7 +12,8 @@ import * as alertify from 'alertify.js';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
+import {IMPORT_FEATURES, IMPORT_DISCLAIMER,
+  USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
 import SimpleLogging from './simpleLogging';
 import time = d3.time;
 
@@ -76,40 +77,56 @@ class DataImport implements MAppViews {
     <div class='fileContainer'>
     <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
     <div class='informationBoxes'>
-      <div class='netflowerFeature'><h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data. 
-      The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data 
-      based on your explorations state. </div>
-      <div class='disclaimer'><h4>Important Information:</h4>The data you upload will only be stored locally on your computer. 
-      When you close the browser, the data is retained. When the computer is restarted or you upload new data, 
-      the data and exploration steps are lost.</div> 
+      <div class='netflowerFeature'>${IMPORT_FEATURES}</div>
+      <div class='disclaimer'>${IMPORT_DISCLAIMER}</div> 
     </div>
     <h3 id='informationText'>Load your data here:</h3>
-      <form class='well' style='padding-bottom: 0 !important;'>
-        <div class='form-group'>
-              <label for='fileByUrl'>Paste your URL (needs to be .csv):</label>
-              <input type='text' class='form-control' id='fileByUrl'>
-        </div>
-        <div class='form-group'>
-          <div class='hr-sect'>OR</div>
-        </div>
-        <div class='form-group'>
-          <div class='input-group'>
-              <span class='input-group-btn' style='padding-right: 2px;'>
-                <span class='btn btn-default btn-file'>
-                  Select CSV file...
-                  <input type='file' id='files' accept='.csv' required />
-                </span>
-              </span>
-            <input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>
+    <div style='width: 100%;'>
+    <div class='row'>
+      <div class='col-md-12'>
+              <div class='panel panel-primary'>
+                  <div class='panel-heading'>
+                      <h3 class='panel-title'>Choose between</h3>
+                      <span class='pull-right'>
+                          <ul class='nav panel-tabs'>
+                              <li class='active'><a href='#tab1' data-toggle='tab'><i class='fa fa-link'></i> URL</a></li>
+                              <li><a href='#tab2' data-toggle='tab'><i class='fa fa-file-excel-o'></i> File</a></li>
+                              <li><a href='#tab3' data-toggle='tab'><i class='fa fa-download'></i> Sample Data</a></li>
+                          </ul>
+                      </span>
+                  </div>
+                  <div class='panel-body'>
+                      <div class='tab-content'>
+                          <div class='tab-pane active' id='tab1'>
+                            <label for='fileByUrl'>Paste your URL (needs to be .csv):</label>
+                            <input type='text' class='form-control' id='fileByUrl'>
+                          </div>
+                          <div class='tab-pane' id='tab2'>
+                            <label for='filename'>Upload your FILE (needs to be .csv):</label>
+                            <div class='input-group'>
+                              <span class='input-group-btn' style='padding-right: 2px;'>
+                              <span class='btn btn-default btn-file'>
+                                Select CSV file...
+                                <input type='file' id='files' accept='.csv' required />
+                              </span>
+                              </span>
+                              <input readonly='readonly' placeholder='CSV file' 
+                                class='form-control' id='filename' type='text' />
+                            </div>
+                          </div>
+                          <div class='tab-pane' id='tab3'>${DOWNLOAD_DIALOG}</div>
+                  </div>
+              </div>
           </div>
-        </div>
-        <div class='form-group' style='margin-top: 40px;'>
-          <button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>
-          <button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>
-            <i class='fa fa-download'></i> Sample Files</button>
-        </div>
-      </form>`
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-12'>
+          <button type='submit' id='submitFile' class='btn btn-primary btn-lg pull-right'>Load & Show</button>
+          <button type='button' id='showMoreBtn' class='btn btn-info pull-right'>View Data</button>
+      </div>
+    </div>
+    `
     );
 
     // Add the display conatiner and the logs
@@ -284,7 +301,8 @@ class DataImport implements MAppViews {
     });
 
     d3.selectAll('a').on('click', (e) => {
-      e.preventDefault();
+      const evt = <MouseEvent>d3.event;
+      evt.preventDefault();
       console.log('testaaaaaaa');
     });
 
@@ -583,3 +601,35 @@ class DataImport implements MAppViews {
 export function create(parent: Element, options: any) {
   return new DataImport(parent, options);
 }
+
+
+/** REMOVE LATER
+
+      <!--<form class='well' style='padding-bottom: 0 !important;'>-->
+        <!--<div class='form-group'>-->
+              <!--<label for='fileByUrl'>Paste your URL (needs to be .csv):</label>-->
+              <!--<input type='text' class='form-control' id='fileByUrl'>-->
+        <!--</div>-->
+        <!--<div class='form-group'>-->
+          <!--<div class='hr-sect'>OR</div>-->
+        <!--</div>-->
+        <!--<div class='form-group'>-->
+          <!--<div class='input-group'>-->
+              <!--<span class='input-group-btn' style='padding-right: 2px;'>-->
+                <!--<span class='btn btn-default btn-file'>-->
+                  <!--Select CSV file...-->
+                  <!--<input type='file' id='files' accept='.csv' required />-->
+                <!--</span>-->
+              <!--</span>-->
+            <!--<input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>-->
+          <!--</div>-->
+        <!--</div>-->
+        <!--<div class='form-group' style='margin-top: 40px;'>-->
+          <!--<button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>-->
+          <!--<button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>-->
+          <!--<button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>-->
+            <!--<i class='fa fa-download'></i> Sample Files</button>-->
+        <!--</div>-->
+      <!--</form>-->
+
+ **/
