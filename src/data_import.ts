@@ -302,7 +302,7 @@ class DataImport implements MAppViews {
       evt.stopPropagation();
     });
 
-    d3.selectAll('a').on('click', (e) => {
+    d3.select('.nav panel-tab').selectAll('a').on('click', (e) => {
       const evt = <MouseEvent>d3.event;
       evt.preventDefault();
       console.log('testaaaaaaa');
