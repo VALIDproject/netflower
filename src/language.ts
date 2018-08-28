@@ -49,6 +49,10 @@ export const NO_TIME_POINTS = `<span class='label label-warning' style='font-wei
 You have no time points selected! <br/> In order to prevent the application from showing nothing or unwanted results,
 the last defined time points were choosen.`;
 
+export const EXPORT_WARN = `<span class='label label-warning' style='font-weight: normal;'>Warning</span>
+Something went wrong, we can't find data! <br/> Reduce the amount of filters, reload the page or change your settings
+and try to export your data again.`;
+
 export const EXPORT_INFO = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span>
 You are going to download a file with the name: <strong>flows</strong> and the current time stamp which contains the exported flow data of the current
 view. Proceed with OK if you want to download the file.`;

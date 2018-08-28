@@ -5,10 +5,12 @@
 import * as events from 'phovea_core/src/event';
 import * as bootbox from 'bootbox';
 import * as d3 from 'd3';
+import * as papaparse from 'papaparse';
+import * as localforage from 'localforage';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
 import {downloadFile, randomString, initDefaultColumnLabels} from './utilities';
-import {EXPORT_INFO, EXPORT_INFO2} from './language';
+import {EXPORT_WARN, EXPORT_INFO, EXPORT_INFO2} from './language';
 import SimpleLogging from './simpleLogging';
 import EntityTagFilter from './filters/entityTagFilter';
 import MediaTagFilter from './filters/mediaTagFilter';
@@ -58,6 +60,14 @@ export default class Export implements MAppViews {
 
       if (this.exportAll) {
         console.log('we export all');
+        let fileName = localStorage.getItem('fileName');
+        if (fileName === '' || fileName === null) {
+          fileName = 'No File Name.csv';
+        }
+        localforage.getItem('data').then((value) => {
+          let olddata = value;
+          this.exportCSVFile(olddata, fileName.slice(0, -4));
+        });
       } else {
         // Column headers (based on input metadata if available)
         let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
@@ -102,7 +112,11 @@ export default class Export implements MAppViews {
       const dataAsStr = d3.csv.format(dataAsArray);
       const filename = 'flows ' + new Date().toLocaleString() + '.csv';
       if (dataAsArray.length === 1) {
-        bootbox.alert('No flows are visible.');
+        bootbox.alert({
+          className: 'dialogBox',
+          title: 'Warning',
+          message: EXPORT_WARN
+        });
       } else {
         bootbox.confirm({
           className: 'dialogBox',
@@ -118,6 +132,58 @@ export default class Export implements MAppViews {
         });
       }
     });
+  }
+
+  /**
+   * This method is a utility that transforms a converted json into a comma seperated string that can
+   * be saved as csv file then.
+   * @param objArray object to be delimited
+   * @returns {string} of the delimited object
+   */
+  private convertToCSV(objArray): string {
+    let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    let str = '';
+    for (let i = 0; i < array.length; i++) {
+      let line = '';
+      for (const index in array[i]) {
+        if (line != '') {
+          line += ';';
+        }
+        line += array[i][index];
+      }
+      str += line + '\r\n';
+    }
+    return str;
+  }
+
+  /**
+   * This method is used in order to save the data we have in the local storage as .csv file. The data
+   * is taken from the local storage and saved in the csv format.
+   * @param items to be saved
+   * @param fileTitle of the file
+   */
+  private exportCSVFile(items, fileTitle?) {
+    // Convert Object to JSON
+    const jsonObject = JSON.stringify(items);
+    const csv = this.convertToCSV(jsonObject);
+    const exportedFilenmae = fileTitle + '.csv' || 'Exported_Data.csv';
+
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    if (navigator.msSaveBlob) { // IE 10+
+      navigator.msSaveBlob(blob, exportedFilenmae);
+    } else {
+      var link = document.createElement('a');
+      if (link.download !== undefined) { // feature detection
+        // Browsers that support HTML5 download attribute
+        var url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', exportedFilenmae);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
   }
 
   /**
