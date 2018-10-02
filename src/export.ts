@@ -17,7 +17,6 @@ import MediaTagFilter from './filters/mediaTagFilter';
 
 export default class Export implements MAppViews {
 
-  private $node: d3.Selection<any>;
   private parentDOM: string;
   private btnExportFlowData: d3.Selection<any>;
   private checkBoxExport: d3.Selection<any>;
@@ -38,7 +37,6 @@ export default class Export implements MAppViews {
   init(): Promise<MAppViews> {
     this.btnExportFlowData = d3.select('#exportData');
     this.checkBoxExport = d3.select('#exportCheckbox');
-    // this.$node = this.btnExportFlowData;
 
     this.attachListener();
 
@@ -53,8 +51,6 @@ export default class Export implements MAppViews {
     // Retrieve the log file
     this.btnExportFlowData.on('click', (d) => {
       SimpleLogging.log('export flows clicked', '');
-
-      // Column headers (based on input metadata if available)
       let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
       if (columnLabels == null) {
         columnLabels = initDefaultColumnLabels(columnLabels);
@@ -68,11 +64,20 @@ export default class Export implements MAppViews {
         if (fileName === '' || fileName === null) {
           fileName = 'No File Name.csv';
         }
-        localforage.getItem('data').then((value) => {
-          let savedData = value;
-          (savedData as Array<Object>).unshift(columnLabels);
-          this.exportCSVFile(savedData, fileName.slice(0, -4));
+        // Store the tags to appropriate objects
+        let newStorageData = Export.currentData.map((val) => {
+          const sourceHash = Export.entityTagFilterRef
+            .getTagsByName(Export.currentData, val.sourceNode).values().join('|');
+          const targetHash = Export.mediaTagFilterRef
+            .getTagsByName(Export.currentData, val.targetNode).values().join('|');
+          return {
+            sourceNode: val.sourceNode, targetNode: val.targetNode, timeNode: val.timeNode,
+            valueNode: val.valueNode, sourceTag: sourceHash, targetTage: targetHash,
+            attribute1: val.attribute1, attribute2: val.attribute2
+          }
         });
+        (newStorageData as Array<Object>).unshift(columnLabels);
+        this.exportCSVFile(newStorageData, fileName.slice(0, -4));
       } else {
         let dataAsArray = [[]];
         dataAsArray = [[columnLabels.sourceNode, columnLabels.sourceTag,
@@ -105,32 +110,31 @@ export default class Export implements MAppViews {
         // Add the meta data as the first line of the csv
         dataAsArray.unshift(['Timerange: ' + currentTime.join('|'),
           'Attribute: ' + currentAttrs.join('|')]);
-      }
 
-      // console.log('data: ', dataAsArray);
-      // // CSV export using D3.js
-      // const dataAsStr = d3.csv.format(dataAsArray);
-      // const filename = 'flows ' + new Date().toLocaleString() + '.csv';
-      // if (dataAsArray.length === 1) {
-      //   bootbox.alert({
-      //     className: 'dialogBox',
-      //     title: 'Warning',
-      //     message: EXPORT_WARN
-      //   });
-      // } else {
-      //   bootbox.confirm({
-      //     className: 'dialogBox',
-      //     title: 'Information',
-      //     message: EXPORT_INFO,
-      //     callback(result) {
-      //       if (result) {
-      //         downloadFile(dataAsStr, filename, 'text/csv');
-      //       } else {
-      //         return;
-      //       }
-      //     }
-      //   });
-      // }
+        // CSV export using D3.js
+        const dataAsStr = d3.csv.format(dataAsArray);
+        const filename = 'flows_' + new Date().toLocaleString() + '.csv';
+        if (dataAsArray.length === 1) {
+          bootbox.alert({
+            className: 'dialogBox',
+            title: 'Warning',
+            message: EXPORT_WARN
+          });
+        } else {
+          bootbox.confirm({
+            className: 'dialogBox',
+            title: 'Information',
+            message: EXPORT_INFO,
+            callback(result) {
+              if (result) {
+                downloadFile(dataAsStr, filename, 'text/csv');
+              } else {
+                return;
+              }
+            }
+          });
+        }
+      }
     });
   }
 
