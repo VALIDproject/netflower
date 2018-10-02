@@ -53,30 +53,30 @@ export default class Export implements MAppViews {
     // Retrieve the log file
     this.btnExportFlowData.on('click', (d) => {
       SimpleLogging.log('export flows clicked', '');
-      let dataAsArray = [[]];
+
+      // Column headers (based on input metadata if available)
+      let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
+      if (columnLabels == null) {
+        columnLabels = initDefaultColumnLabels(columnLabels);
+      }
 
       // Check if we should save whole data or only the small sample before we proceed
       this.exportAll = !this.checkBoxExport.property('checked') ? true : false;
 
       if (this.exportAll) {
-        console.log('we export all');
         let fileName = localStorage.getItem('fileName');
         if (fileName === '' || fileName === null) {
           fileName = 'No File Name.csv';
         }
         localforage.getItem('data').then((value) => {
-          let olddata = value;
-          this.exportCSVFile(olddata, fileName.slice(0, -4));
+          let savedData = value;
+          (savedData as Array<Object>).unshift(columnLabels);
+          this.exportCSVFile(savedData, fileName.slice(0, -4));
         });
       } else {
-        // Column headers (based on input metadata if available)
-        let columnLabels: any = JSON.parse(localStorage.getItem('columnLabels'));
-        if (columnLabels == null) {
-          columnLabels = initDefaultColumnLabels(columnLabels);
-        }
+        let dataAsArray = [[]];
         dataAsArray = [[columnLabels.sourceNode, columnLabels.sourceTag,
           columnLabels.targetNode, columnLabels.targetTag, columnLabels.valueNode]];
-
         // Flows extracted from data properties of the sankey links
         d3.selectAll('#sankeyDiagram path.link').each((d, i) => {
           const sourceHash = Export.entityTagFilterRef
@@ -107,30 +107,30 @@ export default class Export implements MAppViews {
           'Attribute: ' + currentAttrs.join('|')]);
       }
 
-      console.log('data: ', dataAsArray);
-      // CSV export using D3.js
-      const dataAsStr = d3.csv.format(dataAsArray);
-      const filename = 'flows ' + new Date().toLocaleString() + '.csv';
-      if (dataAsArray.length === 1) {
-        bootbox.alert({
-          className: 'dialogBox',
-          title: 'Warning',
-          message: EXPORT_WARN
-        });
-      } else {
-        bootbox.confirm({
-          className: 'dialogBox',
-          title: 'Information',
-          message: EXPORT_INFO,
-          callback(result) {
-            if (result) {
-              downloadFile(dataAsStr, filename, 'text/csv');
-            } else {
-              return;
-            }
-          }
-        });
-      }
+      // console.log('data: ', dataAsArray);
+      // // CSV export using D3.js
+      // const dataAsStr = d3.csv.format(dataAsArray);
+      // const filename = 'flows ' + new Date().toLocaleString() + '.csv';
+      // if (dataAsArray.length === 1) {
+      //   bootbox.alert({
+      //     className: 'dialogBox',
+      //     title: 'Warning',
+      //     message: EXPORT_WARN
+      //   });
+      // } else {
+      //   bootbox.confirm({
+      //     className: 'dialogBox',
+      //     title: 'Information',
+      //     message: EXPORT_INFO,
+      //     callback(result) {
+      //       if (result) {
+      //         downloadFile(dataAsStr, filename, 'text/csv');
+      //       } else {
+      //         return;
+      //       }
+      //     }
+      //   });
+      // }
     });
   }
 
