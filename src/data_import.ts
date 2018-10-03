@@ -12,8 +12,10 @@ import * as alertify from 'alertify.js';
 import {textTransition} from './utilities';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
-import {IMPORT_FEATURES, IMPORT_DISCLAIMER,
-  USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG} from './language';
+import {
+  IMPORT_FEATURES, IMPORT_DISCLAIMER,
+  USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG
+} from './language';
 import SimpleLogging from './simpleLogging';
 import time = d3.time;
 
@@ -34,6 +36,7 @@ class DataImport implements MAppViews {
   private editMode: boolean;
 
   private uploadedFileName: string;
+  private currentTab: string = 'URL';
   private rowsToShow: number = 10;
   private trLength: number;
 
@@ -186,6 +189,10 @@ class DataImport implements MAppViews {
    * Attach the event listeners
    */
   private attachListener() {
+    $('a[data-toggle="tab"]').on('show.bs.tab', (e) => {
+      this.currentTab = $(e.target).text().trim();
+    });
+
     // Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {
@@ -208,28 +215,28 @@ class DataImport implements MAppViews {
         const urlInput = $('#fileByUrl').val();
         const filesInput = <HTMLInputElement>d3.select('#files').node();
 
-        if (urlInput !== '' && filesInput.files[0] !== undefined) {       // A: Take file over url
-          this.handleFileUpload(filesInput);
-          // console.log('We have url but also file --> so we take file');
-        } else if (urlInput !== '') {                                     // B: Just a url
-          if (urlInput.substr(-4) === '.csv') {   // Check for a .csv
-            this.handleFileUrl(urlInput);
-            // console.log('We have only a url where we load from --> so we take url');
+        if (this.currentTab === 'URL') {
+          if (urlInput !== '') {
+            if (urlInput.substr(-4) === '.csv') {   // Check for a .csv
+              this.handleFileUrl(urlInput);
+            } else {
+              const msg = 'Only files with a .csv ending can be loaded by url!';
+              alertify.closeLogOnClick(true).delay(0).error(msg);
+            }
           } else {
-            const msg = 'Only files with a .csv ending can be loaded by url!';
+            const msg = 'Please provide a URL!';
             alertify.closeLogOnClick(true).delay(0).error(msg);
-          }
-        } else {                                                          // C: Just a file
-          if (filesInput.files[0] === undefined) {
-            const msg = 'Please select a file or paste a url in order to proceed!';
-            alertify.closeLogOnClick(true).delay(0).error(msg);
-          } else {
-            // Start the uploading
-            this.handleFileUpload(filesInput);
-            // console.log('We have only afile --> we take file then');
           }
         }
 
+        if (this.currentTab === 'File') {
+          if (filesInput.files[0] !== undefined) {
+            this.handleFileUpload(filesInput);
+          } else {
+            const msg = 'Please select a file order to proceed!';
+            alertify.closeLogOnClick(true).delay(0).error(msg);
+          }
+        }
         // Necessary in order to prevent the reload of the page.
         const evt = <MouseEvent>d3.event;
         evt.preventDefault();
@@ -607,31 +614,31 @@ export function create(parent: Element, options: any) {
 
 /** REMOVE LATER
 
-      <!--<form class='well' style='padding-bottom: 0 !important;'>-->
-        <!--<div class='form-group'>-->
-              <!--<label for='fileByUrl'>Paste your URL (needs to be .csv):</label>-->
-              <!--<input type='text' class='form-control' id='fileByUrl'>-->
-        <!--</div>-->
-        <!--<div class='form-group'>-->
-          <!--<div class='hr-sect'>OR</div>-->
-        <!--</div>-->
-        <!--<div class='form-group'>-->
-          <!--<div class='input-group'>-->
-              <!--<span class='input-group-btn' style='padding-right: 2px;'>-->
-                <!--<span class='btn btn-default btn-file'>-->
-                  <!--Select CSV file...-->
-                  <!--<input type='file' id='files' accept='.csv' required />-->
-                <!--</span>-->
-              <!--</span>-->
-            <!--<input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>-->
-          <!--</div>-->
-        <!--</div>-->
-        <!--<div class='form-group' style='margin-top: 40px;'>-->
-          <!--<button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>-->
-          <!--<button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>-->
-          <!--<button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>-->
-            <!--<i class='fa fa-download'></i> Sample Files</button>-->
-        <!--</div>-->
-      <!--</form>-->
+ <!--<form class='well' style='padding-bottom: 0 !important;'>-->
+ <!--<div class='form-group'>-->
+ <!--<label for='fileByUrl'>Paste your URL (needs to be .csv):</label>-->
+ <!--<input type='text' class='form-control' id='fileByUrl'>-->
+ <!--</div>-->
+ <!--<div class='form-group'>-->
+ <!--<div class='hr-sect'>OR</div>-->
+ <!--</div>-->
+ <!--<div class='form-group'>-->
+ <!--<div class='input-group'>-->
+ <!--<span class='input-group-btn' style='padding-right: 2px;'>-->
+ <!--<span class='btn btn-default btn-file'>-->
+ <!--Select CSV file...-->
+ <!--<input type='file' id='files' accept='.csv' required />-->
+ <!--</span>-->
+ <!--</span>-->
+ <!--<input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>-->
+ <!--</div>-->
+ <!--</div>-->
+ <!--<div class='form-group' style='margin-top: 40px;'>-->
+ <!--<button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>-->
+ <!--<button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>-->
+ <!--<button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>-->
+ <!--<i class='fa fa-download'></i> Sample Files</button>-->
+ <!--</div>-->
+ <!--</form>-->
 
  **/
