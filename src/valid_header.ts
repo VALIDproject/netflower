@@ -59,16 +59,16 @@ class ValidHeader implements MAppViews {
       <div id='timeInfoHeader'></div>
     </div>
         <div id='socialMedia'>
-        <p><a href='imprint.html' 
-          target='blank' title='Legal Disclosure'><i class='fa fa-info fa-2x web'></i></a></p>
-        <p><a href='help.html' 
-          target='blank' title='Help Site'><i class='fa fa-question fa-2x web'></i></a></p>
+        <!--<p><a href='imprint.html' -->
+          <!--target='blank' title='Legal Disclosure'><i class='fa fa-info fa-2x web'></i></a></p>-->
         <p><a href='https://twitter.com/valid_at' 
           target='blank' title='Twitter'><i class='fa fa-twitter-square fa-2x web'></i></a> </p>
         <p><a href='https://github.com/VALIDproject' 
           target='blank' title='Github Code'> <i class='fa fa-github fa-2x web'></i></a> </p>
         <p><a href='http://www.validproject.at/' 
           target='blank' title='Project Website'><i class='fa fa-globe fa-2x web'></i></a></p>
+        <p><a href='index.html' 
+          target='blank' title='Home'><i class='fa fa-home fa-2x web'></i></a></p>
     </div>
     <div class='valid_logo'></div>
     `);
