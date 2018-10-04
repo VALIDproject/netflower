@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>VALiD netflower</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link href="//fonts.googleapis.com/css?family=Yantramanav:500,400,300" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet" type="text/css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <link href="./style.css"rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div id="app">
+    <h3 style="margin: 5px;"></h3>
+    <div class="busy">This is only showing when the application is busy. Leave it empty if nothing should show.</div>
+</div>
+
+<script>
+  (function() {
+    var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    if (!isChrome) {
+      alert('This application was designed to be used in Google Chrome.\nRunning the application in other browsers might result in performance issues or other misbehavior.');
+    }
+  })();
+</script>
+<script src="./common.js"></script>
+<script src="./app.js" data-phovea-offline="true"></script>
+
+</body>
+</html>
