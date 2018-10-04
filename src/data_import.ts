@@ -95,7 +95,6 @@ class DataImport implements MAppViews {
                               <li class='active'><a href='#tab1' data-toggle='tab'><i class='fa fa-link'></i> URL</a></li>
                               <li><a href='#tab2' data-toggle='tab'><i class='fa fa-file-excel-o'></i> File</a></li>
                               <li><a href='#tab3' data-toggle='tab'><i class='fa fa-download'></i> Sample Data</a></li>
-                              <li><a href='#tab4' data-toggle='tab'><i class='fa fa-image'></i> Showcase</a></li>
                           </ul>
                       </span>
                   </div>
@@ -119,7 +118,6 @@ class DataImport implements MAppViews {
                             </div>
                           </div>
                           <div class='tab-pane' id='tab3'>${DOWNLOAD_DIALOG}</div>
-                          <div class='tab-pane' id='tab4'><div class='imageShowcasePanel'></div></div>
                   </div>
               </div>
           </div>

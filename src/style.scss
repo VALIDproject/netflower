@@ -259,15 +259,3 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
-// Special style for image loading in tab
-.imageShowcasePanel {
-  background-image: url('./media/showcaseVis.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center center;
-  height: auto;
-  min-height: 400px;
-  max-width: 100%;
-  margin: .5%;
-}
