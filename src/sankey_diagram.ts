@@ -23,6 +23,7 @@ import {
   setEntityTagFilter, setMediaTagFilter
 } from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER, NOTAGS_INFO} from './language';
+import { setTagFilterRefs } from './export';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -351,6 +352,9 @@ class SankeyDiagram implements MAppViews {
       // Filter the data before and then pass it to the draw function.
       const filteredData = this.pipeline.performFilters(value);
 
+      // Set the refs for the tag filters in order to use it in the export
+      setTagFilterRefs(this.entityTagFilter, this.mediaTagFilter, originalData);
+
       // console.log('----------- Original Data -----------');
       // console.log(originalData);
       // console.log('----------- Filtered Data -----------');
@@ -409,7 +413,6 @@ class SankeyDiagram implements MAppViews {
         } else {
           return d.sourceNode + '|$|' + d.targetNode;
         }
-
       })
       .rollup(function (v: any[]) { // construct object
         return {
@@ -417,7 +420,8 @@ class SankeyDiagram implements MAppViews {
           target: ((that.pipeline.getTagFlowFilterStatus()) ? v[0].targetTag : v[0].targetNode),
           value: d3.sum(v, function (d: any) {
             return d.valueNode;
-          })
+          }),
+          time: v[0].timeNode
         };
       })
       .entries(json)
@@ -437,10 +441,10 @@ class SankeyDiagram implements MAppViews {
     // console.log('changed flows to show: ', that.nodesToShow);
 
     //============ CHECK IF SHOULD DRAW ============
-    if (json.length === 0 || flatNest.length === 0) {                     //ERROR: Too strong filtered
+    if (json.length === 0 || flatNest.length === 0) {         // ERROR: Too strong filtered
       that.drawReally = false;
       this.showErrorDialog(ERROR_TOOMANYFILTER);
-    } else if(that.pipeline.getTagFlowFilterStatus()) {
+    } else if(that.pipeline.getTagFlowFilterStatus()) {       // ERROR: No Tags found
       const sumOfEntityTags = that.entityTagFilter.activeTags.size() + that.entityTagFilter.availableTags.size();
       const sumOfMediaTags = that.mediaTagFilter.activeTags.size() + that.mediaTagFilter.availableTags.size();
       if((sumOfEntityTags === 0) || (sumOfMediaTags === 0)) {

@@ -13,12 +13,14 @@ interface Flow {
   source:string;
   target:string;
   value:number;
+  time:number;
 }
 
 interface Link {
   source:number;
   target:number;
   value:number;
+  time:number;
 }
 
 interface SNode {
@@ -123,7 +125,6 @@ export default class FlowSorter implements MAppViews {
 
   public topFlows(flatNest: Flow[], valuePostFix: string): any {
     const descending: boolean = (this.orderType === ORDER_TYPES[0]);
-
     if (this.sortType === SORT_TYPES[0]) {
       return this.flowOrder(flatNest, valuePostFix, descending);
     } else if (this.sortType === SORT_TYPES[1]) {
@@ -262,7 +263,8 @@ export default class FlowSorter implements MAppViews {
       links.push({
         source: nodeNames.indexOf(d.source),
         target: nodeNames.indexOf(d.target),
-        value: d.value
+        value: d.value,
+        time: d.time
       });
     });
 

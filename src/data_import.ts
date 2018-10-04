@@ -396,17 +396,17 @@ class DataImport implements MAppViews {
       if (this.editMode) {
         const msg = `You have <strong>ERRORS</strong> in your Table. This would produce a strange behaving
                 visualization. You should check the other error messages and clean your data.`;
-        alertify.closeLogOnClick(true).delay(0).error(msg);
-        console.log('In edit mode');
-      } else {
-        console.log('Not in edit mode');
-        Promise.resolve(this.storeData()).then((res) => {
-          events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
-          d3.select('.dataLoadingView').classed('invisibleClass', true);
-          d3.select('.dataVizView').classed('invisibleClass', false);
-        });
-      }
-    }, 4000);
+            alertify.closeLogOnClick(true).delay(0).error(msg);
+            console.log('In edit mode');
+          } else {
+            console.log('Not in edit mode');
+            Promise.resolve(this.storeData()).then((res) => {
+              events.fire(AppConstants.EVENT_DATA_PARSED, 'parsed');
+              d3.select('.dataLoadingView').classed('invisibleClass', true);
+              d3.select('.dataVizView').classed('invisibleClass', false);
+            });
+          }
+        }, 4000);
   }
 
   /**

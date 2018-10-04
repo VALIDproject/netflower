@@ -349,6 +349,7 @@ class FilterData implements MAppViews {
           200);
       } else {
         bootbox.alert({
+          title: 'Warning',
           message: NO_TIME_POINTS,
           backdrop: true,
           className: 'dialogBox',
