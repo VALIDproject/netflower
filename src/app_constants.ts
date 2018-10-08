@@ -41,13 +41,9 @@ export class AppConstants {
 
   // FILE DOWNLOADS
   static SAMPLES = [
-    { title: 'Simple Example',
-      description: 'A simple example file with only a few entries.',
-      file: 'https://dl.dropboxusercontent.com/s/k4dhuh7hnmoclzf/Simple_Data.csv?dl=0',
-      source: ''},
     { title: 'Media Transparency Data',
-      description: 'Austrian governmental organizations are legally required to report the money flow for advertisement and media sponsoring, which are collectively published as open government data on media transparency.',
-      file: 'https://dl.dropboxusercontent.com/s/34ev5sr6u3xdisq/Media_Transperency_Data.csv?dl=0',
+      description: 'Flows of advertisement and sponsoring money from Austrian government entities to media institutions, which are collectively published as open government data on media transparency. (18,000 records over 8 quarters)',
+      file: 'https://www.dropbox.com/s/rrtpndumgd8aqrt/Media_Transparency_Data_2018Q2%20tags.csv?dl=0',
       source: 'https://www.rtr.at/de/m/Medientransparenz'},
     { title: 'Asylum Data',
       description: 'The data presents information about asylum applications lodged in 38 European and 6 non-European countries. Data are broken down by month and origin.',
@@ -60,10 +56,14 @@ export class AppConstants {
     { title: 'Aid payments OECD',
       description: 'Aid payments from EU countries to developing countries in the last 10 years.',
       file: 'https://dl.dropboxusercontent.com/s/cvigz33c3g8h5be/Aid_Payments_OECD.csv?dl=0',
-      source: 'http://dx.doi.org/10.1787/data-00072-en'}
+      source: 'http://dx.doi.org/10.1787/data-00072-en'},
     // { title: '',
     //   description: '',
     //   file: '',
     //   source: ''},
+    { title: 'Simple Example',
+      description: 'A simple example file with only a few entries. Great as a template for your own data.',
+      file: 'https://dl.dropboxusercontent.com/s/k4dhuh7hnmoclzf/Simple_Data.csv?dl=0',
+      source: ''}
   ];
 }
