@@ -127,6 +127,10 @@
   padding: 5px;
 }
 
+.downloadTable tr.selected td {
+  background: $valid-color3 ;
+}
+
 #helpInfo {
   margin-top: 40px;
 }

@@ -151,14 +151,23 @@ class DataImport implements MAppViews {
     const rows = sampleTable.selectAll('tr')
       .data(AppConstants.SAMPLES)
       .enter()
-      .append('tr').html((d, i) => `
-      <td class='leftTD'><strong>${d.title}</strong><br/>
+      .append('tr')
+      .classed('selected', (d, i) => { return (i === 0); })
+      .html((d, i) => `
+      <td class='leftTD'>
+        <i class='fa fa-${i === 0 ? 'check-' : ''}circle-o'></i>
+        <strong>${d.title}</strong><br/>
         ${d.description}
         ${d.source.length > 0  ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
       </td>
       <td class='rightTD'><a href=${d.file}>Download Data (.csv)</a></td>
-      `);
-
+      `)
+      .on('click', function(d) {
+        sampleTable.selectAll('tr').classed('selected', false);
+        sampleTable.selectAll('tr i').classed('fa-check-circle-o', false).classed('fa-circle-o', true);
+        d3.select(this).classed('selected', true);
+        d3.select(this).select('i').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
+      });
 
       // <td class='leftTD'><strong>Media Transparency Data</strong><br/>
       //   Austrian governmental organizations are legally required to report the money flow for advertisement
@@ -248,9 +257,15 @@ class DataImport implements MAppViews {
         const urlInput = $('#fileByUrl').val();
         const filesInput = <HTMLInputElement>d3.select('#files').node();
 
+        if (this.currentTab === 'Sample Data') {
+          const selected = d3.select('.downloadTable tr.selected');
+          console.log(selected.datum().file);
+          this.handleFileUrl(selected.datum().file);
+        }
+
         if (this.currentTab === 'URL') {
           if (urlInput !== '') {
-            if (urlInput.substr(-4) === '.csv') {   // Check for a .csv
+            if (urlInput.substr(-4) === '.csv' || urlInput.substr(-9) === '.csv?dl=0') {   // Check for a .csv
               this.handleFileUrl(urlInput);
             } else {
               const msg = 'Only files with a .csv ending can be loaded by url!';
