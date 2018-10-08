@@ -94,7 +94,7 @@ class DataImport implements MAppViews {
                           <ul class='nav panel-tabs'>
                               <li class='active'><a href='#tab1' data-toggle='tab'><i class='fa fa-link'></i> URL</a></li>
                               <li><a href='#tab2' data-toggle='tab'><i class='fa fa-file-excel-o'></i> File</a></li>
-                              <li><a href='#tab3' data-toggle='tab'><i class='fa fa-download'></i> Sample Data</a></li>
+                              <li><a href='#tab3' data-toggle='tab'><i class='fa fa-university'></i> Sample Data</a></li>
                           </ul>
                       </span>
                   </div>
@@ -160,7 +160,7 @@ class DataImport implements MAppViews {
         ${d.description}
         ${d.source.length > 0  ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
       </td>
-      <td class='rightTD'><a href=${d.file}>Download Data (.csv)</a></td>
+      <td class='rightTD'><a href=${d.file}><i class="fa fa-download"></i> Download Data (.csv)</a></td>
       `)
       .on('click', function(d) {
         sampleTable.selectAll('tr').classed('selected', false);
@@ -168,13 +168,6 @@ class DataImport implements MAppViews {
         d3.select(this).classed('selected', true);
         d3.select(this).select('i').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
       });
-
-      // <td class='leftTD'><strong>Media Transparency Data</strong><br/>
-      //   Austrian governmental organizations are legally required to report the money flow for advertisement
-      //   and media sponsoring, which are collectively published as open government data on media transparency.
-      //   <a target='_blank' href='https://www.rtr.at/de/m/Medientransparenz'>Source</a>
-      // </td>
-      // <td class='rightTD'><a href=${AppConstants.MEDIA_FILE}>Download Data (.csv)</a></td>
 
     // Add the display container and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
@@ -258,14 +251,15 @@ class DataImport implements MAppViews {
         const filesInput = <HTMLInputElement>d3.select('#files').node();
 
         if (this.currentTab === 'Sample Data') {
-          const selected = d3.select('.downloadTable tr.selected');
-          console.log(selected.datum().file);
-          this.handleFileUrl(selected.datum().file);
+          const selectedFile = d3.select('.downloadTable tr.selected').datum().file;
+          SimpleLogging.log('import sample', selectedFile);
+          this.handleFileUrl(selectedFile);
         }
 
         if (this.currentTab === 'URL') {
           if (urlInput !== '') {
             if (urlInput.substr(-4) === '.csv' || urlInput.substr(-9) === '.csv?dl=0') {   // Check for a .csv
+              SimpleLogging.log('import url', urlInput);
               this.handleFileUrl(urlInput);
             } else {
               const msg = 'Only files with a .csv ending can be loaded by url!';
@@ -279,6 +273,7 @@ class DataImport implements MAppViews {
 
         if (this.currentTab === 'File') {
           if (filesInput.files[0] !== undefined) {
+            SimpleLogging.log('import file', filesInput.files[0]);
             this.handleFileUpload(filesInput);
           } else {
             const msg = 'Please select a file order to proceed!';
