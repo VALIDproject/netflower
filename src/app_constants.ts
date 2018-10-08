@@ -40,9 +40,30 @@ export class AppConstants {
   static SANKEY_NODE_PADDING = 20;
 
   // FILE DOWNLOADS
-  static ASYLUM_FILE = 'https://dl.dropboxusercontent.com/s/cr3iu0adtb77de6/Asylum_Seekers_Data.csv?dl=0';
-  static FARM_FILE = 'https://dl.dropboxusercontent.com/s/zunih3hkcooh1gm/Farm_Subsidies_Data.csv?dl=0';
-  static MEDIA_FILE = 'https://dl.dropboxusercontent.com/s/34ev5sr6u3xdisq/Media_Transperency_Data.csv?dl=0';
-  static FILE4 = 'https://dl.dropboxusercontent.com/s/k4dhuh7hnmoclzf/Simple_Data.csv?dl=0';
-  static OECD_FILE = 'https://dl.dropboxusercontent.com/s/cvigz33c3g8h5be/Aid_Payments_OECD.csv?dl=0';
+  static SAMPLES = [
+    { title: 'Simple Example',
+      description: 'A simple example file with only a few entries.',
+      file: 'https://dl.dropboxusercontent.com/s/k4dhuh7hnmoclzf/Simple_Data.csv?dl=0',
+      source: ''},
+    { title: 'Media Transparency Data',
+      description: 'Austrian governmental organizations are legally required to report the money flow for advertisement and media sponsoring, which are collectively published as open government data on media transparency.',
+      file: 'https://dl.dropboxusercontent.com/s/34ev5sr6u3xdisq/Media_Transperency_Data.csv?dl=0',
+      source: 'https://www.rtr.at/de/m/Medientransparenz'},
+    { title: 'Asylum Data',
+      description: 'The data presents information about asylum applications lodged in 38 European and 6 non-European countries. Data are broken down by month and origin.',
+      file: 'https://dl.dropboxusercontent.com/s/cr3iu0adtb77de6/Asylum_Seekers_Data.csv?dl=0',
+      source: 'http://popstats.unhcr.org/en/overview'},
+    { title: 'Farm subsidies data',
+      description: 'The data includes farm subsidy payments made in Austria as published directly by the government of Austria or sourced via freedom of information requests.',
+      file: 'https://dl.dropboxusercontent.com/s/zunih3hkcooh1gm/Farm_Subsidies_Data.csv?dl=0',
+      source: 'https://www.ama.at/Fachliche-Informationen/Transparenzdatenbank'},
+    { title: 'Aid payments OECD',
+      description: 'Aid payments from EU countries to developing countries in the last 10 years.',
+      file: 'https://dl.dropboxusercontent.com/s/cvigz33c3g8h5be/Aid_Payments_OECD.csv?dl=0',
+      source: 'http://dx.doi.org/10.1787/data-00072-en'}
+    // { title: '',
+    //   description: '',
+    //   file: '',
+    //   source: ''},
+  ];
 }

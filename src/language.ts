@@ -9,12 +9,12 @@ import {AppConstants} from './app_constants';
 export const APP_NAME = 'Valid';
 export const HELLO_WORLD = 'Hello World this is VALID... or will be...';
 
-export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data. 
-The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data 
+export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data.
+The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data
 based on your explorations state.`;
 
-export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you upload will only be stored locally on your computer. 
-When you close the browser, the data is retained. When the computer is restarted or you upload new data, 
+export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you upload will only be stored locally on your computer.
+When you close the browser, the data is retained. When the computer is restarted or you upload new data,
 the data and exploration steps are lost.`;
 
 export const ERROR_TOOMANYNODES = `Your current <font color='#DA5A6B'><strong>FILTER</strong></font>
@@ -42,7 +42,7 @@ Be sure you don't lose anything important or save your progress before you proce
  you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
  to change the visualization.`;*/
 
-export const TIME_INFO = `Select here the time range of the visualization.<br/> 
+export const TIME_INFO = `Select here the time range of the visualization.<br/>
 1) Click & Drag mouse for rectangle selection.<br/>
 2) Click one elment to make a single selection.<br/>
 3) CTRL + Click to make a multi selection.`;
@@ -65,53 +65,9 @@ export const EXPORT_INFO = `<span class='label label-info' style='font-weight: n
 You are going to download a file with the name: <strong>flows</strong> and the current time stamp which contains the exported flow data of the current
 view. Proceed with OK if you want to download the file.`;
 
-export const EXPORT_INFO2 = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span> 
+export const EXPORT_INFO2 = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span>
 You are going to download a file with the name: <strong>timeseries</strong> and the current time stamp which contains the exported data of the current
 view. Proceed with OK if you want to download the file.`;
 
 export const DOWNLOAD_INFO = `The <strong>button</strong> below let's you download a sample dataset for the application.
 It contains numerous media transperency data rows who are already in the right format and with meaningful headings.`;
-
-export const DOWNLOAD_DIALOG = `You can download the following sample files by klicking on their name:
-<br/>
-<table class='downloadTable'>
-	<tbody>
-	<tr>
-		<td class='leftTD'><strong>Simple Example</strong><br/>
-        A simple example file with only a few entries.
-    </td>
-		<td class='rightTD'><a href=${AppConstants.FILE4} download=''>Download Data (.csv)</a></td>
-	</tr>
-	<tr>
-	  <td class='leftTD'><strong>Media Transparency Data</strong><br/>
-      Austrian governmental organizations are legally required to report the money flow for advertisement
-      and media sponsoring, which are collectively published as open government data on media transparency.
-      <a target='_blank' href='https://www.rtr.at/de/m/Medientransparenz'>Source</a>
-    </td>
-		<td class='rightTD'><a href=${AppConstants.MEDIA_FILE}>Download Data (.csv)</a></td>
-	</tr>
-	<tr>
-		<td class='leftTD'><strong>Asylum Data</strong><br/>
-        The data presents information about asylum applications lodged in 38 European and 6 non-European
-        countries. Data are broken down by month and origin.
-        <a target='_blank' href='http://popstats.unhcr.org/en/overview'>Source</a>
-    </td>
-		<td class='rightTD'><a href=${AppConstants.ASYLUM_FILE}>Download Data (.csv)</a></td>
-	</tr>
-	<tr>
-		<td class='leftTD'><strong>Farm subsidies data</strong><br/>
-       The data includes farm subsidy payments made in Austria as published directly by the government
-       of Austria or sourced via freedom of information requests.
-       <a target='_blank' href='https://www.ama.at/Fachliche-Informationen/Transparenzdatenbank'>Source</a>
-    </td>
-		<td class='rightTD'><a href=${AppConstants.FARM_FILE}>Download Data (.csv)</a></td>
-	</tr>
-	<tr>
-		<td class='leftTD'><strong>Aid payments OECD</strong><br/>
-       Aid payments from EU countries to developing countries in the last 10 years.
-       <a target='_blank' href='http://dx.doi.org/10.1787/data-00072-en'>Source</a>
-    </td>
-		<td class='rightTD'><a href=${AppConstants.OECD_FILE}>Download Data (.csv)</a></td>
-	</tr>
-	</tbody>
-</table>`;

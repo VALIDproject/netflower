@@ -14,7 +14,7 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {
   IMPORT_FEATURES, IMPORT_DISCLAIMER,
-  USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG
+  USAGE_INFO, DOWNLOAD_INFO
 } from './language';
 import SimpleLogging from './simpleLogging';
 import time = d3.time;
@@ -81,7 +81,7 @@ class DataImport implements MAppViews {
     <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
     <div class='informationBoxes'>
       <div class='netflowerFeature'>${IMPORT_FEATURES}</div>
-      <div class='disclaimer'>${IMPORT_DISCLAIMER}</div> 
+      <div class='disclaimer'>${IMPORT_DISCLAIMER}</div>
     </div>
     <h3 id='informationText'>Load your data here:</h3>
     <div style='width: 100%;'>
@@ -113,11 +113,11 @@ class DataImport implements MAppViews {
                                 <input type='file' id='files' accept='.csv' required />
                               </span>
                               </span>
-                              <input readonly='readonly' placeholder='CSV file' 
+                              <input readonly='readonly' placeholder='CSV file'
                                 class='form-control' id='filename' type='text' />
                             </div>
                           </div>
-                          <div class='tab-pane' id='tab3'>${DOWNLOAD_DIALOG}</div>
+                          <div class='tab-pane' id='tab3'></div>
                   </div>
               </div>
           </div>
@@ -132,7 +132,42 @@ class DataImport implements MAppViews {
     `
     );
 
-    // Add the display conatiner and the logs
+    const sampleTable = this.$fileContainer.select('div#tab3')
+      .append('table').classed('downloadTable', true)
+      .append('tbody');
+    // AppConstants.SAMPLES.forEach((d, i) => {
+    //   const row = sampleTable.append('tr');
+    //   row.html(`
+    //   <td class='leftTD'><strong>${d.title}</strong><br/>
+    //     ${d.description}
+    //     <a target='_blank' href='${d.source}'>Source</a>
+    //   </td>
+    //   <td class='rightTD'><a href=${d.file}>Download Data (.csv)</a></td>
+    //   `);
+    //   console.log(d.title);
+    // });
+
+    // fill sample table using D3.js
+    const rows = sampleTable.selectAll('tr')
+      .data(AppConstants.SAMPLES)
+      .enter()
+      .append('tr').html((d, i) => `
+      <td class='leftTD'><strong>${d.title}</strong><br/>
+        ${d.description}
+        ${d.source.length > 0  && `<a target='_blank' href='${d.source}'>Source</a>`}
+      </td>
+      <td class='rightTD'><a href=${d.file}>Download Data (.csv)</a></td>
+      `);
+
+
+      // <td class='leftTD'><strong>Media Transparency Data</strong><br/>
+      //   Austrian governmental organizations are legally required to report the money flow for advertisement
+      //   and media sponsoring, which are collectively published as open government data on media transparency.
+      //   <a target='_blank' href='https://www.rtr.at/de/m/Medientransparenz'>Source</a>
+      // </td>
+      // <td class='rightTD'><a href=${AppConstants.MEDIA_FILE}>Download Data (.csv)</a></td>
+
+    // Add the display container and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
     this.$displayContainer = d3.select('.additionalInfo').html(`
         <div class='row'>
@@ -167,7 +202,7 @@ class DataImport implements MAppViews {
           <td>Assign the value column name here. Best to uses is a currency sign.</td>
           <td>Assign the tag name referring to the source nodes.</td>
           <td>Assign the tag name referring to the target nodes.</td>
-          <td>Add attributes here (one attriubte per column).</td>          
+          <td>Add attributes here (one attriubte per column).</td>
         </tr>
         </tbody>
       </table>
@@ -299,7 +334,9 @@ class DataImport implements MAppViews {
     this.$node.select('#sampleFile').on('click', (e) => {
       bootbox.alert({
         title: 'Sample Files',
-        message: `${DOWNLOAD_DIALOG}`,
+        // TODO XXX not sure if this is still called; and why
+        message: `Hello World`,
+        // message: `${DOWNLOAD_DIALOG}`,
         className: 'alternateBootboxDialog'
       });
       const evt = <MouseEvent>d3.event;
