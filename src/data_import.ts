@@ -154,7 +154,7 @@ class DataImport implements MAppViews {
       .append('tr').html((d, i) => `
       <td class='leftTD'><strong>${d.title}</strong><br/>
         ${d.description}
-        ${d.source.length > 0  && `<a target='_blank' href='${d.source}'>Source</a>`}
+        ${d.source.length > 0  ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
       </td>
       <td class='rightTD'><a href=${d.file}>Download Data (.csv)</a></td>
       `);
@@ -329,20 +329,6 @@ class DataImport implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
-
-    // Listener for the download file button
-    this.$node.select('#sampleFile').on('click', (e) => {
-      bootbox.alert({
-        title: 'Sample Files',
-        // TODO XXX not sure if this is still called; and why
-        message: `Hello World`,
-        // message: `${DOWNLOAD_DIALOG}`,
-        className: 'alternateBootboxDialog'
-      });
-      const evt = <MouseEvent>d3.event;
-      evt.preventDefault();
-      evt.stopPropagation();
-    });
 
     d3.select('.nav panel-tab').selectAll('a').on('click', (e) => {
       const evt = <MouseEvent>d3.event;
