@@ -155,7 +155,7 @@ class DataImport implements MAppViews {
       .classed('selected', (d, i) => { return (i === 0); })
       .html((d, i) => `
       <td class='leftTD'>
-        <i class='fa fa-${i === 0 ? 'check-' : ''}circle-o'></i>
+        <i class='radio fa fa-${i === 0 ? 'check-' : ''}circle-o'></i>
         <strong>${d.title}</strong><br/>
         ${d.description}
         ${d.source.length > 0  ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
@@ -164,9 +164,9 @@ class DataImport implements MAppViews {
       `)
       .on('click', function(d) {
         sampleTable.selectAll('tr').classed('selected', false);
-        sampleTable.selectAll('tr i').classed('fa-check-circle-o', false).classed('fa-circle-o', true);
+        sampleTable.selectAll('tr i.radio').classed('fa-check-circle-o', false).classed('fa-circle-o', true);
         d3.select(this).classed('selected', true);
-        d3.select(this).select('i').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
+        d3.select(this).select('i.radio').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
       });
 
     // Add the display container and the logs
