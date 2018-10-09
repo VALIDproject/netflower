@@ -8,14 +8,16 @@
 /**
 The other styles of the page.
  */
-//Part of the data loading view.
+// Part of the data loading view.
 @import 'styles/data_imports';
-//Part of the filter data view.
+// Part of the filter data view.
 @import 'styles/filter_data';
-//Part of all sankey related visualization stuff.
+// Part of all sankey related visualization stuff.
 @import 'styles/sankey';
-//Part of the global settings view.
+// Part of the global settings view.
 @import 'styles/global_settings';
+// Part of the tag filter view.
+@import 'styles/tag_filter';
 
 
 //Button Design Filter Area
@@ -33,9 +35,9 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   vertical-align: middle;
   cursor: pointer;
   -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   background-image: none;
   border: 1.5px solid transparent;
   border-radius: 4px;
@@ -44,8 +46,13 @@ button.btn_design, #loadMoreBtn, #loadLessBtn, button {
   border-color: $valid-color3;
 }
 
+.btn_original_design {
+  background-color: $valid-color3 !important;
+  color: white !important;
+}
+
 button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #loadMoreBtn:hover, #loadLessBtn:hover {
-	color: $valid-color2;
+  color: $valid-color2;
   border-color: $valid-color2;
   background-color:white;
 }
@@ -75,6 +82,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 #validHeader {
   position: fixed;
   z-index: 100000;
+  margin: 0 auto;
   width: 100%;
   height: 67px;
   background-color: $background-color;
@@ -116,6 +124,24 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   font-family: 'Oswald', sans-serif;
 }
 
+.netflowerLogo {
+  float: left;
+  background-image: url('media/netflowerlogoN.svg');
+  background-repeat: no-repeat;
+  //margin-right: 20px;
+  //margin-top: 0.3%;
+  height: 100%;
+  width: 15.8%;
+  margin-right: .5%;
+  margin-left: .5%;
+}
+
+.netflowerLogo.shrink {
+  background-image: url('media/onlyN.svg');
+  width: 2%;
+  margin-right: 10px;
+}
+
 .valid_logo {
   background-image: url('media/valid_logo_claim.png');
   background-repeat: no-repeat;
@@ -123,11 +149,12 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
   //padding-left: 20px;
   //margin-left: 150px;
   //position: absolute;
-  float:right;
-  width: 18%;
+  float:left;
+  width: 16.8%;
   height: 40px;
-  margin-top:10px;
-  margin-right: 20px;
+  margin-right: .5%;
+  margin-left: .5%;
+  margin-top: 12px;
 }
 
 .valid_logo.shrink {
@@ -136,35 +163,33 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 
 
 #socialMedia {
-  float: right;
-  z-index: 1000000;
-  height: 80px;
-  margin-left: auto;
-  margin-right: 20px;
-  //margin-top: 50px;
-  //width: 40%;
+  width: 21.8%;
+  float: left;
+  margin-right: .5%;
+  margin-left: .5%;
+  margin-top: 12px;
   p {
     float: right;
-    padding: 15px;
-    //margin-top:-40px;
+    padding: 0 15px 0 15px;
   }
 }
 
 #socialMedia.shrink {
   display:none;
-
 }
 
 .btn_preupload {
   float: left;
-  width: 40%;
-  margin-top: 7px;
+  width: 40.8%;
+  margin-right: .5%;
+  margin-left: .5%;
+  margin-top: 12px;
 }
 
 .btn_preupload.shrink {
   font-size: 14px;
 }
-#web {
+.web {
   color: $valid-color3;
 
   &:hover {
@@ -173,7 +198,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 }
 
 .toolbox {
-    z-index: 50000000;
+  z-index: 50000000;
 }
 
 .button_bar {
@@ -190,7 +215,7 @@ button.btn_design:hover, button.btn_design :focus, button.btn_design:active, #lo
 }
 
 span.to {
-    cursor: pointer !important;
+  cursor: pointer !important;
 }
 
 span.from {
@@ -201,10 +226,10 @@ span.from {
 .input-group-xs>.form-control,
 .input-group-xs>.input-group-addon,
 .input-group-xs>.input-group-btn>.btn {
-    height: 22px;
-    padding: 1px 5px;
-    font-size: 12px;
-    line-height: 1.5;
+  height: 22px;
+  padding: 1px 5px;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 // Brings down the bootbox dialog a bit.
@@ -225,18 +250,12 @@ span.from {
 }
 
 // Removes the number spinner from input elements of type number
-CSS
-
-/* Hide HTML5 Up and Down arrows. */
-CSS
-
-/* Hide HTML5 Up and Down arrows. */
 /* Hide HTML5 Up and Down arrows. */
 input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type="number"] {
-    -moz-appearance: textfield;
+  -moz-appearance: textfield;
 }

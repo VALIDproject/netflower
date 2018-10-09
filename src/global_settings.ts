@@ -62,9 +62,21 @@ class GlobalSettings implements MAppViews {
         </div>
         <div class='form-group' id='noteBox'>
           <label for='noteArea'>Take Notes:</label>
-          <textarea class='form-control' id='noteArea' rows='16' cols='80' wrap='off'></textarea>
+          <textarea class='form-control' id='noteArea' rows='14' cols='80' wrap='off'></textarea>
         </div>
       </form>
+      
+      <div class='optimizeSankeyBox'>
+        <hr/>
+        <p>Toggle Sankey optimization:</p>
+        <div class='onoffswitch'>
+          <input type='checkbox' name='onoffswitch' class='onoffswitch-checkbox' id='myonoffswitch'>
+          <label class='onoffswitch-label' for='myonoffswitch'>
+              <span class='onoffswitch-inner'></span>
+              <span class='onoffswitch-switch'></span>
+          </label>
+        </div>
+      </div>
 
       <div class='clearBox'>
         <hr/>
@@ -105,6 +117,15 @@ class GlobalSettings implements MAppViews {
 
       // Read the file and display all
       fileReader.readAsText(file, 'UTF-8');
+    });
+
+    // React to the toggle switch in order to change the sankey order behavior
+    this.$node.select('#myonoffswitch').on('change', function() {
+      if (d3.select('#myonoffswitch').property('checked')) {
+        events.fire(AppConstants.EVENT_SANKEY_SORT_BEHAVIOR, true);
+      } else {
+        events.fire(AppConstants.EVENT_SANKEY_SORT_BEHAVIOR, false);
+      }
     });
 
     // Watches for actions on the save button.

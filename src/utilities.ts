@@ -4,6 +4,7 @@
 import * as d3 from 'd3';
 import text = d3.text;
 import * as events from 'phovea_core/src/event';
+import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import {AppConstants} from './app_constants';
 
@@ -32,7 +33,7 @@ export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom =
   width = width - (paddingRightLeft * 2); //Take the padding into account
 
   const arrLineCreatedCount = [];
-  text.each(function() {
+  text.each(function () {
     const text = d3.select(this),
       words = text.text().split(/[ \f\n\r\t\v]+/).reverse(), //Don't cut non-breaking space (\xA0), as well as the Unicode characters \u00A0 \u2028 \u2029)
       lineHeight = 1.1, //Ems
@@ -48,7 +49,9 @@ export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom =
 
 
     //Clean the data in case <text> does not define those values
-    if (isNaN(dy)) { dy = 0; } //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
+    if (isNaN(dy)) {
+      dy = 0;
+    } //Default padding (0em) : the 'dy' attribute on the first <tspan> _must_ be identical to the 'dy' specified on the <text> element, or start at '0em' if undefined
 
     //Offset the text position based on the text-anchor
     const wrapTickLabels = d3.select(text.node().parentNode).classed('tick'); //Don't wrap the 'normal untranslated' <text> element and the translated <g class='tick'><text></text></g> elements the same way..
@@ -79,7 +82,7 @@ export function d3TextWrap(text, width, paddingRightLeft = 5, paddingTopBottom =
         default :
       }
     }
-    y = (+((null === y)?paddingTopBottom:y) as any);
+    y = (+((null === y) ? paddingTopBottom : y) as any);
 
     let tspan = (text as any).text(null).append('tspan').attr('x', x).attr('y', y).attr('dy', dy + 'em');
     //noinspection JSHint
@@ -128,7 +131,9 @@ const formatNumber = d3.format(',.0f');    //Zero decimal places
  * This method converts a given number to a String with dot formated thousands seperator.
  * @type {(n:number)=>string} the number to format
  */
-export const dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'); }; //Replacing the , with .
+export const dotFormat = function (d) {
+  return formatNumber(d).replace(/,/g, '.');
+}; //Replacing the , with .
 
 /**
  * This crazy function rounds numbers to the next lower 10th or 100th precision depending on the number.
@@ -140,21 +145,21 @@ export const dotFormat = function (d) { return formatNumber(d).replace(/,/g, '.'
 export function roundToFull(value: number) {
   if (value >= 10 && value < 100) {                             //10 step
     return Math.round(value / 10) * 10;
-  } else if(value >= 100 && value < 1000) {                     //100 step
+  } else if (value >= 100 && value < 1000) {                     //100 step
     return Math.round(value / 100) * 100;
-  } else if(value >= 1000 && value < 10000) {                   //1.000 step
+  } else if (value >= 1000 && value < 10000) {                   //1.000 step
     return Math.round(value / 1000) * 1000;
-  } else if(value >= 10000 && value < 100000) {                 //10.000 step
+  } else if (value >= 10000 && value < 100000) {                 //10.000 step
     return Math.round(value / 10000) * 10000;
-  } else if(value >= 100000 && value < 1000000) {               //100.000 step
+  } else if (value >= 100000 && value < 1000000) {               //100.000 step
     return Math.round(value / 100000) * 100000;
-  } else if(value >= 1000000 && value < 10000000) {             //1.000.000 step
+  } else if (value >= 1000000 && value < 10000000) {             //1.000.000 step
     return Math.round(value / 1000000) * 1000000;
-  } else if(value >= 10000000 && value < 100000000) {           //10.000.000 step
+  } else if (value >= 10000000 && value < 100000000) {           //10.000.000 step
     return Math.round(value / 10000000) * 10000000;
-  } else if(value >= 100000000 && value < 1000000000) {         //100.000.000 step
+  } else if (value >= 100000000 && value < 1000000000) {         //100.000.000 step
     return Math.round(value / 10000000) * 10000000;
-  } else if(value >= 1000000000 && value < 10000000000) {       //1.000.000.000 step
+  } else if (value >= 1000000000 && value < 10000000000) {       //1.000.000.000 step
     return Math.round(value / 100000000) * 100000000;
   } else {
     return Math.round(value);
@@ -386,13 +391,26 @@ export function textTransition(element: d3.Selection<any>, newText: string, dura
 }
 
 /**
+ * This function can be used in order to compute the dimensions of a string, that is going to be drawn
+ * but without drawing it.
+ * @param text that should be drawn
+ * @returns {{width: number, height: number}} the dimensions of the drawn text
+ */
+export function textSize(text): {width: number, height: number} {
+  const container = d3.select('body').append('svg');
+  container.append('text').attr({x: -99999, y: -99999}).text(text);
+  const size = (container.node() as any).getBBox();
+  container.remove();
+  return {width: size.width, height: size.height};
+}
+/**
  * This function can be used to add text ellipses to overvlowing text. It will add dots to all text
  * that is above the given width.
  * @param text element in d3 which contains the text e.g. d3.selectAll('text');
  * @param maxTextWidth the width in pixel where the text should be broken
  */
 export function d3TextEllipse(text, maxTextWidth) {
-  text.each(function() {
+  text.each(function () {
     const text = d3.select(this);
     const words = text.text().split(/\s+/);
     const ellipsis = text.text('').append('tspan').attr('class', 'elip').text('...');
@@ -417,6 +435,32 @@ export function d3TextEllipse(text, maxTextWidth) {
     if (words.length === numWords) {
       ellipsis.remove();
     }
+  });
+}
+
+/**
+ * Sanitized the data in a way such that all the nodes with the same name have the same tags
+ * @param data to sanitize
+ * @param filteredData data with the correct tags and their respective nodes
+ */
+export function applyTagChangesToNode(data: any, filteredData: any): any {
+  const newData = data;
+  for (const entry of newData) {
+    const sourceValue = entry.sourceNode.toLowerCase();
+    const targetValue = entry.targetNode.toLowerCase();
+
+    filteredData.forEach(function (d) {
+      const term = d.key.toLowerCase();
+      if (sourceValue === term) {
+        entry.sourceTag = d.values;
+      }
+      if (targetValue === term) {
+        entry.targetTag = d.values;
+      }
+    });
+  }
+  localforage.setItem('data', newData).then(function (value) {
+    return localforage.getItem('data');
   });
 }
 
@@ -453,13 +497,72 @@ export class Tooltip {
   }
 
   public static mouseOut(type: string) {
-      Tooltip.tooltip1.transition().duration(500).style('opacity', 0);
-      Tooltip.tooltip2.transition().duration(500).style('opacity', 0);
+    Tooltip.tooltip1.transition().duration(500).style('opacity', 0);
+    Tooltip.tooltip2.transition().duration(500).style('opacity', 0);
   }
+}
+
+/**
+ * Displays a tooltip about a node.
+ * @param d data of a node as received from D3
+ * @param valuePostFix either "to" or "from"
+ */
+export function assembleNodeTooltip(d: any, valuePostFix: string) {
+  const direction = (d.sourceLinks.length <= 0) ? 'from' : 'to';
+  // Table because of aligned decimal numbers
+  const text = `${d.name}
+    <br />
+    <table class='node'>
+      <tr><td>
+        <svg width='8' height='8'>
+          <rect width='8' height='8' fill='#DA5A6B' />
+        </svg>
+        ${dotFormat(d.value) + valuePostFix}
+      </td><td> ${direction} displayed elements.</td></tr>
+    `;
+
+  // compare to a small number to avoid floating point issues
+  const hiddenFlows = (d.overall - d.value) > 0.00001 ? `
+    <tr><td>
+      <svg width='8' height='8'>
+        <defs>
+          <pattern id='diagonalHatch2' patternUnits='userSpaceOnUse' width='4' height='4'>
+            <rect width='4' height='4' fill='#DA5A6B' />
+            <path d='M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' stroke='#ffffff' 'stroke-width='1' />
+          </pattern>
+        </defs>
+      <rect width='8' height='8' fill='url(#diagonalHatch2)' />
+      </svg>
+    ${dotFormat((d.overall - d.value)) + valuePostFix}</td><td>are not displayed.</td></tr>
+    <tr><td>${dotFormat(d.overall) + valuePostFix}</td><td>in total.</td></tr>
+    ` : '';
+
+  Tooltip.mouseOver(d, text + hiddenFlows + '</table>', 'T2');
+}
+
+/**
+ * This method sets the default column labels if none are found or initialized.
+ * Structure: ['sourceNode', 'targetNode', 'timeNode', 'valueNode', 'sourceTag',
+ *  'targetTag', 'attribute1', 'attribute2']
+ * @param columnLabels object we want to transform the column labels at
+ * @returns {any} the new column labels with default values
+ */
+export function initDefaultColumnLabels(columnLabels: any) {
+  columnLabels = {};
+  columnLabels.sourceNode = 'source';
+  columnLabels.targetNode = 'target';
+  columnLabels.timeNode = 'time';
+  columnLabels.valueNode = 'value';
+  columnLabels.sourceTag = 'sourceHash';
+  columnLabels.targetTag = 'targetHash';
+  columnLabels.attribute1 = 'attribute 1';
+  // columnLabels.attribute2 = 'attribute 2';
+
+  return columnLabels;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 /*
-* Create a copy of an object to log it out:
-* Object.assign({},this._container)
-*/
+ * Create a copy of an object to log it out:
+ * Object.assign({},this._container)
+ */

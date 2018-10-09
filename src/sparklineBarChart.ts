@@ -31,6 +31,8 @@ export default class SparklineBarChart implements MAppViews {
   private necessaryHeight = INITIAL_SVG_HEIGHT;
   private chartWidth: number = 120;        // Fallback if not calcualted dynamically
 
+  private aggregatedSankeyActive;
+
   /** unit of flows (e.g., '€'). Extracted from CSV header. */
   private valuePostFix = '';
 
@@ -95,17 +97,21 @@ export default class SparklineBarChart implements MAppViews {
       node.each(function (d, i) {
         const nodeElem = d3.select(this);
 
+        const aggregatedSankeyActive = (nodeElem.attr('class').includes('tag'));
+
         if (nodeElem.attr('class').includes('source')) {
-          SparklineBarChart.sourceChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
+          SparklineBarChart.sourceChart.build(attFiltData, aggregatedSankeyActive, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         } else {
-          SparklineBarChart.targetChart.build(attFiltData, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
+          SparklineBarChart.targetChart.build(attFiltData, aggregatedSankeyActive, nodeElem.datum().name, nodeElem.datum().y, nodeElem.datum().dy, timePoints);
         }
       });
     });
   }
 
-  private build(data: any, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
+  private build(data: any, aggregatedSankeyActive: boolean, nodeName: string, elemTop: number, elemHeight: number, timePoints: string[]) {
     const _self = this;
+
+    _self.aggregatedSankeyActive = aggregatedSankeyActive;
 
     const columnLabels : any = JSON.parse(localStorage.getItem('columnLabels'));
     this.valuePostFix = (columnLabels == null) ? '' : ' ' + columnLabels.valueNode;
@@ -153,10 +159,30 @@ export default class SparklineBarChart implements MAppViews {
    */
   private prepareData(data: any, nodeName: string): IKeyValue[] {
     const _self = this;
-    const filteredData = data.filter(function (d) { return d[_self.field] === nodeName; });
+    let filteredData;
+    if(_self.aggregatedSankeyActive) {
+      if(_self.field.includes('source')) {
+        filteredData = data.filter(function (d) {
+          if(d.sourceTag !== undefined) {
+            return d.sourceTag.includes(nodeName);
+          }
+        });
+      } else {
+        filteredData = data.filter(function (d) {
+          if(d.targetTag !== undefined) {
+            return d.targetTag.includes(nodeName);
+          }
+        });
+      }
+    } else {
+      filteredData = data.filter(function (d) {
+        return d[_self.field] === nodeName;
+      });
+    }
+
     const aggregatedData = d3.nest()
       .key(function (d: any) { return d.timeNode; })
-      .rollup(function (v) { return d3.sum(v, function (d: any) { return d.valueNode; }); })
+      .rollup(function (v) {return d3.sum(v, function (d: any) { return d.valueNode; }); })
       .entries(filteredData);
 
     return aggregatedData;
@@ -210,7 +236,27 @@ export default class SparklineBarChart implements MAppViews {
       `);
       d3TextWrap(d3.select('text#flowtotals'), this.chartWidth, 2);
 
-      overlay.selectAll('bar')
+      overlay.selectAll('.barbg')
+        .data(timePoints)
+        .enter().append('rect')
+        .classed('barbg', true)
+        .attr('x', function (d, i) { return x(d); })
+        .attr('width', x.rangeBand() + 1)
+        .attr('y', yBaseline)
+        .attr('height', CHART_HEIGHT)
+        // bar hover -- update text above barchart
+        .on('mouseover', (t : string) => {
+          const aggD : IKeyValue = aggregatedData.find((aggD, i) => {return aggD.key === t; });
+          const value = aggD ? aggD.values : 0;
+          d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(t)}: ${dotFormat(value) + _self.valuePostFix}`);
+        })
+        .on('mouseout', (d) => {
+          const text = d3.select('text#flowtotals');
+          text.text(_self.generateFlowTotalsText(aggregatedData, timePoints));
+          d3TextWrap(text, this.chartWidth, 2);
+        });
+
+        overlay.selectAll('.bar')
         .data(aggregatedData)
         .enter().append('rect')
         .classed('bar', true)
@@ -220,7 +266,7 @@ export default class SparklineBarChart implements MAppViews {
         .attr('y', function (d) { return y(d.values) + yBaseline; })
         .attr('height', function (d) { return CHART_HEIGHT - y(d.values); })
         // bar hover -- update text above barchart
-        .on('mouseover', (d) => {
+        .on('mouseover', (d : IKeyValue) => {
           d3.select('text#flowtotals').text(`Total flows in ${TimeFormat.format(d.key)}: ${dotFormat(d.values) + _self.valuePostFix}`);
         })
         .on('mouseout', (d) => {

@@ -69,7 +69,7 @@
       "check-whitespace"
     ],
     "object-literal-shorthand": true,
-    "prefer-for-of": true,
+    "prefer-for-of": false,
     "prefer-const": true,
     "quotemark": [
       true,

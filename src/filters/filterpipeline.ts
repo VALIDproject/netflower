@@ -1,6 +1,7 @@
 import Filter from './filter';
 import EntitySearchFilter from './entitySearchFilter';
 import MediaSearchFilter from './mediaSearchFilter';
+import TagFlowFilter from './tagFlowFilter';
 
 /**
  * This class represents the whole filter pipeline where all filters are added and processed.
@@ -16,6 +17,8 @@ export default class FilterPipeline
   // Search filters have to be right after the topFilter and therefore are also stored separately
   private _entitySearchFilter: EntitySearchFilter;
   private _mediaSearchFilter: MediaSearchFilter;
+  // Tag flow filter as a separate filter as it has no relation to the three filters above
+  private _tagFlowFilter: TagFlowFilter;
 
   private constructor()
   {
@@ -87,6 +90,24 @@ export default class FilterPipeline
   }
 
   /**
+   * Changes the stored tagFlowFilter.
+   * @param {TagFlowFilter} newTagFlow tags to filter.
+   */
+  public changeTagFlowFilter(newTagFlow: TagFlowFilter): void
+  {
+    this._tagFlowFilter = newTagFlow;
+  }
+
+  /**
+   * Checks if the aggregated sankey view is active.
+   * @returns {boolean} whether the aggregated sankey view is active or not.
+   */
+  public getTagFlowFilterStatus(): boolean
+  {
+    return this._tagFlowFilter.active;
+  }
+
+  /**
    * This method performs all filters in the pipeline and additionally the time filter,
    * entitySearchFilter and mediaSearchFilter which are special ones.
    * @param data to perform the filter pipeline on.
@@ -94,11 +115,17 @@ export default class FilterPipeline
    */
   public performFilters(data: any): any
   {
-    if (this._entitySearchFilter !== null && this._entitySearchFilter !== undefined)
-      data = this._entitySearchFilter.meetCriteria(data);
+    if(this._tagFlowFilter.active) {
+      if(this._tagFlowFilter !== null && this._tagFlowFilter !== undefined) {
+        data = this._tagFlowFilter.meetCriteria(data);
+      }
+    } else {
+      if (this._entitySearchFilter !== null && this._entitySearchFilter !== undefined)
+        data = this._entitySearchFilter.meetCriteria(data);
 
-    if (this._mediaSearchFilter !== null && this._mediaSearchFilter !== undefined)
-      data = this._mediaSearchFilter.meetCriteria(data);
+      if (this._mediaSearchFilter !== null && this._mediaSearchFilter !== undefined)
+        data = this._mediaSearchFilter.meetCriteria(data);
+    }
 
     for (let filter of this.filters)
     {
@@ -128,6 +155,7 @@ export default class FilterPipeline
     console.log('Filter Count: ' + (this.filters.length+3));
     this._entitySearchFilter.printData();
     this._mediaSearchFilter.printData();
+    this._tagFlowFilter.printData();
     for (let filter of this.filters)
     {
       filter.printData();

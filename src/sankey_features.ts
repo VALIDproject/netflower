@@ -40,24 +40,34 @@ class SankeyFeatures implements MAppViews {
      this.$node.html(`
       <div class='container-fluid'>
       	<div class='row'>
-      		<div class='col-md-3'>
+      	  <!--First section on the left with filters-->
+      		<div class='col-md-4'>
             <div class='row'>
-              <div class='col-sm-4'>
+              <div class='col-sm-3'>
                 <h5>Filter</h5>
               </div>
               <div class='col-sm-4' style='margin-top: 7px;'>
                 <button id='clearAllBtn' class='label'
                   style='background: #45B07C; font-weight: normal;'><i class='fa fa-times'></i> Clear All</button>
               </div>
+              <div class='col-sm-4'>
+                <h5>View Flow between:</h5>
+              </div>
             </div>
       			<div class='row'>
-              <div class='col-md-4'>
+              <div class='col-md-3'>
                 <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
               </div>
               <div class='col-md-4'>
                   <div class='btn-group'>
                     <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>      						
                   </div>
+                </div>
+                <div class='col-md-4'>
+                  <select class='form-control input-sm' id='tagFlowFilter'>
+                     <option value='-1' selected>nodes</option>
+                     <option value='1'>tags</option>
+                  </select>
                 </div>
       			</div>
       			<div class='row'>
@@ -68,7 +78,40 @@ class SankeyFeatures implements MAppViews {
       			</p>
       			</div>
       		</div>
+      		
+      		<!--Second section with the sort options in hte middle-->
+      		<div class='col-md-3'>
+      		  <div class='row'>
+      		    <div class='col-sm-5'>
+      		      <h5>Sort & Order</h5>
+              </div>
+            </div>
+      		  <div class='row' style='margin-bottom: 5px;'>
+      		    <div class='col-sm-3'>
+      		      <label style='margin-top: 5px;'>Sort by:</label>
+      		    </div>
+      		    <div class='col-sm-6' id='sortBySelector'></div>
+            </div>
+            <div class='row'>
+              <div class='col-sm-3'>
+      		      <label style='margin-top: 5px;'>Order:</label>
+      		    </div>
+      		    <div class='col-sm-6' id='orderBySelector'></div>
+            </div>
+          </div>
 
+          <!--Export Settings-->
+          <div class='col-md-2'>
+            <h5>Miscellaneous</h5>
+            <button type='button' class='btn btn-default btn_design' id='exportData'>
+              Export Data
+            </button>
+            <div class='custom-control custom-checkbox' style='margin-top: 4px;'>
+              <input type='checkbox' class='custom-control-input' id='exportCheckbox'>
+              <label class='custom-control-label' for='exportCheckbox'>Only visible elemments</label>
+            </div>
+          </div>
+          
           <!--Global Filters-->
           <!--<div class='col-md-3'>
             <div class='row'>
@@ -88,22 +131,6 @@ class SankeyFeatures implements MAppViews {
               </div>
             </div>
           </div>-->
-
-        <!--Export Settings-->
-        <div class='col-md-2'>
-          <h5>Export Settings</h5>
-          <button type='button' class='btn btn-default btn_design' id='exportData'>
-            Export Data
-          </button>
-        </div>
-
-          <!--Notebook
-      		<div class='col-md-2'>
-      			<h5>Notebook</h5>
-      			<button type='button' class='btn btn-default btn_design'>
-      				Notebook
-      			</button>
-      		</div>-->
       	</div>
       </div>
     `);
