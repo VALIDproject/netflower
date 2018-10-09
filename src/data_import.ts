@@ -81,7 +81,7 @@ class DataImport implements MAppViews {
     <!--<button type='button' id='specialBtn' class='btn btn-primary btn-lg'>Start Visualization</button>-->
     <div class='informationBoxes'>
       <div class='netflowerFeature'>${IMPORT_FEATURES}</div>
-      <div class='disclaimer'>${IMPORT_DISCLAIMER}</div> 
+      <div class='disclaimer'>${IMPORT_DISCLAIMER}</div>
     </div>
     <h3 id='informationText'>Load your data here:</h3>
     <div style='width: 100%;'>
@@ -113,7 +113,7 @@ class DataImport implements MAppViews {
                                 <input type='file' id='files' accept='.csv' required />
                               </span>
                               </span>
-                              <input readonly='readonly' placeholder='CSV file' 
+                              <input readonly='readonly' placeholder='CSV file'
                                 class='form-control' id='filename' type='text' />
                             </div>
                           </div>
@@ -163,11 +163,11 @@ class DataImport implements MAppViews {
         <tr>
           <td>Assign an appropriate name for the source nodes of your visualization.</td>
           <td>Assign an appropriate name for the target nodes of your visualization.</td>
-          <td>Assign the time column name here.</td>
-          <td>Assign the value column name here. Best to uses is a currency sign.</td>
+          <td>Assign the time column name here. Use "Quarter" or "Month" as column name to reformat values such as 20184 or 201812.</td>
+          <td>Assign the value column name here. Better keep it short, for example use a currency sign.</td>
           <td>Assign the tag name referring to the source nodes.</td>
           <td>Assign the tag name referring to the target nodes.</td>
-          <td>Add attributes here (one attriubte per column).</td>          
+          <td>Add attributes here (one attribute per column).</td>
         </tr>
         </tbody>
       </table>
@@ -443,7 +443,6 @@ class DataImport implements MAppViews {
 
     // Show a success message
     const msg = `<strong>Success!!</strong> Data is loaded.
-                 <br/>Rows-preview: ${this.rowsToShow}
                  <br/>Rows-total: ${this.parseResults.data.length}`;
     setTimeout(function () {
       alertify.delay(5000).log(msg);

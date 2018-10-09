@@ -9,12 +9,12 @@ import {AppConstants} from './app_constants';
 export const APP_NAME = 'Valid';
 export const HELLO_WORLD = 'Hello World this is VALID... or will be...';
 
-export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data. 
-The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data 
-based on your explorations state.`;
+export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bipartite network data.
+The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data
+based on your exploration state.`;
 
-export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you upload will only be stored locally on your computer. 
-When you close the browser, the data is retained. When the computer is restarted or you upload new data, 
+export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you load will only be stored locally on your computer.
+When you close the browser, the data is retained. When the computer is restarted or you upload new data,
 the data and exploration steps are lost.`;
 
 export const ERROR_TOOMANYNODES = `Your current <font color='#DA5A6B'><strong>FILTER</strong></font>
@@ -42,7 +42,7 @@ Be sure you don't lose anything important or save your progress before you proce
  you will see your current selection. After you finished, hit the <strong>Submit</strong> button in order
  to change the visualization.`;*/
 
-export const TIME_INFO = `Select here the time range of the visualization.<br/> 
+export const TIME_INFO = `Select here the time range of the visualization.<br/>
 1) Click & Drag mouse for rectangle selection.<br/>
 2) Click one elment to make a single selection.<br/>
 3) CTRL + Click to make a multi selection.`;
@@ -65,7 +65,7 @@ export const EXPORT_INFO = `<span class='label label-info' style='font-weight: n
 You are going to download a file with the name: <strong>flows</strong> and the current time stamp which contains the exported flow data of the current
 view. Proceed with OK if you want to download the file.`;
 
-export const EXPORT_INFO2 = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span> 
+export const EXPORT_INFO2 = `<span class='label label-info' style='font-weight: normal; background: #45B07C;'>Info</span>
 You are going to download a file with the name: <strong>timeseries</strong> and the current time stamp which contains the exported data of the current
 view. Proceed with OK if you want to download the file.`;
 
