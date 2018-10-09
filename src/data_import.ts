@@ -14,7 +14,7 @@ import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 import {
   IMPORT_FEATURES, IMPORT_DISCLAIMER,
-  USAGE_INFO, DOWNLOAD_INFO, DOWNLOAD_DIALOG
+  USAGE_INFO, DOWNLOAD_INFO
 } from './language';
 import SimpleLogging from './simpleLogging';
 import time = d3.time;
@@ -94,7 +94,7 @@ class DataImport implements MAppViews {
                           <ul class='nav panel-tabs'>
                               <li class='active'><a href='#tab1' data-toggle='tab'><i class='fa fa-link'></i> URL</a></li>
                               <li><a href='#tab2' data-toggle='tab'><i class='fa fa-file-excel-o'></i> File</a></li>
-                              <li><a href='#tab3' data-toggle='tab'><i class='fa fa-download'></i> Sample Data</a></li>
+                              <li><a href='#tab3' data-toggle='tab'><i class='fa fa-university'></i> Sample Data</a></li>
                           </ul>
                       </span>
                   </div>
@@ -117,7 +117,7 @@ class DataImport implements MAppViews {
                                 class='form-control' id='filename' type='text' />
                             </div>
                           </div>
-                          <div class='tab-pane' id='tab3'>${DOWNLOAD_DIALOG}</div>
+                          <div class='tab-pane' id='tab3'></div>
                   </div>
               </div>
           </div>
@@ -132,7 +132,33 @@ class DataImport implements MAppViews {
     `
     );
 
-    // Add the display conatiner and the logs
+    const sampleTable = this.$fileContainer.select('div#tab3')
+      .append('table').classed('downloadTable', true)
+      .append('tbody');
+
+    // fill sample table using D3.js
+    const rows = sampleTable.selectAll('tr')
+      .data(AppConstants.SAMPLES)
+      .enter()
+      .append('tr')
+      .classed('selected', (d, i) => { return (i === 0); })
+      .html((d, i) => `
+      <td class='leftTD'>
+        <i class='radio fa fa-${i === 0 ? 'check-' : ''}circle-o'></i>
+        <strong>${d.title}</strong><br/>
+        ${d.description}
+        ${d.source.length > 0  ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
+      </td>
+      <td class='rightTD'><a href=${d.file}><i class="fa fa-download"></i> Download Data (.csv)</a></td>
+      `)
+      .on('click', function(d) {
+        sampleTable.selectAll('tr').classed('selected', false);
+        sampleTable.selectAll('tr i.radio').classed('fa-check-circle-o', false).classed('fa-circle-o', true);
+        d3.select(this).classed('selected', true);
+        d3.select(this).select('i.radio').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
+      });
+
+    // Add the display container and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
     this.$displayContainer = d3.select('.additionalInfo').html(`
         <div class='row'>
@@ -213,9 +239,16 @@ class DataImport implements MAppViews {
         const urlInput = $('#fileByUrl').val();
         const filesInput = <HTMLInputElement>d3.select('#files').node();
 
+        if (this.currentTab === 'Sample Data') {
+          const selectedFile = d3.select('.downloadTable tr.selected').datum().file;
+          SimpleLogging.log('import sample', selectedFile);
+          this.handleFileUrl(selectedFile);
+        }
+
         if (this.currentTab === 'URL') {
           if (urlInput !== '') {
-            if (urlInput.substr(-4) === '.csv') {   // Check for a .csv
+            if (urlInput.substr(-4) === '.csv' || urlInput.substr(-9) === '.csv?dl=0') {   // Check for a .csv
+              SimpleLogging.log('import url', urlInput);
               this.handleFileUrl(urlInput);
             } else {
               const msg = 'Only files with a .csv ending can be loaded by url!';
@@ -229,6 +262,7 @@ class DataImport implements MAppViews {
 
         if (this.currentTab === 'File') {
           if (filesInput.files[0] !== undefined) {
+            SimpleLogging.log('import file', filesInput.files[0]);
             this.handleFileUpload(filesInput);
           } else {
             const msg = 'Please select a file order to proceed!';
@@ -294,18 +328,6 @@ class DataImport implements MAppViews {
         evt.preventDefault();
         evt.stopPropagation();
       });
-
-    // Listener for the download file button
-    this.$node.select('#sampleFile').on('click', (e) => {
-      bootbox.alert({
-        title: 'Sample Files',
-        message: `${DOWNLOAD_DIALOG}`,
-        className: 'alternateBootboxDialog'
-      });
-      const evt = <MouseEvent>d3.event;
-      evt.preventDefault();
-      evt.stopPropagation();
-    });
 
     d3.select('.nav panel-tab').selectAll('a').on('click', (e) => {
       const evt = <MouseEvent>d3.event;
@@ -608,34 +630,3 @@ export function create(parent: Element, options: any) {
   return new DataImport(parent, options);
 }
 
-
-/** REMOVE LATER
-
- <!--<form class='well' style='padding-bottom: 0 !important;'>-->
- <!--<div class='form-group'>-->
- <!--<label for='fileByUrl'>Paste your URL (needs to be .csv):</label>-->
- <!--<input type='text' class='form-control' id='fileByUrl'>-->
- <!--</div>-->
- <!--<div class='form-group'>-->
- <!--<div class='hr-sect'>OR</div>-->
- <!--</div>-->
- <!--<div class='form-group'>-->
- <!--<div class='input-group'>-->
- <!--<span class='input-group-btn' style='padding-right: 2px;'>-->
- <!--<span class='btn btn-default btn-file'>-->
- <!--Select CSV file...-->
- <!--<input type='file' id='files' accept='.csv' required />-->
- <!--</span>-->
- <!--</span>-->
- <!--<input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>-->
- <!--</div>-->
- <!--</div>-->
- <!--<div class='form-group' style='margin-top: 40px;'>-->
- <!--<button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>-->
- <!--<button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>-->
- <!--<button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>-->
- <!--<i class='fa fa-download'></i> Sample Files</button>-->
- <!--</div>-->
- <!--</form>-->
-
- **/
