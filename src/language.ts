@@ -9,11 +9,11 @@ import {AppConstants} from './app_constants';
 export const APP_NAME = 'Valid';
 export const HELLO_WORLD = 'Hello World this is VALID... or will be...';
 
-export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bibartite network data.
+export const IMPORT_FEATURES = `<h4>Features of Netflower:</h4>Netflower is developed to explore large bipartite network data.
 The tool supports you finding interesting aspects in the data. You cannot directly create visualizations out of it, but you can export the data
-based on your explorations state.`;
+based on your exploration state.`;
 
-export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you upload will only be stored locally on your computer.
+export const IMPORT_DISCLAIMER = `<h4>Important Information:</h4>The data you load will only be stored locally on your computer.
 When you close the browser, the data is retained. When the computer is restarted or you upload new data,
 the data and exploration steps are lost.`;
 

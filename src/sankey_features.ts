@@ -56,11 +56,11 @@ class SankeyFeatures implements MAppViews {
             </div>
       			<div class='row'>
               <div class='col-md-3'>
-                <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
+                <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>
               </div>
               <div class='col-md-4'>
                   <div class='btn-group'>
-                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>      						
+                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>
                   </div>
                 </div>
                 <div class='col-md-4'>
@@ -78,7 +78,7 @@ class SankeyFeatures implements MAppViews {
       			</p>
       			</div>
       		</div>
-      		
+
       		<!--Second section with the sort options in hte middle-->
       		<div class='col-md-3'>
       		  <div class='row'>
@@ -108,10 +108,10 @@ class SankeyFeatures implements MAppViews {
             </button>
             <div class='custom-control custom-checkbox' style='margin-top: 4px;'>
               <input type='checkbox' class='custom-control-input' id='exportCheckbox'>
-              <label class='custom-control-label' for='exportCheckbox'>Only visible elemments</label>
+              <label class='custom-control-label' for='exportCheckbox'>Only Visible Elements</label>
             </div>
           </div>
-          
+
           <!--Global Filters-->
           <!--<div class='col-md-3'>
             <div class='row'>
@@ -119,7 +119,7 @@ class SankeyFeatures implements MAppViews {
                 <div class='row'>
                   <div class='col-md-6' id = 'btn_above'>
                     <h5>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>                   
+                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>
                     <button type='button' class='btn btn-default btn_design'>Number of Links</button>
                   </div>
                   <div class='col-md-6' id = 'btn_above'>
