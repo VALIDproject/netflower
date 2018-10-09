@@ -135,17 +135,6 @@ class DataImport implements MAppViews {
     const sampleTable = this.$fileContainer.select('div#tab3')
       .append('table').classed('downloadTable', true)
       .append('tbody');
-    // AppConstants.SAMPLES.forEach((d, i) => {
-    //   const row = sampleTable.append('tr');
-    //   row.html(`
-    //   <td class='leftTD'><strong>${d.title}</strong><br/>
-    //     ${d.description}
-    //     <a target='_blank' href='${d.source}'>Source</a>
-    //   </td>
-    //   <td class='rightTD'><a href=${d.file}>Download Data (.csv)</a></td>
-    //   `);
-    //   console.log(d.title);
-    // });
 
     // fill sample table using D3.js
     const rows = sampleTable.selectAll('tr')
@@ -642,34 +631,3 @@ export function create(parent: Element, options: any) {
   return new DataImport(parent, options);
 }
 
-
-/** REMOVE LATER
-
- <!--<form class='well' style='padding-bottom: 0 !important;'>-->
- <!--<div class='form-group'>-->
- <!--<label for='fileByUrl'>Paste your URL (needs to be .csv):</label>-->
- <!--<input type='text' class='form-control' id='fileByUrl'>-->
- <!--</div>-->
- <!--<div class='form-group'>-->
- <!--<div class='hr-sect'>OR</div>-->
- <!--</div>-->
- <!--<div class='form-group'>-->
- <!--<div class='input-group'>-->
- <!--<span class='input-group-btn' style='padding-right: 2px;'>-->
- <!--<span class='btn btn-default btn-file'>-->
- <!--Select CSV file...-->
- <!--<input type='file' id='files' accept='.csv' required />-->
- <!--</span>-->
- <!--</span>-->
- <!--<input readonly='readonly' placeholder='CSV file' class='form-control' id='filename' type='text'>-->
- <!--</div>-->
- <!--</div>-->
- <!--<div class='form-group' style='margin-top: 40px;'>-->
- <!--<button type='submit' id='submitFile' class='btn btn-primary'>Load & Show</button>-->
- <!--<button type='button' id='showMoreBtn' class='btn btn-info'>View Data</button>-->
- <!--<button type='button' id='sampleFile' class='btn btn-primary btn-large pull-right'>-->
- <!--<i class='fa fa-download'></i> Sample Files</button>-->
- <!--</div>-->
- <!--</form>-->
-
- **/
