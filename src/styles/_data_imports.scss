@@ -286,3 +286,8 @@ New styles for the panels
     background-color: rgba(255,255,255, .23);
     border-bottom-color: transparent;
 }
+
+
+.downloadTable tr.selected td > a {
+  color: #fff !important;
+}
