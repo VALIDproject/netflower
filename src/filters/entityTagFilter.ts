@@ -69,16 +69,17 @@ export default class EntityTagFilter extends TagFilter
    */
   public getTagsByName(data: any, val: string): d3.Set
   {
-    let resultSet:d3.Set = d3.set([]);
-    for(let entry of data) {
-      if(entry.sourceNode.indexOf(val) !== -1) {
+    const resultSet:d3.Set = d3.set([]);
+    for(const entry of data) {
+      if(entry.sourceNode.trim() === val) {
         const tagsAsText:string = entry.sourceTag;
         if (tagsAsText !== undefined) {
-          const values:Array<string> = tagsAsText.split("|");
+          const values:Array<string> = tagsAsText.split('|');
           values.forEach(function (value) {
-            if(value !== '' && !resultSet.has(value))
+            if(value !== '') {
               resultSet.add(value);
-          })
+            }
+          });
         }
       }
     }
