@@ -43,7 +43,7 @@ export class AppConstants {
   static SAMPLES = [
     { title: 'Media Transparency',
       description: 'Flows of advertisement and sponsoring money from Austrian government entities to media institutions, which are collectively published as open government data on media transparency (coverage: 2017 Q3-2018 Q2).',
-      file: 'https://www.dropbox.com/s/rrtpndumgd8aqrt/Media_Transparency_Data_2018Q2%20tags.csv?dl=0',
+      file: 'https://dl.dropboxusercontent.com/s/rrtpndumgd8aqrt/Media_Transparency_Data_2018Q2_tags.csv?dl=0',
       source: 'https://www.rtr.at/de/m/Medientransparenz'},
     { title: 'Asylum Seekers',
       description: 'The data presents information about asylum applications lodged in 38 European and 6 non-European countries. Data are broken down by month and origin.',
@@ -55,7 +55,7 @@ export class AppConstants {
       source: 'https://www.ama.at/Fachliche-Informationen/Transparenzdatenbank'},
     { title: 'Official Development Assistance',
       description: 'ODA commitments by EU countries plus selected other countries and foundations to recipient countries in Afrika, Asia, and Europe; constant prices 2016; coverage 2008-2017 (incomplete).',
-      file: 'https://www.dropbox.com/s/t5s7nufwtewg9tv/oecd_development_assistance.csv?dl=0',
+      file: 'https://dl.dropboxusercontent.com/s/t5s7nufwtewg9tv/oecd_development_assistance.csv?dl=0',
       source: 'https://doi.org/10.1787/data-00068-en'},
     { title: 'Aid payments OECD (old)',
       description: 'Aid payments from EU countries to developing countries in the last 10 years.',

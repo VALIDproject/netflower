@@ -118,15 +118,13 @@ class DataImport implements MAppViews {
                             </div>
                           </div>
                           <div class='tab-pane' id='tab3'></div>
+                      </div>
+                      <div>
+                        <button type='submit' id='submitFile' class='btn btn-primary btn-lg pull-right'>Load & Show</button>
+                        <button type='button' id='showMoreBtn' class='btn btn-info pull-right'>View Data</button>
+                      </div>
                   </div>
-              </div>
           </div>
-      </div>
-    </div>
-    <div class='row'>
-      <div class='col-md-12'>
-          <button type='submit' id='submitFile' class='btn btn-primary btn-lg pull-right'>Load & Show</button>
-          <button type='button' id='showMoreBtn' class='btn btn-info pull-right'>View Data</button>
       </div>
     </div>
     `

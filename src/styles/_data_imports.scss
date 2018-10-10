@@ -129,7 +129,7 @@
 }
 
 .downloadTable tr.selected td {
-  background: $valid-color3 ;
+  background: rgba(69, 176, 124, 0.73);
 }
 
 #helpInfo {
@@ -288,7 +288,10 @@ New styles for the panels
     border-bottom-color: transparent;
 }
 
-
 .downloadTable tr.selected td > a {
   color: #fff !important;
+}
+
+div.dataLoadingView  div.tab-content {
+  margin-bottom: 15px;
 }
