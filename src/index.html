@@ -6,12 +6,341 @@
     <title>VALiD Netflower - Home</title>
 
     <link href='https://fonts.googleapis.com/css?family=Yantramanav' rel='stylesheet'>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
-        crossorigin="anonymous">
-    <style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+          integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+          crossorigin="anonymous">
 
+    <script>
+        /*
+         debugout.js
+         by @inorganik
+         */
+        // save all the console.logs
+        function debugout() {
+            var self = this;
+
+            // OPTIONS
+            self.realTimeLoggingOn = true; // log in real time (forwards to console.log)
+            self.useTimestamps = true; // insert a timestamp in front of each log
+            self.useLocalStorage = false; // store the output using window.localStorage() and continuously add to the same log each session
+            self.recordLogs = true; // set to false after you're done debugging to avoid the log eating up memory
+            self.autoTrim = true; // to avoid the log eating up potentially endless memory
+            self.maxLines = 2500; // if autoTrim is true, this many most recent lines are saved
+            self.tailNumLines = 100; // how many lines tail() will retrieve
+            self.logFilename = new Date().toUTCString() + '__Log.txt'; // filename of log downloaded with downloadLog()
+            self.maxDepth = 25; // max recursion depth for logged objects
+
+            // vars
+            self.depth = 0;
+            self.parentSizes = [0];
+            self.currentResult = '';
+            self.startTime = new Date();
+            self.output = '';
+
+            this.version = function () {
+                return '0.5.0'
+            };
+
+            /*
+             USER METHODS
+             */
+            this.getLog = function () {
+                var retrievalTime = new Date();
+                // if recording is off, so dev knows why they don't have any logs
+                if (!self.recordLogs) {
+                    self.log('[debugout.js] log recording is off.');
+                }
+                // if using local storage, get values
+                if (self.useLocalStorage) {
+                    var saved = window.localStorage.getItem('debugout.js');
+                    if (saved) {
+                        saved = JSON.parse(saved);
+                        self.startTime = new Date(saved.startTime);
+                        self.output = saved.log;
+                        retrievalTime = new Date(saved.lastLog);
+                    }
+                }
+                return self.output
+                    + '\n---- Log retrieved: ' + retrievalTime + ' ----\n'
+                    + self.formatSessionDuration(self.startTime, retrievalTime);
+            };
+            // accepts optional number or uses the default for number of lines
+            this.tail = function (numLines) {
+                var numLines = numLines || self.tailLines;
+                return self.trimLog(self.getLog(), numLines);
+            };
+            // accepts a string to search for
+            this.search = function (string) {
+                var lines = self.output.split('\n');
+                var rgx = new RegExp(string);
+                var matched = [];
+                // can't use a simple Array.prototype.filter() here
+                // because we need to add the line number
+                for (var i = 0; i < lines.length; i++) {
+                    var addr = '[' + i + '] ';
+                    if (lines[i].match(rgx)) {
+                        matched.push(addr + lines[i]);
+                    }
+                }
+                var result = matched.join('\n');
+                if (result.length == 0) result = 'Nothing found for "' + string + '".';
+                return result
+            };
+            // accepts the starting line and how many lines after the starting line you want
+            this.getSlice = function (lineNumber, numLines) {
+                var lines = self.output.split('\n');
+                var segment = lines.slice(lineNumber, lineNumber + numLines);
+                return segment.join('\n');
+            };
+            // immediately downloads the log - for desktop browser use
+            this.downloadLog = function () {
+                var logFile = self.getLog();
+                var blob = new Blob([logFile], {type: 'data:text/plain;charset=utf-8'});
+                var a = document.createElement('a');
+                a.href = window.URL.createObjectURL(blob);
+                a.target = '_blank';
+                a.download = self.logFilename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(a.href);
+            };
+            // clears the log
+            this.clear = function () {
+                var clearTime = new Date();
+                self.output = '---- Log cleared: ' + clearTime + ' ----\n';
+                if (self.useLocalStorage) {
+                    // local storage
+                    var saveObject = {
+                        startTime: self.startTime,
+                        log: self.output,
+                        lastLog: clearTime
+                    }
+                    saveObject = JSON.stringify(saveObject);
+                    window.localStorage.setItem('debugout.js', saveObject);
+                }
+                if (self.realTimeLoggingOn) console.log('[debugout.js] clear()');
+            };
+            // records a log
+            this.log = function (obj) {
+                // log in real time
+                if (self.realTimeLoggingOn) console.log(obj);
+                // record log
+                var type = self.determineType(obj);
+                if (type != null && self.recordLogs) {
+                    var addition = self.formatType(type, obj);
+                    // timestamp, formatted for brevity
+                    if (self.useTimestamps) {
+                        var logTime = new Date();
+                        self.output += self.formatTimestamp(logTime);
+                    }
+                    self.output += addition + '\n';
+                    if (self.autoTrim) self.output = self.trimLog(self.output, self.maxLines);
+                    // local storage
+                    if (self.useLocalStorage) {
+                        var last = new Date();
+                        var saveObject = {
+                            startTime: self.startTime,
+                            log: self.output,
+                            lastLog: last
+                        }
+                        saveObject = JSON.stringify(saveObject);
+                        window.localStorage.setItem('debugout.js', saveObject);
+                    }
+                }
+                self.depth = 0;
+                self.parentSizes = [0];
+                self.currentResult = '';
+            };
+            /*
+             METHODS FOR CONSTRUCTING THE LOG
+             */
+
+            // like typeof but classifies objects of type 'object'
+            // kept separate from formatType() so you can use at your convenience!
+            this.determineType = function (object) {
+                if (object != null) {
+                    var typeResult;
+                    var type = typeof object;
+                    if (type == 'object') {
+                        var len = object.length;
+                        if (len == null) {
+                            if (typeof object.getTime == 'function') {
+                                typeResult = 'Date';
+                            }
+                            else if (typeof object.test == 'function') {
+                                typeResult = 'RegExp';
+                            }
+                            else {
+                                typeResult = 'Object';
+                            }
+                        } else {
+                            typeResult = 'Array';
+                        }
+                    } else {
+                        typeResult = type;
+                    }
+                    return typeResult;
+                } else {
+                    return null;
+                }
+            };
+            // format type accordingly, recursively if necessary
+            this.formatType = function (type, obj) {
+                if (self.maxDepth && self.depth >= self.maxDepth) {
+                    return '... (max-depth reached)';
+                }
+
+                switch (type) {
+                    case 'Object' :
+                        self.currentResult += '{\n';
+                        self.depth++;
+                        self.parentSizes.push(self.objectSize(obj));
+                        var i = 0;
+                        for (var prop in obj) {
+                            self.currentResult += self.indentsForDepth(self.depth);
+                            self.currentResult += prop + ': ';
+                            var subtype = self.determineType(obj[prop]);
+                            var subresult = self.formatType(subtype, obj[prop]);
+                            if (subresult) {
+                                self.currentResult += subresult;
+                                if (i != self.parentSizes[self.depth] - 1) self.currentResult += ',';
+                                self.currentResult += '\n';
+                            } else {
+                                if (i != self.parentSizes[self.depth] - 1) self.currentResult += ',';
+                                self.currentResult += '\n';
+                            }
+                            i++;
+                        }
+                        self.depth--;
+                        self.parentSizes.pop();
+                        self.currentResult += self.indentsForDepth(self.depth);
+                        self.currentResult += '}';
+                        if (self.depth == 0) return self.currentResult;
+                        break;
+                    case 'Array' :
+                        self.currentResult += '[';
+                        self.depth++;
+                        self.parentSizes.push(obj.length);
+                        for (var i = 0; i < obj.length; i++) {
+                            var subtype = self.determineType(obj[i]);
+                            if (subtype == 'Object' || subtype == 'Array') self.currentResult += '\n' + self.indentsForDepth(self.depth);
+                            var subresult = self.formatType(subtype, obj[i]);
+                            if (subresult) {
+                                self.currentResult += subresult;
+                                if (i != self.parentSizes[self.depth] - 1) self.currentResult += ', ';
+                                if (subtype == 'Array') self.currentResult += '\n';
+                            } else {
+                                if (i != self.parentSizes[self.depth] - 1) self.currentResult += ', ';
+                                if (subtype != 'Object') self.currentResult += '\n';
+                                else if (i == self.parentSizes[self.depth] - 1) self.currentResult += '\n';
+                            }
+                        }
+                        self.depth--;
+                        self.parentSizes.pop();
+                        self.currentResult += ']';
+                        if (self.depth == 0) return self.currentResult;
+                        break;
+                    case 'function' :
+                        obj += '';
+                        var lines = obj.split('\n');
+                        for (var i = 0; i < lines.length; i++) {
+                            if (lines[i].match(/\}/)) self.depth--;
+                            self.currentResult += self.indentsForDepth(self.depth);
+                            if (lines[i].match(/\{/)) self.depth++;
+                            self.currentResult += lines[i] + '\n';
+                        }
+                        return self.currentResult;
+                        break;
+                    case 'RegExp' :
+                        return '/' + obj.source + '/';
+                        break;
+                    case 'Date' :
+                    case 'string' :
+                        if (self.depth > 0 || obj.length == 0) {
+                            return '"' + obj + '"';
+                        } else {
+                            return obj;
+                        }
+                    case 'boolean' :
+                        if (obj) return 'true';
+                        else return 'false';
+                    case 'number' :
+                        return obj + '';
+                        break;
+                }
+            };
+            this.indentsForDepth = function (depth) {
+                var str = '';
+                for (var i = 0; i < depth; i++) {
+                    str += '\t';
+                }
+                return str;
+            };
+            this.trimLog = function (log, maxLines) {
+                var lines = log.split('\n');
+                if (lines.length > maxLines) {
+                    lines = lines.slice(lines.length - maxLines);
+                }
+                return lines.join('\n');
+            };
+            this.lines = function () {
+                return self.output.split('\n').length;
+            };
+            // calculate testing time
+            this.formatSessionDuration = function (startTime, endTime) {
+                var msec = endTime - startTime;
+                var hh = Math.floor(msec / 1000 / 60 / 60);
+                var hrs = ('0' + hh).slice(-2);
+                msec -= hh * 1000 * 60 * 60;
+                var mm = Math.floor(msec / 1000 / 60);
+                var mins = ('0' + mm).slice(-2);
+                msec -= mm * 1000 * 60;
+                var ss = Math.floor(msec / 1000);
+                var secs = ('0' + ss).slice(-2);
+                msec -= ss * 1000;
+                return '---- Session duration: ' + hrs + ':' + mins + ':' + secs + ' ----'
+            };
+            this.formatTimestamp = function (timestamp) {
+                var year = timestamp.getFullYear();
+                var date = timestamp.getDate();
+                var month = ('0' + (timestamp.getMonth() + 1)).slice(-2);
+                var hrs = Number(timestamp.getHours());
+                var mins = ('0' + timestamp.getMinutes()).slice(-2);
+                var secs = ('0' + timestamp.getSeconds()).slice(-2);
+                return '[' + year + '-' + month + '-' + date + ' ' + hrs + ':' + mins + ':' + secs + ']: ';
+            };
+            this.objectSize = function (obj) {
+                var size = 0, key;
+                for (key in obj) {
+                    if (obj.hasOwnProperty(key)) size++;
+                }
+                return size;
+            };
+
+            /*
+             START/RESUME LOG
+             */
+            if (self.useLocalStorage) {
+                var saved = window.localStorage.getItem('debugout.js');
+                if (saved) {
+                    saved = JSON.parse(saved);
+                    self.output = saved.log;
+                    var start = new Date(saved.startTime);
+                    var end = new Date(saved.lastLog);
+                    self.output += '\n---- Session end: ' + saved.lastLog + ' ----\n';
+                    self.output += self.formatSessionDuration(start, end);
+                    self.output += '\n\n';
+                }
+            }
+            self.output += '---- Session started: ' + self.startTime + ' ----\n\n';
+        }
+    </script>
+
+    <style>
         * {
             font-family: Yantramanav, 'Helvetica Neue', Helvetica, sans-serif;
         }
@@ -56,7 +385,7 @@
             height: auto;
         }
 
-        #backgroundArea {
+        .backgroundArea {
             background-color: #f3f3f3;
             padding-top: 10vh;
             padding-bottom: 10vh;
@@ -75,48 +404,31 @@
             padding-right: 2vh;
         }
 
-
-        .picture {
-        width: 100%;
-        background-repeat: no-repeat;
-        background-position: center center;
-        padding-top: 2vh;
-        padding-bottom: 2vh;
-        position: relative;
-        }
-
         .carousel-caption {
-        color: black;
-        background: white;
-        border-radius: 5px;
+            color: black;
+            background: white;
+            border-radius: 5px;
 
         }
+
         .carousel-control-prev-icon,
         .carousel-control-next-icon {
-        height: 100px;
-        width: 100px;
-        outline: black;
-        /*background-size: 100%, 100%;
-        border-radius: 50%;
-        border: 1px solid black;*/
-        background-image: none;
+            height: 100px;
+            width: 100px;
+            outline: black;
+            background-image: none;
         }
 
-        .carousel-control-next-icon:after
-        {
-        content: '>';
-        font-size: 55px;
-        color: black;
+        .carousel-control-next-icon:after {
+            content: '>';
+            font-size: 55px;
+            color: black;
         }
 
         .carousel-control-prev-icon:after {
-        content: '<';
-        font-size: 55px;
-        color: black;
-        }
-
-        .arrow {
-            font-size: 2em;
+            content: '<';
+            font-size: 55px;
+            color: black;
         }
 
         .modal-content {
@@ -125,234 +437,395 @@
 
         /*Footer*/
         section {
-        padding: 60px 0;
+            padding: 60px 0;
         }
 
-        section .section-title {
+        section {
             text-align: center;
             color: #45B07C;
-            margin-bottom: 50px;
             text-transform: uppercase;
         }
+
         #footer {
             background: #45B07C !important;
         }
-        #footer h5{
+
+        #footer h5 {
             padding-left: 10px;
             border-left: 3px solid #eeeeee;
             padding-bottom: 6px;
             margin-bottom: 20px;
-            color:#ffffff;
+            color: #ffffff;
         }
+
         #footer a {
             color: #ffffff;
             text-decoration: none !important;
             background-color: transparent;
             -webkit-text-decoration-skip: objects;
         }
-        #footer ul.social li{
+
+        #footer ul.social li {
             padding: 3px 0;
         }
+
         #footer ul.social li a i {
             margin-right: 5px;
-            font-size:25px;
+            font-size: 25px;
             -webkit-transition: .5s all ease;
             -moz-transition: .5s all ease;
             transition: .5s all ease;
         }
+
         #footer ul.social li:hover a i {
-            font-size:30px;
-            margin-top:-10px;
+            font-size: 30px;
+            margin-top: -10px;
         }
+
         #footer ul.social li a,
-        #footer ul.quick-links li a{
-            color:#ffffff;
+        #footer ul.quick-links li a {
+            color: #ffffff;
         }
-        #footer ul.social li a:hover{
-            color:#eeeeee;
+
+        #footer ul.social li a:hover {
+            color: #eeeeee;
         }
-        #footer ul.quick-links li{
+
+        #footer ul.quick-links li {
             padding: 3px 0;
             -webkit-transition: .5s all ease;
             -moz-transition: .5s all ease;
             transition: .5s all ease;
         }
-        #footer ul.quick-links li:hover{
+
+        #footer ul.quick-links li:hover {
             padding: 3px 0;
-            margin-left:5px;
-            font-weight:700;
+            margin-left: 5px;
+            font-weight: 700;
         }
-        #footer ul.quick-links li a i{
+
+        #footer ul.quick-links li a i {
             margin-right: 5px;
         }
+
         #footer ul.quick-links li:hover a i {
             font-weight: 700;
         }
 
-        @media (max-width:767px){
+        @media (max-width: 767px) {
             #footer h5 {
-            padding-left: 0;
-            border-left: transparent;
-            padding-bottom: 0px;
-            margin-bottom: 10px;
-        }
+                padding-left: 0;
+                border-left: transparent;
+                padding-bottom: 0px;
+                margin-bottom: 10px;
+            }
         }
 
-        #rightPosition {
+        .rightPosition {
             padding-left: 2vh;
         }
 
-        #textWidth {
+        .textWidth {
             width: 85%;
             text-align: justify;
         }
 
         /*Button Style*/
-        #btn_design {
-        display: inline-block;
-        margin-bottom: 0;
-        background-color:white;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        background-image: none;
-        border: 1.5px solid transparent;
-        border-radius: 4px;
-        padding: 5px 16px;
-        color: #45B07C;
-        border-color: #45B07C;
+        .btn_design {
+            display: inline-block;
+            margin-bottom: 0;
+            background-color: white;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: none;
+            border: 1.5px solid transparent;
+            border-radius: 4px;
+            padding: 5px 16px;
+            color: #45B07C;
+            border-color: #45B07C;
         }
 
-        button#btn_design:hover, button#btn_design :focus, button#btn_design:active{
-        color: #45B07C;
-         border-color: #45B07C;
-         background-color:white;
+        button.btn_design:hover, button.btn_design :focus, button.btn_design:active {
+            color: #45B07C;
+            border-color: #45B07C;
+            background-color: white;
         }
 
-        #validLogo {   
-            width: 40%;
-        float: left;
-        margin-left: 40%;
-        margin-top: 12px;      
-    
+        .specialBtn {
+            color: #fff !important;
+            text-transform: uppercase;
+            font-weight: bold;
+            background: #45B07C;
+            padding: 15px;
+            border-radius: 5px;
+            display: inline-block;
+            border: none;
         }
 
+        .specialBtn:hover {
+            background: #3e9f71;
+            letter-spacing: 1px;
+            font-weight: bolder;
+            -webkit-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+            -moz-box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+            box-shadow: 5px 40px -10px rgba(0, 0, 0, 0.57);
+            transition: all 0.4s ease 0s;
+        }
+
+        .makeSmall {
+            margin-left: 20%;
+            margin-right: 20%;
+        }
     </style>
 </head>
 
 <body>
-    <div class='container-fluid'>
-        <div class='row'>
-            <div class='col-md-12'>
-                <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                    <a class="navbar-brand" href="#">
-                        <img src='https://www.dropbox.com/s/2lpi4sb9b2oxd0u/netflowerlogoN.png?raw=1' type='text/html'
-                            alt='Netflower Logo' class="d-inline-block align-top" width='150' />
-                    </a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+<!--The menu-->
+<div class='container-fluid'>
+    <div class='row'>
+        <div class='col-md-12'>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#">
+                    <img src='https://www.dropbox.com/s/2lpi4sb9b2oxd0u/netflowerlogoN.png?raw=1' type='text/html'
+                         alt='Netflower Logo' class="d-inline-block align-top" width='150'/>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
                         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                        <a class="nav-item nav-link active" href="#" id="navHome">Home <span
+                                class="sr-only">(current)</span></a>
+                        <a class="nav-item nav-link" href='#loaddata' id="navLoad">Loading data</a>
+                        <a class="nav-item nav-link" href='#readviz' id="navReadViz">Read Vis</a>
+                        <a class="nav-item nav-link" href="#filter" id="navFilter">Filtering, Sorting, Ordering</a>
+                        <a class="nav-item nav-link" href="#tags" id="navTags">Tags</a>
+                        <a class="nav-item nav-link" href="#notebook" id="navNotebook">Notebook</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!--First card-->
+<div class="row jumbotron">
+    <div class="col-md-6">
+        <div class="text-right" id='rightPosition'>
+            <img class='img-fluid' src='https://www.dropbox.com/s/25plszjtv3wyeep/vis.png?raw=1' width='650px'/>
+        </div>
+    </div>
+    <div class='col-md-6'>
+        <div class='text-left'>
+            <div class='container'>
+                <h2 class='jumbotron-heading'>Netflower</h2>
+                <p class='lead'>
+                    Netflower is a tool for visual exploration of flows in dynamic networks, such as money flows
+                    between organizations or migration flows between countries.
+                    It is a highly interactive web application particularly developed for investigative data
+                    journalism.
+                </p>
+                <p>The tool was developed in the reserach project VALiD.</p>
+                <p><a href='http://www.validproject.at'><img
+                        src='https://www.dropbox.com/s/ts1sup3irh3ws0h/valid_logo_claim.png?raw=1'
+                        width='40%'/></a></p></br>
+                <div class="makeSmall">
+                <p><a class='btn btn-block specialBtn' target='_blank'
+                      id='btnUseIt' href='app.html'>Use it now!</a></p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Cards with each features with screenshot text and link to the video-->
+<div class="row" id='padding'>
+    <div class="col-md-6">
+        <div class="text-right rightPosition">
+            <img class='img-fluid' src='https://www.dropbox.com/s/kqw2z6ndh7uw2gl/load_data_marks.png?raw=1'
+                 width='650px'/>
+        </div>
+    </div>
+    <div class='col-md-6'>
+        <div class='text-center'>
+            <div class="text-left">
+                <div class='textWidth'>
+                    <h4 id='loaddata'><strong>Loading data</strong></h4>
+                    <p>
+                        This tool requires a specific format for the tables in order to visualize them
+                        appropriately.
+                        Also only <strong>.CSV</strong> files are accepted. If the required format isn't met, it
+                        will result in erros or no displayed data.
+                        The format of the table headings defines all further views but needs to be in a specific
+                        order.</p>
+                    <p>(1) Prepare your data file as a .csv file with the structure shown in the table <br/>
+                        (2) Load you data here and click 'Load & Show' <br/>
+                        (3) Here you can download some sample files. </p>
+
+                    <!-- Button trigger modal -->
+                    <button type="button" id='btnWatchVLoad' class="btn btn-primary btn_design" data-toggle="modal"
+                            data-target="#exampleModal1">
+                        <i class="far fa-play-circle"></i> Watch the Video!
                     </button>
-                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                        <div class="navbar-nav">
-                            <a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
-                            <a class="nav-item nav-link" href='#loaddata'>Loading data</a>
-                            <a class="nav-item nav-link" href='#readviz'>Read Vis</a>
-                            <a class="nav-item nav-link" href="#filter">Filtering, Sorting, Ordering</a>
-                            <a class="nav-item nav-link" href="#tags">Tags</a>
-                            <a class="nav-item nav-link" href="#notebook">Notebook</a>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel1"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel1">Loading Data</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span id='btnCloseLoad' aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <video width='650' controls>
+                                        <source src='https://www.dropbox.com/s/oaqfe5d9vd2tjk1/Loading_Voiceover.mp4?raw=1'
+                                                type='video/mp4'>
+                                    </video>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </nav>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<!--Read Visualization-->
+<div class='row backgroundArea' >
+    <div class="col-md-6">
+        <div class="text-right rightPosition">
+            <!--Carousel-->
+            <div class="carousel slide" id="carousel-230874">
+                <ol class="carousel-indicators">
+                    <li data-slide-to="0" data-target="#carousel-230874" class="active">
+                    </li>
+                    <li data-slide-to="1" data-target="#carousel-230874">
+                    </li>
+                    <li data-slide-to="2" data-target="#carousel-230874">
+                    </li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img alt="Carousel Bootstrap First" class='img-fluid'
+                             src="https://www.dropbox.com/s/z26ahjx9g6nqsmu/vis_marks.png?raw=1"
+                             width="650px"/>
+                        <div class="carousel-caption">
+                            <h4>
+                                Main Visualization
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img alt="Carousel Bootstrap Second" class='img-fluid'
+                             src="https://www.dropbox.com/s/t8sf0ct38g6pypb/visual-encoding-bg.png?raw=1"
+                             width="650px"/>
+                        <div class="carousel-caption">
+                            <h4>
+                                Visual Encoding
+                            </h4>
+
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img alt="Carousel Bootstrap Third" class='img-fluid'
+                             src="https://www.dropbox.com/s/imy3jcn4iw132xx/detailview-bg.png?raw=1"
+                             width="650px"/>
+                        <div class="carousel-caption">
+                            <h4>
+                                Detailed View
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#carousel-230874" data-slide="prev"><span
+                        class="carousel-control-prev-icon"></span>
+                    <span class="sr-only">Previous</span></a>
+                <a class="carousel-control-next" href="#carousel-230874" data-slide="next"><span
+                        class="carousel-control-next-icon"></span>
+                    <span class="sr-only">Next</span></a>
+            </div>
+            <!--Carousel ENDS-->
+        </div>
     </div>
 
-    <!--first card-->
-    <div class="row jumbotron">
-        <div class="col-md-6">
-            <div class="text-right" id='rightPosition'>
-                <img class='img-fluid' src='https://www.dropbox.com/s/25plszjtv3wyeep/vis.png?raw=1' width='650px' />
-            </div>
-        </div>
-        <div class='col-md-6'>
-            <div class='text-left'>
-                <div class='container'>
-                    <h2 class='jumbotron-heading'>
-                        Netflower
-                    </h2>
-                    <p class='lead'>
-                        Netflower is a tool for visual exploration of flows in dynamic networks, such as money flows
-                        between organizations or migration flows between countries.
-                        It is a highly interactive web application particularly developed for investigative data
-                        journalism.
+    <div class='col-md-6'>
+        <div class='text-center'>
+            <div class="text-left">
+                <div class='textWidth'>
+                    <h4 id='readviz'><strong>Read the visualization</strong></h4>
+                    <p>
+                        (1) The <strong>main visualization</strong> is a sankey diagram. You read the sankey
+                        diagram
+                        from left to
+                        right.
+                        In this example you see the number of Asylum seekers which make an application. The left
+                        side show the origin countries
+                        and on the right are the destination countries.</p>
+                    <p>(2) The small bar charts left and right show the amount of asylum applications from the
+                        original country and destination country point of
+                        view. </p>
+
+                    <p>On the end of the site, you find two buttons <strong>'Show Less'</strong> and <strong>'Show
+                        more'</strong>. Here you can load more nodes or show less nodes. When you hover over
+                        the nodes (Rects) in the visualization you get the information of how many asylum
+                        applications were made from the selected country (node). You also
+                        see that maybe not all destination and origin countries are visible by the hatching
+                        rect. Here you can use the buttons below to load more origin and destination countries.
                     </p>
-                    <p>The tools was developed in the reserach project VALiD.</p>
-                    <p><a href='http://www.validproject.at'><img src='https://www.dropbox.com/s/ts1sup3irh3ws0h/valid_logo_claim.png?raw=1'
-                                width='40%' /></a></p></br>
-                    <p><a class='btn btn-primary btn-large' target='_blank' id='btn_design' href='app.html'>Use it now!</a></p>
-                    <!-- <p class='arrow'><a href='#loaddata'><i class="fas fa-angle-down"></i></a></p> -->
-                    <!--<p><a class='btn btn-primary btn-large' id='btn_design' href='app.html'>Use it now!</a></p>-->
-                    <!--<p class='arrow'><a href='#loaddata'><i class="fas fa-angle-down"></i></a></p>-->
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!--Cards with each features with screenshot text and link to the video-->
-    <div class="row" id='padding'>
-        <div class="col-md-6">
-            <div class="text-right" id='rightPosition'>
-                <img class='img-fluid' src='https://www.dropbox.com/s/kqw2z6ndh7uw2gl/load_data_marks.png?raw=1' width='650px' />
-            </div>
-        </div>
-        <div class='col-md-6'>
-            <div class='text-center'>
-                <div class="text-left">
-                    <div id='textWidth'>
-                        <h4 id='loaddata'><strong>Loading data</strong></h4>
-                        <p>
-                            This tool requires a specific format for the tables in order to visualize them
-                            appropriately.
-                            Also only <strong>.CSV</strong> files are accepted. If the required format isn't met, it
-                            will result in erros or no displayed data.
-                            The format of the table headings defines all further views but needs to be in a specific
-                            order.</p>
-                        <p>(1) Prepare your data file as a .csv file with the structure shown in the table <br />
-                            (2) Load you data here and click 'Load & Show' <br />
-                            (3) Here you can download some sample files. </p>
 
-                        <!-- Button trigger modal -->
-                        <button type="button" id='btn_design' class="btn btn-primary" data-toggle="modal" data-target="#exampleModal1">
-                            <i class="far fa-play-circle"></i> Watch the Video!
-                        </button>
+                    <p><strong>Detailed view: </strong>By clicking on one connection line in the sankey diagram,
+                        you
+                        get a detail view showing
+                        the amount of asylum applications between
+                        the two nodes (origin countries and destination countries).</p>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Loading Data</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <video width='650' controls>
-                                            <source src='https://www.dropbox.com/s/oaqfe5d9vd2tjk1/Loading_Voiceover.mp4?raw=1'
+                    <p> The screen picture shows the <strong>visual encoding</strong>. There is this example table
+                        of
+                        asylum data.
+                        The lines from the table to the sankey diagram
+                        show the encoding from the data to the visual element - in this case a sankey
+                        diagram. </p>
+
+                    <!-- Button trigger modal -->
+                    <button type="button" id='btnWatchVRead' class="btn btn-primary btn_design" data-toggle="modal"
+                            data-target="#exampleModal2">
+                        <i class="far fa-play-circle"></i> Watch the Video!
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel2"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel2">Read the Visualization</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span id="btnCloseRead" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <video width='650' controls>
+                                        <source src='https://www.dropbox.com/s/9j5vfifm38jcn9t/Visual_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
-                                        </video>
-                                    </div>
+                                    </video>
                                 </div>
                             </div>
                         </div>
@@ -361,121 +834,57 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!--Read Visualization-->
-    <div class='row' id='backgroundArea'>
-        <div class="col-md-6">
-            <div class="text-right" id='rightPosition'>
-                <!--Carousel-->
-                <div class="carousel slide" id="carousel-230874">
-                    <ol class="carousel-indicators">
-                        <li data-slide-to="0" data-target="#carousel-230874" class="active">
-                        </li>
-                        <li data-slide-to="1" data-target="#carousel-230874">
-                        </li>
-                        <li data-slide-to="2" data-target="#carousel-230874">
-                        </li>
-                    </ol>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img alt="Carousel Bootstrap First" class='img-fluid' src="https://www.dropbox.com/s/z26ahjx9g6nqsmu/vis_marks.png?raw=1"
-                                width="650px" />
-                            <div class="carousel-caption">
-                                <h4>
-                                    Main Visualization
-                                </h4>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Carousel Bootstrap Second" class='img-fluid' src="https://www.dropbox.com/s/t8sf0ct38g6pypb/visual-encoding-bg.png?raw=1"
-                                width="650px" />
-                            <div class="carousel-caption">
-                                <h4>
-                                    Visual Encoding
-                                </h4>
-
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Carousel Bootstrap Third" class='img-fluid' src="https://www.dropbox.com/s/imy3jcn4iw132xx/detailview-bg.png?raw=1"
-                                width="650px" />
-                            <div class="carousel-caption">
-                                <h4>
-                                    Detailed View
-                                </h4>
-                            </div>
-                        </div>
-                    </div> <a class="carousel-control-prev" href="#carousel-230874" data-slide="prev"><span class="carousel-control-prev-icon"></span>
-                        <span class="sr-only">Previous</span></a>
-                    <a class="carousel-control-next" href="#carousel-230874" data-slide="next"><span class="carousel-control-next-icon"></span>
-                        <span class="sr-only">Next</span></a>
-                </div>
-                <!--Carousel ENDS-->
-            </div>
+<!--Filtering, Sorting, Ordering-->
+<div class='row' id='padding'>
+    <div class="col-md-6">
+        <div class="text-right rightPosition">
+            <img class='img-fluid' src='https://www.dropbox.com/s/pgpvtm7n6icel59/filter_marks2.png?raw=1'
+                 width='650px'/>
         </div>
+    </div>
+    <div class='col-md-6'>
+        <div class='text-center'>
+            <div class="text-left">
+                <div class='textWidth'>
+                    <h4 id='filter'><strong>Filtering, Sorting, Ordering</strong></h4>
+                    <p>You can filter, sort and order the data, which influences the visualization view.
+                        <br/>
+                        1) You can filter the data in time and connection. <br/>
+                        2) You can sort the data by source, target and flow and order it, ascending and
+                        decending. <br/>
+                        3) Exporting the data from the current view. You get a .csv file with the data of
+                        the current visualization, including all sorting and
+                        filtering operations.<br/>
+                        4) You can limit the number of asylum applications by using the slider on both
+                        sides. <br/>
+                        5) Search for a particular country in the origin and also in the destination
+                        countries using the seach box. </p>
+                    <!-- Button trigger modal -->
+                    <button type="button" id='btnWatchVFilter' class="btn btn-primary btn_design" data-toggle="modal"
+                            data-target="#exampleModal3">
+                        <i class="far fa-play-circle"></i> Watch the Video!
+                    </button>
 
-
-        <div class='col-md-6'>
-            <div class='text-center'>
-                <div class="text-left">
-                    <div id='textWidth'>
-                        <h4 id='readviz'><strong>Read the visualization</strong></h4>
-                        <p>
-                            (1) The <strong>main visualization</strong> is a sankey diagram. You read the sankey
-                            diagram
-                            from left to
-                            right.
-                            In this example you see the number of Asylum seekers which make an application. The left
-                            side show the origin countries
-                            and on the right are the destination countries.</p>
-                        <p>(2) The small bar charts left and right show the amount of asylum applications from the
-                            original country and destination country point of
-                            view. </p>
-
-                        <p>On the end of the site, you find two buttons <strong>'Show Less'</strong> and <strong>'Show
-                                more'</strong>. Here you can load more nodes or show less nodes. When you hover over
-                            the nodes (Rects) in the visualization you get the information of how many asylum
-                            applications were made from the selected country (node). You also
-                            see that maybe not all destination and origin countries are visible by the hatching
-                            rect. Here you can use the buttons below to load more origin and destination countries.
-                        </p>
-
-
-                        <p><strong>Detailed view: </strong>By clicking on one connection line in the sankey diagram,
-                            you
-                            get a detail view showing
-                            the amount of asylum applications between
-                            the two nodes (origin countries and destination countries).</p>
-
-                        <p> The screen picture shows the <strong>visual encoding</strong>. There is this example table
-                            of
-                            asylum data.
-                            The lines from the table to the sankey diagram
-                            show the encoding from the data to the visual element - in this case a sankey
-                            diagram. </p>
-
-                        <!-- Button trigger modal -->
-                        <button type="button" id='btn_design' class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2">
-                            <i class="far fa-play-circle"></i> Watch the Video!
-                        </button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Read the Visualization</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <video width='650' controls>
-                                            <source src='https://www.dropbox.com/s/9j5vfifm38jcn9t/Visual_Voiceover.mp4?raw=1'
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel3"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel3">Filtering, Sorting, Ordering</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span id="btnCloseFilter" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <video width='650' controls>
+                                        <source src='https://www.dropbox.com/s/3c2r9g0boplw3xw/Filter_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
-                                        </video>
-                                    </div>
+                                    </video>
                                 </div>
                             </div>
                         </div>
@@ -484,54 +893,113 @@
             </div>
         </div>
     </div>
+</div>
 
+<!--Tags-->
+<div class='row backgroundArea'>
+    <div class="col-md-6">
+        <div class="text-right rightPosition">
+            <!--Carousel-->
+            <div class="carousel slide" id="carousel-2308745">
+                <ol class="carousel-indicators">
+                    <li data-slide-to="0" data-target="#carousel-2308745" class="active">
+                    </li>
+                    <li data-slide-to="1" data-target="#carousel-2308745">
+                    </li>
+                    <li data-slide-to="2" data-target="#carousel-2308745">
+                    </li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img alt="Carousel Bootstrap First" class='img-fluid'
+                             src="https://www.dropbox.com/s/omnb0dfwbrfswos/tagging1.png?raw=1"
+                             width="650px"/>
+                        <div class="carousel-caption">
+                            <h4>
+                                Define Tags
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img alt="Carousel Bootstrap Second" class='img-fluid'
+                             src="https://www.dropbox.com/s/g158oaanbkcexpu/tagging2.png?raw=1"
+                             width="650px"/>
+                        <div class="carousel-caption">
+                            <h4>
+                                Open Tags and add new tags
+                            </h4>
 
-    <!--Filtering, Sorting, Ordering-->
-    <div class='row' id='padding'>
-        <div class="col-md-6">
-            <div class="text-right" id='rightPosition'>
-                <img class='img-fluid' src='https://www.dropbox.com/s/pgpvtm7n6icel59/filter_marks2.png?raw=1' width='650px' />
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img alt="Carousel Bootstrap Third" class='img-fluid'
+                             src="https://www.dropbox.com/s/k6sfcm8xbhoq80l/taggin3.png?raw=1"
+                             width="650px"/>
+                        <div class="carousel-caption">
+                            <h4>
+                                Filter by Tags
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#carousel-2308745" data-slide="prev"><span
+                        class="carousel-control-prev-icon"></span>
+                    <span class="sr-only">Previous</span></a>
+                <a class="carousel-control-next" href="#carousel-2308745" data-slide="next"><span
+                        class="carousel-control-next-icon"></span>
+                    <span class="sr-only">Next</span></a>
             </div>
         </div>
-        <div class='col-md-6'>
-            <div class='text-center'>
-                <div class="text-left">
-                    <div id='textWidth'>
-                        <h4 id='filter'><strong>Filtering, Sorting, Ordering</strong></h4>
-                        <p>You can filter, sort and order the data, which influences the visualization view.
-                            <br />
-                            1) You can filter the data in time and connection. <br />
-                            2) You can sort the data by source, target and flow and order it, ascending and
-                            decending. <br />
-                            3) Exporting the data from the current view. You get a .csv file with the data of
-                            the current visualization, including all sorting and
-                            filtering operations.<br />
-                            4) You can limit the number of asylum applications by using the slider on both
-                            sides. <br />
-                            5) Search for a particular country in the origin and also in the destination
-                            countries using the seach box. </p>
-                        <!-- Button trigger modal -->
-                        <button type="button" id='btn_design' class="btn btn-primary" data-toggle="modal" data-target="#exampleModal3">
-                            <i class="far fa-play-circle"></i> Watch the Video!
-                        </button>
+    </div>
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Filtering, Sorting, Ordering</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <video width='650' controls>
-                                            <source src='https://www.dropbox.com/s/3c2r9g0boplw3xw/Filter_Voiceover.mp4?raw=1'
+    <div class='col-md-6'>
+        <div class='text-center'>
+            <div class="text-left">
+                <div class='textWidth'>
+                    <h4 id='tags'><strong>Use Tags</strong></h4>
+                    <p>You can use tags to organize and group nodes on the source or target side. You can add tags
+                        in
+                        the csv file you will upload, or you can
+                        add tags directly in the visualization view. <br/>
+                        1) Add tags in the .csv in the 'SourceTag' or 'TargetTag' row. By using the pipe sign '|'
+                        you
+                        can add more than one tag to a particular node. <br/>
+                        2) You can add tags by clicking the tags-sign next to the nodes in the sankey diagram.<br/>
+                        3) You can filter by tags by clicking the small button below the search either on the left
+                        and
+                        right side.<br/>
+                        4) To see the flows between given tags you can switch the view in the header, as it is
+                        desribed
+                        in the video. <br/>
+                        5) When you export the data, the tags, you have assigned in the visualization view, are
+                        also
+                        exported.
+                    </p>
+
+                    <!-- Button trigger modal -->
+                    <button type="button" id='btnWatchVTags' class="btn btn-primary btn_design" data-toggle="modal"
+                            data-target="#exampleModal4">
+                        <i class="far fa-play-circle"></i> Watch the Video!
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal4" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel4"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel4">Tags</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span id="btnCloseTags" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <video width='650' controls>
+                                        <source src='https://www.dropbox.com/s/e97pb769ctejjpl/NetflowerTags3.mp4?raw=1'
                                                 type='video/mp4'>
-                                        </video>
-                                    </div>
+                                    </video>
                                 </div>
                             </div>
                         </div>
@@ -540,106 +1008,55 @@
             </div>
         </div>
     </div>
+</div>
 
-    <!--Tags-->
-
-    <div class='row' id='backgroundArea'>
-        <div class="col-md-6">
-            <div class="text-right" id='rightPosition'>
-                <!--Carousel-->
-                <div class="carousel slide" id="carousel-2308745">
-                    <ol class="carousel-indicators">
-                        <li data-slide-to="0" data-target="#carousel-2308745" class="active">
-                        </li>
-                        <li data-slide-to="1" data-target="#carousel-2308745">
-                        </li>
-                        <li data-slide-to="2" data-target="#carousel-2308745">
-                        </li>
-                    </ol>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img alt="Carousel Bootstrap First" class='img-fluid' src="https://www.dropbox.com/s/omnb0dfwbrfswos/tagging1.png?raw=1"
-                                width="650px" />
-                            <div class="carousel-caption">
-                                <h4>
-                                    Define Tags
-                                </h4>
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Carousel Bootstrap Second" class='img-fluid' src="https://www.dropbox.com/s/g158oaanbkcexpu/tagging2.png?raw=1"
-                                width="650px" />
-                            <div class="carousel-caption">
-                                <h4>
-                                    Open Tags and add new tags
-                                </h4>
-
-                            </div>
-                        </div>
-                        <div class="carousel-item">
-                            <img alt="Carousel Bootstrap Third" class='img-fluid' src="https://www.dropbox.com/s/k6sfcm8xbhoq80l/taggin3.png?raw=1"
-                                width="650px" />
-                            <div class="carousel-caption">
-                                <h4>
-                                    Filter by Tags
-                                </h4>
-                            </div>
-                        </div>
-                    </div> <a class="carousel-control-prev" href="#carousel-2308745" data-slide="prev"><span class="carousel-control-prev-icon"></span>
-                        <span class="sr-only">Previous</span></a>
-                    <a class="carousel-control-next" href="#carousel-2308745" data-slide="next"><span class="carousel-control-next-icon"></span>
-                        <span class="sr-only">Next</span></a>
-                </div>
-                <!--Carousel ENDS-->
-                <!-- <img class='img-fluid' src='https://www.dropbox.com/s/geka2pcfybdukrt/tags.png?raw=1' width='650px' /> -->
-            </div>
+<!--Notebook-->
+<div class='row' id='padding'>
+    <div class="col-md-6">
+        <div class="text-right rightPosition">
+            <img class='img-fluid' src='https://www.dropbox.com/s/ejf85l057deiw30/notebook.png?raw=1' width='650px'/>
         </div>
-        <div class='col-md-6'>
-            <div class='text-center'>
-                <div class="text-left">
-                    <div id='textWidth'>
-                        <h4 id='tags'><strong>Use Tags</strong></h4>
-                        <p>You can use tags to organize and group nodes on the source or target side. You can add tags
-                            in
-                            the csv file you will upload, or you can
-                            add tags directly in the visualization view. <br />
-                            1) Add tags in the .csv in the 'SourceTag' or 'TargetTag' row. By using the pipe sign '|'
-                            you
-                            can add more than one tag to a particular node. <br />
-                            2) You can add tags by clicking the tags-sign next to the nodes in the sankey diagram.<br />
-                            3) You can filter by tags by clicking the small button below the search either on the left
-                            and
-                            right side.<br />
-                            4) To see the flows between given tags you can switch the view in the header, as it is
-                            desribed
-                            in the video. <br />
-                            5) When you export the data, the tags, you have assigned in the visualization view, are
-                            also
-                            exported.
-                        </p>
+    </div>
+    <div class='col-md-6'>
+        <div class='text-center'>
+            <div class="text-left">
+                <div class='textWidth'>
+                    <h4 id='notebook'><strong>Notebook</strong></h4>
+                    <p>You can use a notebook, which opens when clicking the handler on the left side of
+                        the screen.
+                        You can add some notes and also export it as a .txt. file. This file can be
+                        loaded in the notebook sidebar, when starting for example a new session analysing data with
+                        netflower.</p>
+                    <p style='border:2px; border-style:solid; border-color:#DA5A6B; padding: 1em;'>
+                        <i>Please notice, that if you clean your browser forcefully shut down your
+                            device, the data gets lost. However, if
+                            you referesh the page or go back to it if you closed the browser normally it
+                            will still be there!</i>
+                    </p>
+                    <!-- Button trigger modal -->
+                    <button type="button" id='btnWatchVNote' class="btn btn-primary btn_design" data-toggle="modal"
+                            data-target="#exampleModal5">
+                        <i class="far fa-play-circle"></i> Watch the Video!
+                    </button>
 
-                        <!-- Button trigger modal -->
-                        <button type="button" id='btn_design' class="btn btn-primary" data-toggle="modal" data-target="#exampleModal4">
-                            <i class="far fa-play-circle"></i> Watch the Video!
-                        </button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="exampleModal4" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Tags</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <video width='650' controls>
-                                            <source src='https://www.dropbox.com/s/e97pb769ctejjpl/NetflowerTags3.mp4?raw=1'
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal5" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel5"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel5">Notebook</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span id="btnCloseNote" aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <video width='650' controls>
+                                        <source src='https://www.dropbox.com/s/eojnigrttqxftm3/Notes_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
-                                        </video>
-                                    </div>
+                                    </video>
                                 </div>
                             </div>
                         </div>
@@ -648,97 +1065,138 @@
             </div>
         </div>
     </div>
+</div>
 
-
-    <!--Notebook-->
-    <div class='row' id='padding'>
-        <div class="col-md-6">
-            <div class="text-right" id='rightPosition'>
-                <img class='img-fluid' src='https://www.dropbox.com/s/ejf85l057deiw30/notebook.png?raw=1' width='650px' />
-            </div>
-        </div>
-        <div class='col-md-6'>
-            <div class='text-center'>
-                <div class="text-left">
-                    <div id='textWidth'>
-                        <h4 id='notebook'><strong>Notebook</strong></h4>
-                        <p>You can use a notebook, which opens when clicking the handler on the left side of
-                            the screen.
-                            You can add some notes and also export it as a .txt. file. This file can be
-                            loaded in the notebook sidebar, when starting for example a new session analysing data with
-                            netflower.</p>
-                        <p style='border:2px; border-style:solid; border-color:#DA5A6B; padding: 1em;'>
-                            <i>Please notice, that if you clean your browser forcefully shut down your
-                                device, the data gets lost. However, if
-                                you referesh the page or go back to it if you closed the browser normally it
-                                will still be there!</i>
-                        </p>
-                        <!-- Button trigger modal -->
-                        <button type="button" id='btn_design' class="btn btn-primary" data-toggle="modal" data-target="#exampleModal5">
-                            <i class="far fa-play-circle"></i> Watch the Video!
-                        </button>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="exampleModal5" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Notebook</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <video width='650' controls>
-                                            <source src='https://www.dropbox.com/s/eojnigrttqxftm3/Notes_Voiceover.mp4?raw=1'
-                                                type='video/mp4'>
-                                        </video>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<!-- Footer -->
+<section id="footer">
+    <div class="container">
+        <div class="text-center">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mt-sm-5">
+                    <ul class="list-unstyled list-inline social text-center">
+                        <li class="list-inline-item"><a href='http://www.validproject.at/' target='_blank'>
+                            <i id="btnSocialProject" class="fas fa-globe-asia"></i></a></li>
+                        <li class="list-inline-item"><a href='https://github.com/VALIDproject' target='_blank'>
+                            <i id="btnSocialGit" class="fab fa-github"></i></a></li>
+                        <li class="list-inline-item"><a href='https://twitter.com/valid_at' target='_blank'>
+                            <i id="btnSocialTwitter" class="fab fa-twitter-square"></i></a></li>
+                    </ul>
+                    <p><a href='http://www.validproject.at' id="btnProject" target='_blank'>VALiD Project</a></p>
+                    <!-- <p><img src='https://www.dropbox.com/s/ts1sup3irh3ws0h/valid_logo_claim.png?raw=1' width='20%' /></p> -->
+                    <p><a href='https://www.fhstp.ac.at/' id="btnUniversity" target='_blank'>St. Pölten University of
+                        Applied
+                        Sciences, Austria</a></br><span style='color:white'>&copy All right Reversed.</span></p>
+                    <p><a href='http://netflower.fhstp.ac.at/imprint.html' id="btnImprint" target='_blank'>Imprint</a>
+                    </p>
                 </div>
+
             </div>
         </div>
     </div>
-    </div>
+</section>
 
 
-    <!-- Footer -->
-    <section id="footer">
-        <div class="container">
-            <div class="text-center">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 mt-2 mt-sm-5">
-                        <ul class="list-unstyled list-inline social text-center">
-                            <li class="list-inline-item"><a href='http://www.validproject.at/' target='_blank'><i class="fas fa-globe-asia"></i></a></li>
-                            <li class="list-inline-item"><a href='https://github.com/VALIDproject' target='_blank'><i
-                                        class="fab fa-github"></i></a></li>
-                            <li class="list-inline-item"><a href='https://twitter.com/valid_at' target='_blank'><i
-                                        class="fab fa-twitter-square"></i></a></li>
-                        </ul>
-                        <p><a href='http://www.validproject.at' target='_blank'>VALiD Project</a></p>
-                        <!-- <p><img src='https://www.dropbox.com/s/ts1sup3irh3ws0h/valid_logo_claim.png?raw=1' width='20%' /></p> -->
-                        <p><a href='https://www.fhstp.ac.at/' target='_blank'>St. Pölten University of Applied
-                                Sciences, Austria</a></br><span style='color:white'>&copy All right Reversed.</span></p>
-                        <p><a href='http://netflower.fhstp.ac.at/imprint.html' target='_blank'>Imprint</a></p>
-                    </div>
+<!--Scripts-->
+<script>
+    // The logger
+    let bugout = new debugout();
 
-                </div>
-            </div>
-        </div>
-    </section>
+    // Attach click listener to track specific clicks
+    document.addEventListener('click', function (e) {
+        const target = e.target;
+        switch (target.id) {
+            case 'navHome':
+                bugout.log('User clicked on the home menu item.');
+                break;
+            case 'navLoad':
+                bugout.log('User clicked on the load data section menu item.');
+                break;
+            case 'navReadViz':
+                bugout.log('User clicked on the read viz section menu item.');
+                break;
+            case 'navFilter':
+                bugout.log('User clicked on the filter, sorting, ordering section menu item.');
+                break;
+            case 'navTags':
+                bugout.log('User clicked on the tags section menu item.');
+                break;
+            case 'navNotebook':
+                bugout.log('User clicked on the notebook section menu item.');
+                break;
+            case 'btnUseIt':
+                bugout.log('User clicked on the tool button and changed the site to main tool.');
+                break;
+            case 'btnWatchVLoad':
+                bugout.log('User is watching the load data video now.');
+                break;
+            case 'btnCloseLoad':
+                bugout.log('User stopped watching the load data video.');
+                break;
+            case 'btnWatchVRead':
+                bugout.log('User is watching the read data video now.');
+                break;
+            case 'btnCloseRead':
+                bugout.log('User stopped watching the read data video.');
+                break;
+            case 'btnWatchVFilter':
+                bugout.log('User is watching the filter, sorting, ordering video now.');
+                break;
+            case 'btnCloseFilter':
+                bugout.log('User stopped watching the filter, sorting, ordering video.');
+                break;
+            case 'btnWatchVTags':
+                bugout.log('User is watching the tags video now.');
+                break;
+            case 'btnCloseTags':
+                bugout.log('User stopped watching the tags video.');
+                break;
+            case 'btnWatchVNote':
+                bugout.log('User is watching the notebook video now.');
+                break;
+            case 'btnCloseNote':
+                bugout.log('User stopped watching the notebook video.');
+                break;
+            case 'btnSocialProject':
+                bugout.log('User clicked on the project website button (social menu).');
+                break;
+            case 'btnSocialGit':
+                bugout.log('User clicked on the github website button (social menu).');
+                break;
+            case 'btnSocialTwitter':
+                bugout.log('User clicked on the twitter account button (social menu).');
+                break;
+            case 'btnProject':
+                bugout.log('User clicked on the project website link.');
+                break;
+            case 'btnUniversity':
+                bugout.log('User clicked on the university website link.');
+                break;
+            case 'btnImprint':
+                bugout.log('User clicked on the imprint website link.');
+                break;
+            default:
+                break;
+        }
+    });
+
+    // SHORTCUT to download log: CTRL + ALT + L
+    document.onkeyup = function (e) {
+        if (e.ctrlKey && e.altKey && e.which || e.keyCode == 76) {
+            bugout.downloadLog();
+        }
+    };
+
+</script>
 
 
-    <!--Scripts-->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+        integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
         crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+        integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
         crossorigin="anonymous"></script>
 </body>
-
 </html>
