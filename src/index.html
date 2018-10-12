@@ -680,18 +680,18 @@
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog"
                          aria-labelledby="exampleModalLabel1"
-                         aria-hidden="true">
+                         aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel1">Loading Data</h5>
-                                    <button type="button" class="close" data-dismiss="modal"
+                                    <button id="btnCloseLoadAlt" type="button" class="close" data-dismiss="modal"
                                             aria-label="Close">
                                         <span id='btnCloseLoad' aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <video width='650' controls>
+                                    <video id="loadDataVideo" width='650' controls>
                                         <source src='https://www.dropbox.com/s/oaqfe5d9vd2tjk1/Loading_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
                                     </video>
@@ -753,10 +753,10 @@
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#carousel-230874" data-slide="prev"><span
-                        class="carousel-control-prev-icon"></span>
+                        class="carousel-control-prev-icon" id="carousel1Prev"></span>
                     <span class="sr-only">Previous</span></a>
                 <a class="carousel-control-next" href="#carousel-230874" data-slide="next"><span
-                        class="carousel-control-next-icon"></span>
+                        class="carousel-control-next-icon" id="carousel1Next"></span>
                     <span class="sr-only">Next</span></a>
             </div>
             <!--Carousel ENDS-->
@@ -811,18 +811,18 @@
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog"
                          aria-labelledby="exampleModalLabel2"
-                         aria-hidden="true">
+                         aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel2">Read the Visualization</h5>
-                                    <button type="button" class="close" data-dismiss="modal"
+                                    <button id="btnCloseReadAlt" type="button" class="close" data-dismiss="modal"
                                             aria-label="Close">
                                         <span id="btnCloseRead" aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <video width='650' controls>
+                                    <video id="readDataVideo" width='650' controls>
                                         <source src='https://www.dropbox.com/s/9j5vfifm38jcn9t/Visual_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
                                     </video>
@@ -870,18 +870,18 @@
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog"
                          aria-labelledby="exampleModalLabel3"
-                         aria-hidden="true">
+                         aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel3">Filtering, Sorting, Ordering</h5>
-                                    <button type="button" class="close" data-dismiss="modal"
+                                    <button id="btnCloseFilterAlt" type="button" class="close" data-dismiss="modal"
                                             aria-label="Close">
                                         <span id="btnCloseFilter" aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <video width='650' controls>
+                                    <video id="filterVideo" width='650' controls>
                                         <source src='https://www.dropbox.com/s/3c2r9g0boplw3xw/Filter_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
                                     </video>
@@ -943,10 +943,10 @@
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#carousel-2308745" data-slide="prev"><span
-                        class="carousel-control-prev-icon"></span>
+                        class="carousel-control-prev-icon" id="carousel2Prev"></span>
                     <span class="sr-only">Previous</span></a>
                 <a class="carousel-control-next" href="#carousel-2308745" data-slide="next"><span
-                        class="carousel-control-next-icon"></span>
+                        class="carousel-control-next-icon" id="carousel2Next"></span>
                     <span class="sr-only">Next</span></a>
             </div>
         </div>
@@ -985,18 +985,18 @@
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModal4" tabindex="-1" role="dialog"
                          aria-labelledby="exampleModalLabel4"
-                         aria-hidden="true">
+                         aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel4">Tags</h5>
-                                    <button type="button" class="close" data-dismiss="modal"
+                                    <button id="btnCloseTagsAlt" type="button" class="close" data-dismiss="modal"
                                             aria-label="Close">
                                         <span id="btnCloseTags" aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <video width='650' controls>
+                                    <video id="tagsVideo" width='650' controls>
                                         <source src='https://www.dropbox.com/s/e97pb769ctejjpl/NetflowerTags3.mp4?raw=1'
                                                 type='video/mp4'>
                                     </video>
@@ -1042,18 +1042,18 @@
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModal5" tabindex="-1" role="dialog"
                          aria-labelledby="exampleModalLabel5"
-                         aria-hidden="true">
+                         aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel5">Notebook</h5>
-                                    <button type="button" class="close" data-dismiss="modal"
+                                    <button id="btnCloseNoteAlt" type="button" class="close" data-dismiss="modal"
                                             aria-label="Close">
                                         <span id="btnCloseNote" aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <video width='650' controls>
+                                    <video id="notebookVideo" width='650' controls>
                                         <source src='https://www.dropbox.com/s/eojnigrttqxftm3/Notes_Voiceover.mp4?raw=1'
                                                 type='video/mp4'>
                                     </video>
@@ -1082,7 +1082,6 @@
                             <i id="btnSocialTwitter" class="fab fa-twitter-square"></i></a></li>
                     </ul>
                     <p><a href='http://www.validproject.at' id="btnProject" target='_blank'>VALiD Project</a></p>
-                    <!-- <p><img src='https://www.dropbox.com/s/ts1sup3irh3ws0h/valid_logo_claim.png?raw=1' width='20%' /></p> -->
                     <p><a href='https://www.fhstp.ac.at/' id="btnUniversity" target='_blank'>St. Pölten University of
                         Applied
                         Sciences, Austria</a></br><span style='color:white'>&copy All right Reversed.</span></p>
@@ -1095,11 +1094,31 @@
     </div>
 </section>
 
-
 <!--Scripts-->
 <script>
     // The logger
     let bugout = new debugout();
+
+    // Attach video listener to track video events
+    const vidNotebook = document.getElementById('notebookVideo');
+    vidNotebook.onplay = () => { bugout.log('User is watching the notebook video.'); };
+    vidNotebook.onpause = () => { bugout.log('User stopped watching the notebook video.'); };
+
+    const vidTags = document.getElementById('tagsVideo');
+    vidTags.onplay = () => { bugout.log('User is watching the tags video.'); };
+    vidTags.onpause = () => { bugout.log('User stopped watching the tags video.'); };
+
+    const vidFilter = document.getElementById('filterVideo');
+    vidFilter.onplay = () => { bugout.log('User is watching the filtering, sorting, ordering video.'); };
+    vidFilter.onpause = () => { bugout.log('User stopped watching the filtering, sorting, ordering video.'); };
+
+    const vidReadData = document.getElementById('readDataVideo');
+    vidReadData.onplay = () => { bugout.log('User is watching the read data video.'); };
+    vidReadData.onpause = () => { bugout.log('User stopped watching the read data video.'); };
+
+    const vidLoadData = document.getElementById('loadDataVideo');
+    vidLoadData.onplay = () => { bugout.log('User is watching the load data video.'); };
+    vidLoadData.onpause = () => { bugout.log('User stopped watching the load data video.'); };
 
     // Attach click listener to track specific clicks
     document.addEventListener('click', function (e) {
@@ -1127,34 +1146,39 @@
                 bugout.log('User clicked on the tool button and changed the site to main tool.');
                 break;
             case 'btnWatchVLoad':
-                bugout.log('User is watching the load data video now.');
+                bugout.log('User opened the load data video now.');
                 break;
             case 'btnCloseLoad':
-                bugout.log('User stopped watching the load data video.');
+            case 'btnCloseLoadAlt':
+                bugout.log('User closed the load data video.');
                 break;
             case 'btnWatchVRead':
-                bugout.log('User is watching the read data video now.');
+                bugout.log('User opened the read data video now.');
                 break;
             case 'btnCloseRead':
-                bugout.log('User stopped watching the read data video.');
+            case 'btnCloseReadAlt':
+                bugout.log('User closed the read data video.');
                 break;
             case 'btnWatchVFilter':
-                bugout.log('User is watching the filter, sorting, ordering video now.');
+                bugout.log('User opened the filter, sorting, ordering video now.');
                 break;
             case 'btnCloseFilter':
-                bugout.log('User stopped watching the filter, sorting, ordering video.');
+            case 'btnCloseFilterAlt':
+                bugout.log('User closed the filter, sorting, ordering video.');
                 break;
             case 'btnWatchVTags':
-                bugout.log('User is watching the tags video now.');
+                bugout.log('User opened the tags video now.');
                 break;
             case 'btnCloseTags':
-                bugout.log('User stopped watching the tags video.');
+            case 'btnCloseTagsAlt':
+                bugout.log('User closed the tags video.');
                 break;
             case 'btnWatchVNote':
-                bugout.log('User is watching the notebook video now.');
+                bugout.log('User opened the notebook video now.');
                 break;
             case 'btnCloseNote':
-                bugout.log('User stopped watching the notebook video.');
+            case 'btnCloseNoteAlt':
+                bugout.log('User closed the notebook video.');
                 break;
             case 'btnSocialProject':
                 bugout.log('User clicked on the project website button (social menu).');
@@ -1173,6 +1197,14 @@
                 break;
             case 'btnImprint':
                 bugout.log('User clicked on the imprint website link.');
+                break;
+            case 'carousel1Prev':
+            case 'carousel1Next':
+                bugout.log('User is browisng the read visualization carousel.');
+                break;
+            case 'carousel2Prev':
+            case 'carousel2Next':
+                bugout.log('User is browsing the tags carousel.');
                 break;
             default:
                 break;
