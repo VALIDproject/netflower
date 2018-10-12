@@ -1213,7 +1213,7 @@
 
     // SHORTCUT to download log: CTRL + ALT + L
     document.onkeyup = function (e) {
-        if (e.ctrlKey && e.altKey && e.which || e.keyCode == 76) {
+        if (e.ctrlKey && e.altKey && (e.which == 76 || e.keyCode == 76)) {
             bugout.downloadLog();
         }
     };
