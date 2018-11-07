@@ -180,18 +180,21 @@ class DataImport implements MAppViews {
       <table class='demo'>
         <thead>
         <tr>
-          <th>Source</th><th>Target</th><th>Time</th><th>Value</th><th>SourceTag</th><th>TargetTag</th><th>Attribute...</th>
+          <th>Source</th><th>Target</th><th>Time</th><th>Value</th><th>SourceTag</th><th>TargetTag</th><th>Attribute</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-          <td>Assign an appropriate name for the source nodes of your visualization.</td>
-          <td>Assign an appropriate name for the target nodes of your visualization.</td>
-          <td>Assign the time column name here. Use "Quarter" or "Month" as column name to reformat values such as 20184 or 201812.</td>
-          <td>Assign the value column name here. Better keep it short, for example use a currency sign.</td>
-          <td>Assign the tag name referring to the source nodes.</td>
-          <td>Assign the tag name referring to the target nodes.</td>
-          <td>Add attributes here (one attribute per column).</td>
+          <td width="10%">Assign an appropriate name for the source nodes of your visualization.</td>
+          <td width="10%">Assign an appropriate name for the target nodes of your visualization.</td>
+          <td width="20%">Assign the time column name here. Use "Quarter" (e.g. 20184 or 201812) or "Month" (3, 4). 
+              Only <span class="highlight"><strong>numeric</strong></span> values are possible (currently).</td>
+          <td width="30%">Assign the value column name here. Better keep it short (e.g. currency sign).
+              Use <span class="highlight"><strong>dot</strong></span> seperation for comma values (e.g. 34.56).
+              Thousand seperatiors are made automatically.</td>
+          <td width="10%">Assign the tag name referring to the source nodes.</td>
+          <td width="10%">Assign the tag name referring to the target nodes.</td>
+          <td width="10%">Add attributes here (currently only one supported).</td>
         </tr>
         </tbody>
       </table>
