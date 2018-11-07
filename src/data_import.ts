@@ -108,7 +108,7 @@ class DataImport implements MAppViews {
                             <label for='filename'>Upload your FILE (needs to be .csv):</label>
                             <div class='input-group'>
                               <span class='input-group-btn' style='padding-right: 2px;'>
-                              <span class='btn btn-default btn-file'>
+                              <span class='btn btn-default btn-file csvInputText'>
                                 Select CSV file...
                                 <input type='file' id='files' accept='.csv' required />
                               </span>
