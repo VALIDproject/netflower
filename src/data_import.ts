@@ -187,9 +187,9 @@ class DataImport implements MAppViews {
         <tr>
           <td width="10%">Assign an appropriate name for the source nodes of your visualization.</td>
           <td width="10%">Assign an appropriate name for the target nodes of your visualization.</td>
-          <td width="20%">Assign the time column name here. Use "Quarter" (e.g. 20184 or 201812) or "Month" (3, 4). 
+          <td width="25%">Assign the time column name here. Use "Quarter" (e.g. 20184 or 201812) or "Month" (3, 4). 
               Only <span class="highlight"><strong>numeric</strong></span> values are possible (currently).</td>
-          <td width="30%">Assign the value column name here. Better keep it short (e.g. currency sign).
+          <td width="25%">Assign the value column name here. Better keep it short (e.g. currency sign).
               Use <span class="highlight"><strong>dot</strong></span> seperation for comma values (e.g. 34.56).
               Thousand seperatiors are made automatically.</td>
           <td width="10%">Assign the tag name referring to the source nodes.</td>
