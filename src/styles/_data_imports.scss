@@ -87,7 +87,6 @@
 }
 
 .demo {
-  width: 100%;
   border: 1px dashed #C0C0C0;
   border-collapse: collapse;
   padding: 5px;
@@ -139,25 +138,6 @@
 .btn-file {
   position: relative;
   overflow: hidden;
- // background: $valid-color3;
-
-  /*background:*/
-    /* On "top" */
-    /*repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        #fbfbfb 10px,
-        #fbfbfb 20px
-    ),*/
-      /* on "bottom" */
-    /*linear-gradient(
-        to bottom,
-        #fbfbfb,
-        #dfdfdf
-    );*/
-
-
 }
 
 .btn-file input[type=file] {
@@ -294,4 +274,18 @@ New styles for the panels
 
 div.dataLoadingView  div.tab-content {
   margin-bottom: 15px;
+}
+
+.highlight {
+  background: #45B07C;
+  color: white;
+  padding: 2px;
+  border-radius: 5px;
+}
+
+.csvInputText {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

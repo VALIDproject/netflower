@@ -82,9 +82,6 @@ class FilterData implements MAppViews {
        <br/>
          <div class='form-group' style='display: flex;'>
             <ul class='list-group list-inline' id='selectable'></ul>
-            <!--<p id='informationTextTimeSelection'>1) Click & Drag mouse for rectangle selection.<br/>
-            2) Click one elment to make a single selection.<br/>
-            3) CTRL + Click to make a multi selection.</p>-->
          </div>
          <div class='form-group'>
            <button id='btnSelectAll' class='btn btn-xs btn-info'>Select All</button>

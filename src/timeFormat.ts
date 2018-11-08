@@ -77,8 +77,6 @@ export default class TimeFormat {
                     result += '-' + TimeFormat.format(end);
                 }
             }
-            console.log(result);
-
             return result;
         }
     }

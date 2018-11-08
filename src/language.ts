@@ -24,7 +24,11 @@ utton at the end of the sankey diagram.<br/>This will create more visual space f
 
 export const ERROR_TOOMANYFILTER = `Your current <font color='#DA5A6B'><strong>FILTER</strong></font> settings are
 too restrictive. There is <strong>NO DATA</strong> to show!<br/>Please change your filter settings in order to show
-data on the visualization.`;
+data on the visualization.
+<br/><br/><p>Clicking the <span style='border: 1px solid grey; background-color: #f0f0f0; padding: 2px;
+border-radius: 5px;'>Ok</span> button will <strong>reset</strong> all filters to default!</p>
+<p>Clicking the <span style='border: 1px solid grey; padding: 2px;border-radius: 5px;'>Cancel</span> button
+will do nothing and you have to adjust the filters yourself to see some data.</p>`;
 
 export const NOTAGS_INFO = `There are <font color='#DA5A6B'><strong>no tags</strong></font> to display tag flows.`;
 

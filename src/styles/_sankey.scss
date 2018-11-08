@@ -375,3 +375,9 @@ Section for the input fields of the sliders.
     margin-top: 0 !important;
   }
 }
+
+#nothingToShowText {
+  stroke-width: 3;
+  stroke: $valid-color;
+  fill: none;
+}
