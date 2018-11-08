@@ -14,8 +14,10 @@ import 'style-loader!css-loader!ion-rangeslider/css/ion.rangeSlider.skinNice.css
 import 'imports-loader?d3=d3!../lib/sankey.js';
 import {AppConstants} from './app_constants';
 import {MAppViews} from './app';
-import {roundToFull, dotFormat, textTransition, d3TextEllipse,
-  Tooltip, assembleNodeTooltip} from './utilities';
+import {
+  roundToFull, dotFormat, textTransition, d3TextEllipse,
+  Tooltip, assembleNodeTooltip
+} from './utilities';
 import {
   setEntityFilterRange, updateEntityRange, setMediaFilterRange,
   updateMediaRange, setEuroFilterRange, updateEuroRange,
@@ -23,7 +25,7 @@ import {
   setEntityTagFilter, setMediaTagFilter
 } from './filters/filterMethods';
 import {ERROR_TOOMANYNODES, ERROR_TOOMANYFILTER, NOTAGS_INFO} from './language';
-import { setTagFilterRefs } from './export';
+import {setTagFilterRefs} from './export';
 import FilterPipeline from './filters/filterpipeline';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -59,9 +61,15 @@ class SankeyDiagram implements MAppViews {
   private mediaTagFilter: MediaTagFilter;
 
   // Sliders
-  private entitySlider; private entityFrom = 0; private entityTo = 0;
-  private mediaSlider; private mediaFrom = 0; private mediaTo = 0;
-  private valueSlider; private euroFrom = 0; private euroTo = 0;
+  private entitySlider;
+  private entityFrom = 0;
+  private entityTo = 0;
+  private mediaSlider;
+  private mediaFrom = 0;
+  private mediaTo = 0;
+  private valueSlider;
+  private euroFrom = 0;
+  private euroTo = 0;
 
   private activeQuarters: string[] = [];
 
@@ -312,7 +320,7 @@ class SankeyDiagram implements MAppViews {
     d3.select('#sankeyDiagram').html('');
 
     // Resize the box for the Tags
-    d3.selectAll('.tagFilterBox').style('width', function() {
+    d3.selectAll('.tagFilterBox').style('width', function () {
       return (d3.select('.controlBox') as any).node().getBoundingClientRect().width + 'px';
     });
     this.getStorageData(true);
@@ -371,7 +379,9 @@ class SankeyDiagram implements MAppViews {
   private buildSankey(json, origJson) {
     const that = this;
     const sankey = (<any>d3).sankey();
-    const timePoints: any = d3.set(json.map(function (d: any) {return d.timeNode;})).values().sort();
+    const timePoints: any = d3.set(json.map(function (d: any) {
+      return d.timeNode;
+    })).values().sort();
     const selectedTimePointsAsString = (timePoints.length > 1)
       ? TimeFormat.format(timePoints[0]) + ' \u2013 ' + TimeFormat.format(timePoints[timePoints.length - 1])
       : TimeFormat.format(timePoints[0]);
@@ -408,7 +418,7 @@ class SankeyDiagram implements MAppViews {
     let flatNest = d3.nest()
       .key((d: any) => {
         // First define keys
-        if(that.pipeline.getTagFlowFilterStatus()) {
+        if (that.pipeline.getTagFlowFilterStatus()) {
           return d.sourceTag + '|$|' + d.targetTag;
         } else {
           return d.sourceNode + '|$|' + d.targetNode;
@@ -426,9 +436,11 @@ class SankeyDiagram implements MAppViews {
       })
       .entries(json)
       .map((o) => o.values) // Remove key/values
-      .filter((e) => {return e.value > 0;}); // Remove entries whos sum is smaller than 0
+      .filter((e) => {
+        return e.value > 0;
+      }); // Remove entries whos sum is smaller than 0
 
-    if(that.pipeline.getTagFlowFilterStatus()) {
+    if (that.pipeline.getTagFlowFilterStatus()) {
       flatNest = flatNest.filter(function (d) {
         return (d.source !== '' && d.source !== undefined) && (d.target !== '' && d.target !== undefined);
       });
@@ -443,11 +455,11 @@ class SankeyDiagram implements MAppViews {
     //============ CHECK IF SHOULD DRAW ============
     if (json.length === 0 || flatNest.length === 0) {         // ERROR: Too strong filtered
       that.drawReally = false;
-      this.showErrorDialog(ERROR_TOOMANYFILTER);
-    } else if(that.pipeline.getTagFlowFilterStatus()) {       // ERROR: No Tags found
+      this.showErrorDialog(ERROR_TOOMANYFILTER, true);
+    } else if (that.pipeline.getTagFlowFilterStatus()) {       // ERROR: No Tags found
       const sumOfEntityTags = that.entityTagFilter.activeTags.size() + that.entityTagFilter.availableTags.size();
       const sumOfMediaTags = that.mediaTagFilter.activeTags.size() + that.mediaTagFilter.availableTags.size();
-      if((sumOfEntityTags === 0) || (sumOfMediaTags === 0)) {
+      if ((sumOfEntityTags === 0) || (sumOfMediaTags === 0)) {
         that.drawReally = false;
         this.showErrorDialog(NOTAGS_INFO);
       } else {
@@ -503,7 +515,7 @@ class SankeyDiagram implements MAppViews {
         .on('mouseover', function (d) {
           d3.select(this).style('cursor', 'pointer');
           let text;
-          if(that.pipeline.getTagFlowFilterStatus()) {
+          if (that.pipeline.getTagFlowFilterStatus()) {
             const re = /\|/g;
             text = d.source.name.replace(re, ', ') + ' → ' + d.target.name.replace(re, ', ') + '\n' + dotFormat(d.value) + valuePostFix;
           } else {
@@ -543,8 +555,12 @@ class SankeyDiagram implements MAppViews {
 
       // White background rect so that tooltip is easier to reach
       node.append('rect')
-        .attr('height', (d) => { return d.dy; })
-        .attr('width', (d) => { return 45 + (margin.left + margin.right) / 2; })
+        .attr('height', (d) => {
+          return d.dy;
+        })
+        .attr('width', (d) => {
+          return 45 + (margin.left + margin.right) / 2;
+        })
         .style('fill', 'white')
         .filter(function (d, i) {
           return d.x < width / 2;
@@ -553,9 +569,11 @@ class SankeyDiagram implements MAppViews {
 
       // Add the rectangles for the nodes
       node.append('rect')
-        .attr('height', (d) => { return d.dy; })
+        .attr('height', (d) => {
+          return d.dy;
+        })
         .attr('width', (d) => {
-          return Math.max(this.minFraction * sankey.nodeWidth()  / d.fraction, 1);
+          return Math.max(this.minFraction * sankey.nodeWidth() / d.fraction, 1);
         })
         .attr('x', (d) => {
           if (d.sourceLinks.length <= 0) {
@@ -565,7 +583,7 @@ class SankeyDiagram implements MAppViews {
           }
         })
         .style('fill', '#DA5A6B')
-        .on('click', function(d: any) {
+        .on('click', function (d: any) {
           if (d.sourceLinks.length > 0) {
             const txtSource = '"' + d.name + '"';
             $('#entitySearchFilter').val(txtSource);
@@ -584,11 +602,15 @@ class SankeyDiagram implements MAppViews {
 
       // This is how the overlays for the rects can be done after they have been added
       node.append('rect')
-        .filter((d) => {return d.overall - d.value > 0.00001; }) // compare to a small number to avoid floating point issues
-        .attr('width', (d) =>  {
+        .filter((d) => {
+          return d.overall - d.value > 0.00001;
+        }) // compare to a small number to avoid floating point issues
+        .attr('width', (d) => {
           return Math.max(this.minFraction * sankey.nodeWidth() * (d.overall / d.value - 1), 1);
         })
-        .attr('height', (d) => { return d.dy; })
+        .attr('height', (d) => {
+          return d.dy;
+        })
         .style('fill', 'url(#diagonalHatch)')
         .attr('x', (d) => {
           if (d.sourceLinks.length <= 0) {
@@ -597,7 +619,7 @@ class SankeyDiagram implements MAppViews {
             return sankey.nodeWidth() - Math.max(this.minFraction * sankey.nodeWidth() * d.overall / d.value, 1);
           }
         })
-        .on('click', function(d: any) {
+        .on('click', function (d: any) {
           if (d.sourceLinks.length > 0) {
             const txtSource = '"' + d.name + '"';
             $('#entitySearchFilter').val(txtSource);
@@ -621,13 +643,13 @@ class SankeyDiagram implements MAppViews {
         .attr('text-anchor', 'start')
         .attr('class', 'rightText')
         .text(function (d) {
-          if(that.pipeline.getTagFlowFilterStatus()) {
+          if (that.pipeline.getTagFlowFilterStatus()) {
             return `${d.name.replace(/\|/gi, ', ')}`;
           } else {
             return `${d.name}`;
           }
         })
-        .on('click', function(d: any) {
+        .on('click', function (d: any) {
           const txt = '"' + d.name + '"';
           $('#mediaSearchFilter').val(txt);
           $('#mediaSearchButton').trigger('click');
@@ -639,7 +661,7 @@ class SankeyDiagram implements MAppViews {
         .attr('x', -45 + sankey.nodeWidth())
         .attr('text-anchor', 'end')
         .attr('class', 'leftText')
-        .on('click', function(d: any) {  // Click and add it to the search box for source
+        .on('click', function (d: any) {  // Click and add it to the search box for source
           const txt = '"' + d.name + '"';
           $('#entitySearchFilter').val(txt);
           $('#entitySearchButton').trigger('click');
@@ -647,7 +669,7 @@ class SankeyDiagram implements MAppViews {
         });
 
       // Add tag managing buttons if the aggregated sankey view shall be displayed
-      if(!that.pipeline.getTagFlowFilterStatus()) {
+      if (!that.pipeline.getTagFlowFilterStatus()) {
         const managers = node.append('g');
         const buttons = managers.append('text')
           .attr('x', 170)
@@ -658,8 +680,8 @@ class SankeyDiagram implements MAppViews {
           .attr('font-family', 'FontAwesome')
           .attr('font-size', '1.0em')
           .attr('cursor', 'pointer')
-          .text(function(d) {
-              return '\uf02c';
+          .text(function (d) {
+            return '\uf02c';
           })
           .attr('class', function (d) {
             if (that.getNumOfTagsForMediaNode(json, d.name) === 'No Tags') {
@@ -704,8 +726,19 @@ class SankeyDiagram implements MAppViews {
 
       // On Hover titles for Sankey Diagram Text - after Text Elipsis
     } else {
-      const svgPlain = d3.select('#sankeyDiagram svg');
-      svgPlain.append('text').attr('transform', 'translate(' + (width + margin.left + margin.right) / 2 + ')')
+            const svgPlain = d3.select('#sankeyDiagram svg');
+      const g = svgPlain.append('g');
+
+      g.append('rect')
+        .attr('width', width / 2)
+        .attr('height', width / 2)
+        .attr('x', ((width + margin.left + margin.right) / 2) - (width / 2) / 2)
+        .attr('y', (height + margin.top + margin.bottom) / 2 - (width / 2) / 2)
+        .attr('rx', 10)
+        .attr('ry', 10)
+        .attr('id', 'nothingToShowText');
+      g.append('text')
+        .attr('transform', 'translate(' + (width + margin.left + margin.right) / 2 + ')')
         .attr('y', (height + margin.top + margin.bottom) / 2)
         .append('tspan').attr('x', '0').attr('text-anchor', 'middle').style('font-size', '2em')
         .style('font-varaint', 'small-caps')
@@ -955,7 +988,7 @@ class SankeyDiagram implements MAppViews {
    * This method is used in order to display error messages for the user.
    * @param text which shall be shown in the dialog
    */
-  private showErrorDialog(text: string): void {
+  private showErrorDialog(text: string, restFilters?: boolean): void {
     bootbox.confirm({
       className: 'dialogBox',
       title: 'Information',
@@ -963,6 +996,9 @@ class SankeyDiagram implements MAppViews {
       callback(result) {
         if (result) {
           console.log('Ok pressed...');
+          if (restFilters) {
+            $('#clearAllBtn').trigger('click');
+          }
         } else {
           return;
         }
@@ -979,13 +1015,15 @@ class SankeyDiagram implements MAppViews {
   private getNumOfTagsForMediaNode(json, name) {
     const tags: d3.Set = this.mediaTagFilter.getTagsByName(json, name);
     let numberOfTags = '';
-    switch(tags.size()) {
+    switch (tags.size()) {
       case 0: {
         numberOfTags = 'No Tags';
-      } break;
+      }
+        break;
       default: {
         numberOfTags = tags.size() + '';
-      } break;
+      }
+        break;
     }
     return numberOfTags;
   }
@@ -999,13 +1037,15 @@ class SankeyDiagram implements MAppViews {
   private getNumOfTagsForEntityNode(json, name) {
     const tags: d3.Set = this.entityTagFilter.getTagsByName(json, name);
     let numberOfTags = '';
-    switch(tags.size()) {
+    switch (tags.size()) {
       case 0: {
         numberOfTags = 'No Tags';
-      } break;
+      }
+        break;
       default: {
         numberOfTags = tags.size() + '';
-      } break;
+      }
+        break;
     }
     return numberOfTags;
   }
