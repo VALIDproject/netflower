@@ -135,26 +135,36 @@ class DataImport implements MAppViews {
       .append('tbody');
 
     // fill sample table using D3.js
-    const rows = sampleTable.selectAll('tr')
-      .data(AppConstants.SAMPLES)
-      .enter()
-      .append('tr')
-      .classed('selected', (d, i) => { return (i === 0); })
-      .html((d, i) => `
+    d3.json('./static/samples.json', (err, data) => {
+      interface Sample {
+        title: string;
+        description: string;
+        file: string;
+        source: string;
+      }
+
+      const rows = sampleTable.selectAll('tr')
+        .data(data as [Sample])
+        .enter()
+        .append('tr')
+        .classed('selected', (d, i) => { return (i === 0); })
+        .html((d, i) => `
       <td class='leftTD'>
         <i class='radio fa fa-${i === 0 ? 'check-' : ''}circle-o'></i>
         <strong>${d.title}</strong><br/>
         ${d.description}
-        ${d.source.length > 0  ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
+        ${d.source.length > 0 ? `<a target='_blank' href='${d.source}'>Source</a>` : ''}
       </td>
       <td class='rightTD'><a href=${d.file}><i class="fa fa-download"></i> Download Data (.csv)</a></td>
       `)
-      .on('click', function(d) {
-        sampleTable.selectAll('tr').classed('selected', false);
-        sampleTable.selectAll('tr i.radio').classed('fa-check-circle-o', false).classed('fa-circle-o', true);
-        d3.select(this).classed('selected', true);
-        d3.select(this).select('i.radio').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
-      });
+        .on('click', function (d) {
+          sampleTable.selectAll('tr').classed('selected', false);
+          sampleTable.selectAll('tr i.radio').classed('fa-check-circle-o', false).classed('fa-circle-o', true);
+          d3.select(this).classed('selected', true);
+          d3.select(this).select('i.radio').classed('fa-check-circle-o', true).classed('fa-circle-o', false);
+        });
+    });
+
 
     // Add the display container and the logs
     d3.select('.fileContainer').append('div').classed('additionalInfo', true);
@@ -187,7 +197,7 @@ class DataImport implements MAppViews {
         <tr>
           <td width="10%">Assign an appropriate name for the source nodes of your visualization.</td>
           <td width="10%">Assign an appropriate name for the target nodes of your visualization.</td>
-          <td width="25%">Assign the time column name here. Use "Quarter" (e.g. 20184 or 201812) or "Month" (3, 4). 
+          <td width="25%">Assign the time column name here. Use "Quarter" (e.g. 20184 or 201812) or "Month" (3, 4).
               Only <span class="highlight"><strong>numeric</strong></span> values are possible (currently).</td>
           <td width="25%">Assign the value column name here. Better keep it short (e.g. currency sign).
               Use <span class="highlight"><strong>dot</strong></span> seperation for comma values (e.g. 34.56).
