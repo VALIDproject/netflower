@@ -10,6 +10,7 @@ const pkg = require('./package.json');
 const webpack = require('webpack');
 const fs = require('fs');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const buildInfo = require('./buildInfo.js');
 
 const now = new Date();
@@ -140,6 +141,7 @@ function generateWebpack(options) {
         banner: banner,
         raw: true
       }),
+      new CopyWebpackPlugin([ {from: 'static', to: 'static'} ]),
       //define magic constants that are replaced
       new webpack.DefinePlugin({
         'process.env': {

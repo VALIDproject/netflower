@@ -36,6 +36,7 @@
   "devDependencies": {
     "@types/jasmine": "2.5.41",
     "awesome-typescript-loader": "3.0.3",
+    "copy-webpack-plugin": "^4.6.0",
     "css-loader": "0.26.1",
     "extract-text-webpack-plugin": "2.0.0-rc.3",
     "extract-loader": "0.1.0",
