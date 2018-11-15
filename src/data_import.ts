@@ -228,6 +228,18 @@ class DataImport implements MAppViews {
       this.currentTab = $(e.target).text().trim();
     });
 
+    // check if file is passed via URL
+    const urlPart = document.URL.match(/\?.*data=(.*)/);
+    if (urlPart != null) {
+      const newFileName = urlPart[1].replace(/^.*[\\\/]/, '')                 // 2: Remove everyhting before last slash or backslash
+            .split('.')                               // 3: Split it at the dot which is the extension afterwards
+            .slice(0, -1)                             // 4: Remove the rest
+            .join('.');
+      if (newFileName !== localStorage.getItem('fileName')) {
+        this.handleFileUrl(urlPart[1]);
+      }
+    }
+
     // Listener for the upload button
     this.$node.select('#submitFile')
       .on('click', (e) => {

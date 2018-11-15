@@ -96,6 +96,8 @@ class ValidHeader implements MAppViews {
               localforage.clear();
               // Remove all elements that get not created from the DOM
               d3.select('.dataVizView').selectAll('*').remove();
+              // remove a data URL parameter
+              window.history.pushState('', '', '/app.html');
               // Force reload and loose all data
               location.reload(true);
             } else {
