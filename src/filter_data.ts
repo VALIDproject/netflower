@@ -20,6 +20,7 @@ import {AppConstants} from './app_constants';
 import {splitAt, splitQuarter} from './utilities';
 import FilterPipeline from './filters/filterpipeline';
 import TimeFilter from './filters/timeFilter';
+import TagFlowFilter from './filters/tagFlowFilter';
 import ParagraphFilter from './filters/paragraphFilter';
 import EntityEuroFilter from './filters/entityEuroFilter';
 import MediaEuroFilter from './filters/mediaEuroFilter';
@@ -33,6 +34,7 @@ class FilterData implements MAppViews {
   private $node: d3.Selection<any>;
   private pipeline: FilterPipeline;
   private timeFilter: TimeFilter;
+  private tagFlowFilter: TagFlowFilter;
   private paragraphFilter: ParagraphFilter;
 
   constructor(parent: Element, private options: any)
@@ -42,8 +44,10 @@ class FilterData implements MAppViews {
     // Create Filters
     this.timeFilter = new TimeFilter();
     this.paragraphFilter = new ParagraphFilter();
+    this.tagFlowFilter = new TagFlowFilter();
     // Add Filters to Pipeline
     this.pipeline.addFilter(this.timeFilter);
+    this.pipeline.changeTagFlowFilter(this.tagFlowFilter);
     this.pipeline.addAttributeFilter(this.paragraphFilter);
 
     this.$node = d3.select(parent)
@@ -78,9 +82,6 @@ class FilterData implements MAppViews {
        <br/>
          <div class='form-group' style='display: flex;'>
             <ul class='list-group list-inline' id='selectable'></ul>
-            <!--<p id='informationTextTimeSelection'>1) Click & Drag mouse for rectangle selection.<br/>
-            2) Click one elment to make a single selection.<br/>
-            3) CTRL + Click to make a multi selection.</p>-->
          </div>
          <div class='form-group'>
            <button id='btnSelectAll' class='btn btn-xs btn-info'>Select All</button>
@@ -146,6 +147,11 @@ class FilterData implements MAppViews {
       const filterTime = this.timeFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
 
+      events.on(AppConstants.EVENT_FILTER_DEACTIVATE_TAG_FLOW_FILTER, (evt, data) => {
+        this.tagFlowFilter.active = false;
+        $('#tagFlowFilter').val(-1);
+      });
+
       // Reset all Labels afterwards
       textTransition(d3.select('#currentTimeInfo'),
         `Selected: ${TimeFormat.format(timePoints[timePoints.length - 1])}`,
@@ -177,6 +183,7 @@ class FilterData implements MAppViews {
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
       events.fire(AppConstants.EVENT_FILTER_CHANGED, 'changed');
       events.fire(AppConstants.EVENT_TIME_VALUES, [timePoints[timePoints.length - 1]]);
+      events.fire(AppConstants.EVENT_FILTER_DEACTIVATE_TAG_FLOW_FILTER, 'changed');
       SimpleLogging.log(AppConstants.EVENT_CLEAR_FILTERS, 0);
     });
 
@@ -196,6 +203,21 @@ class FilterData implements MAppViews {
       const filterTime = this.timeFilter.meetCriteria(json);
       const paraFilterData = this.paragraphFilter.meetCriteria(filterTime);
       events.fire(AppConstants.EVENT_SLIDER_CHANGE, paraFilterData);
+      events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
+    });
+
+    // Listener for the change of the tag flow filter
+    $('#tagFlowFilter').on('change', (d) => {
+      const value:string = $('#tagFlowFilter').val().toString();
+
+      if(value === '1')
+      {
+        this.tagFlowFilter.active = true;
+        SimpleLogging.log('tag flow filter', 'activated');
+      } else {
+        this.tagFlowFilter.active = false;
+        SimpleLogging.log('tag flow filter', ' disabled');
+      }
       events.fire(AppConstants.EVENT_FILTER_CHANGED, d, json);
     });
 
@@ -324,6 +346,7 @@ class FilterData implements MAppViews {
           200);
       } else {
         bootbox.alert({
+          title: 'Warning',
           message: NO_TIME_POINTS,
           backdrop: true,
           className: 'dialogBox',

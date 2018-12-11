@@ -42,7 +42,7 @@ interface MAppViewsDesc {
 export class App implements MAppViews {
 
   private $node;
-    private counter;
+  private counter;
 
   /**
    * Enter here the views you want to append. You can choose between either the
@@ -64,7 +64,7 @@ export class App implements MAppViews {
       parent: 'app',
       options: {},
     },
-     {
+    {
       view: 'FilterData',
       parent: 'dataVizView',
       options: {}
@@ -114,12 +114,18 @@ export class App implements MAppViews {
       view: 'FlowSorter',
       parent: 'dataVizView',
       // options: {'parentDOM' : 'div.clearBox'},
-      options: {'parentDOM' : 'div.sankey_features div.col-md-2'},
+      options: {'sortBySelector' : 'div.sankey_features div#sortBySelector',
+        'orderBySelector' : 'div.sankey_features div#orderBySelector'},
     },
     {
       view: 'SimpleLogging',
       parent: 'dataVizView',
       options: {'parentDOM' : 'div.clearBox'},
+    },
+    {
+      view: 'HelpWindow',
+      parent: 'app',
+      options: {'parentDOM' : 'div#socialMedia'},
     }
   ];
 
@@ -167,7 +173,7 @@ export class App implements MAppViews {
    * @returns {Promise<App>}
    */
   private build() {
-       this.setBusy(true); // show loading indicator before loading
+    this.setBusy(true); // show loading indicator before loading
 
     // wrap view ids from package.json as plugin and load the necessary files
     const pluginPromises = this.views

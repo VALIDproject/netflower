@@ -138,13 +138,13 @@ export default class EntityEuroFilter implements Filter
 
       if (first)
       {
-        minValue = totalAmount;
+        // minValue = totalAmount;
         maxValue = totalAmount;
         first = false;
       }
 
-      if (totalAmount < minValue)
-        minValue = totalAmount;
+      // if (totalAmount < minValue)
+      //   minValue = totalAmount;
 
       if (totalAmount > maxValue)
       {
@@ -152,7 +152,8 @@ export default class EntityEuroFilter implements Filter
       }
     }
 
-    this._minValue = Math.floor(minValue);
+    // this._minValue = Math.floor(minValue);
+    this._minValue = 0;
     this._maxValue = Math.ceil(maxValue);
   }
 

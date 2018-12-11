@@ -104,7 +104,7 @@ class SankeyDetail implements MAppViews {
    * @param clickedPath is the node which was clicked by the user
    * @param json is the whole data set in order to retrieve all time points for the current node
    */
-  private drawDetails (clickedPath, json, coordinates) {
+  private drawDetails(clickedPath, json, coordinates) {
     const margin = {top: 50 , right: 60, bottom: 60, left: 60},
       w = 400 - margin.left - margin.right,
       h = 200 - margin.top - margin.bottom;
@@ -293,7 +293,8 @@ class SankeyDetail implements MAppViews {
 
     // Filter data based on the clicked path (sourceName and targetName) and store it
     const path = json.filter((obj) => {
-      return obj.sourceNode === sourceName && obj.targetNode === targetName;
+      return (obj.sourceNode === sourceName && obj.targetNode === targetName) ||
+        (obj.sourceTag === sourceName && obj.targetTag === targetName);
     });
 
     // Data for the bar chart

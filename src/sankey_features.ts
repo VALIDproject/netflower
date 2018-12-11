@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 import * as localforage from 'localforage';
 import * as $ from 'jquery';
 import * as bootbox from 'bootbox';
+import * as d3_save_svg from 'd3-save-svg';
 import {MAppViews} from './app';
 import {AppConstants} from './app_constants';
 
@@ -37,27 +38,37 @@ class SankeyFeatures implements MAppViews {
    * Build the basic DOM elements
    */
   private build() {
-     this.$node.html(`
+    this.$node.html(`
       <div class='container-fluid'>
       	<div class='row'>
-      		<div class='col-md-3'>
+      	  <!--First section on the left with filters-->
+      		<div class='col-md-5'>
             <div class='row'>
-              <div class='col-sm-4'>
+              <div class='col-sm-2'>
                 <h5>Filter</h5>
               </div>
               <div class='col-sm-4' style='margin-top: 7px;'>
                 <button id='clearAllBtn' class='label'
                   style='background: #45B07C; font-weight: normal;'><i class='fa fa-times'></i> Clear All</button>
               </div>
+              <div class='col-sm-4'>
+                <h5>View Flow between:</h5>
+              </div>
             </div>
       			<div class='row'>
-              <div class='col-md-4'>
-                <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>      						
+              <div class='col-md-2'>
+                <button id='btnTimeDialog' class='btn btn-default btn_design'>Time</button>
               </div>
               <div class='col-md-4'>
                   <div class='btn-group'>
-                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>      						
+                    <button id='btnAttributeDialog' class='btn btn-default btn_design'>Connection Filter</button>
                   </div>
+                </div>
+                <div class='col-md-4'>
+                  <select class='form-control input-sm' id='tagFlowFilter'>
+                     <option value='-1' selected>nodes</option>
+                     <option value='1'>tags</option>
+                  </select>
                 </div>
       			</div>
       			<div class='row'>
@@ -69,41 +80,45 @@ class SankeyFeatures implements MAppViews {
       			</div>
       		</div>
 
-          <!--Global Filters-->
-          <!--<div class='col-md-3'>
-            <div class='row'>
-              <div class='col-md-12'>
-                <div class='row'>
-                  <div class='col-md-6' id = 'btn_above'>
-                    <h5>Show State <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>                   
-                    <button type='button' class='btn btn-default btn_design'>Number of Links</button>
-                  </div>
-                  <div class='col-md-6' id = 'btn_above'>
-                    <h5>Show Change <i class='fa fa-question-circle' aria-hidden='true'></i></h5>
-                    <button type='button' class='btn btn-default btn_design'>Absolute Value</button>
-                    <button type='button' class='btn btn-default btn_design'>Relative Value</button>
-                  </div>
-                </div>
+      		<!--Second section with the sort options in hte middle-->
+      		<div class='col-md-3'>
+      		  <div class='row'>
+      		    <div class='col-sm-5'>
+      		      <h5>Sort & Order</h5>
               </div>
             </div>
-          </div>-->
+      		  <div class='row' style='margin-bottom: 5px;'>
+      		    <div class='col-sm-3'>
+      		      <label style='margin-top: 5px;'>Sort by:</label>
+      		    </div>
+      		    <div class='col-sm-6' id='sortBySelector'></div>
+            </div>
+            <div class='row'>
+              <div class='col-sm-3'>
+      		      <label style='margin-top: 5px;'>Order:</label>
+      		    </div>
+      		    <div class='col-sm-6' id='orderBySelector'></div>
+            </div>
+          </div>
 
-        <!--Export Settings-->
-        <div class='col-md-2'>
-          <h5>Export Settings</h5>
-          <button type='button' class='btn btn-default btn_design' id='exportData'>
-            Export Data
-          </button>
-        </div>
+          <!--Export Settings-->
+          <div class='col-md-2'>
+            <h5>Miscellaneous</h5>
+            <button type='button' class='btn btn-default btn_design' id='exportData'>
+              Export Data
+            </button>
+            <div class='custom-control custom-checkbox' style='margin-top: 4px;'>
+              <input type='checkbox' class='custom-control-input' id='exportCheckbox'>
+              <label class='custom-control-label' for='exportCheckbox'>Only Visible Elements</label>
+            </div>
+          </div>
 
-          <!--Notebook
-      		<div class='col-md-2'>
-      			<h5>Notebook</h5>
-      			<button type='button' class='btn btn-default btn_design'>
-      				Notebook
-      			</button>
-      		</div>-->
+          <!--Global Filters-->
+          <div class='col-md-2'>
+            <h5>Download SVG</h5>
+             <button id='getSVGBtn' type='button' class='btn btn-default btn_design'>Get SVG</button>
+             <p><small>Note: Only visible flows will be exported.</small></p>
+          </div>
       	</div>
       </div>
     `);
@@ -115,6 +130,15 @@ class SankeyFeatures implements MAppViews {
   private attachListener() {
     this.$node.select('#clearAllBtn').on('click', (d) => {
       events.fire(AppConstants.EVENT_CLEAR_FILTERS, d, null);
+    });
+
+    this.$node.select('#getSVGBtn').on('click', (d) => {
+      const chart = d3.select('#sankeyDiagram > svg');
+      const date = new Date();
+      const config = {
+        filename: 'sankeyFlow ' + date.toDateString(),
+      };
+      d3_save_svg.save(chart.node(), config);
     });
   }
 }

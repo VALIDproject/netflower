@@ -48,7 +48,8 @@ class ValidHeader implements MAppViews {
     }
 
     this.$node.html(`
-    <div class='logo'>NETFLOWER</div>
+    <!--<div class='logo'>NETFLOWER</div>-->
+    <div class='netflowerLogo'></div>
     <div class='btn_preupload'>
     <span id='backBtn'><i class='fa fa-folder-open-o fa-2x'></i>
      <span id='textBackBtn'>${fileName.replace('.csv', '')}</span>
@@ -57,12 +58,19 @@ class ValidHeader implements MAppViews {
     <div class='timeInfoBox invisibleClass'><div style='font-size: 0.9em;'>Viewing Timestamps: </div>
       <div id='timeInfoHeader'></div>
     </div>
-    <div class='valid_logo'></div>
-    <div id='socialMedia'>
-        <p><a href='https://twitter.com/valid_at' target ='blank'><i class='fa fa-twitter-square fa-2x' id='web' ></i></a> </p>
-        <p><a href='https://github.com/VALIDproject' target='blank'> <i class='fa fa-github fa-2x' id='web'></i></a> </p>
-        <p><a href='http://www.validproject.at/' target ='blank'><i class='fa fa-globe fa-2x' id='web'></i></a></p>
+        <div id='socialMedia'>
+        <p><a href='imprint.html'
+          target='blank' title='Legal Disclosure'><i class='fa fa-info fa-2x web'></i></a></p>
+        <p><a href='https://twitter.com/valid_at' 
+          target='blank' title='Twitter'><i class='fa fa-twitter-square fa-2x web'></i></a> </p>
+        <p><a href='https://github.com/VALIDproject' 
+          target='blank' title='Github Code'> <i class='fa fa-github fa-2x web'></i></a> </p>
+        <p><a href='http://www.validproject.at/' 
+          target='blank' title='Project Website'><i class='fa fa-globe fa-2x web'></i></a></p>
+        <p><a href='index.html' 
+          target='blank' title='Home'><i class='fa fa-home fa-2x web'></i></a></p>
     </div>
+    <div class='valid_logo'></div>
     `);
   }
 
@@ -118,9 +126,9 @@ class ValidHeader implements MAppViews {
   }
 
   private shrinkHeader(): void {
-    $(document).on('scroll', function(){
+    $(document).on('scroll', function () {
       if ($(document).scrollTop() > 100) {
-        $('.logo').addClass('shrink');
+        $('.netflowerLogo').addClass('shrink');
         $('#validHeader').addClass('shrink');
         $('#socialMedia').addClass('shrink');
         $('.valid_logo').addClass('shrink');
@@ -130,14 +138,14 @@ class ValidHeader implements MAppViews {
         $('.btn_preupload').attr('style', 'margin-top: 3px;');
         $('#textBackBtn').attr('style', 'margin-top: 0px;');
       } else {
-        $('.logo').removeClass('shrink');
+        $('.netflowerLogo').removeClass('shrink');
         $('#validHeader').removeClass('shrink');
         $('#socialMedia').removeClass('shrink');
         $('.valid_logo').removeClass('shrink');
         $('.timeInfoBox').addClass('invisibleClass');
         $('.btn_preupload i').removeClass('fa fa-folder-open-o');
         $('.btn_preupload i').addClass('fa fa-folder-open-o fa-2x');
-        $('.btn_preupload').attr('style', 'margin-top: 7px;');
+        $('.btn_preupload').attr('style', 'margin-top: 12px;');
         $('#textBackBtn').attr('style', 'margin-top: 6px;');
       }
     });
