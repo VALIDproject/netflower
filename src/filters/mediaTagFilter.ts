@@ -70,7 +70,7 @@ export default class MediaTagFilter extends TagFilter
   {
     const resultSet:d3.Set = d3.set([]);
     for(const entry of data) {
-      if(entry.targetNode.trim() === val) {
+      if(entry.targetNode.trim() === val.trim()) {
         const tagsAsText:string = entry.targetTag;
         if (tagsAsText !== undefined) {
           const values:Array<string> = tagsAsText.split('|');
