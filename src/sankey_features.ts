@@ -137,7 +137,7 @@ class SankeyFeatures implements MAppViews {
       const date = new Date();
       const config = {
         filename: 'sankeyFlow ' + date.toDateString(),
-      }
+      };
       d3_save_svg.save(chart.node(), config);
     });
   }
